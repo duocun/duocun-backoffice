@@ -29,7 +29,6 @@ import CategoryIcon from '@material-ui/icons/Category';
 // core components/views for Admin layout
 import DashboardPage from "views/Dashboard/Dashboard.js";
 import UserProfile from "views/UserProfile/UserProfile.js";
-import OrderList from "views/Orders/OrderList.js";
 
 import TableList from "views/TableList/TableList.js";
 
@@ -40,6 +39,7 @@ import NotificationsPage from "views/Notifications/Notifications.js";
 import CategoriesPage from "views/Categories/Categories.js";
 import ProductPage from "views/Products/Products.js";
 import AttributePage from "views/Attributes/Attributes.js";
+import OrderPage from "views/Orders/OrderPage.js";
 
 import AccountPage from "views/Accounts/AccountPage";
 import MerchantPage from "views/Merchants/MerchantPage";
@@ -81,17 +81,17 @@ const dashboardRoutes = [
     layout: "/"
   },
   {
-    path: "/merchant",
+    path: "/merchants",
     name: "Merchant",
     icon: "content_paste",
     component: MerchantPage,
     layout: "/"
   },
   {
-    path: "/order",
-    name: "Order List",
+    path: "/orders",
+    name: "Order",
     icon: "content_paste",
-    component: OrderList,
+    component: OrderPage,
     layout: "/"
   },
   {
