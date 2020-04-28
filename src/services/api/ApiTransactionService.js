@@ -8,22 +8,15 @@ export default {
       query.query = buildPaginationQuery(page, pageSize, {}, [], sort);
     } else {
       const condition = {
-        // $or: [{
-        //     fromName:{
-        //         $regex: search
-        //       }
-        //   },
-        //   {
-        //     toName: {
-        //         $regex: search
-        //       }
-        //   }
-        // ]
         $or: [{
-            fromName: search
+            fromName:{
+                $regex: search
+              }
           },
           {
-            toName: search
+            toName: {
+                $regex: search
+              }
           }
         ]
       };

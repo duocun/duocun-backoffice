@@ -3,6 +3,11 @@ import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
 
+import moment from 'moment';
+import { DateRangePicker } from "react-dates";
+import 'react-dates/initialize';
+import 'react-dates/lib/css/_datepicker.css';
+
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
 
@@ -48,6 +53,9 @@ export default function FinanceDetails({ location }) {
   const classes = useStyles();
   // states related to list and pagniation
   const [transactions, setTransactions] = useState([]);
+  const [startDate, setStartDate] = useState(moment());
+  const [endDate, setEndDate] = useState(moment());
+  const [focusDate, setFocusDate] = useState('START_DATE');
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(
     getQueryParam(location, "page")
@@ -166,7 +174,7 @@ export default function FinanceDetails({ location }) {
               </IconButton>
             </TableCell>
             <TableCell>
-              <IconButton aria-label="edit" href={`products/${row._id}`}>
+              <IconButton aria-label="edit" href={`finance/${row._id}`}>
                 <EditIcon />
               </IconButton>
               <IconButton aria-label="delete" disabled={processing}>
@@ -216,6 +224,20 @@ export default function FinanceDetails({ location }) {
                       {t("New Product")}
                     </Button>
                   </Box> */}
+                  <DateRangePicker
+                    startDate={startDate} // momentPropTypes.momentObj or null,
+                    startDateId="your_unique_start_date_id" // PropTypes.string.isRequired,
+                    endDate={endDate} // momentPropTypes.momentObj or null,
+                    endDateId="your_unique_end_date_id" // PropTypes.string.isRequired,
+                    onDatesChange={({ startDate, endDate }) =>
+                      {
+                        setStartDate(startDate);
+                        setEndDate(endDate);
+                      }
+                    } // PropTypes.func.isRequired,
+                    focusedInput={focusDate}
+                    onFocusChange={focusDate => setFocusDate(focusDate)}
+                  />
 
                   <Searchbar
                     onChange={(e) => {
@@ -247,7 +269,7 @@ export default function FinanceDetails({ location }) {
                   <TableContainer>
                     <Table
                       className={classes.table}
-                      aria-label="Product Table"
+                      aria-label="Transaction Table"
                       size="small"
                     >
                       <TableHead>
@@ -256,7 +278,6 @@ export default function FinanceDetails({ location }) {
                           {/* <TableCell>{t("Image")}</TableCell> */}
                           <TableCell
                             onClick={() => {
-                              console.log('yeah')
                               toggleSort("created");
                             }}
                             style={{ cursor: "pointer" }}
