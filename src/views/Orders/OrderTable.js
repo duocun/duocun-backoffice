@@ -92,6 +92,10 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
     }
   };
 
+  const toDateString = s => {
+    return s ? s.split('T')[0] : '';
+  }
+
   if (!rows.length) {
     return (
       <TableRow>
@@ -139,6 +143,15 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
             >
               {t("Client")}
               {renderSort("clientName")}
+            </TableCell>
+            <TableCell
+              onClick={() => {
+                toggleSort("client");
+              }}
+              style={{ cursor: "pointer" }}
+            >
+              {t("Client Phone")}
+              {renderSort("client")}
             </TableCell>
             <TableCell
               onClick={() => {
@@ -192,9 +205,10 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
                   <TableRow key={idx}>
                     <TableCell>{page * rowsPerPage + idx + 1}</TableCell>
                     <TableCell>{row.code}</TableCell>
-                    <TableCell>{row.delivered}</TableCell>
-                    <TableCell>{row.clientName}</TableCell>
-                    <TableCell>{row.merchantName}</TableCell>
+                    <TableCell>{toDateString(row.delivered)}</TableCell>
+                    <TableCell>{row.client.username}</TableCell>
+                    <TableCell>{row.client.phone}</TableCell>
+                    <TableCell>{row.merchant.name}</TableCell>
                     <TableCell>{row.price}</TableCell>
                     <TableCell>{row.cost}</TableCell>
                     <TableCell>
