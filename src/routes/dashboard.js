@@ -74,8 +74,8 @@ const dashboardRoutes = [
     layout: "/"
   },
   {
-    path: "/account",
-    name: "Account",
+    path: "/accounts",
+    name: "Accounts",
     icon: Person,
     component: AccountPage,
     layout: "/"
