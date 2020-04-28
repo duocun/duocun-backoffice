@@ -1,0 +1,24 @@
+language: node_js
+node_js:
+  - "12.14.0"
+
+branches:
+  only:
+    - master
+
+cache:
+  directories:
+    - node_modules
+
+script:
+  - npm run test
+  - npm run build
+
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GITHUB_TOKEN
+  keep-history: true
+  on:
+    branch: master
+  local_dir: build

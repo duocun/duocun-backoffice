@@ -26,7 +26,7 @@ export default class ApiService {
   static v2() {
     return new ApiService(API_HOST); // API_V2_HOST
   }
-
+  
   buildUrl(url, param = null) {
     url = this.apiHost + (url.startsWith("/") ? url : `/${url}`);
     if (!param) {
