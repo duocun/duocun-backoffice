@@ -15,7 +15,10 @@ const AuthService = () => {
       return window.localStorage.getItem(TOKEN_KEY);
     },
     isAuthorized: user => {
-      return user && user._id && user.roles.includes(ADMIN_ROLE_ID);
+      return (
+        // for users without any role, it will throw an exception
+        user && user._id && user.roles && user.roles.includes(ADMIN_ROLE_ID)
+      );
     }
   };
 };
