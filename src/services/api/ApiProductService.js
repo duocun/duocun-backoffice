@@ -26,5 +26,9 @@ export default {
   saveProduct: model => {
     model._id = model._id || "new";
     return ApiService.v2().post(`products/${model._id}`, model);
+  },
+  changeStatus: (productId,currentStatus)=>{
+    const data = {status: currentStatus==='A'? 'I':'A'}
+    return ApiService.v2().put('products/?productId=' + productId, data);
   }
 };

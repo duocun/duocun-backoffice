@@ -19,7 +19,7 @@ import TableHead from "@material-ui/core/TableHead";
 import TablePagination from "components/Table/TablePagniation.js";
 import TableRow from "@material-ui/core/TableRow";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
-
+import ThreeSixtyIcon from '@material-ui/icons/ThreeSixty';
 import IconButton from "@material-ui/core/IconButton";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -64,6 +64,16 @@ export default function Product({ location }) {
     FlashStorage.get("PRODUCT_ALERT") || { message: "", severity: "info" }
   );
   const [processing, setProcessing] = useState(false);
+
+  const onChangeProductStatus = (rowId,currentStatus) =>{
+   
+    ApiProductService.changeStatus(rowId,currentStatus).then(
+      (r)=>{
+        console.log("status change, result: " + r);
+      }
+    )
+    console.log("productId " + rowId);
+  }
 
   const updateData = () => {
     ApiProductService.getProductList(page, rowsPerPage, query, [sort]).then(
@@ -167,6 +177,9 @@ export default function Product({ location }) {
               </IconButton>
               <IconButton aria-label="delete" disabled={processing}>
                 <DeleteIcon />
+              </IconButton>
+              <IconButton aria-label="status" disabled={processing} onClick={()=> onChangeProductStatus(row._id,row.status)}>
+                <ThreeSixtyIcon />
               </IconButton>
             </TableCell>
           </TableRow>
