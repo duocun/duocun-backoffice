@@ -265,7 +265,7 @@ export default function FinanceTablePage({ location }) {
                 </GridItem>
               </GridContainer>
             </CardBody>
-            <CardFooter>
+            {/* <CardFooter>
               {!loading && (
                 <TablePagination
                   rowsPerPage={rowsPerPage}
@@ -278,7 +278,7 @@ export default function FinanceTablePage({ location }) {
                   }}
                 ></TablePagination>
               )}
-            </CardFooter>
+            </CardFooter> */}
           </Card>
         </GridItem>
       </GridContainer>

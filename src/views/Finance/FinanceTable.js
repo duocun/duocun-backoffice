@@ -19,8 +19,6 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import CheckIcon from "@material-ui/icons/Check";
 import CloseIcon from "@material-ui/icons/Close";
 
-import ApiTransactionService from "services/api/ApiTransactionService";
-
 const styles = {
   cardCategoryWhite: {
     "&,& a,& a:hover,& a:focus": {
