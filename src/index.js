@@ -12,8 +12,6 @@ import lang from "./assets/i18n";
 import Root from "./routes/root";
 // styles
 import "assets/css/material-dashboard-react.css?v=1.8.0";
-//datepicker css
-import "react-dates/lib/css/_datepicker.css";
 
 i18n.use(initReactI18next).init({
   resources: lang,
