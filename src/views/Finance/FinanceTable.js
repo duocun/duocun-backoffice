@@ -19,6 +19,9 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import CheckIcon from "@material-ui/icons/Check";
 import CloseIcon from "@material-ui/icons/Close";
 
+//helper function
+import { toDateString } from "../../helper";
+
 const styles = {
   cardCategoryWhite: {
     "&,& a,& a:hover,& a:focus": {
@@ -126,10 +129,6 @@ export const FinanceTable = ({
 //         setProcessing(false);
 //       });
 //   };
-
-  const toDateString = (s) => {
-    return s ? s.split("T")[0] : "";
-  };
 
   const renderRows = (rows) => {
     if (!rows.length) {
