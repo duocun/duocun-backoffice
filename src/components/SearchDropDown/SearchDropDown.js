@@ -20,48 +20,49 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "white",
     width: "182px",
     right: "43px",
+    boxShadow: "0px 0px 5px 0px rgba(0,0,0,0.75)",
+    maxHeight: "250px",
+    overflow: "scroll",
     [theme.breakpoints.down("sm")]: {
       width: "60%",
       right: "58px",
     },
   },
-  ListItem:{
-    color:'black',
-    "& :hover":{
-      cursor:"pointer"
-    }
-  }
+  ListItem: {
+    color: "black",
+    "& :hover": {
+      cursor: "pointer",
+    },
+  },
 }));
 
-const SearchDropDown = ({ data, onClick, hide = true }) => {
+const SearchDropDown = ({ data, onClick, show = false }) => {
   const classes = useStyles();
   const { t } = useTranslation();
 
   const [dense, setDense] = React.useState(false);
   const [secondary, setSecondary] = React.useState(false);
 
-  function generate(element) {
-    return [0, 1, 2].map((value) =>
-      React.cloneElement(element, {
-        key: value,
-      })
-    );
+  function generate(data) {
+    return data.map((item) => {
+      let text = item.phone ? item.username + " " + item.phone : item.username;
+      return (
+        <ListItem key={item._id}>
+          <ListItemText primary={text} className={classes.ListItem} />
+        </ListItem>
+      );
+    });
   }
 
-  const defineVisibility = (hide) => hide ? "hidden" : "visible";
+  const defineVisibility = (show) => (show ? "visible" : "hidden");
 
   return (
-    <div className={classes.searchDropDpwnWrapper} style={{visibility:defineVisibility(hide)}}>
+    <div
+      className={classes.searchDropDpwnWrapper}
+      style={{ visibility: defineVisibility(show) }}
+    >
       <List dense={dense} className={classes.list}>
-        {generate(
-          <ListItem>
-            <ListItemText
-              primary="Single-line item"
-              secondary={secondary ? "Secondary text" : null}
-              className={classes.ListItem}
-            />
-          </ListItem>
-        )}
+        {generate(data)}
       </List>
     </div>
   );
@@ -70,7 +71,7 @@ const SearchDropDown = ({ data, onClick, hide = true }) => {
 SearchDropDown.propTypes = {
   onClick: PropTypes.func,
   data: PropTypes.array,
-  hide: PropTypes.bool
+  hide: PropTypes.bool,
 };
 
 export default SearchDropDown;

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
+import { connect } from "react-redux";
 
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
@@ -20,16 +21,21 @@ import ApiTransactionService from "services/api/ApiTransactionService";
 
 import { getQueryParam } from "helper/index";
 import FlashStorage from "services/FlashStorage";
-import { Button, Box } from "@material-ui/core";
 
 import { FinanceTable } from "./FinanceTable";
+
+//redux actions
+import { loadAccountsAsync } from "redux/actions/account";
+
+import { Throttle } from "react-throttle";
 
 const useStyles = makeStyles(() => ({
   table: {
     minWidth: 750,
   },
 }));
-export default function FinanceTablePage({ location }) {
+
+function FinanceTablePage({ location, accounts, loadAccounts }) {
   const { t } = useTranslation();
   const classes = useStyles();
   // states related to list and pagniation
@@ -44,16 +50,28 @@ export default function FinanceTablePage({ location }) {
   const [totalRows, setTotalRows] = useState(0);
   const [query, setQuery] = useState(getQueryParam(location, "search") || "");
   const [sort, setSort] = useState(["_id", 1]);
+  const [selectUserName, setSelectUserName] = useState('');
+  const [showList, setShowList] = useState(false);
 
   // states related to processing
   const [alert, setAlert] = useState(
     FlashStorage.get("TRANSACTION_ALERT") || { message: "", severity: "info" }
   );
-  const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
     updateData();
-  }, [page, rowsPerPage, sort]);
+  }, [page, rowsPerPage, sort, selectUserName]);
+
+  useEffect(() => {
+    if (query) {
+      loadAccounts(query);
+    }
+  }, [query]);
+
+  const handleOnchange = (e) => {
+    const { target } = e;
+    setQuery(target.value);
+  };
 
   const updateData = () => {
     ApiTransactionService.getTransactionList(page, rowsPerPage, query, [
@@ -72,10 +90,13 @@ export default function FinanceTablePage({ location }) {
     });
   };
 
-  useEffect(() => {
-    updateData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, rowsPerPage, sort]);
+  const handleShowList = () =>{
+    setShowList(true)
+  }
+
+  const handleHideList = () =>{
+    setShowList(false)
+  }
 
   return (
     <div>
@@ -88,23 +109,25 @@ export default function FinanceTablePage({ location }) {
                   <h4>{t("Finance")}</h4>
                 </GridItem>
                 <GridItem xs={12} lg={6} align="right">
-                  <Searchbar
-                    onChange={(e) => {
-                      const { target } = e;
-                      setQuery(target.value);
-                    }}
-                    onSearch={() => {
-                      setLoading(true);
-                      if (page === 0) {
-                        updateData();
-                      } else {
-                        setPage(0);
-                      }
-                    }}
-                  />
+                  <Throttle time="1000" handler="onChange">
+                    <Searchbar
+                      onChange={handleOnchange}
+                      onSearch={() => {
+                        setLoading(true);
+                        if (page === 0) {
+                          updateData();
+                        } else {
+                          setPage(0);
+                        }
+                      }}
+                      onFocus={handleShowList}
+                      onBlur={handleHideList}
+                    />
+                  </Throttle>
                   <SearchDropDown
-                    data={[]}
-                    onClick={() => console.log("yeah")}
+                    data={accounts}
+                    // onClick={setSelectUserName}
+                    show={showList}
                   />
                 </GridItem>
               </GridContainer>
@@ -133,20 +156,6 @@ export default function FinanceTablePage({ location }) {
                 </GridItem>
               </GridContainer>
             </CardBody>
-            {/* <CardFooter>
-              {!loading && (
-                <TablePagination
-                  rowsPerPage={rowsPerPage}
-                  page={page}
-                  onChangePage={(e, newPage) => setPage(newPage)}
-                  count={totalRows}
-                  onChangeRowsPerPage={({ target }) => {
-                    setPage(0);
-                    setRowsPerPage(target.value);
-                  }}
-                ></TablePagination>
-              )}
-            </CardFooter> */}
           </Card>
         </GridItem>
       </GridContainer>
@@ -156,4 +165,17 @@ export default function FinanceTablePage({ location }) {
 
 FinanceTablePage.propTypes = {
   location: PropTypes.object,
+  loadAccounts: PropTypes.func,
+  accounts: PropTypes.array
 };
+
+const mapStateToProps = (state) => ({ accounts: state.accounts });
+const mapDispatchToProps = (dispatch) => ({
+  loadAccounts: (payload) => {
+    dispatch(loadAccountsAsync(payload));
+  },
+});
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(FinanceTablePage);

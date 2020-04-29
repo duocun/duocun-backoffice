@@ -2,7 +2,6 @@ import ApiService from "services/api/ApiService";
 import { buildPaginationQuery } from "helper/index";
 export default {
   getTransactionList: (page, pageSize, search = "", sort = []) => {
-      console.log(search)
     let query = {};
     if (!search) {
       query.query = buildPaginationQuery(page, pageSize, {}, [], sort);

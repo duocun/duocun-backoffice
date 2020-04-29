@@ -102,3 +102,20 @@ export const getAllCombinations = (groupData) => {
 export const toDateString = (s = null) => {
   return s ? s.split("T")[0] : "";
 };
+
+//debounce not really good
+
+// export function debounce(func, args, wait, immediate = false) {
+// 	var timeout;
+// 	return function() {
+// 		var context = this;
+// 		var later = function() {
+//       timeout = null;
+// 			if (!immediate) func.call(context, args);
+// 		};
+// 		var callNow = immediate && !timeout;
+// 		clearTimeout(timeout);
+// 		timeout = setTimeout(later, wait);
+// 		if (callNow) func.call(context, args);
+// 	};
+// };

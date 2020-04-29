@@ -1,11 +1,10 @@
 import ApiAccountService from "../../services/api/ApiAccountService";
 
-export const loadAccounts = (payload) => {
-  return (dispatch) => {
-    dispatch({ type: "LOAD_STARTED" });
-
-    ApiAccountService.getAccountList(payload).then(
-      (res) => dispatch(setAccounts(res)),
+export const loadAccountsAsync = (payload) => {
+    return (dispatch) => {
+    dispatch({ type: "LOAD_ACCOUNTS" });
+    ApiAccountService.getAccountAllKeyword(payload).then(res=>res.data).then(
+      (res) => dispatch(setAccounts(res.data)),
       (err) => {throw err}
     ).catch(err=>{
       console.log(err)
