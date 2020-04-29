@@ -37,7 +37,7 @@ import Icons from "views/Icons/Icons.js";
 import Maps from "views/Maps/Maps.js";
 import NotificationsPage from "views/Notifications/Notifications.js";
 import CategoriesPage from "views/Categories/Categories.js";
-import FinancePage from "views/Finance/Finance.js";
+import FinancePage from "views/Finance/FinancePage.js";
 import ProductPage from "views/Products/Products.js";
 import AttributePage from "views/Attributes/Attributes.js";
 import OrderPage from "views/Orders/OrderPage.js";
