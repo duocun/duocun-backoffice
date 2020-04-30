@@ -8,11 +8,37 @@ export default {
     } else {
       const condition = {
         username: {
-          $regex: search
-        }
+          $regex: search,
+        },
       };
       query.query = buildPaginationQuery(page, pageSize, condition, [], sort);
     }
     return ApiService.v2().get("accounts", query);
-  }
+  },
+  getAccountAllKeyword: (keyword = "") => {
+    // let isNum = /^\d+$/.test(keyword);
+    let query = {};
+    let condition = {};
+    // if (!isNum) {
+    condition = {
+      username: {
+        $regex: keyword,
+      },
+    };
+    // } else {
+    //   condition = {
+    //     phone: {
+    //       $regex: keyword,
+    //     },
+    //   };
+    // }
+    query.keyword = query.query = buildPaginationQuery(
+      null,
+      null,
+      condition,
+      [],
+      []
+    );
+    return ApiService.v2().get("accounts", query);
+  },
 };

@@ -31,12 +31,12 @@ export const buildPaginationQuery = (
     where: condition,
     options: {
       limit: pageSize,
-      skip: page * pageSize
-    }
+      skip: page * pageSize,
+    },
   };
   if (fields && fields.length) {
     const projection = {};
-    fields.forEach(field => {
+    fields.forEach((field) => {
       projection[field] = true;
     });
     query.options.projection = projection;
@@ -47,11 +47,11 @@ export const buildPaginationQuery = (
   return JSON.stringify(query);
 };
 
-export const groupAttributeData = flatData => {
+export const groupAttributeData = (flatData) => {
   const groupData = [];
-  flatData.forEach(data => {
+  flatData.forEach((data) => {
     const dataInGroup = groupData.find(
-      groupData => groupData.attrIdx === data.attrIdx
+      (groupData) => groupData.attrIdx === data.attrIdx
     );
     if (dataInGroup) {
       if (dataInGroup.valIndices) {
@@ -62,23 +62,23 @@ export const groupAttributeData = flatData => {
     } else {
       groupData.push({
         attrIdx: data.attrIdx,
-        valIndices: [data.valIdx]
+        valIndices: [data.valIdx],
       });
     }
   });
   return groupData;
 };
 
-export const getAllCombinations = groupData => {
+export const getAllCombinations = (groupData) => {
   if (!groupData.length) {
     return [];
   }
   if (groupData.length === 1) {
-    return groupData[0].valIndices.map(valIdx => [
+    return groupData[0].valIndices.map((valIdx) => [
       {
         attrIdx: groupData[0].attrIdx,
-        valIdx
-      }
+        valIdx,
+      },
     ]);
   }
   const result = [];
@@ -88,11 +88,34 @@ export const getAllCombinations = groupData => {
       result.push([
         {
           attrIdx: groupData[0].attrIdx,
-          valIdx: groupData[0].valIndices[j]
+          valIdx: groupData[0].valIndices[j],
         },
-        ...restCombinations[i]
+        ...restCombinations[i],
       ]);
     }
   }
   return result;
 };
+
+//dateString parser
+
+export const toDateString = (s = null) => {
+  return s ? s.split("T")[0] : "";
+};
+
+//debounce not really good
+
+// export function debounce(func, args, wait, immediate = false) {
+// 	var timeout;
+// 	return function() {
+// 		var context = this;
+// 		var later = function() {
+//       timeout = null;
+// 			if (!immediate) func.call(context, args);
+// 		};
+// 		var callNow = immediate && !timeout;
+// 		clearTimeout(timeout);
+// 		timeout = setTimeout(later, wait);
+// 		if (callNow) func.call(context, args);
+// 	};
+// };

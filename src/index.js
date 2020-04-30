@@ -1,8 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
-import { createStore } from "redux";
+import { createStore, applyMiddleware } from "redux";
 import rootReducer from "./redux/reducers";
+import { composeWithDevTools } from "redux-devtools-extension";
+import thunk from "redux-thunk";
 // i18n
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
@@ -16,11 +18,14 @@ i18n.use(initReactI18next).init({
   lng: process.env.NODE_ENV === "production" ? "zh" : "en",
   fallbackLng: "en",
   interpolation: {
-    escapeValue: false
-  }
+    escapeValue: false,
+  },
 });
 
-const store = createStore(rootReducer);
+const store = createStore(
+  rootReducer,
+  composeWithDevTools(applyMiddleware(thunk))
+);
 
 ReactDOM.render(
   <Provider store={store}>
