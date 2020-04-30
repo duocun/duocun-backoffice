@@ -25,6 +25,7 @@ import Notifications from "@material-ui/icons/Notifications";
 import LocalMallIcon from "@material-ui/icons/LocalMall";
 import EditAttributesIcon from '@material-ui/icons/EditAttributes';
 import CategoryIcon from '@material-ui/icons/Category';
+import StoreIcon from '@material-ui/icons/Store';
 
 // core components/views for Admin layout
 import DashboardPage from "views/Dashboard/Dashboard.js";
@@ -42,8 +43,8 @@ import ProductPage from "views/Products/Products.js";
 import AttributePage from "views/Attributes/Attributes.js";
 import OrderPage from "views/Orders/OrderPage.js";
 
-import AccountPage from "views/Accounts/AccountPage";
-import MerchantPage from "views/Merchants/MerchantPage";
+import AccountsPage from "views/Accounts/AccountsPage";
+import MerchantsPage from "views/Merchants/MerchantsPage";
 
 const dashboardRoutes = [
   {
@@ -85,14 +86,14 @@ const dashboardRoutes = [
     path: "/accounts",
     name: "Accounts",
     icon: Person,
-    component: AccountPage,
+    component: AccountsPage,
     layout: "/"
   },
   {
     path: "/merchants",
-    name: "Merchant",
-    icon: "content_paste",
-    component: MerchantPage,
+    name: "Merchants",
+    icon: StoreIcon,
+    component: MerchantsPage,
     layout: "/"
   },
   {
