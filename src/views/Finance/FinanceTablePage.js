@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
 import { connect } from "react-redux";
+import moment from "moment";
 
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
@@ -11,11 +12,10 @@ import SearchDropDown from "components/SearchDropDown/SearchDropDown.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-
-import moment from "moment";
-import Alert from "@material-ui/lab/Alert";
 import Searchbar from "components/Searchbar/Searchbar";
-import DatePicker from "components/TimePicker"; 
+import TimePicker from "components/TimePicker/TimePicker";
+
+import Alert from "@material-ui/lab/Alert";
 import ApiTransactionService from "services/api/ApiTransactionService";
 
 import { getQueryParam } from "helper/index";
@@ -52,8 +52,8 @@ function FinanceTablePage({ location, accounts, loadAccounts }) {
   const [selectUserId, setSelectUserId] = useState("");
   const [showList, setShowList] = useState(false);
 
-  const [startDate, setStartDate] = useState(moment().format())
-  const [endDate, setEndDate] = useState()
+  const [startDate, setStartDate] = useState(moment().utc().toISOString());
+  const [endDate, setEndDate] = useState(moment().utc().toISOString());
 
   // states related to processing
   const [alert, setAlert] = useState(
@@ -62,7 +62,7 @@ function FinanceTablePage({ location, accounts, loadAccounts }) {
 
   useEffect(() => {
     updateData();
-  }, [page, rowsPerPage, sort, selectUserId]);
+  }, [page, rowsPerPage, sort, selectUserId, startDate, endDate]);
 
   useEffect(() => {
     if (query) {
@@ -76,7 +76,7 @@ function FinanceTablePage({ location, accounts, loadAccounts }) {
   };
 
   const updateData = () => {
-    ApiTransactionService.getTransactionList(page, rowsPerPage, selectUserId, [
+    ApiTransactionService.getTransactionList(page, rowsPerPage, selectUserId, startDate, endDate, [
       sort,
     ]).then(({ data }) => {
       setTransactions(data.data);
@@ -118,8 +118,25 @@ function FinanceTablePage({ location, accounts, loadAccounts }) {
                   <h4>{t("Finance")}</h4>
                 </GridItem>
                 <GridItem xs={12} lg={6} align="right">
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <TimePicker
+                      label="Start Date"
+                      date={startDate}
+                      getDate={setStartDate}
+                    />
+                    <TimePicker
+                      label="End Date"
+                      date={endDate}
+                      getDate={setEndDate}
+                    />
+                  </div>
                   <Throttle time="1000" handler="onChange">
-                  <DatePicker />
                     <Searchbar
                       value={query}
                       onChange={handleOnchange}

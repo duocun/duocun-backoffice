@@ -1,10 +1,14 @@
 import ApiService from "services/api/ApiService";
 import { buildPaginationQuery } from "helper/index";
 export default {
-  getTransactionList: (page, pageSize, search = "", sort = []) => {
+  getTransactionList: (page, pageSize, search = "", startDate = new Date(), endDate = new Date(), sort = []) => {
+    console.log(startDate)
     let query = {};
     if (!search) {
-      query.query = buildPaginationQuery(page, pageSize, {}, [], sort);
+      const condition={
+        created: {$gte: startDate, $lte: endDate}
+      }
+      query.query = buildPaginationQuery(page, pageSize, condition, [], sort);
     } else {
       const condition = {
         $or: [
@@ -15,6 +19,7 @@ export default {
             toId: search,
           },
         ],
+        created: {$gte: startDate, $lte: endDate}
       };
       query.query = buildPaginationQuery(page, pageSize, condition, [], sort);
     }
