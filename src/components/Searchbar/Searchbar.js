@@ -8,9 +8,10 @@ import Button from "components/CustomButtons/Button.js";
 import Search from "@material-ui/icons/Search";
 const useStyles = makeStyles(styles);
 
-const Searchbar = ({ onChange, onSearch, onFocus, onBlur }) => {
+const Searchbar = ({ onChange, onSearch, onFocus, onBlur, value }) => {
   const classes = useStyles();
   const { t } = useTranslation();
+
   return (
     <div className={classes.searchWrapper}>
       <CustomInput
@@ -32,6 +33,7 @@ const Searchbar = ({ onChange, onSearch, onFocus, onBlur }) => {
           },
           onFocus: onFocus,
           onBlur: onBlur,
+          // value:value,
         }}
       />
       <Button color="white" aria-label="edit" justIcon round onClick={onSearch}>
@@ -46,6 +48,7 @@ Searchbar.propTypes = {
   onSearch: PropTypes.func,
   onFocus: PropTypes.func,
   onBlur: PropTypes.func,
+  value:PropTypes.string
 };
 
 export default Searchbar;

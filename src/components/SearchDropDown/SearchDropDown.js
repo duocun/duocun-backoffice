@@ -46,8 +46,12 @@ const SearchDropDown = ({ data, onClick, show = false }) => {
   function generate(data) {
     return data.map((item) => {
       let text = item.phone ? item.username + " " + item.phone : item.username;
+      //avoid pass in an arrow function to avoid redundant render
+      function handleAccountClick(){
+        onClick(item._id, item.username)
+      }
       return (
-        <ListItem key={item._id}>
+        <ListItem key={item._id} onClick={handleAccountClick}>
           <ListItemText primary={text} className={classes.ListItem} />
         </ListItem>
       );

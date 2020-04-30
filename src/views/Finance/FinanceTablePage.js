@@ -50,7 +50,7 @@ function FinanceTablePage({ location, accounts, loadAccounts }) {
   const [totalRows, setTotalRows] = useState(0);
   const [query, setQuery] = useState(getQueryParam(location, "search") || "");
   const [sort, setSort] = useState(["_id", 1]);
-  const [selectUserName, setSelectUserName] = useState('');
+  const [selectUserId, setSelectUserId] = useState("");
   const [showList, setShowList] = useState(false);
 
   // states related to processing
@@ -60,7 +60,7 @@ function FinanceTablePage({ location, accounts, loadAccounts }) {
 
   useEffect(() => {
     updateData();
-  }, [page, rowsPerPage, sort, selectUserName]);
+  }, [page, rowsPerPage, sort, selectUserId]);
 
   useEffect(() => {
     if (query) {
@@ -74,13 +74,18 @@ function FinanceTablePage({ location, accounts, loadAccounts }) {
   };
 
   const updateData = () => {
-    ApiTransactionService.getTransactionList(page, rowsPerPage, query, [
+    ApiTransactionService.getTransactionList(page, rowsPerPage, selectUserId, [
       sort,
     ]).then(({ data }) => {
       setTransactions(data.data);
       setTotalRows(data.count);
       setLoading(false);
     });
+  };
+
+  const handleSelectSearch = (id, name) => {
+    setSelectUserId(id);
+    setQuery(name);
   };
 
   const removeAlert = () => {
@@ -90,13 +95,15 @@ function FinanceTablePage({ location, accounts, loadAccounts }) {
     });
   };
 
-  const handleShowList = () =>{
-    setShowList(true)
-  }
+  const handleShowList = () => {
+    setShowList(true);
+  };
 
-  const handleHideList = () =>{
-    setShowList(false)
-  }
+  const handleHideList = () => {
+    setTimeout(() => {
+      setShowList(false);
+    }, 500);
+  };
 
   return (
     <div>
@@ -111,6 +118,7 @@ function FinanceTablePage({ location, accounts, loadAccounts }) {
                 <GridItem xs={12} lg={6} align="right">
                   <Throttle time="1000" handler="onChange">
                     <Searchbar
+                      value={query}
                       onChange={handleOnchange}
                       onSearch={() => {
                         setLoading(true);
@@ -126,7 +134,7 @@ function FinanceTablePage({ location, accounts, loadAccounts }) {
                   </Throttle>
                   <SearchDropDown
                     data={accounts}
-                    // onClick={setSelectUserName}
+                    onClick={handleSelectSearch}
                     show={showList}
                   />
                 </GridItem>
@@ -166,7 +174,7 @@ function FinanceTablePage({ location, accounts, loadAccounts }) {
 FinanceTablePage.propTypes = {
   location: PropTypes.object,
   loadAccounts: PropTypes.func,
-  accounts: PropTypes.array
+  accounts: PropTypes.array,
 };
 
 const mapStateToProps = (state) => ({ accounts: state.accounts });
