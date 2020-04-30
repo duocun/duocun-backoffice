@@ -4,13 +4,14 @@ import Auth from "../AuthService";
 
 export const API_HOST =
   process.env.NODE_ENV === "production"
-    ? "https://1fcee761-fa67-402e-aca9-d57991a9f60c.mock.pstmn.io"
+    ? "https://duocun.com.cn/api/admin"
     : "http://localhost:8001/api/admin";
 
-export const API_V2_HOST =
+
+export const API_V2_HOST = 
   process.env.NODE_ENV === "production"
-    ? "https://1fcee761-fa67-402e-aca9-d57991a9f60c.mock.pstmn.io"
-    : "http://localhost:8001/api/v2";
+    ? "https://duocun.com.cn/api/admin"
+    : "http://localhost:8001/api/admin";
 
 export default class ApiService {
   apiHost = "";
