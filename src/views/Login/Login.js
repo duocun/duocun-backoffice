@@ -42,13 +42,15 @@ const Login = ({ signIn, history, isAuthorized }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [failed, setFailed] = useState(false);
+
   const handleLogin = () => {
     ApiAuthService.login(username, password)
       .then(({ data }) => {
-        if (data) {
-          const tokenId = data;
+        if (data.code === 'success') {
+          const tokenId = data.data;
           ApiAuthService.getCurrentUser(tokenId).then(({ data }) => {
-            if (AuthService.isAuthorized(data)) {
+            const account = data;
+            if (AuthService.isAuthorized(account)) {
               AuthService.login(tokenId);
               signIn();
               history.push("/admin/dashboard");
