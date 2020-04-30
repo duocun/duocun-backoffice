@@ -69,9 +69,12 @@ export default function Product({ location }) {
    
     ApiProductService.changeStatus(rowId,currentStatus).then(
       (r)=>{
-        console.log("status change, result: " + r);
+        console.log("status change, result: " + r.data.code);
+
       }
+
     )
+    updateData();
     console.log("productId " + rowId);
   }
 
