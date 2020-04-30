@@ -2,23 +2,17 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 
-import { makeStyles } from "@material-ui/core/styles";
-import LocalMallIcon from "@material-ui/icons/LocalMall";
-import { Tooltip, Avatar, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel }  from "@material-ui/core";
+import { LocalMall as LocalMallIcon,
+          FormatListBulleted as FormatListBulletedIcon,
+          Edit as EditIcon,
+          Delete as DeleteIcon,
+        } from "@material-ui/icons";
+import { Tooltip, IconButton, Avatar, Button, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel }  from "@material-ui/core";
 
 import TableBodySkeleton from "components/Table/TableBodySkeleton";
-import { isTypeNode } from "typescript";
-
-const useStyles = makeStyles(() => ({
-  table: {
-    minWidth: 750
-  }
-}));
 
 export default function MerchantsTable({ merchants, rowsPerPage, toggleSort, sort, page, loading }) {
   const { t } = useTranslation();
-  const classes = useStyles();
-
   const MerchantType = {
     'R': "RESTAURANT",
     'G': "GROCERY",
@@ -72,6 +66,14 @@ export default function MerchantsTable({ merchants, rowsPerPage, toggleSort, sor
                   }
                 </table>
                 {row.dow ? `星期 ${row.dow}` : null}</TableCell>
+                <TableCell>
+                  <IconButton aria-label="edit" href={`merchants/${row._id}`}>
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton aria-label="delete" disabled>
+                    <DeleteIcon />
+                  </IconButton>
+                </TableCell>
             </TableRow>
           ))}
         </React.Fragment>
@@ -93,7 +95,7 @@ export default function MerchantsTable({ merchants, rowsPerPage, toggleSort, sor
 
   return (
     <TableContainer>
-      <Table className={classes.table} aria-label="Product Table"  size="small">
+      <Table className="dc-table" aria-label="Product Table"  size="small">
         <TableHead>
           <TableRow>
             <TableCell>#</TableCell>
@@ -112,6 +114,7 @@ export default function MerchantsTable({ merchants, rowsPerPage, toggleSort, sor
               {t("Order")} {renderSort("order")}
             </TableCell>
             <TableCell>{t("Dows/Phases")}</TableCell>
+            <TableCell>{t("Actions")}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

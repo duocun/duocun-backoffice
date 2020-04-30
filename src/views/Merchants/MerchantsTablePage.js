@@ -84,7 +84,7 @@ export default function MerchantsTablePage({ location }) {
                 <GridItem xs={12} lg={6} align="right">
                   <Box mr={2} style={{ display: "inline-block" }}>
                     <Button
-                      href="accounts/new"
+                      href="merchants/new"
                       variant="contained"
                       color="default"
                     >
