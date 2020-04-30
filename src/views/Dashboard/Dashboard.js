@@ -43,6 +43,8 @@ const useStyles = makeStyles(styles);
 
 export default function Dashboard() {
   const classes = useStyles();
+  const nOrders = 40;
+  const nProducts = 100;
   return (
     <div>
       <GridContainer>
@@ -52,9 +54,15 @@ export default function Dashboard() {
               <CardIcon color="warning">
                 <Icon>content_copy</Icon>
               </CardIcon>
-              <p className={classes.cardCategory}>Used Space</p>
+              <p className={classes.cardCategory}>
+                <span>Orders</span>
+                <span>/</span>
+                <span>Products</span>
+              </p>
               <h3 className={classes.cardTitle}>
-                49/50 <small>GB</small>
+                <span>{nOrders}</span>
+                <span>/</span>
+                <span>{nProducts}</span>
               </h3>
             </CardHeader>
             <CardFooter stats>
