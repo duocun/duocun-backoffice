@@ -12,11 +12,10 @@ import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 
-import Avatar from "@material-ui/core/Avatar";
+import moment from "moment";
 import Alert from "@material-ui/lab/Alert";
-import TableBodySkeleton from "components/Table/TableBodySkeleton";
 import Searchbar from "components/Searchbar/Searchbar";
-
+import DatePicker from "components/TimePicker"; 
 import ApiTransactionService from "services/api/ApiTransactionService";
 
 import { getQueryParam } from "helper/index";
@@ -52,6 +51,9 @@ function FinanceTablePage({ location, accounts, loadAccounts }) {
   const [sort, setSort] = useState(["_id", 1]);
   const [selectUserId, setSelectUserId] = useState("");
   const [showList, setShowList] = useState(false);
+
+  const [startDate, setStartDate] = useState(moment().format())
+  const [endDate, setEndDate] = useState()
 
   // states related to processing
   const [alert, setAlert] = useState(
@@ -117,6 +119,7 @@ function FinanceTablePage({ location, accounts, loadAccounts }) {
                 </GridItem>
                 <GridItem xs={12} lg={6} align="right">
                   <Throttle time="1000" handler="onChange">
+                  <DatePicker />
                     <Searchbar
                       value={query}
                       onChange={handleOnchange}
