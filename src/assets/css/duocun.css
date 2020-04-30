@@ -1,0 +1,10 @@
+
+/** Common */
+/** textarea */
+.dc-full-textarea {
+  width: 100%;
+}
+/** table */
+table.dc-table {
+  min-width: 750
+}
