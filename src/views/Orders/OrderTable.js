@@ -98,89 +98,90 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
 
   if (!rows.length) {
     return (
-      <TableRow>
-        <TableCell align="center" colSpan={7} size="medium">
-          {t("No data to display")}
-        </TableCell>
-      </TableRow>
+      <div>{t("No data to display")}</div>
+      // <TableRow>
+      //   <TableCell align="center" colSpan={7} size="medium">
+      //     {t("No data to display")}
+      //   </TableCell>
+      // </TableRow>
     );
-  }
-  return (
-    <TableContainer>
+  } else {
 
 
-      <Table
-        className={classes.table}
-        aria-label="Order Table"
-        size="small"
-      >
-        <TableHead>
-          <TableRow>
-            <TableCell>#</TableCell>
-            <TableCell
-              onClick={() => {
-                toggleSort("code");
-              }}
-              style={{ cursor: "pointer" }}
-            >
-              {t("code")}
-              {renderSort("code")}
-            </TableCell>
-            <TableCell
-              onClick={() => {
-                toggleSort("delivered");
-              }}
-              style={{ cursor: "pointer" }}
-            >
-              {t("Deliver Date")}
-              {renderSort("delivered")}
-            </TableCell>
-            <TableCell
-              onClick={() => {
-                toggleSort("clientName");
-              }}
-              style={{ cursor: "pointer" }}
-            >
-              {t("Client")}
-              {renderSort("clientName")}
-            </TableCell>
-            <TableCell
-              onClick={() => {
-                toggleSort("client");
-              }}
-              style={{ cursor: "pointer" }}
-            >
-              {t("Client Phone")}
-              {renderSort("client")}
-            </TableCell>
-            <TableCell
-              onClick={() => {
-                toggleSort("merchantName");
-              }}
-              style={{ cursor: "pointer" }}
-            >
-              {t("Merchant")}
-              {renderSort("merchantName")}
-            </TableCell>
-            <TableCell
-              onClick={() => {
-                toggleSort("price");
-              }}
-              style={{ cursor: "pointer" }}
-            >
-              {t("Price")}
-              {renderSort("price")}
-            </TableCell>
-            <TableCell
-              onClick={() => {
-                toggleSort("cost");
-              }}
-              style={{ cursor: "pointer" }}
-            >
-              {t("Cost")}
-              {renderSort("cost")}
-            </TableCell>
-            {/* <TableCell
+    return (
+      <TableContainer>
+        <Table
+          className={classes.table}
+          aria-label="Order Table"
+          size="small"
+        >
+          <TableHead>
+            <TableRow>
+              <TableCell>#</TableCell>
+              <TableCell
+                onClick={() => {
+                  toggleSort("code");
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                {t("code")}
+                {renderSort("code")}
+              </TableCell>
+              <TableCell
+                onClick={() => {
+                  toggleSort("delivered");
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                {t("Deliver Date")}
+                {renderSort("delivered")}
+              </TableCell>
+              <TableCell
+                onClick={() => {
+                  toggleSort("clientName");
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                {t("Client")}
+                {renderSort("clientName")}
+              </TableCell>
+              <TableCell
+                onClick={() => {
+                  toggleSort("client");
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                {t("Client Phone")}
+                {renderSort("client")}
+              </TableCell>
+              <TableCell
+                onClick={() => {
+                  toggleSort("merchantName");
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                {t("Merchant")}
+                {renderSort("merchantName")}
+              </TableCell>
+              <TableCell
+                onClick={() => {
+                  toggleSort("price");
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                {t("Price")}
+                {renderSort("price")}
+              </TableCell>
+              <TableCell
+                onClick={() => {
+                  toggleSort("cost");
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                {t("Cost")}
+                {renderSort("cost")}
+              </TableCell>
+              {/* <TableCell
                             onClick={() => {
                               toggleSort("featured");
                             }}
@@ -189,71 +190,72 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
                             {t("Featured")}
                             {renderSort("featured")}
                           </TableCell> */}
-            <TableCell>{t("Actions")}</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {loading ? (
-            <TableBodySkeleton
-              colCount={7}
-              rowCount={rowsPerPage}
-            />
-          ) : (
-              // <OrderTable rows={orders} page={page} rowsPerPage={rowsPerPage} processing={processing}/>
-              <React.Fragment>
-                {rows.map((row, idx) => (
-                  <TableRow key={idx}>
-                    <TableCell>{page * rowsPerPage + idx + 1}</TableCell>
-                    <TableCell>{row.code}</TableCell>
-                    <TableCell>{toDateString(row.delivered)}</TableCell>
-                    <TableCell>{row.client.username}</TableCell>
-                    <TableCell>{row.client.phone}</TableCell>
-                    <TableCell>{row.merchant.name}</TableCell>
-                    <TableCell>{row.price}</TableCell>
-                    <TableCell>{row.cost}</TableCell>
-                    <TableCell>
-                      <IconButton
-                        disabled={processing}
-                      // onClick={() => {
-                      //   toggleFeature(row._id);
-                      // }}
-                      >
-                        {row.featured ? (
-                          <CheckIcon color="primary"></CheckIcon>
-                        ) : (
-                            <CloseIcon color="error"></CloseIcon>
-                          )}
-                      </IconButton>
-                    </TableCell>
-                    <TableCell>
-                      <IconButton aria-label="edit" href={`orders/${row._id}`}>
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton aria-label="delete" disabled={processing}>
-                        <DeleteIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </React.Fragment>
+              <TableCell>{t("Actions")}</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {loading ? (
+              <TableBodySkeleton
+                colCount={7}
+                rowCount={rowsPerPage}
+              />
+            ) : (
+                // <OrderTable rows={orders} page={page} rowsPerPage={rowsPerPage} processing={processing}/>
+                <React.Fragment>
+                  {rows.map((row, idx) => (
+                    <TableRow key={idx}>
+                      <TableCell>{page * rowsPerPage + idx + 1}</TableCell>
+                      <TableCell>{row.code}</TableCell>
+                      <TableCell>{toDateString(row.delivered)}</TableCell>
+                      <TableCell>{row.client ? row.client.username : 'N/A'}</TableCell>
+                      <TableCell>{row.client ? row.client.phone : 'N/A'}</TableCell>
+                      <TableCell>{row.merchant ? row.merchant.name: 'N/A'}</TableCell>
+                      <TableCell>{row.price}</TableCell>
+                      <TableCell>{row.cost}</TableCell>
+                      <TableCell>
+                        <IconButton
+                          disabled={processing}
+                        // onClick={() => {
+                        //   toggleFeature(row._id);
+                        // }}
+                        >
+                          {row.featured ? (
+                            <CheckIcon color="primary"></CheckIcon>
+                          ) : (
+                              <CloseIcon color="error"></CloseIcon>
+                            )}
+                        </IconButton>
+                      </TableCell>
+                      <TableCell>
+                        <IconButton aria-label="edit" href={`orders/${row._id}`}>
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton aria-label="delete" disabled={processing}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </React.Fragment>
 
 
-            )}
-        </TableBody>
-      </Table>
+              )}
+          </TableBody>
+        </Table>
 
-      {!loading && (
-        <TablePagination
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onChangePage={(e, newPage) => setPage(newPage)}
-          count={totalRows}
-          onChangeRowsPerPage={({ target }) => {
-            setPage(0);
-            setRowsPerPage(target.value);
-          }}
-        ></TablePagination>
-      )}
-    </TableContainer>
-  );
+        {!loading && (
+          <TablePagination
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onChangePage={(e, newPage) => setPage(newPage)}
+            count={totalRows}
+            onChangeRowsPerPage={({ target }) => {
+              setPage(0);
+              setRowsPerPage(target.value);
+            }}
+          ></TablePagination>
+        )}
+      </TableContainer>
+    );
+  }
 };

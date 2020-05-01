@@ -125,8 +125,7 @@ export default function OrderTablePage({ location }) {
             </GridContainer>
           </CardHeader>
           <CardBody>
-            <OrderTable
-              rows={orders}
+            <OrderTable rows={orders}
               page={page}
               rowsPerPage={rowsPerPage}
               totalRows={totalRows}
@@ -134,8 +133,7 @@ export default function OrderTablePage({ location }) {
               loading={loading}
               setRowsPerPage={setRowsPerPage}
               setSort={setSort}
-              setPage={setPage}
-            />
+              setPage={setPage} />
           </CardBody>
         </Card>
       </GridItem>
