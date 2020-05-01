@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
-import { makeStyles } from "@material-ui/core/styles";
 
 import { Button, Box } from "@material-ui/core";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
@@ -56,19 +55,6 @@ export default function MerchantsTablePage({ location }) {
     } else {
       setSort([fieldName, 1]);
     }
-  };
-
-
-  const renderSort = fieldName => {
-    return (
-      <TableSortLabel
-        active={sort && sort[0] === fieldName}
-        direction={sort && sort[1] === -1 ? "desc" : "asc"}
-        onClick={() => {
-          toggleSort(fieldName);
-        }}
-      ></TableSortLabel>
-    );
   };
 
   return (

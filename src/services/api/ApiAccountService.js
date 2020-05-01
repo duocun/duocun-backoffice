@@ -39,4 +39,7 @@ export default {
     );
     return ApiService.v2().get("accounts", query);
   },
+  createAccount: (accountData = {}) => {
+    return ApiService.v2().post("accounts", accountData);
+  },
 };

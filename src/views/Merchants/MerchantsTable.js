@@ -1,13 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 
-import { LocalMall as LocalMallIcon,
-          FormatListBulleted as FormatListBulletedIcon,
-          Edit as EditIcon,
-          Delete as DeleteIcon,
-        } from "@material-ui/icons";
-import { Tooltip, IconButton, Avatar, Button, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel }  from "@material-ui/core";
+import { LocalMall as LocalMallIcon, Edit as EditIcon, Delete as DeleteIcon, } from "@material-ui/icons";
+import { IconButton, Avatar, Chip, Table, TableBody, 
+    TableCell, TableContainer, TableHead, TableRow, TableSortLabel }  from "@material-ui/core";
 
 import TableBodySkeleton from "components/Table/TableBodySkeleton";
 

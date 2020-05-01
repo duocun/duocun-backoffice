@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Save as SaveIcon, FormatListBulleted as FormatListBulletedIcon } from "@material-ui/icons";
 import { TextField, Button, Checkbox,
     Select, MenuItem, InputLabel, FormControl, FormControlLabel } from "@material-ui/core";
+import { Alert } from "@material-ui/lab"
 
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
@@ -12,7 +13,7 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 
-import EditSkeleton, { EditSkeletonShort } from "../Common/EditSkeleton";
+import EditSkeleton from "../Common/EditSkeleton";
 import ApiAccountService from "services/api/ApiAccountService";
 
 const defaultAccountsModelState = {
@@ -21,7 +22,6 @@ const defaultAccountsModelState = {
   imageurl: "",
   realm: "",
   sex: "",
-  realm: "",
   openId: "",
   type: "merchant",
   balance: 0,
@@ -38,15 +38,7 @@ const AccountsForm = ({}) => {
 
   // for model
   const [model, setModel] = useState(defaultAccountsModelState);
-  const [attributes, setAttributes] = React.useState({
-    I: false, // INDOOR, 
-    G: false, // GARDENING, 
-    R: false, // ROOFING, 
-    O: false, // OFFICE, 
-    P: false, // PLAZA, 
-    H: false, // HOUSE, 
-    C: false, // CONDO
-  });
+  const [alert, setAlert] = useState({ message: "", severity: "info" });
 
   const _ATTRIBUTES = {
     I: "INDOOR", 
@@ -58,14 +50,12 @@ const AccountsForm = ({}) => {
     C: "CONDO",
   }
 
-  ////////////////////////////////////
-  // For data fetch
+  //////////////////// For data fetch
   const getAccountData = () => {
 
   }
 
-  ////////////////////////////////////
-  // For render and events 
+  /////////////////// For render and events 
 
   const _renderUserInfo = ()=> {
     return <React.Fragment>
@@ -117,8 +107,19 @@ const AccountsForm = ({}) => {
       </GridItem>
     </React.Fragment>
   }
-  const _attributeClick = (e) => {
-
+  const _attributeClick = (e, _key) => {
+    const attr = model.attributes || [];
+    if (e.target.checked) {
+      if (attr.indexOf(_key) < 0 ) {
+        attr.push(_key);
+      }
+    } else {
+      const index = attr.indexOf(_key);
+      if (index >= 0 ) {
+        attr.splice(index, 1);
+      }
+    }
+    setModel({...model, attributes: attr});
   }
   const _renderAttributes = () => {
     return <React.Fragment>
@@ -132,7 +133,7 @@ const AccountsForm = ({}) => {
               return <GridItem xs={6} lg={6} >
                   <FormControlLabel
                     control={<Checkbox checked={model.attributes.indexOf(_key)>=0}
-                      onChange={(e) => _attributeClick(e)} color="primary" />}
+                      onChange={(e) => _attributeClick(e, _key)} color="primary" />}
                     label={_ATTRIBUTES[_key]||_key}
                     labelPlacement="end"
                   />
@@ -154,11 +155,36 @@ const AccountsForm = ({}) => {
         {_renderUserInfo()}
       </GridContainer>
   }
+  const removeAlert = () => {
+    setAlert({
+      message: "",
+      severity: "info"
+    });
+  };
+
 
   ////////////////////////////////////
   // For submit
   const saveModel = () => {
-
+    setProcessing(true);
+    ApiAccountService.createAccount(model).then(
+      ({ data }) => {
+        setProcessing(false);
+        if ( data.code === "success" ) {
+          // success 
+          setAlert({
+            message: "Created success!",
+            severity: "success"
+          });
+        } else {
+          // failure
+          setAlert({
+            message: data.data,
+            severity: "error"
+          });
+        }
+      }
+    );
   }
 
   return (
@@ -177,6 +203,11 @@ const AccountsForm = ({}) => {
           </CardHeader>
           <CardBody>
             {loading && <EditSkeleton />}
+            {!!alert.message && (
+              <Alert severity={alert.severity} onClose={removeAlert}>
+                {alert.message}
+              </Alert>
+            )}
             {!loading && <GridContainer>
               <GridItem xs={12} md={6} lg={6}>{renderLeft()}</GridItem>
               <GridItem xs={12} md={6} lg={6}>{renderRight()} </GridItem>
@@ -186,7 +217,8 @@ const AccountsForm = ({}) => {
             <GridContainer>
               <GridItem xs={12} >
                 <Button color="primary" variant="contained"
-                  disabled={loading || processing } onClick={saveModel} >
+                  disabled={loading || processing || !model.username || !model.type  } 
+                  onClick={saveModel} >
                   <SaveIcon /> {t("Save")}
                 </Button>
                 &nbsp;&nbsp;&nbsp;&nbsp;

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { Delete as DeleteIcon,  Add as AddIcon, Save as SaveIcon,  
-    FormatListBulleted as FormatListBulletedIcon } from "@material-ui/icons";
-import { Box, TextField, ButtonGroup, Button, List, ListItem,
+import { Save as SaveIcon, FormatListBulleted as FormatListBulletedIcon } from "@material-ui/icons";
+import { TextField, ButtonGroup, Button, List, ListItem,
     Select, MenuItem, InputLabel, FormControl } from "@material-ui/core";
+import { Alert } from "@material-ui/lab"
 
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
@@ -15,6 +15,7 @@ import CardFooter from "components/Card/CardFooter.js";
 
 import EditSkeleton, { EditSkeletonShort } from "../Common/EditSkeleton";
 import ApiAccountService from "services/api/ApiAccountService";
+import ApiMerchantService from "services/api/ApiMerchantService";
 
 const defaultMerchantsModelState = {
   _id: 'new',
@@ -24,7 +25,6 @@ const defaultMerchantsModelState = {
   descriptionEN: "",
   accountId: "",
   pictures: [],
-  closed: [],
   dow: "",          // day of week opening, eg. '1,2,3,4,5'
   type: "G",
   rank: 0,
@@ -50,13 +50,13 @@ const MerchantsForm = ({}) => {
 
   // for accounts
   const [accounts, setAccounts] = useState([]);
-  const [associateAccount, setAssociateAccount] = useState("")
   const [accountLoading, setAccountLoading] = useState(true);
   const [accountFilter, setAccountFilter] = useState("");
 
   // for model
   const [model, setModel] = useState(defaultMerchantsModelState);
   const [ruleSimple, setRuleSimple] = useState(true);
+  const [alert, setAlert] = useState({ message: "", severity: "info" });
 
   ////////////////////////////////////
   // For data fetch
@@ -95,13 +95,13 @@ const MerchantsForm = ({}) => {
         </FormControl>
       </GridItem>
       <GridItem xs={12} md={6} lg={6}>
-        <TextField id="merchant-name" label={`${t("Merchant Name (Chinese)")}`}
+        <TextField id="merchant-name" label={`${t("Merchant Name (CN)")}`}
           required className="dc-full" value={model.name}
           onChange={e => { setModel({  ...model, name: e.target.value }); }}
         />
       </GridItem>
       <GridItem xs={12} md={6} lg={6}>
-        <TextField id="merchant-nameEN" label={`${t("Merchant Name (English)")}`}
+        <TextField id="merchant-nameEN" label={`${t("Merchant Name (EN)")}`}
           required className="dc-full" value={model.nameEN}
           onChange={e => { setModel({  ...model, nameEN: e.target.value }); }}
         />
@@ -129,14 +129,17 @@ const MerchantsForm = ({}) => {
     </React.Fragment>
   }
   const _clickDow = (e, _key) => {
-    let _dow =  model.dow;
+    const _dow =  model.dow.split(",")
+      .filter(a=>{ return a && a!==',' });
     const index = _dow.indexOf(_key);
     if ( index >= 0 ) {
-      _dow = _dow.substr(0, index-1) + _dow.substr(index+2);
+      _dow.splice(index, 1);
     } else {
-      _dow = `${_dow}${_dow ? ',' : ''}${_key}`
+      _dow.push(_key);
     }
-    setModel({ ...model, dow: _dow });
+    
+    setModel({ ...model, 
+      dow: _dow.sort( (a, b) => a > b ).join(",") });
   }
   const _DOWS_MAPPING = {
     0: "Sun",
@@ -223,7 +226,7 @@ const MerchantsForm = ({}) => {
             <FormControl className="dc-full-select">
               <InputLabel id="merchant-type-label">Choose an account to associate</InputLabel>
               <Select labelId="merchant-type-label" id="merchant-type" 
-                value={associateAccount} onChange={(e) => setAssociateAccount(e.target.value)} >
+                value={model.accountId} onChange={(e) => setModel({...model, accountId: e.target.value}) } >
                 { accounts.filter( 
                     (item) => item.username.indexOf(accountFilter) >=0 ).map( 
                     (item) => <MenuItem value={item._id}>{item.username}</MenuItem> )}
@@ -234,7 +237,7 @@ const MerchantsForm = ({}) => {
             <TextField id="standard-search" label="Filter" type="search"
               value={accountFilter} onChange={(e) => setAccountFilter(e.target.value)}/>
           </GridItem>
-          <GridItem xs={12}>No result? Create one and refresh</GridItem>
+          <GridItem xs={12}>No result? <a target="_blank" href="../accounts/new">Create one</a> and refresh</GridItem>
         </React.Fragment>
       }
     </React.Fragment>
@@ -252,10 +255,65 @@ const MerchantsForm = ({}) => {
       </GridContainer>
   }
 
+  const removeAlert = () => {
+    setAlert({
+      message: "",
+      severity: "info"
+    });
+  };
+
   ////////////////////////////////////
   // For submit
+  // For submit
   const saveModel = () => {
-
+    setProcessing(true);
+    const _mData = {...model};
+    const _dows = model.dow.split(",")
+      .filter(a=>{ return a && a!==',' })
+      .sort( (a, b) => a > b);
+    const _rules = [];
+    if (ruleSimple) { 
+      // simple mode 
+      _dows.map( item => {
+        _rules.push({
+          orderEnd: {
+            dow: item,
+            time: model._orderEnd
+          }
+        })
+      });
+    } else {  
+      // complex
+      _dows.map( item => {
+        _rules.push({
+          orderEnd: {
+            dow: item,
+            time: model._orderEndTimeArr[item]
+          }
+        })
+      });
+    }
+    _mData.dow = _dows.join(",");
+    _mData.rules = _rules;
+    setModel( {..._mData} );
+    ApiMerchantService.createMerchant(_mData).then(
+      ({ data }) => {
+        setProcessing(false);
+        if ( data.code === "success" ) {
+          // success 
+          setAlert({
+            message: "Created success!",
+            severity: "success"
+          });
+        } else {
+          // failure
+          setAlert({
+            message: data.data,
+            severity: "error"
+          });
+        }
+      }
+    );
   }
 
   return (
@@ -274,6 +332,11 @@ const MerchantsForm = ({}) => {
           </CardHeader>
           <CardBody>
             {loading && <EditSkeleton />}
+            {!!alert.message && (
+              <Alert severity={alert.severity} onClose={removeAlert}>
+                {alert.message}
+              </Alert>
+            )}
             {!loading && <GridContainer>
               <GridItem xs={12} md={6} lg={6}>{renderLeft()}</GridItem>
               <GridItem xs={12} md={6} lg={6}>{renderRight()} </GridItem>
