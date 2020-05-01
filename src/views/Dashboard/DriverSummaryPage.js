@@ -24,6 +24,14 @@ import ListItemText from '@material-ui/core/ListItemText';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+//table
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+
 const styles = {
   cardCategoryWhite: {
     color: "rgba(255,255,255,.62)",
@@ -131,6 +139,38 @@ const OrderSummaryPage = ({driverSummaryArray,loadDriverSummary}) => {
                     <div>{selectedDriver?selectedDriver.nProducts:"N/A"}</div>
                 </div>
                 </GridItem>
+                <GridItem xs={12} sm={12} md={5}>
+                <div>
+                    <div>司机手机:</div>
+                    <div>{selectedDriver?selectedDriver.phone:"N/A"}</div>
+                </div>
+                </GridItem>
+                {selectedDriver?
+                <Table className={classes.table} aria-label="simple table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>商家名称 </TableCell>
+                      <TableCell align="right">产品名称</TableCell>
+                      <TableCell align="right">应取数量</TableCell>
+                    </TableRow>
+                  </TableHead>
+                 <TableBody>
+                  {
+                  Object.keys(selectedDriver.merchantMap).map((merchantId,merchantIdx) => (
+                    Object.keys(selectedDriver.merchantMap[merchantId].itemMap).map((productId,productIdx)=>(
+                    <TableRow key={productId}>
+                        <TableCell component="th" scope="row">
+                          {selectedDriver.merchantMap[merchantId].merchantName}
+                        </TableCell>
+                        <TableCell align="right">{selectedDriver.merchantMap[merchantId].itemMap[productId].productName}</TableCell>
+                        <TableCell align="right">{selectedDriver.merchantMap[merchantId].itemMap[productId].quantity}</TableCell>
+  
+                      </TableRow>
+            ))
+          ))}
+        </TableBody>
+      </Table>
+:<div>暂无数据</div>}
               </GridContainer>
 
 
