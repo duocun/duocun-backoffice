@@ -14,22 +14,28 @@ export default {
     return ApiService.v2().get("accounts", query);
   },
   getAccountAllKeyword: (keyword = "") => {
-    // let isNum = /^\d+$/.test(keyword);
     let query = {};
-    let condition = {};
-    // if (!isNum) {
-    condition = {
+    const condition = {
       username: {
         $regex: keyword,
       },
     };
-    // } else {
-    //   condition = {
-    //     phone: {
-    //       $regex: keyword,
-    //     },
-    //   };
-    // }
+    query.keyword = query.query = buildPaginationQuery(
+      null,
+      null,
+      condition,
+      [],
+      []
+    );
+    return ApiService.v2().get("accounts", query);
+  },
+  getAccountAllPhone: (phone) => {
+    let query = {};
+    const condition = {
+      phone: {
+        $regex: phone,
+      },
+    };
     query.keyword = query.query = buildPaginationQuery(
       null,
       null,
