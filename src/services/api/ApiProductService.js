@@ -29,6 +29,6 @@ export default {
   },
   changeStatus: (productId,currentStatus)=>{
     const data = {data:{status: currentStatus==='A'? 'I':'A'}};
-    return ApiService.v2().put('products/?productId=' + productId, data);
+    return ApiService.v2().put('products/'+ productId, data);
   }
 };

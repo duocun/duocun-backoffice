@@ -5,7 +5,8 @@ import ChartistGraph from "react-chartist";
 import { makeStyles } from "@material-ui/core/styles";
 import Icon from "@material-ui/core/Icon";
 // @material-ui/icons
-
+import IconButton from "@material-ui/core/IconButton";
+import AccountBoxOutlinedIcon from '@material-ui/icons/AccountBoxOutlined';
 import * as moment from 'moment';
 import {connect} from 'react-redux';
 
@@ -112,10 +113,13 @@ const Dashboard = ({summary, loadStatisticsSummary}) => {
         </GridItem>
         <GridItem xs={12} sm={6} md={3}>
           <Card>
-            <CardHeader color="danger" stats icon>
+            <CardHeader href="/products" color="danger" stats icon >
               <CardIcon color="danger">
                 <Icon>info_outline</Icon>
               </CardIcon>
+              <IconButton aria-label="driverSummary" href="dashboard/pickup">
+                <AccountBoxOutlinedIcon />
+              </IconButton>
               <p className={classes.cardCategory}>Products</p>
               <h3 className={classes.cardTitle}>{summary.nProducts}</h3>
             </CardHeader>

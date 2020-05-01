@@ -42,7 +42,7 @@ import FinancePage from "views/Finance/FinancePage.js";
 import ProductPage from "views/Products/Products.js";
 import AttributePage from "views/Attributes/Attributes.js";
 import OrderPage from "views/Orders/OrderPage.js";
-
+import DashboardRoute from "views/Dashboard/DashboardRoute.js";
 import AccountsPage from "views/Accounts/AccountsPage";
 import MerchantsPage from "views/Merchants/MerchantsPage";
 
@@ -51,7 +51,7 @@ const dashboardRoutes = [
     path: "/dashboard",
     name: "Dashboard",
     icon: Dashboard,
-    component: DashboardPage,
+    component: DashboardRoute,
     layout: "/"
   },
   {
