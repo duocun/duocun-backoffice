@@ -10,7 +10,7 @@ export const OrderStatus = {
 
 export const loadOrders = payload => {
   return {
-    type: 'LOAD_ORDERS',
+    type: 'SET_ORDERS',
     payload
   }
 }
