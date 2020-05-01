@@ -13,6 +13,11 @@ export const driverSummaryArray = (state = [], action) => {
   }
   return state;
 };
-
+export const merchantSummaryArray = (state = [], action) => {
+  if (action && action.type === "SET_MERCHANT_SUMMARY") {
+    return action.payload;
+  }
+  return state;
+};
 
 

@@ -14,6 +14,13 @@ export const setDriverSummary = payload => {
     payload
   }
 }
+export const setMerchantSummary = payload => {
+  return {
+    type: 'SET_MERCHANT_SUMMARY',
+    payload
+  }
+}
+
 
 
 // async actions
@@ -32,6 +39,15 @@ export const loadDriverSummaryAsync = (startDate) => {
     return ApiStatisticsService.saveDriverStatistic(startDate).then(
       ({data}) => {
         dispatch(setDriverSummary(data.data));
+      }
+    );
+  }
+}
+export const loadMerchantSummaryAsync = (startDate, endDate) => {
+  return (dispatch) => {
+    return ApiStatisticsService.getMerchantStatistic(startDate, endDate).then(
+      ({data}) => {
+        dispatch(setMerchantSummary(data.data));
       }
     );
   }

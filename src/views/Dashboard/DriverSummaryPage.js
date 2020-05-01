@@ -46,7 +46,7 @@ const styles = {
 const useStyles = makeStyles(styles);
 
 
-const DriverSummaryPage = ({driverSummaryArray,loadDriverSummary}) => {
+const OrderSummaryPage = ({driverSummaryArray,loadDriverSummary}) => {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [selectedDriver, setSelectedDriver] = React.useState(null);
@@ -66,8 +66,8 @@ const DriverSummaryPage = ({driverSummaryArray,loadDriverSummary}) => {
   };
 
   useEffect(() => {
-    const startDate = moment().format('YYYY-MM-DD');
-    // const startDate = '2020-04-03';  // hard coded date because 05-01 has no data
+    // const startDate = moment().format('YYYY-MM-DD');
+    const startDate = '2020-04-03';  // hard coded date because 05-01 has no data
     loadDriverSummary(startDate);
   }, []);
   return (
@@ -79,18 +79,17 @@ const DriverSummaryPage = ({driverSummaryArray,loadDriverSummary}) => {
             <CardHeader color="primary">
             <div>
               <List component="nav" aria-label="Device settings">
-                <ListItem
+                { driverSummaryArray.length>0?<ListItem
                     button
                     onClick={handleClickListItem}
-                 >
+                 >       
                 <ListItemText primary={
-                <div>
-                    <span>请点击此处选择司机</span>
-                    <span><ArrowDropDownIcon/></span>
-                </div>
-                    } />
-         
-                </ListItem>
+                        <div>
+                            <span>请点击此处选择司机</span>
+                            <span><ArrowDropDownIcon/></span>
+                        </div>
+                    } />           
+                </ListItem>:<div>今日暂无记录</div>}
                 <div>司机：{selectedDriver?selectedDriver.driverName:"N/A"}</div>
               </List>
               <Menu
@@ -154,4 +153,4 @@ const mapDispatchToProps = (dispatch) => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(DriverSummaryPage);
+)(OrderSummaryPage);

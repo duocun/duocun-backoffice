@@ -4,6 +4,7 @@ import { orders, order, filterOrders } from "./order";
 import { accounts } from "./account";
 import { statisticsSummary } from "./statistics";
 import { driverSummaryArray } from "./statistics";
+import { merchantSummaryArray } from "./statistics";
 export default combineReducers({
   authReducer,
   orders,
@@ -11,5 +12,6 @@ export default combineReducers({
   filterOrders,
   accounts,
   statisticsSummary,
-  driverSummaryArray
+  driverSummaryArray,
+  merchantSummaryArray,
 });
