@@ -30,5 +30,15 @@ const EditSkeleton = () => (
     </GridItem>
   </React.Fragment>
 );
+export const EditSkeletonShort = () => (
+  <React.Fragment>
+    <GridItem xs={12} lg={12}>
+      <Skeleton height={48} />
+    </GridItem>
+    <GridItem xs={12} lg={12}>
+      <Skeleton height={48} />
+    </GridItem>
+  </React.Fragment>
+);
 
 export default EditSkeleton;

@@ -14,5 +14,8 @@ export default {
       query.query = buildPaginationQuery(page, pageSize, condition, [], sort);
     }
     return ApiService.v2().get("merchants", query);
-  }
+  },
+  createMerchant: (merchantData = {}) => {
+    return ApiService.v2().post("merchants", merchantData);
+  },
 };

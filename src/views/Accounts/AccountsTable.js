@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 
-import { Avatar, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel }  from "@material-ui/core";
+import { Avatar, Chip, Table, TableBody, TableCell, TableContainer, 
+    TableHead, TableRow, TableSortLabel, Switch }  from "@material-ui/core";
 import LocalMallIcon from "@material-ui/icons/LocalMall";
 
 import TableBodySkeleton from "components/Table/TableBodySkeleton";
@@ -41,7 +42,7 @@ export default function AccountsTable({ accounts, rowsPerPage, toggleSort, sort,
       return (
         <React.Fragment>
           {rows.map((row, idx) => (
-            <TableRow key={idx}>
+            <TableRow key={`${row._id}_${idx}`}>
               <TableCell>{page * rowsPerPage + idx + 1}</TableCell>
               <TableCell>
                 <Avatar
@@ -56,14 +57,18 @@ export default function AccountsTable({ accounts, rowsPerPage, toggleSort, sort,
               <TableCell>{row.type}</TableCell>
               <TableCell>{row.phone}</TableCell>
               <TableCell>{row.balance}</TableCell>
-              <TableCell>{row.email}</TableCell>
+              <TableCell>
+                <Switch checked={row.verified} name="checkedA" color="primary"
+                  inputProps={{ 'aria-label': 'primary checkbox' }}
+                />
+              </TableCell>
               <TableCell>
                 {row.roles &&
                   row.roles
                     .map(item => ROLE_MAPPING[item] || item)
                     .map(item => (
                       // eslint-disable-next-line react/jsx-key
-                      <React.Fragment>
+                      <React.Fragment key={`${item}`}>
                         <Chip variant="outlined" size="small" label={item} />
                         <br />
                       </React.Fragment>
@@ -75,7 +80,7 @@ export default function AccountsTable({ accounts, rowsPerPage, toggleSort, sort,
                     .map(item => ATTRIBUTES_MAPPING[item] || item)
                     .map(item => (
                       // eslint-disable-next-line react/jsx-key
-                      <React.Fragment>
+                      <React.Fragment key={`${item}`}>
                         <Chip variant="outlined" size="small" label={item} />
                         <br />
                       </React.Fragment>
@@ -125,7 +130,7 @@ export default function AccountsTable({ accounts, rowsPerPage, toggleSort, sort,
             </TableCell>
             <TableCell onClick={() => { toggleSort && toggleSort("email"); }}
               style={{ cursor: "pointer" }} >
-              {t("Email")} {renderSort("email")}
+              {t("Verified")} {renderSort("verified")}
             </TableCell>
             <TableCell>{t("Roles")}</TableCell>
             <TableCell>{t("Attributes")}</TableCell>
