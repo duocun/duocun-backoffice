@@ -124,8 +124,8 @@ const Dashboard = ({summary, loadStatisticsSummary}) => {
               <IconButton aria-label="driverSummary" href="dashboard/pickup">
                 <AccountBoxOutlinedIcon />
               </IconButton>
-              <p className={classes.cardCategory} >Fixed Issues</p>
-              <h3 className={classes.cardTitle}>75</h3>
+              <p className={classes.cardCategory}>Products</p>
+              <h3 className={classes.cardTitle}>{summary.nProducts}</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
