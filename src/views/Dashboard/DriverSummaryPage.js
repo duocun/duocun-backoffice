@@ -66,8 +66,8 @@ const DriverSummaryPage = ({driverSummaryArray,loadDriverSummary}) => {
   };
 
   useEffect(() => {
-    // const startDate = moment().format('YYYY-MM-DD');
-    const startDate = '2020-04-03';  // hard coded date because 05-01 has no data
+    const startDate = moment().format('YYYY-MM-DD');
+    // const startDate = '2020-04-03';  // hard coded date because 05-01 has no data
     loadDriverSummary(startDate);
   }, []);
   return (
