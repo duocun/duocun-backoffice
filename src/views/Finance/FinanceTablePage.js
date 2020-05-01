@@ -22,6 +22,7 @@ import { getQueryParam } from "helper/index";
 import FlashStorage from "services/FlashStorage";
 
 import { FinanceTable } from "./FinanceTable";
+import SecondaryNav from "components/SecondaryNav/SecondaryNav";
 
 //redux actions
 import { loadAccountsAsync } from "redux/actions/account";
@@ -34,7 +35,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-function FinanceTablePage({ location, accounts, loadAccounts }) {
+function FinanceTablePage({ location, accounts, loadAccounts, history }) {
   const { t } = useTranslation();
   const classes = useStyles();
   // states related to list and pagniation
@@ -51,9 +52,18 @@ function FinanceTablePage({ location, accounts, loadAccounts }) {
   const [sort, setSort] = useState(["_id", 1]);
   const [selectUserId, setSelectUserId] = useState("");
   const [showList, setShowList] = useState(false);
+  const [searchOption, setSearchOption] = useState('name');
 
-  const [startDate, setStartDate] = useState(moment().utc().toISOString());
-  const [endDate, setEndDate] = useState(moment().utc().toISOString());
+  const [startDate, setStartDate] = useState(
+    moment()
+      .utc()
+      .toISOString()
+  );
+  const [endDate, setEndDate] = useState(
+    moment()
+      .utc()
+      .toISOString()
+  );
 
   // states related to processing
   const [alert, setAlert] = useState(
@@ -66,7 +76,7 @@ function FinanceTablePage({ location, accounts, loadAccounts }) {
 
   useEffect(() => {
     if (query) {
-      loadAccounts(query);
+      loadAccounts(query, searchOption);
     }
   }, [query]);
 
@@ -76,9 +86,14 @@ function FinanceTablePage({ location, accounts, loadAccounts }) {
   };
 
   const updateData = () => {
-    ApiTransactionService.getTransactionList(page, rowsPerPage, selectUserId, startDate, endDate, [
-      sort,
-    ]).then(({ data }) => {
+    ApiTransactionService.getTransactionList(
+      page,
+      rowsPerPage,
+      selectUserId,
+      startDate,
+      endDate,
+      [sort]
+    ).then(({ data }) => {
       setTransactions(data.data);
       setTotalRows(data.count);
       setLoading(false);
@@ -116,6 +131,13 @@ function FinanceTablePage({ location, accounts, loadAccounts }) {
               <GridContainer>
                 <GridItem xs={12} lg={6}>
                   <h4>{t("Finance")}</h4>
+                  <SecondaryNav
+                    tabs={[
+                      { title: "Finance", route: "/finance" },
+                      { title: "Exception", route: "/finance/exception" },
+                    ]}
+                    history={history}
+                  />
                 </GridItem>
                 <GridItem xs={12} lg={6} align="right">
                   <div
@@ -150,6 +172,9 @@ function FinanceTablePage({ location, accounts, loadAccounts }) {
                       }}
                       onFocus={handleShowList}
                       onBlur={handleHideList}
+                      ifSearch = {false}
+                      options = {['name', 'phone']}
+                      getOption = {setSearchOption}
                     />
                   </Throttle>
                   <SearchDropDown
@@ -195,12 +220,13 @@ FinanceTablePage.propTypes = {
   location: PropTypes.object,
   loadAccounts: PropTypes.func,
   accounts: PropTypes.array,
+  history: PropTypes.object
 };
 
 const mapStateToProps = (state) => ({ accounts: state.accounts });
 const mapDispatchToProps = (dispatch) => ({
-  loadAccounts: (payload) => {
-    dispatch(loadAccountsAsync(payload));
+  loadAccounts: (payload, searchOption) => {
+    dispatch(loadAccountsAsync(payload, searchOption));
   },
 });
 export default connect(

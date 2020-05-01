@@ -2,7 +2,6 @@ import ApiService from "services/api/ApiService";
 import { buildPaginationQuery } from "helper/index";
 export default {
   getTransactionList: (page, pageSize, search = "", startDate = new Date(), endDate = new Date(), sort = []) => {
-    console.log(startDate)
     let query = {};
     if (!search) {
       const condition={
