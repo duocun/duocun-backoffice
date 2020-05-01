@@ -68,14 +68,10 @@ const Dashboard = ({summary, loadStatisticsSummary}) => {
                 <Icon>content_copy</Icon>
               </CardIcon>
               <p className={classes.cardCategory}>
-                <span>Orders</span>
-                <span>/</span>
-                <span>Products</span>
+                Orders
               </p>
               <h3 className={classes.cardTitle}>
-                <span>{summary.nOrders}</span>
-                <span>/</span>
-                <span>{summary.nProducts}</span>
+                {summary.nOrders}
               </h3>
             </CardHeader>
             <CardFooter stats>
@@ -101,7 +97,7 @@ const Dashboard = ({summary, loadStatisticsSummary}) => {
                 <Store />
               </CardIcon>
               <p className={classes.cardCategory}>
-                <span>Sales</span>
+                Sales
               </p>
               <h3 className={classes.cardTitle}>
                 <span>${summary.totalPrice}</span>
@@ -130,7 +126,7 @@ const Dashboard = ({summary, loadStatisticsSummary}) => {
             <CardFooter stats>
               <div className={classes.stats}>
                 <LocalOffer />
-                Tracked from Github
+                By drivers
               </div>
             </CardFooter>
           </Card>
