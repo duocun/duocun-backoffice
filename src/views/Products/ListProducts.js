@@ -19,7 +19,6 @@ import TableHead from "@material-ui/core/TableHead";
 import TablePagination from "components/Table/TablePagniation.js";
 import TableRow from "@material-ui/core/TableRow";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
-import ThreeSixtyIcon from '@material-ui/icons/ThreeSixty';
 import IconButton from "@material-ui/core/IconButton";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -27,11 +26,14 @@ import CheckIcon from "@material-ui/icons/Check";
 import CloseIcon from "@material-ui/icons/Close";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 import LocalMallIcon from "@material-ui/icons/LocalMall";
-
+import ToggleOffIcon from '@material-ui/icons/ToggleOff';
+import ToggleOnIcon from '@material-ui/icons/ToggleOn';
 import Avatar from "@material-ui/core/Avatar";
 import Alert from "@material-ui/lab/Alert";
 import TableBodySkeleton from "components/Table/TableBodySkeleton";
 import Searchbar from "components/Searchbar/Searchbar";
+import Tooltip from '@material-ui/core/Tooltip';
+
 
 import ApiProductService from "services/api/ApiProductService";
 import { getQueryParam } from "helper/index";
@@ -160,6 +162,7 @@ export default function Product({ location }) {
             <TableCell>{row.name}</TableCell>
             <TableCell>{row.price}</TableCell>
             <TableCell>{row.cost}</TableCell>
+            <TableCell>{row.status}</TableCell>
             <TableCell>
               <IconButton
                 disabled={processing}
@@ -175,15 +178,21 @@ export default function Product({ location }) {
               </IconButton>
             </TableCell>
             <TableCell>
+              <Tooltip title="修改">
               <IconButton aria-label="edit" href={`products/${row._id}`}>
                 <EditIcon />
               </IconButton>
+              </Tooltip>
+              <Tooltip title="删除">
               <IconButton aria-label="delete" disabled={processing}>
                 <DeleteIcon />
               </IconButton>
+              </Tooltip>
+              <Tooltip title="上架/下架">
               <IconButton aria-label="status" disabled={processing} onClick={()=> onChangeProductStatus(row._id,row.status)}>
-                <ThreeSixtyIcon />
+                {row.status==='A'?<ToggleOffIcon />:<ToggleOnIcon />}
               </IconButton>
+              </Tooltip>
             </TableCell>
           </TableRow>
         ))}
@@ -292,6 +301,16 @@ export default function Product({ location }) {
                             {t("Cost")}
                             {renderSort("cost")}
                           </TableCell>
+                          <TableCell
+                            onClick={() => {
+                              toggleSort("status");
+                            }}
+                            style={{ cursor: "pointer" }}
+                          >
+                            {t("Status")}
+                            {renderSort("status")}
+                          </TableCell>
+                          
                           <TableCell
                             onClick={() => {
                               toggleSort("featured");

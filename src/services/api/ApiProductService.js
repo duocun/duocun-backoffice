@@ -28,7 +28,7 @@ export default {
     return ApiService.v2().post(`products/${model._id}`, model);
   },
   changeStatus: (productId,currentStatus)=>{
-    let data = {data:{status: currentStatus==='A'? 'I':'A'}};
+    const data = {data:{status: currentStatus==='A'? 'I':'A'}};
     return ApiService.v2().put('products/?productId=' + productId, data);
   }
 };
