@@ -8,3 +8,8 @@
 table.dc-table {
   min-width: 750
 }
+
+/** select */
+.dc-full-select {
+  width: 100%;
+}
