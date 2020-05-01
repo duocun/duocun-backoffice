@@ -11,7 +11,7 @@
     "classnames": "2.2.6",
     "history": "4.9.0",
     "i18next": "^19.4.1",
-    "moment": "^2.24.0",
+    "moment": "2.24.0",
     "moment-timezone": "^0.5.28",
     "perfect-scrollbar": "1.4.0",
     "prop-types": "15.7.2",

@@ -12,7 +12,6 @@ import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
-import CustomInput from "components/CustomInput/CustomInput";
 
 import EditSkeleton, { EditSkeletonShort } from "../Common/EditSkeleton";
 import ApiAccountService from "services/api/ApiAccountService";
@@ -88,30 +87,27 @@ const MerchantsForm = ({}) => {
       <GridItem xs={12} lg={12} >
         <FormControl className="dc-full-select">
           <InputLabel id="merchant-type-label">Type</InputLabel>
-          <Select labelId="merchant-type-label" id="merchant-type"
+          <Select required labelId="merchant-type-label" id="merchant-type"
             value={model.type} onChange={ e => setModel({...model, type: e.target.value})} >
             <MenuItem value={'G'}>Grocery</MenuItem>
             <MenuItem value={'2'}>Restaurant</MenuItem>
           </Select>
         </FormControl>
       </GridItem>
-      <GridItem xs={12} lg={6}>
-        <CustomInput labelText={t("Merchant Name (Chinese)")} id="merchant-name"
-          formControlProps={{ fullWidth: true }}
-          inputProps={{ value: model.name, onChange: e => {
-            setModel({ ...model, name: e.target.value });
-          }}}
+      <GridItem xs={12} md={6} lg={6}>
+        <TextField id="merchant-name" label={`${t("Merchant Name (Chinese)")}`}
+          required className="dc-full" value={model.name}
+          onChange={e => { setModel({  ...model, name: e.target.value }); }}
         />
       </GridItem>
-      <GridItem xs={12} lg={6}>
-        <CustomInput labelText={t("Merchant Name (English)")} id="merchant-nameEN"
-          formControlProps={{ fullWidth: true }}
-          inputProps={{ value: model.nameEN, onChange: e => {
-            setModel({ ...model, nameEN: e.target.value });
-          }}}
+      <GridItem xs={12} md={6} lg={6}>
+        <TextField id="merchant-nameEN" label={`${t("Merchant Name (English)")}`}
+          required className="dc-full" value={model.nameEN}
+          onChange={e => { setModel({  ...model, nameEN: e.target.value }); }}
         />
       </GridItem>
-      <GridItem xs={12} lg={12}>
+      <GridItem xs={12} md={6} lg={12}>
+        <br />
         <TextField id="merchant-description" label={t("Description")}
           multiline rowsMax={4} variant="outlined" 
           className="dc-full-textarea" value={model.description}
