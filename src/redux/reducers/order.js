@@ -6,7 +6,7 @@ export const deliverDate = (state = {}, action) => {
 };
 
 export const orders = (state = [], action) => {
-  if (action && action.type === "LOAD_ORDERS") {
+  if (action && action.type === "SET_ORDERS") {
     return action.payload;
   }
   return state;
