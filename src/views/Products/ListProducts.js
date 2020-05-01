@@ -70,14 +70,11 @@ export default function Product({ location }) {
   const onChangeProductStatus = (rowId,currentStatus) =>{
    
     ApiProductService.changeStatus(rowId,currentStatus).then(
-      (r)=>{
-        console.log("status change, result: " + r.data.code);
 
-      }
-
+      updateData()
     )
-    updateData();
-    console.log("productId " + rowId);
+
+
   }
 
   const updateData = () => {
