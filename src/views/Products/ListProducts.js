@@ -186,7 +186,7 @@ export default function Product({ location }) {
               </IconButton>
               </Tooltip>
               <Tooltip title="上架/下架">
-              <IconButton aria-label="status" disabled={processing} onClick={()=> onChangeProductStatus(row._id,row.status)}>
+              <IconButton size="medium" aria-label="status" disabled={processing} onClick={()=> onChangeProductStatus(row._id,row.status)}>
                 {row.status==='A'?<ToggleOffIcon />:<ToggleOnIcon />}
               </IconButton>
               </Tooltip>

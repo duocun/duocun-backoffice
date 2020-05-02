@@ -144,8 +144,14 @@ const dashboardRoutes = [
     icon: Notifications,
     component: NotificationsPage,
     layout: "/"
-  }
-
+  },
+  {
+    path: "/dashboard/pickup",
+    name: "Dashboard",
+    icon: Dashboard,
+    component: DashboardRoute,
+    layout: "/dashboard"
+  },
 ];
 
 export default dashboardRoutes;
