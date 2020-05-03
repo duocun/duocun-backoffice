@@ -50,7 +50,7 @@ function FinanceTablePage({ location, accounts, loadAccounts, history }) {
   const [totalRows, setTotalRows] = useState(0);
   const [query, setQuery] = useState(getQueryParam(location, "search") || "");
   const [sort, setSort] = useState(["_id", 1]);
-  const [selectedAccountId, setSelectUserId] = useState("");
+  const [selectedAccount, setAccount] = useState({_id:'', type: ''});
   const [showList, setShowList] = useState(false);
   const [searchOption, setSearchOption] = useState('name');
 
@@ -72,7 +72,7 @@ function FinanceTablePage({ location, accounts, loadAccounts, history }) {
 
   useEffect(() => {
     updateData();
-  }, [page, rowsPerPage, sort, selectedAccountId, startDate, endDate]);
+  }, [page, rowsPerPage, sort, selectedAccount, startDate, endDate]);
 
   useEffect(() => {
     if (query) {
@@ -88,7 +88,7 @@ function FinanceTablePage({ location, accounts, loadAccounts, history }) {
     ApiTransactionService.getTransactionList(
       page,
       rowsPerPage,
-      selectedAccountId,
+      selectedAccount._id,
       startDate,
       endDate,
       [sort]
@@ -100,7 +100,9 @@ function FinanceTablePage({ location, accounts, loadAccounts, history }) {
   };
 
   const handleSelectSearch = (id, name) => {
-    setSelectUserId(id);
+    const account = accounts.find(a => a._id === id);
+    const type = account ? account.type : 'client';
+    setAccount({_id:id, type});
     setQuery(name);
   };
 
@@ -146,7 +148,7 @@ function FinanceTablePage({ location, accounts, loadAccounts, history }) {
                       alignItems: "center",
                     }}
                   >
-                    <TimePicker
+                    {/* <TimePicker
                       label="Start Date"
                       date={startDate}
                       getDate={setStartDate}
@@ -155,7 +157,7 @@ function FinanceTablePage({ location, accounts, loadAccounts, history }) {
                       label="End Date"
                       date={endDate}
                       getDate={setEndDate}
-                    />
+                    /> */}
                   </div>
                   <Throttle time="1000" handler="onChange">
                     <Searchbar
@@ -195,7 +197,7 @@ function FinanceTablePage({ location, accounts, loadAccounts, history }) {
                 )}
                 <GridItem xs={12}>
                   <FinanceTable
-                    accountId={selectedAccountId}
+                    account={selectedAccount}
                     rows={transactions}
                     page={page}
                     rowsPerPage={rowsPerPage}

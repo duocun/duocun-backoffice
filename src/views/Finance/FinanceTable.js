@@ -60,7 +60,7 @@ const useStyles = makeStyles(styles);
 // }));
 
 export const FinanceTable = ({
-  accountId,
+  account,
   rows,
   page,
   rowsPerPage,
@@ -131,7 +131,18 @@ export const FinanceTable = ({
 //       });
 //   };
 
-  const renderRows = (rows) => {
+  const renderRows = (account, rows) => {
+
+    const getBalance = (account, row) => {
+      if(account.type === 'driver'){
+        return row.toId === account._id ? row.toBalance : row.fromBalance;
+      }else if(account.type === 'client'){
+        return row.toId === account._id ? row.toBalance : row.fromBalance;
+      }else{
+        return row.toBalance;
+      }
+    }
+
     if (!rows.length) {
       return (
         <TableRow>
@@ -163,7 +174,8 @@ export const FinanceTable = ({
             <TableCell>{row.toName}</TableCell>
             <TableCell>{row.actionCode}</TableCell>
             <TableCell>{row.amount}</TableCell>
-            <TableCell>{row.toId === accountId ? row.toBalance : row.fromBalance}</TableCell>
+            <TableCell>{getBalance(account, row)}</TableCell>
+            <TableCell>{row.note}</TableCell>
             {/* <TableCell>
               <IconButton
                 disabled={processing}
@@ -278,6 +290,15 @@ export const FinanceTable = ({
               {t("balance")}
               {renderSort("toBalance")}
             </TableCell>
+            <TableCell
+              onClick={() => {
+                toggleSort("note");
+              }}
+              style={{ cursor: "pointer" }}
+            >
+              {t("note")}
+              {renderSort("note")}
+            </TableCell>
             <TableCell>{t("Actions")}</TableCell>
           </TableRow>
         </TableHead>
@@ -285,7 +306,7 @@ export const FinanceTable = ({
           {loading ? (
             <TableBodySkeleton colCount={7} rowCount={rowsPerPage} />
           ) : (
-            renderRows(rows)
+            renderRows(account, rows)
           )}
         </TableBody>
       </Table>

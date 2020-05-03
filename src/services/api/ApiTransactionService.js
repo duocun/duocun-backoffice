@@ -16,6 +16,7 @@ export default {
             toId: accountId,
           },
         ],
+        status: { $nin: ['bad', 'del', 'tmp'] }
       };
       query.query = buildPaginationQuery(page, pageSize, condition, [], sort);
     } else {
@@ -28,6 +29,7 @@ export default {
             toId: accountId,
           },
         ],
+        status: { $nin: ['bad', 'del', 'tmp'] }
         // created: {$gte: startDate, $lte: endDate}
       };
       query.query = buildPaginationQuery(page, pageSize, condition, [], sort);

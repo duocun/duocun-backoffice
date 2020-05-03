@@ -13,6 +13,7 @@ export default {
     query.query = buildPaginationQuery(page, pageSize, conditions, [], sort);
     return ApiService.v2().get("accounts", query);
   },
+
   getAccountAllKeyword: (keyword = "") => {
     let query = {};
     const condition = {
