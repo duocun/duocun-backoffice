@@ -1,6 +1,6 @@
 import ApiAccountService from "../../services/api/ApiAccountService";
 
-export const loadAccountsAsync = (payload, option) => {
+export const loadAccountsSearchAsync = (payload, option) => {
     return (dispatch) => {
     dispatch({ type: "LOAD_ACCOUNTS" });
     if(option === 'name'){
@@ -20,6 +20,18 @@ export const loadAccountsAsync = (payload, option) => {
     }
   };
 };
+
+export const loadAccountsByTypeAsync = (payload) =>{
+  return (dispatch) => {
+    dispatch({ type: "LOAD_ACCOUNTS" });
+      ApiAccountService.getAccountsByType(payload).then(res=>res.data).then(
+        (res) => dispatch(setAccounts(res.data)),
+        (err) => {throw err}
+      ).catch(err=>{
+        console.log(err)
+      })
+  };
+}
 
 const setAccounts = (payload) => {
   return {

@@ -16,6 +16,22 @@ export default {
     }
     return ApiService.v2().get("orders", query);
   },
+  getOrderListByDate: (page, pageSize, search = "",startDate = new Date(), endDate = new Date(), sort = []) => {
+    let query = {};
+    if (!search) {
+      query.query = buildPaginationQuery(page, pageSize, {pickupTime: "10:00", created: {$gte: startDate, $lte: endDate}}, [], sort);
+    } else {
+      const condition = {
+        name: {
+          $regex: search
+        },
+        pickupTime: "10:00",
+        created: {$gte: startDate, $lte: endDate}
+      };
+      query.query = buildPaginationQuery(page, pageSize, condition, [], sort);
+    }
+    return ApiService.v2().get("orders", query);
+  },
   getOrder: id => {
     return ApiService.v2().get(`orders/${id}`);
   },

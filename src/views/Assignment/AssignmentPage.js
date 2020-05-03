@@ -7,7 +7,6 @@ import moment from "moment";
 
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
-import SearchDropDown from "components/SearchDropDown/SearchDropDown.js";
 
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
@@ -16,30 +15,34 @@ import Searchbar from "components/Searchbar/Searchbar";
 import TimePicker from "components/TimePicker/TimePicker";
 
 import Alert from "@material-ui/lab/Alert";
-import ApiTransactionService from "services/api/ApiTransactionService";
+import ApiOrderService from "services/api/ApiOrderService";
 
 import { getQueryParam } from "helper/index";
 import FlashStorage from "services/FlashStorage";
 
-import { FinanceTable } from "./FinanceTable";
-import SecondaryNav from "components/SecondaryNav/SecondaryNav";
+import { OrderTable } from "./OrderTable";
+import DriverTable from "./DriverTable";
+import AssignmentMap from "./Map";
 
 //redux actions
-import { loadAccountsSearchAsync } from "redux/actions/account";
+import { loadDriversAsync } from "redux/actions/driver";
 
 import { Throttle } from "react-throttle";
 
-const useStyles = makeStyles(() => ({
-  table: {
-    minWidth: 750,
+const useStyles = makeStyles({
+  flexCard: {
+    display: "flex",
+    justifyContent: "space-between",
+    flexDirection: "row",
+    width: "100%",
   },
-}));
+});
 
-function FinanceTablePage({ location, accounts, loadAccounts, history }) {
+function AssignmentPage({ location, accounts, loadDrivers, history, drivers }) {
   const { t } = useTranslation();
   const classes = useStyles();
   // states related to list and pagniation
-  const [transactions, setTransactions] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(
     getQueryParam(location, "page")
@@ -51,8 +54,6 @@ function FinanceTablePage({ location, accounts, loadAccounts, history }) {
   const [query, setQuery] = useState(getQueryParam(location, "search") || "");
   const [sort, setSort] = useState(["_id", 1]);
   const [selectUserId, setSelectUserId] = useState("");
-  const [showList, setShowList] = useState(false);
-  const [searchOption, setSearchOption] = useState('name');
 
   const [startDate, setStartDate] = useState(
     moment()
@@ -75,34 +76,23 @@ function FinanceTablePage({ location, accounts, loadAccounts, history }) {
   }, [page, rowsPerPage, sort, selectUserId, startDate, endDate]);
 
   useEffect(() => {
-    if (query) {
-      loadAccounts(query, searchOption);
-    }
-  }, [query]);
-
-  const handleOnchange = (e) => {
-    const { target } = e;
-    setQuery(target.value);
-  };
+    loadDrivers();
+  }, []);
 
   const updateData = () => {
-    ApiTransactionService.getTransactionList(
+    ApiOrderService.getOrderListByDate(
       page,
       rowsPerPage,
-      selectUserId,
+      query,
       startDate,
       endDate,
       [sort]
     ).then(({ data }) => {
-      setTransactions(data.data);
+      console.log(data);
+      setOrders(data.data);
       setTotalRows(data.count);
       setLoading(false);
     });
-  };
-
-  const handleSelectSearch = (id, name) => {
-    setSelectUserId(id);
-    setQuery(name);
   };
 
   const removeAlert = () => {
@@ -110,16 +100,6 @@ function FinanceTablePage({ location, accounts, loadAccounts, history }) {
       message: "",
       severity: "info",
     });
-  };
-
-  const handleShowList = () => {
-    setShowList(true);
-  };
-
-  const handleHideList = () => {
-    setTimeout(() => {
-      setShowList(false);
-    }, 500);
   };
 
   return (
@@ -130,14 +110,7 @@ function FinanceTablePage({ location, accounts, loadAccounts, history }) {
             <CardHeader color="primary">
               <GridContainer>
                 <GridItem xs={12} lg={6}>
-                  <h4>{t("Finance")}</h4>
-                  <SecondaryNav
-                    tabs={[
-                      { title: "Finance", route: "/finance" },
-                      { title: "Exception", route: "/finance/exception" },
-                    ]}
-                    history={history}
-                  />
+                  <h4>{t("Assignment")}</h4>
                 </GridItem>
                 <GridItem xs={12} lg={6} align="right">
                   <div
@@ -160,8 +133,10 @@ function FinanceTablePage({ location, accounts, loadAccounts, history }) {
                   </div>
                   <Throttle time="1000" handler="onChange">
                     <Searchbar
-                      value={query}
-                      onChange={handleOnchange}
+                      onChange={(e) => {
+                        const { target } = e;
+                        setQuery(target.value);
+                      }}
                       onSearch={() => {
                         setLoading(true);
                         if (page === 0) {
@@ -170,18 +145,8 @@ function FinanceTablePage({ location, accounts, loadAccounts, history }) {
                           setPage(0);
                         }
                       }}
-                      onFocus={handleShowList}
-                      onBlur={handleHideList}
-                      ifSearch = {false}
-                      options = {['name', 'phone']}
-                      getOption = {setSearchOption}
                     />
                   </Throttle>
-                  <SearchDropDown
-                    data={accounts}
-                    onClick={handleSelectSearch}
-                    show={showList}
-                  />
                 </GridItem>
               </GridContainer>
             </CardHeader>
@@ -195,17 +160,23 @@ function FinanceTablePage({ location, accounts, loadAccounts, history }) {
                   </GridItem>
                 )}
                 <GridItem xs={12}>
-                  <FinanceTable
-                    rows={transactions}
-                    page={page}
-                    rowsPerPage={rowsPerPage}
-                    totalRows={totalRows}
-                    sort={sort}
-                    loading={loading}
-                    setRowsPerPage={setRowsPerPage}
-                    setSort={setSort}
-                    setPage={setPage}
-                  />
+                  <div className={classes.flexCard}>
+                    <OrderTable
+                      rows={orders}
+                      page={page}
+                      rowsPerPage={rowsPerPage}
+                      totalRows={totalRows}
+                      sort={sort}
+                      loading={loading}
+                      setRowsPerPage={setRowsPerPage}
+                      setSort={setSort}
+                      setPage={setPage}
+                    />
+                    <div style={{width:'50%' ,display:'flex', justifyContent:'center'}}>
+                      <AssignmentMap orders={orders}/>
+                      <DriverTable drivers={drivers} />
+                    </div>
+                  </div>
                 </GridItem>
               </GridContainer>
             </CardBody>
@@ -216,20 +187,24 @@ function FinanceTablePage({ location, accounts, loadAccounts, history }) {
   );
 }
 
-FinanceTablePage.propTypes = {
+AssignmentPage.propTypes = {
   location: PropTypes.object,
   loadAccounts: PropTypes.func,
   accounts: PropTypes.array,
-  history: PropTypes.object
+  history: PropTypes.object,
+  drivers: PropTypes.array,
 };
 
-const mapStateToProps = (state) => ({ accounts: state.accounts });
+const mapStateToProps = (state) => ({
+  accounts: state.accounts,
+  drivers: state.drivers,
+});
 const mapDispatchToProps = (dispatch) => ({
-  loadAccounts: (payload, searchOption) => {
-    dispatch(loadAccountsSearchAsync(payload, searchOption));
+  loadDrivers: () => {
+    dispatch(loadDriversAsync());
   },
 });
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(FinanceTablePage);
+)(AssignmentPage);

@@ -25,7 +25,7 @@ import { FinanceTable } from "./FinanceTable";
 import SecondaryNav from "components/SecondaryNav/SecondaryNav";
 
 //redux actions
-import { loadAccountsAsync } from "redux/actions/account";
+// import { loadAccountsAsync } from "redux/actions/account";
 
 import { Throttle } from "react-throttle";
 
@@ -209,9 +209,9 @@ FinanceException.propTypes = {
 
 const mapStateToProps = (state) => ({ accounts: state.accounts });
 const mapDispatchToProps = (dispatch) => ({
-  loadAccounts: (payload) => {
-    dispatch(loadAccountsAsync(payload));
-  },
+  // loadAccounts: (payload) => {
+  //   dispatch(loadAccountsAsync(payload));
+  // },
 });
 export default connect(
   mapStateToProps,

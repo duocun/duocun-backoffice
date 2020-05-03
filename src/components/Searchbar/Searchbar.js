@@ -16,8 +16,8 @@ const useStyles = makeStyles(styles);
 const Searchbar = ({
   onChange,
   onSearch,
-  onFocus,
-  onBlur,
+  onFocus = () => 0,
+  onBlur = () => 0,
   options = [],
   optionTitle = "option",
   getOption,
