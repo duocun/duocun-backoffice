@@ -86,6 +86,12 @@ export default function Product({ location }) {
   // set model
   const [model, setModel] = useState(defaultProduct);
 
+  // type
+  const [productType, setType] = useState('G'); // grocery
+  const handleTypeChange = (type) => {
+    setType(type);
+    updateData(type);
+  }
 
   // categories
   const [categories, setCategories] = useState([]);
@@ -96,8 +102,9 @@ export default function Product({ location }) {
     });
   }, []);
 
-  const handleCategoryChange = (_id) => {
-    setModel({...model, category: {_id}})
+  const handleCategoryChange = (catId, productType, row) => {
+    updateProduct(row._id, productType, {categoryId: catId});
+    setModel({...model, category: {_id: catId}});
   };
 
 
@@ -112,12 +119,13 @@ export default function Product({ location }) {
 
     ApiProductService.changeStatus(rowId, currentStatus).then(
 
-      updateData()
+      updateData(productType)
     )
   }
 
-  const updateData = () => {
-    ApiProductService.getProductList(page, rowsPerPage, query, [sort]).then(
+  const updateData = (type) => {
+    const params = {type};
+    ApiProductService.getProductList(page, rowsPerPage, query, params, [sort]).then(
       ({ data }) => {
         setProducts(data.data);
         setTotalRows(data.count);
@@ -140,7 +148,36 @@ export default function Product({ location }) {
     });
   };
 
-  const toggleFeature = productId => {
+  const updateProduct = (productId, productType, params) => {
+    removeAlert();
+    setProcessing(true);
+    ApiProductService.updateProduct(productId, params).then(({data}) => {
+      if (data.code === 'success') {
+        setAlert({
+          message: t("Saved successfully"),
+          severtiy: "success"
+        });
+        updateData(productType);
+      } else {
+        setAlert({
+          message: t("Save failed"),
+          severity: "error"
+        });
+      }
+    }).catch(e => {
+      console.error(e);
+      setAlert({
+        message: t("Save exception"),
+        severity: "error"
+      });
+    })
+    .finally(() => {
+      setProcessing(false);
+    });
+  }
+
+  // change status
+  const toggleFeature = (productId, type) => {
     removeAlert();
     setProcessing(true);
     ApiProductService.toggleFeature(productId)
@@ -150,7 +187,7 @@ export default function Product({ location }) {
             message: t("Saved successfully"),
             severtiy: "success"
           });
-          updateData();
+          updateData(type);
         } else {
           setAlert({
             message: t("Save failed"),
@@ -196,17 +233,18 @@ export default function Product({ location }) {
               </Avatar>
             </TableCell>
             <TableCell>{row.name}</TableCell>
-            {/* <TableCell>{row.catetory ? row.category.name : ''}</TableCell> */}
+            <TableCell>
             <FormControl className={classes.formControl}>
               {/* <InputLabel id="category-select-label">Category</InputLabel> */}
               <Select required labelId="category-select-label" id="category-select"
-                value={model.category ? model.category._id : ''} onChange={e => handleCategoryChange(e.target.value)} >
+                value={row.category ? row.category._id : ''} onChange={e => handleCategoryChange(e.target.value, productType, row)} >
                 {
                   categories && categories.length > 0 &&
-                  categories.map(cat => <MenuItem value={cat._id}>{cat.name}</MenuItem>)
-                }fieldName
+                  categories.map(cat => <MenuItem key={cat._id} value={cat._id}>{cat.name}</MenuItem>)
+                }
               </Select>
             </FormControl>
+            </TableCell>
             <TableCell>{row.price}</TableCell>
             <TableCell>{row.cost}</TableCell>
             <TableCell>{row.status}</TableCell>
@@ -214,7 +252,7 @@ export default function Product({ location }) {
               <IconButton
                 disabled={processing}
                 onClick={() => {
-                  toggleFeature(row._id);
+                  toggleFeature(row._id, productType);
                 }}
               >
                 {row.featured ? (
@@ -259,7 +297,7 @@ export default function Product({ location }) {
   };
 
   useEffect(() => {
-    updateData();
+    updateData(productType);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, rowsPerPage, sort]);
 
@@ -284,6 +322,18 @@ export default function Product({ location }) {
                       {t("New Product")}
                     </Button>
                   </Box>
+
+            {
+            <FormControl className={classes.formControl}>
+              <InputLabel id="type-select-label">Type</InputLabel>
+              <Select required labelId="type-select-label" id="type-select"
+                value={productType} onChange={e => handleTypeChange(e.target.value)} >
+                <MenuItem value={'F'}>餐饮</MenuItem>
+                <MenuItem value={'G'}>商超</MenuItem>
+              </Select>
+            </FormControl>
+            }
+
                   <Searchbar
                     onChange={e => {
                       const { target } = e;
@@ -292,7 +342,7 @@ export default function Product({ location }) {
                     onSearch={() => {
                       setLoading(true);
                       if (page === 0) {
-                        updateData();
+                        updateData(productType);
                       } else {
                         setPage(0);
                       }
