@@ -160,9 +160,9 @@ export const FinanceTable = ({
             <TableCell>{toDateString(row.modified)}</TableCell>
             <TableCell>{row.fromName}</TableCell>
             <TableCell>{row.toName}</TableCell>
-            <TableCell>{row.action}</TableCell>
+            <TableCell>{row.actionCode}</TableCell>
             <TableCell>{row.amount}</TableCell>
-            <TableCell>{row.toBalance}</TableCell>
+            <TableCell>{row.toId === '5cad44629687ac4a075e2f42' ? row.toBalance : row.fromBalance}</TableCell>
             {/* <TableCell>
               <IconButton
                 disabled={processing}
