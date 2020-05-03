@@ -50,7 +50,7 @@ function FinanceTablePage({ location, accounts, loadAccounts, history }) {
   const [totalRows, setTotalRows] = useState(0);
   const [query, setQuery] = useState(getQueryParam(location, "search") || "");
   const [sort, setSort] = useState(["_id", 1]);
-  const [selectUserId, setSelectUserId] = useState("");
+  const [selectedAccountId, setSelectUserId] = useState("");
   const [showList, setShowList] = useState(false);
   const [searchOption, setSearchOption] = useState('name');
 
@@ -72,7 +72,7 @@ function FinanceTablePage({ location, accounts, loadAccounts, history }) {
 
   useEffect(() => {
     updateData();
-  }, [page, rowsPerPage, sort, selectUserId, startDate, endDate]);
+  }, [page, rowsPerPage, sort, selectedAccountId, startDate, endDate]);
 
   useEffect(() => {
     if (query) {
@@ -80,8 +80,7 @@ function FinanceTablePage({ location, accounts, loadAccounts, history }) {
     }
   }, [query]);
 
-  const handleOnchange = (e) => {
-    const { target } = e;
+  const handleSearchChange = ({target}) => {
     setQuery(target.value);
   };
 
@@ -89,7 +88,7 @@ function FinanceTablePage({ location, accounts, loadAccounts, history }) {
     ApiTransactionService.getTransactionList(
       page,
       rowsPerPage,
-      selectUserId,
+      selectedAccountId,
       startDate,
       endDate,
       [sort]
@@ -161,7 +160,7 @@ function FinanceTablePage({ location, accounts, loadAccounts, history }) {
                   <Throttle time="1000" handler="onChange">
                     <Searchbar
                       value={query}
-                      onChange={handleOnchange}
+                      onChange={handleSearchChange}
                       onSearch={() => {
                         setLoading(true);
                         if (page === 0) {
@@ -196,6 +195,7 @@ function FinanceTablePage({ location, accounts, loadAccounts, history }) {
                 )}
                 <GridItem xs={12}>
                   <FinanceTable
+                    accountId={selectedAccountId}
                     rows={transactions}
                     page={page}
                     rowsPerPage={rowsPerPage}

@@ -60,6 +60,7 @@ const useStyles = makeStyles(styles);
 // }));
 
 export const FinanceTable = ({
+  accountId,
   rows,
   page,
   rowsPerPage,
@@ -162,7 +163,7 @@ export const FinanceTable = ({
             <TableCell>{row.toName}</TableCell>
             <TableCell>{row.actionCode}</TableCell>
             <TableCell>{row.amount}</TableCell>
-            <TableCell>{row.toId === '5cad44629687ac4a075e2f42' ? row.toBalance : row.fromBalance}</TableCell>
+            <TableCell>{row.toId === accountId ? row.toBalance : row.fromBalance}</TableCell>
             {/* <TableCell>
               <IconButton
                 disabled={processing}
