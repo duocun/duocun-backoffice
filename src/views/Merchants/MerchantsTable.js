@@ -54,14 +54,14 @@ export default function MerchantsTable({ merchants, rowsPerPage, toggleSort, sor
                 label={ MerchantType[row.type] || row.type } /> : null }</TableCell>
               <TableCell>{row.order}</TableCell>
               <TableCell>
-                <table>
+                {/* <table>
                   <tr><td>下单</td><td></td><td>配送</td></tr>
                   {
                     row.phases && row.phases.map((item) => {
                       return <tr><td>{ item.orderEnd }</td><td>,</td><td>{ item.pickup }</td></tr>
                     })
                   }
-                </table>
+                </table> */}
                 {row.dow ? `星期 ${row.dow}` : null}</TableCell>
                 <TableCell>
                   <IconButton aria-label="edit" href={`merchants/${row._id}`}>
