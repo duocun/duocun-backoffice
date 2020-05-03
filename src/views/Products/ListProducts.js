@@ -85,10 +85,14 @@ export default function Product({ location }) {
 
   // set model
   const [model, setModel] = useState(defaultProduct);
+
+
+  // categories
   const [categories, setCategories] = useState([]);
   useEffect( () => {
     ApiCategoryService.getCategories({type:'G'}).then(({data}) => {
-      setCategories(data.data);
+      const cats = data.data;
+      setCategories(cats);
     });
   }, []);
 
@@ -195,10 +199,12 @@ export default function Product({ location }) {
             {/* <TableCell>{row.catetory ? row.category.name : ''}</TableCell> */}
             <FormControl className={classes.formControl}>
               {/* <InputLabel id="category-select-label">Category</InputLabel> */}
-              <Select required labelId="category-select-label" id="catgory-select"
-                value={model.category ? model.category.name : ''} onChange={e => handleCategoryChange(e.target.value)} >
-                <MenuItem value={'G'}>Grocery</MenuItem>
-                <MenuItem value={'2'}>Restaurant</MenuItem>
+              <Select required labelId="category-select-label" id="category-select"
+                value={model.category ? model.category._id : ''} onChange={e => handleCategoryChange(e.target.value)} >
+                {
+                  categories && categories.length > 0 &&
+                  categories.map(cat => <MenuItem value={cat._id}>{cat.name}</MenuItem>)
+                }fieldName
               </Select>
             </FormControl>
             <TableCell>{row.price}</TableCell>
