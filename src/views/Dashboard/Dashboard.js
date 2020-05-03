@@ -1,4 +1,5 @@
 import React, {useEffect} from "react";
+import { Link } from "react-router-dom";
 // react plugin for creating charts
 import ChartistGraph from "react-chartist";
 // @material-ui/core
@@ -9,6 +10,7 @@ import IconButton from "@material-ui/core/IconButton";
 import AccountBoxOutlinedIcon from '@material-ui/icons/AccountBoxOutlined';
 import * as moment from 'moment';
 import {connect} from 'react-redux';
+
 
 import Store from "@material-ui/icons/Store";
 import Warning from "@material-ui/icons/Warning";
@@ -49,7 +51,7 @@ import { loadStatisticsSummaryAsync } from 'redux/actions/statistics';
 
 const useStyles = makeStyles(styles);
 
-const Dashboard = ({summary, loadStatisticsSummary}) => {
+const Dashboard = ({summary, loadStatisticsSummary, history}) => {
   const classes = useStyles();
 
   useEffect(() => {
@@ -113,15 +115,17 @@ const Dashboard = ({summary, loadStatisticsSummary}) => {
         </GridItem>
         <GridItem xs={12} sm={6} md={3}>
           <Card>
-            <CardHeader href="/products" color="danger" stats icon >
+            <CardHeader href="/products" color="danger" stats icon onClick={()=>{history.push("/dashboard/pickup")}}>
               <CardIcon color="danger">
                 <Icon>info_outline</Icon>
               </CardIcon>
-              <IconButton aria-label="driverSummary" href="dashboard/pickup">
+              {/* <IconButton aria-label="driverSummary" href="dashboard/pickup">
                 <AccountBoxOutlinedIcon />
-              </IconButton>
+              </IconButton> */}
+
               <p className={classes.cardCategory}>Products</p>
               <h3 className={classes.cardTitle}>{summary.nProducts}</h3>
+
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>

@@ -19,6 +19,11 @@ export default {
     }
     return ApiService.v2().get("categories", query);
   },
+
+  getCategories: (query) => {
+    return ApiService.v2().get("categories", {where: query} );
+  },
+
   getCategoryTree: () => {
     return ApiService.v2().get("categories/category-tree");
   },

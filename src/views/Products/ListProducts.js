@@ -11,6 +11,7 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 
+
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -34,17 +35,38 @@ import TableBodySkeleton from "components/Table/TableBodySkeleton";
 import Searchbar from "components/Searchbar/Searchbar";
 import Tooltip from '@material-ui/core/Tooltip';
 
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+// import FormHelperText from '@material-ui/core/FormHelperText';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import { Button, Box } from "@material-ui/core";
 
+import ApiCategoryService from "services/api/ApiCategoryService";
 import ApiProductService from "services/api/ApiProductService";
 import { getQueryParam } from "helper/index";
 import FlashStorage from "services/FlashStorage";
-import { Button, Box } from "@material-ui/core";
 
-const useStyles = makeStyles(() => ({
+
+const useStyles = makeStyles((theme) => ({
   table: {
     minWidth: 750
-  }
+  },
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+  },
+  selectEmpty: {
+    marginTop: theme.spacing(2),
+  },
 }));
+
+const defaultProduct = {
+  name: '',
+  description: '',
+  category: { _id: '', name: '' }
+};
+
 export default function Product({ location }) {
   const { t } = useTranslation();
   const classes = useStyles();
@@ -61,20 +83,33 @@ export default function Product({ location }) {
   const [query, setQuery] = useState(getQueryParam(location, "search") || "");
   const [sort, setSort] = useState(["_id", 1]);
 
+  // set model
+  const [model, setModel] = useState(defaultProduct);
+  const [categories, setCategories] = useState([]);
+  useEffect( () => {
+    ApiCategoryService.getCategories({type:'G'}).then(({data}) => {
+      setCategories(data.data);
+    });
+  }, []);
+
+  const handleCategoryChange = (_id) => {
+    setModel({...model, category: {_id}})
+  };
+
+
+
   // states related to processing
   const [alert, setAlert] = useState(
     FlashStorage.get("PRODUCT_ALERT") || { message: "", severity: "info" }
   );
   const [processing, setProcessing] = useState(false);
 
-  const onChangeProductStatus = (rowId,currentStatus) =>{
-   
-    ApiProductService.changeStatus(rowId,currentStatus).then(
+  const onChangeProductStatus = (rowId, currentStatus) => {
+
+    ApiProductService.changeStatus(rowId, currentStatus).then(
 
       updateData()
     )
-
-
   }
 
   const updateData = () => {
@@ -157,6 +192,15 @@ export default function Product({ location }) {
               </Avatar>
             </TableCell>
             <TableCell>{row.name}</TableCell>
+            {/* <TableCell>{row.catetory ? row.category.name : ''}</TableCell> */}
+            <FormControl className={classes.formControl}>
+              {/* <InputLabel id="category-select-label">Category</InputLabel> */}
+              <Select required labelId="category-select-label" id="catgory-select"
+                value={model.category ? model.category.name : ''} onChange={e => handleCategoryChange(e.target.value)} >
+                <MenuItem value={'G'}>Grocery</MenuItem>
+                <MenuItem value={'2'}>Restaurant</MenuItem>
+              </Select>
+            </FormControl>
             <TableCell>{row.price}</TableCell>
             <TableCell>{row.cost}</TableCell>
             <TableCell>{row.status}</TableCell>
@@ -170,25 +214,25 @@ export default function Product({ location }) {
                 {row.featured ? (
                   <CheckIcon color="primary"></CheckIcon>
                 ) : (
-                  <CloseIcon color="error"></CloseIcon>
-                )}
+                    <CloseIcon color="error"></CloseIcon>
+                  )}
               </IconButton>
             </TableCell>
             <TableCell>
               <Tooltip title="修改">
-              <IconButton aria-label="edit" href={`products/${row._id}`}>
-                <EditIcon />
-              </IconButton>
+                <IconButton aria-label="edit" href={`products/${row._id}`}>
+                  <EditIcon />
+                </IconButton>
               </Tooltip>
               <Tooltip title="删除">
-              <IconButton aria-label="delete" disabled={processing}>
-                <DeleteIcon />
-              </IconButton>
+                <IconButton aria-label="delete" disabled={processing}>
+                  <DeleteIcon />
+                </IconButton>
               </Tooltip>
               <Tooltip title="上架/下架">
-              <IconButton aria-label="status" disabled={processing} onClick={()=> onChangeProductStatus(row._id,row.status)}>
-                {row.status==='A'?<ToggleOffIcon />:<ToggleOnIcon />}
-              </IconButton>
+                <IconButton size="medium" aria-label="status" disabled={processing} onClick={() => onChangeProductStatus(row._id, row.status)}>
+                  {row.status === 'A' ? <ToggleOffIcon /> : <ToggleOnIcon />}
+                </IconButton>
               </Tooltip>
             </TableCell>
           </TableRow>
@@ -280,6 +324,17 @@ export default function Product({ location }) {
                             {t("Product Name")}
                             {renderSort("name")}
                           </TableCell>
+                          <TableCell>
+                            <TableCell
+                              onClick={() => {
+                                toggleSort("category");
+                              }}
+                              style={{ cursor: "pointer" }}
+                            >
+                              {t("Category")}
+                              {renderSort("category")}
+                            </TableCell>
+                          </TableCell>
                           <TableCell
                             onClick={() => {
                               toggleSort("price");
@@ -307,7 +362,7 @@ export default function Product({ location }) {
                             {t("Status")}
                             {renderSort("status")}
                           </TableCell>
-                          
+
                           <TableCell
                             onClick={() => {
                               toggleSort("featured");
@@ -327,8 +382,8 @@ export default function Product({ location }) {
                             rowCount={rowsPerPage}
                           />
                         ) : (
-                          renderRows(products)
-                        )}
+                            renderRows(products)
+                          )}
                       </TableBody>
                     </Table>
                   </TableContainer>

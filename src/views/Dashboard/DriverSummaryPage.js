@@ -46,7 +46,7 @@ const styles = {
 const useStyles = makeStyles(styles);
 
 
-const DriverSummaryPage = ({driverSummaryArray,loadDriverSummary}) => {
+const DriverSummaryPage = ({driverSummary,loadDriverSummary}) => {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [selectedDriver, setSelectedDriver] = React.useState(null);
@@ -66,8 +66,8 @@ const DriverSummaryPage = ({driverSummaryArray,loadDriverSummary}) => {
   };
 
   useEffect(() => {
-    const startDate = moment().format('YYYY-MM-DD');
-    // const startDate = '2020-04-03';  // hard coded date because 05-01 has no data
+    // const startDate = moment().format('YYYY-MM-DD');
+    const startDate = '2020-04-03';  // hard coded date because 05-01 has no data
     loadDriverSummary(startDate);
   }, []);
   return (
@@ -100,21 +100,21 @@ const DriverSummaryPage = ({driverSummaryArray,loadDriverSummary}) => {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
               >
-             {driverSummaryArray.map((driver, index) => (
+             {/* {driverSummary.map((v, index) => (
                 <MenuItem
-                  key={driver.driverName}
+                  key={v.merchantName}
                   selected={index === selectedIndex}
                   onClick={(event) => handleMenuItemClick(event, driver,index)}
                 >
                  {driver.driverName}
                 </MenuItem>
-            ))}
+            ))} */}
             </Menu>
              </div>
             </CardHeader>
             <CardBody>
               <GridContainer>
-                <GridItem xs={12} sm={12} md={5}>
+                {/* <GridItem xs={12} sm={12} md={5}>
                 <div>
                     <div>司机名称:</div>
                     <div>{selectedDriver?selectedDriver.driverName:"N/A"}</div>
@@ -131,7 +131,25 @@ const DriverSummaryPage = ({driverSummaryArray,loadDriverSummary}) => {
                     <div>分配产品数:</div>
                     <div>{selectedDriver?selectedDriver.nProducts:"N/A"}</div>
                 </div>
-                </GridItem>
+                </GridItem> */}
+
+
+                selectedDriver &&
+                {
+                  driverSummary[selectedDriver.driverId].map(g => 
+                    <div key={selectedDriver.driverId}>
+                      {/* {selectedDriver.dreiverName} */}
+                      {
+                        g.merchants.map(m => {
+                          // <div key={m.merchantId}>{m.merchantName}</div>
+                          m.items.map(it => 
+                            <div key={it.productId}>{it.productName}</div>
+                          )
+                        })
+                      }
+                    </div>
+                  )
+                }
               </GridContainer>
 
 
@@ -145,7 +163,7 @@ const DriverSummaryPage = ({driverSummaryArray,loadDriverSummary}) => {
   );
 }
 
-const mapStateToProps = (state) => ({ driverSummaryArray: state.driverSummaryArray });
+const mapStateToProps = (state) => ({ driverSummary: state.driverSummary });
 const mapDispatchToProps = (dispatch) => ({
   loadDriverSummary: (startDate) => {
     dispatch(loadDriverSummaryAsync(startDate));
