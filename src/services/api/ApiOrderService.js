@@ -22,5 +22,8 @@ export default {
   saveOrder: model => {
     model._id = model._id || "new";
     return ApiService.v2().post(`orders/${model._id}`, model);
-  }
+  },
+  removeOrder: id => {
+    return ApiService.v2().delete(`orders/${id}`);
+  },
 };

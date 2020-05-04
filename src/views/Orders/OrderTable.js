@@ -19,6 +19,9 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import CheckIcon from "@material-ui/icons/Check";
 import CloseIcon from "@material-ui/icons/Close";
 
+import FlashStorage from "services/FlashStorage";
+
+import ApiOrderService from "services/api/ApiOrderService";
 
 const styles = {
   cardCategoryWhite: {
@@ -57,7 +60,7 @@ const useStyles = makeStyles(styles);
 //   }
 // }));
 
-export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, setRowsPerPage, setSort, setPage }) => {
+export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, setRowsPerPage, setSort, setPage, removeData }) => {
   const { t } = useTranslation();
   const classes = useStyles();
   // const [page, setPage] = useState(
@@ -69,7 +72,6 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
   // const [rowsPerPage, setRowsPerPage] = useState(10);
   // const [totalRows, setTotalRows] = useState(0);
 
-  const [processing, setProcessing] = useState(false);
 
   const renderSort = fieldName => {
     return (
@@ -95,6 +97,8 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
   const toDateString = s => {
     return s ? s.split('T')[0] : '';
   }
+  const [processing, setProcessing] = useState(false);
+
 
   if (!rows.length) {
     return (
@@ -230,7 +234,7 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
                         <IconButton aria-label="edit" href={`orders/${row._id}`}>
                           <EditIcon />
                         </IconButton>
-                        <IconButton aria-label="delete" disabled={processing}>
+                        <IconButton aria-label="delete" disabled={processing} onClick={() => removeData(row._id)}>
                           <DeleteIcon />
                         </IconButton>
                       </TableCell>
