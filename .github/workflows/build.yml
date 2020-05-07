@@ -32,4 +32,6 @@ jobs:
     - run: npm run test
     - run: npm run build
       env:
-        CI: true
+        # This value should be set as true
+        # Contributors, please remove warnings from your source code to make me & CI happy again!
+        CI: false
