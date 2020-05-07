@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/bravemaster619/duocun-backoffice.svg?branch=master)](https://travis-ci.org/bravemaster619/duocun-backoffice)
+![build](https://github.com/duocun/duocun-backoffice/workflows/build/badge.svg?branch=develop)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node version](https://img.shields.io/badge/npm-v6.13.4-blue)](http://nodejs.org/download/)
