@@ -42,6 +42,7 @@ import CancelIcon from "@material-ui/icons/Cancel";
 
 import FlashStorage from "services/FlashStorage";
 import ApiProductService from "services/api/ApiProductService";
+import ApiCategoryService from "services/api/ApiCategoryService";
 import CategoryTree from "views/Categories/CategoryTree";
 import { groupAttributeData, getAllCombinations } from "helper/index";
 const useStyles = makeStyles(() => ({
@@ -362,11 +363,14 @@ const EditProduct = ({ match, history }) => {
 
   const updatePage = () => {
     ApiProductService.getProduct(match.params.id)
-      .then(({ data }) => {
-        if (data.success) {
+      .then(async ({ data }) => {
+        if (data.code === "success") {
           setModel({ ...model, ...data.data });
-          setCategoryTreeData(data.meta.categoryTree);
-          setAttributes(data.meta.attributes);
+          const categoryResp = await ApiCategoryService.getCategoryTree();
+          if (categoryResp.data && categoryResp.data.code === "success") {
+            setCategoryTreeData(categoryResp.data.data);
+          }
+          setAttributes(data.meta?.attributes || []);
         } else {
           setAlert({
             message: t("Data not found"),

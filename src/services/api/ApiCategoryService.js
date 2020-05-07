@@ -20,10 +20,10 @@ export default {
     return ApiService.v2().get("categories", query);
   },
 
-  getCategories: (params) => {
+  getCategories: params => {
     const query = {};
     query.query = buildPaginationQuery(null, null, params, [], []);
-    return ApiService.v2().get("categories", query );
+    return ApiService.v2().get("categories", query);
   },
 
   getCategoryTree: () => {
