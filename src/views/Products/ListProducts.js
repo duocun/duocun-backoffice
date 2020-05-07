@@ -11,7 +11,6 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 
-
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -27,19 +26,19 @@ import CheckIcon from "@material-ui/icons/Check";
 import CloseIcon from "@material-ui/icons/Close";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 import LocalMallIcon from "@material-ui/icons/LocalMall";
-import ToggleOffIcon from '@material-ui/icons/ToggleOff';
-import ToggleOnIcon from '@material-ui/icons/ToggleOn';
+import ToggleOffIcon from "@material-ui/icons/ToggleOff";
+import ToggleOnIcon from "@material-ui/icons/ToggleOn";
 import Avatar from "@material-ui/core/Avatar";
 import Alert from "@material-ui/lab/Alert";
 import TableBodySkeleton from "components/Table/TableBodySkeleton";
 import Searchbar from "components/Searchbar/Searchbar";
-import Tooltip from '@material-ui/core/Tooltip';
+import Tooltip from "@material-ui/core/Tooltip";
 
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
 // import FormHelperText from '@material-ui/core/FormHelperText';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
+import FormControl from "@material-ui/core/FormControl";
+import Select from "@material-ui/core/Select";
 import { Button, Box } from "@material-ui/core";
 
 import ApiCategoryService from "services/api/ApiCategoryService";
@@ -47,24 +46,23 @@ import ApiProductService from "services/api/ApiProductService";
 import { getQueryParam } from "helper/index";
 import FlashStorage from "services/FlashStorage";
 
-
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   table: {
     minWidth: 750
   },
   formControl: {
     margin: theme.spacing(1),
-    minWidth: 120,
+    minWidth: 120
   },
   selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
+    marginTop: theme.spacing(2)
+  }
 }));
 
 const defaultProduct = {
-  name: '',
-  description: '',
-  category: { _id: '', name: '' }
+  name: "",
+  description: "",
+  category: { _id: "", name: "" }
 };
 
 export default function Product({ location }) {
@@ -87,27 +85,25 @@ export default function Product({ location }) {
   const [model, setModel] = useState(defaultProduct);
 
   // type
-  const [productType, setType] = useState('G'); // grocery
-  const handleTypeChange = (type) => {
+  const [productType, setType] = useState("G"); // grocery
+  const handleTypeChange = type => {
     setType(type);
     updateData(type);
-  }
+  };
 
   // categories
   const [categories, setCategories] = useState([]);
-  useEffect( () => {
-    ApiCategoryService.getCategories({type:'G'}).then(({data}) => {
+  useEffect(() => {
+    ApiCategoryService.getCategories({ type: "G" }).then(({ data }) => {
       const cats = data.data;
       setCategories(cats);
     });
   }, []);
 
   const handleCategoryChange = (catId, productType, row) => {
-    updateProduct(row._id, productType, {categoryId: catId});
-    setModel({...model, category: {_id: catId}});
+    updateProduct(row._id, productType, { categoryId: catId });
+    setModel({ ...model, category: { _id: catId } });
   };
-
-
 
   // states related to processing
   const [alert, setAlert] = useState(
@@ -116,22 +112,20 @@ export default function Product({ location }) {
   const [processing, setProcessing] = useState(false);
 
   const onChangeProductStatus = (rowId, currentStatus) => {
-
     ApiProductService.changeStatus(rowId, currentStatus).then(
-
       updateData(productType)
-    )
-  }
-
-  const updateData = (type) => {
-    const params = {type};
-    ApiProductService.getProductList(page, rowsPerPage, query, params, [sort]).then(
-      ({ data }) => {
-        setProducts(data.data);
-        setTotalRows(data.count);
-        setLoading(false);
-      }
     );
+  };
+
+  const updateData = type => {
+    const params = { type };
+    ApiProductService.getProductList(page, rowsPerPage, query, params, [
+      sort
+    ]).then(({ data }) => {
+      setProducts(data.data);
+      setTotalRows(data.count);
+      setLoading(false);
+    });
   };
   const toggleSort = fieldName => {
     // sort only one field
@@ -151,30 +145,32 @@ export default function Product({ location }) {
   const updateProduct = (productId, productType, params) => {
     removeAlert();
     setProcessing(true);
-    ApiProductService.updateProduct(productId, params).then(({data}) => {
-      if (data.code === 'success') {
+    ApiProductService.updateProduct(productId, params)
+      .then(({ data }) => {
+        if (data.code === "success") {
+          setAlert({
+            message: t("Saved successfully"),
+            severtiy: "success"
+          });
+          updateData(productType);
+        } else {
+          setAlert({
+            message: t("Save failed"),
+            severity: "error"
+          });
+        }
+      })
+      .catch(e => {
+        console.error(e);
         setAlert({
-          message: t("Saved successfully"),
-          severtiy: "success"
-        });
-        updateData(productType);
-      } else {
-        setAlert({
-          message: t("Save failed"),
+          message: t("Save exception"),
           severity: "error"
         });
-      }
-    }).catch(e => {
-      console.error(e);
-      setAlert({
-        message: t("Save exception"),
-        severity: "error"
+      })
+      .finally(() => {
+        setProcessing(false);
       });
-    })
-    .finally(() => {
-      setProcessing(false);
-    });
-  }
+  };
 
   // change status
   const toggleFeature = (productId, type) => {
@@ -234,16 +230,26 @@ export default function Product({ location }) {
             </TableCell>
             <TableCell>{row.name}</TableCell>
             <TableCell>
-            <FormControl className={classes.formControl}>
-              {/* <InputLabel id="category-select-label">Category</InputLabel> */}
-              <Select required labelId="category-select-label" id="category-select"
-                value={row.category ? row.category._id : ''} onChange={e => handleCategoryChange(e.target.value, productType, row)} >
-                {
-                  categories && categories.length > 0 &&
-                  categories.map(cat => <MenuItem key={cat._id} value={cat._id}>{cat.name}</MenuItem>)
-                }
-              </Select>
-            </FormControl>
+              <FormControl className={classes.formControl}>
+                {/* <InputLabel id="category-select-label">Category</InputLabel> */}
+                <Select
+                  required
+                  labelId="category-select-label"
+                  id="category-select"
+                  value={row.categoryId}
+                  onChange={e =>
+                    handleCategoryChange(e.target.value, productType, row)
+                  }
+                >
+                  {categories &&
+                    categories.length > 0 &&
+                    categories.map(cat => (
+                      <MenuItem key={cat._id} value={cat._id}>
+                        {cat.name}
+                      </MenuItem>
+                    ))}
+                </Select>
+              </FormControl>
             </TableCell>
             <TableCell>{row.price}</TableCell>
             <TableCell>{row.cost}</TableCell>
@@ -258,8 +264,8 @@ export default function Product({ location }) {
                 {row.featured ? (
                   <CheckIcon color="primary"></CheckIcon>
                 ) : (
-                    <CloseIcon color="error"></CloseIcon>
-                  )}
+                  <CloseIcon color="error"></CloseIcon>
+                )}
               </IconButton>
             </TableCell>
             <TableCell>
@@ -274,8 +280,13 @@ export default function Product({ location }) {
                 </IconButton>
               </Tooltip>
               <Tooltip title="上架/下架">
-                <IconButton size="medium" aria-label="status" disabled={processing} onClick={() => onChangeProductStatus(row._id, row.status)}>
-                  {row.status === 'A' ? <ToggleOffIcon /> : <ToggleOnIcon />}
+                <IconButton
+                  size="medium"
+                  aria-label="status"
+                  disabled={processing}
+                  onClick={() => onChangeProductStatus(row._id, row.status)}
+                >
+                  {row.status === "A" ? <ToggleOffIcon /> : <ToggleOnIcon />}
                 </IconButton>
               </Tooltip>
             </TableCell>
@@ -323,16 +334,21 @@ export default function Product({ location }) {
                     </Button>
                   </Box>
 
-            {
-            <FormControl className={classes.formControl}>
-              <InputLabel id="type-select-label">Type</InputLabel>
-              <Select required labelId="type-select-label" id="type-select"
-                value={productType} onChange={e => handleTypeChange(e.target.value)} >
-                <MenuItem value={'F'}>餐饮</MenuItem>
-                <MenuItem value={'G'}>商超</MenuItem>
-              </Select>
-            </FormControl>
-            }
+                  {
+                    <FormControl className={classes.formControl}>
+                      <InputLabel id="type-select-label">Type</InputLabel>
+                      <Select
+                        required
+                        labelId="type-select-label"
+                        id="type-select"
+                        value={productType}
+                        onChange={e => handleTypeChange(e.target.value)}
+                      >
+                        <MenuItem value={"F"}>餐饮</MenuItem>
+                        <MenuItem value={"G"}>商超</MenuItem>
+                      </Select>
+                    </FormControl>
+                  }
 
                   <Searchbar
                     onChange={e => {
@@ -434,12 +450,12 @@ export default function Product({ location }) {
                       <TableBody>
                         {loading ? (
                           <TableBodySkeleton
-                            colCount={7}
+                            colCount={9}
                             rowCount={rowsPerPage}
                           />
                         ) : (
-                            renderRows(products)
-                          )}
+                          renderRows(products)
+                        )}
                       </TableBody>
                     </Table>
                   </TableContainer>
