@@ -22,6 +22,7 @@
     "react-dom": "16.9.0",
     "react-google-maps": "9.4.5",
     "react-i18next": "^11.3.4",
+    "react-infinite-scroll-component": "^5.0.4",
     "react-moment": "^0.9.7",
     "react-redux": "^7.2.0",
     "react-router-dom": "^5.1.2",

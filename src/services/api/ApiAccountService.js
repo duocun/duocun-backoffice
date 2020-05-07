@@ -14,7 +14,7 @@ export default {
     return ApiService.v2().get("accounts", query);
   },
 
-  getAccountAllKeyword: (keyword = "") => {
+  getAccountByKeyword: (page, pageSize, keyword = "", sort = []) => {
     let query = {};
     const condition = {
       username: {
@@ -22,15 +22,16 @@ export default {
       },
     };
     query.keyword = query.query = buildPaginationQuery(
-      null,
-      null,
+      page,
+      pageSize,
       condition,
       [],
       []
     );
     return ApiService.v2().get("accounts", query);
   },
-  getAccountAllPhone: (phone) => {
+
+  getAccountAllPhone: (page, pageSize, phone) => {
     let query = {};
     const condition = {
       phone: {
@@ -38,8 +39,8 @@ export default {
       },
     };
     query.keyword = query.query = buildPaginationQuery(
-      null,
-      null,
+      page,
+      pageSize,
       condition,
       [],
       []

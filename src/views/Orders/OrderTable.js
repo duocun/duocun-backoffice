@@ -185,6 +185,24 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
                 {t("Cost")}
                 {renderSort("cost")}
               </TableCell>
+              <TableCell
+                onClick={() => {
+                  toggleSort("driver");
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                {t("Driver Name")}
+                {renderSort("driver")}
+              </TableCell>
+              <TableCell
+                onClick={() => {
+                  toggleSort("driver phone");
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                {t("Driver Phone")}
+                {renderSort("driver phone")}
+              </TableCell>
               {/* <TableCell
                             onClick={() => {
                               toggleSort("featured");
@@ -216,6 +234,8 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
                       <TableCell>{row.merchant ? row.merchant.name: 'N/A'}</TableCell>
                       <TableCell>{row.price}</TableCell>
                       <TableCell>{row.cost}</TableCell>
+                      <TableCell>{row.driver ? row.driver.username : 'N/A'}</TableCell>
+                      <TableCell>{row.driver ? row.driver.phone: 'N/A'}</TableCell>
                       <TableCell>
                         <IconButton
                           disabled={processing}

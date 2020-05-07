@@ -7,7 +7,6 @@ import moment from "moment";
 
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
-import SearchDropDown from "components/SearchDropDown/SearchDropDown.js";
 
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
@@ -15,8 +14,12 @@ import CardBody from "components/Card/CardBody.js";
 import Searchbar from "components/Searchbar/Searchbar";
 import TimePicker from "components/TimePicker/TimePicker";
 
+import { Button, Box } from "@material-ui/core";
+import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
+
 import Alert from "@material-ui/lab/Alert";
 import ApiTransactionService from "services/api/ApiTransactionService";
+import ApiAccountService from "services/api/ApiAccountService";
 
 import { getQueryParam } from "helper/index";
 import FlashStorage from "services/FlashStorage";
@@ -24,10 +27,10 @@ import FlashStorage from "services/FlashStorage";
 import { FinanceTable } from "./FinanceTable";
 import SecondaryNav from "components/SecondaryNav/SecondaryNav";
 
+import AccountSearch from "./AccountSearch";
 //redux actions
-import { loadAccountsAsync } from "redux/actions/account";
+// import { loadAccountsAsync } from "redux/actions/account";
 
-import { Throttle } from "react-throttle";
 
 const useStyles = makeStyles(() => ({
   table: {
@@ -35,11 +38,12 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-function FinanceTablePage({ location, accounts, loadAccounts, history }) {
+export const FinanceTablePage = ({ location, history }) => {
   const { t } = useTranslation();
   const classes = useStyles();
   // states related to list and pagniation
   const [transactions, setTransactions] = useState([]);
+  
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(
     getQueryParam(location, "page")
@@ -50,6 +54,7 @@ function FinanceTablePage({ location, accounts, loadAccounts, history }) {
   const [totalRows, setTotalRows] = useState(0);
   const [query, setQuery] = useState(getQueryParam(location, "search") || "");
   const [sort, setSort] = useState(["_id", 1]);
+
   const [selectedAccount, setAccount] = useState({_id:'', type: ''});
   const [showList, setShowList] = useState(false);
   const [searchOption, setSearchOption] = useState('name');
@@ -74,15 +79,16 @@ function FinanceTablePage({ location, accounts, loadAccounts, history }) {
     updateData();
   }, [page, rowsPerPage, sort, selectedAccount, startDate, endDate]);
 
-  useEffect(() => {
-    if (query) {
-      loadAccounts(query, searchOption);
-    }
-  }, [query]);
+  // useEffect(() => {
+  //   if (query) {
+  //     // ApiAccountService.getAccountByKeyword(page, pageSize, keyword = "").then(({data}) => {
 
-  const handleSearchChange = ({target}) => {
-    setQuery(target.value);
-  };
+  //     // });
+  //     // loadAccounts(query, searchOption);
+  //   }
+  // }, [query]);
+
+
 
   const updateData = () => {
     ApiTransactionService.getTransactionList(
@@ -91,19 +97,12 @@ function FinanceTablePage({ location, accounts, loadAccounts, history }) {
       selectedAccount._id,
       startDate,
       endDate,
-      [sort]
+      [] // sort
     ).then(({ data }) => {
       setTransactions(data.data);
       setTotalRows(data.count);
       setLoading(false);
     });
-  };
-
-  const handleSelectSearch = (id, name) => {
-    const account = accounts.find(a => a._id === id);
-    const type = account ? account.type : 'client';
-    setAccount({_id:id, type});
-    setQuery(name);
   };
 
   const removeAlert = () => {
@@ -113,15 +112,18 @@ function FinanceTablePage({ location, accounts, loadAccounts, history }) {
     });
   };
 
-  const handleShowList = () => {
-    setShowList(true);
+  const handleSelectSearch = (id, name) => {
+    // const account = accounts.find(a => a._id === id);
+    // const type = account ? account.type : 'client';
+    // setAccount({_id:id, type});
+    // setQuery(name);
   };
 
-  const handleHideList = () => {
-    setTimeout(() => {
-      setShowList(false);
-    }, 500);
-  };
+  const handleSelectAccount = account => {
+    const type = account ? account.type : 'client';
+    setAccount({_id: account? account._id: '', type});
+    setQuery(account? account.username:'');
+  }
 
   return (
     <div>
@@ -132,13 +134,22 @@ function FinanceTablePage({ location, accounts, loadAccounts, history }) {
               <GridContainer>
                 <GridItem xs={12} lg={6}>
                   <h4>{t("Finance")}</h4>
-                  <SecondaryNav
+                  {/* <SecondaryNav
                     tabs={[
                       { title: "Finance", route: "/finance" },
                       { title: "Exception", route: "/finance/exception" },
                     ]}
                     history={history}
-                  />
+                  /> */}
+                    <Button
+                      // href="finance/salary"
+                      variant="contained"
+                      color="default"
+                      onClick={()=>{history.push("/finance/salary")}}
+                    >
+                      <AddCircleOutlineIcon />
+                      {t("Pay Salary")}
+                    </Button>
                 </GridItem>
                 <GridItem xs={12} lg={6} align="right">
                   <div
@@ -159,30 +170,12 @@ function FinanceTablePage({ location, accounts, loadAccounts, history }) {
                       getDate={setEndDate}
                     /> */}
                   </div>
-                  <Throttle time="1000" handler="onChange">
-                    <Searchbar
-                      value={query}
-                      onChange={handleSearchChange}
-                      onSearch={() => {
-                        setLoading(true);
-                        if (page === 0) {
-                          updateData();
-                        } else {
-                          setPage(0);
-                        }
-                      }}
-                      onFocus={handleShowList}
-                      onBlur={handleHideList}
-                      ifSearch = {false}
-                      options = {['name', 'phone']}
-                      getOption = {setSearchOption}
-                    />
-                  </Throttle>
-                  <SearchDropDown
-                    data={accounts}
-                    onClick={handleSelectSearch}
-                    show={showList}
+
+                  <AccountSearch
+                    val={query}
+                    handleSelectAccount={handleSelectAccount}
                   />
+
                 </GridItem>
               </GridContainer>
             </CardHeader>
@@ -225,13 +218,13 @@ FinanceTablePage.propTypes = {
   history: PropTypes.object
 };
 
-const mapStateToProps = (state) => ({ accounts: state.accounts });
-const mapDispatchToProps = (dispatch) => ({
-  loadAccounts: (payload, searchOption) => {
-    dispatch(loadAccountsAsync(payload, searchOption));
-  },
-});
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(FinanceTablePage);
+// const mapStateToProps = (state) => ({ accounts: state.accounts });
+// const mapDispatchToProps = (dispatch) => ({
+//   loadAccounts: (payload, searchOption) => {
+//     dispatch(loadAccountsAsync(payload, searchOption));
+//   },
+// });
+// export default connect(
+//   mapStateToProps,
+//   mapDispatchToProps
+// )(FinanceTablePage);

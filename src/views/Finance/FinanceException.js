@@ -25,7 +25,7 @@ import { FinanceTable } from "./FinanceTable";
 import SecondaryNav from "components/SecondaryNav/SecondaryNav";
 
 //redux actions
-import { loadAccountsAsync } from "redux/actions/account";
+// import { loadAccountsAsync } from "redux/actions/account";
 
 import { Throttle } from "react-throttle";
 
@@ -35,7 +35,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-function FinanceException({ location, accounts, loadAccounts, history }) {
+export const FinanceException = ({ location, history }) => {
   const { t } = useTranslation();
   const classes = useStyles();
   // states related to list and pagniation
@@ -48,13 +48,15 @@ function FinanceException({ location, accounts, loadAccounts, history }) {
   );
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalRows, setTotalRows] = useState(0);
-  const [query, setQuery] = useState(getQueryParam(location, "search") || "");
+  // const [query, setQuery] = useState(getQueryParam(location, "search") || "");
   const [sort, setSort] = useState(["_id", 1]);
   const [selectUserId, setSelectUserId] = useState("");
   const [showList, setShowList] = useState(false);
 
   const [startDate, setStartDate] = useState(moment().utc().toISOString());
   const [endDate, setEndDate] = useState(moment().utc().toISOString());
+
+
 
   // states related to processing
   const [alert, setAlert] = useState(
@@ -163,6 +165,8 @@ function FinanceException({ location, accounts, loadAccounts, history }) {
                   </Throttle>
                   <SearchDropDown
                     data={accounts}
+                    hasMore={hasMoreAccounts}
+                    fetchData={fetchAccounts}
                     onClick={handleSelectSearch}
                     show={showList}
                   />
@@ -184,10 +188,10 @@ function FinanceException({ location, accounts, loadAccounts, history }) {
                     page={page}
                     rowsPerPage={rowsPerPage}
                     totalRows={totalRows}
-                    sort={sort}
+                    // sort={sort}
                     loading={loading}
                     setRowsPerPage={setRowsPerPage}
-                    setSort={setSort}
+                    // setSort={setSort}
                     setPage={setPage}
                   />
                 </GridItem>
@@ -207,13 +211,13 @@ FinanceException.propTypes = {
   history: PropTypes.object
 };
 
-const mapStateToProps = (state) => ({ accounts: state.accounts });
-const mapDispatchToProps = (dispatch) => ({
-  loadAccounts: (payload) => {
-    dispatch(loadAccountsAsync(payload));
-  },
-});
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(FinanceException);
+// const mapStateToProps = (state) => ({ accounts: state.accounts });
+// const mapDispatchToProps = (dispatch) => ({
+//   loadAccounts: (payload) => {
+//     dispatch(loadAccountsAsync(payload));
+//   },
+// });
+// export default connect(
+//   mapStateToProps,
+//   mapDispatchToProps
+// )(FinanceException);

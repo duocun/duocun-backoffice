@@ -126,5 +126,5 @@ export default function MerchantsTablePage({ location }) {
 }
 
 MerchantsTablePage.propTypes = {
-  location: PropTypes.object
+  location: PropTypes.arrayOf(PropTypes.object)
 };

@@ -16,7 +16,7 @@ export default {
             toId: accountId,
           },
         ],
-        status: { $nin: ['bad', 'del', 'tmp'] }
+        status: { $nin: ['bad', 'tmp'] }
       };
       query.query = buildPaginationQuery(page, pageSize, condition, [], sort);
     } else {
@@ -29,7 +29,7 @@ export default {
             toId: accountId,
           },
         ],
-        status: { $nin: ['bad', 'del', 'tmp'] }
+        status: { $nin: ['bad', 'tmp'] }
         // created: {$gte: startDate, $lte: endDate}
       };
       query.query = buildPaginationQuery(page, pageSize, condition, [], sort);
@@ -44,8 +44,10 @@ export default {
   //   getProduct: id => {
   //     return ApiService.v2().get(`products/${id}`);
   //   },
-  //   saveProduct: model => {
-  //     model._id = model._id || "new";
-  //     return ApiService.v2().post(`products/${model._id}`, model);
-  //   }
+  // saveTransaction: model => {
+  //   // model._id = model._id || "new";
+  //   // if(model._id === 'new'){
+  //   //   return ApiService.v2().post(`Transactions/`, model);
+  //   // }
+  // }
 };
