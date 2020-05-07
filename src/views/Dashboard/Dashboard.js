@@ -65,7 +65,7 @@ const Dashboard = ({summary, loadStatisticsSummary, history}) => {
       <GridContainer>
         <GridItem xs={12} sm={6} md={3}>
           <Card>
-            <CardHeader color="warning" stats icon>
+            <CardHeader color="warning" stats icon onClick={()=>{history.push("/dashboard/order")}}>
               <CardIcon color="warning">
                 <Icon>content_copy</Icon>
               </CardIcon>

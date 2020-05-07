@@ -19,8 +19,8 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   list: {
-    backgroundColor: "gray",
-    width: "182px",
+    backgroundColor: "primary",
+    width: "200px",
     right: "43px",
     boxShadow: "0px 0px 5px 0px rgba(0,0,0,0.75)",
     maxHeight: "250px",
@@ -44,21 +44,6 @@ const SearchDropDown = ({ data, hasMore, fetchData, selectData, show = false }) 
 
   const [dense, setDense] = React.useState(false);
   const [secondary, setSecondary] = React.useState(false);
-
-  // function generate(data) {
-  //   return data.map((item) => {
-  //     let text = item.phone ? item.username + " " + item.phone : item.username;
-  //     //avoid pass in an arrow function to avoid redundant render
-  //     function handleAccountClick(){
-  //       onClick(item._id, item.username)
-  //     }
-  //     return (
-  //       <ListItem key={item._id} onClick={handleAccountClick}>
-  //         <ListItemText primary={text} className={classes.ListItem} />
-  //       </ListItem>
-  //     );
-  //   });
-  // }
 
   const getVisibility = (show) => (show ? "visible" : "hidden");
 
@@ -89,7 +74,13 @@ const SearchDropDown = ({ data, hasMore, fetchData, selectData, show = false }) 
         >
         {
           data && data.length > 0 &&
-          data.map(d => <div key={d._id} onClick={() => selectData(d)}>{d.username+' ' + (d.phone? d.phone:'')}</div>)
+
+          data.map(d => 
+            <ListItem key={d._id} onClick={() => selectData(d)}>
+              <ListItemText primary={d.username+' ' + (d.phone? d.phone:'')} className={classes.ListItem} />
+            </ListItem>
+            // <div key={d._id} onClick={() => selectData(d)}>{d.username+' ' + (d.phone? d.phone:'')}</div>
+          )
         }
     </InfiniteScroll>
       {/* <List dense={dense} className={classes.list}>
