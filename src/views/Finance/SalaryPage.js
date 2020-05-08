@@ -44,7 +44,6 @@ import { getQueryParam } from "helper/index";
 
 import ApiAuthService from 'services/api/ApiAuthService';
 import ApiAccountService from 'services/api/ApiAccountService';
-import ApiTransaction from 'services/api/ApiTransactionService';
 import Auth from "services/AuthService";
 import ApiTransactionService from "services/api/ApiTransactionService";
 import { FinanceTable } from "./FinanceTable";
@@ -154,20 +153,13 @@ const SalaryPage = ({ history, location}) => {
     if(model.staffId){
       removeAlert();
       setProcessing(true);
-      ApiTransaction.updateTransactions(model.staffId).then(({ data }) => {
+      ApiTransactionService.updateTransactions(model.staffId).then(({ data }) => {
         if (data.code === 'success') {
-          const newAlert = {
+          setAlert({
             message: t("Update successfully"),
             severity: "success"
-          };
-          if (model._id === "new") {
-            FlashStorage.set("SALARY_ALERT", newAlert);
-            history.push("../finance/salary");
-            return;
-          } else {
-            setAlert(newAlert);
-            // updatePage();
-          }
+          });
+          // updatePage();
         } else {
           setAlert({
             message: t("Update failed"),
@@ -191,7 +183,7 @@ const SalaryPage = ({ history, location}) => {
     if(model.fromId && model.staffId){
       removeAlert();
       setProcessing(true);
-      ApiTransaction.createTransaction(model).then(({ data }) => {
+      ApiTransactionService.createTransaction(model).then(({ data }) => {
         if (data.code === 'success') {
           const newAlert = {
             message: t("Saved successfully"),
