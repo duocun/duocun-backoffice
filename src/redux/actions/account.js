@@ -1,17 +1,19 @@
 import ApiAccountService from "../../services/api/ApiAccountService";
 
-export const loadAccountsSearchAsync = (payload, option) => {
+// export const loadAccountsSearchAsync = (payload, option) => {}
+
+export const loadAccountsAsync = (page, pageSize, payload, option) => {
     return (dispatch) => {
     dispatch({ type: "LOAD_ACCOUNTS" });
     if(option === 'name'){
-      ApiAccountService.getAccountAllKeyword(payload).then(res=>res.data).then(
+      ApiAccountService.getAccountAllKeyword(page, pageSize, payload).then(res=>res.data).then(
         (res) => dispatch(setAccounts(res.data)),
         (err) => {throw err}
       ).catch(err=>{
         console.log(err)
       })
     }else if(option === 'phone' && payload.length >= 3){
-      ApiAccountService.getAccountAllPhone(payload).then(res=>res.data).then(
+      ApiAccountService.getAccountAllPhone(page, pageSize, payload).then(res=>res.data).then(
         (res) => dispatch(setAccounts(res.data)),
         (err) => {throw err}
       ).catch(err=>{
@@ -33,9 +35,16 @@ export const loadAccountsByTypeAsync = (payload) =>{
   };
 }
 
-const setAccounts = (payload) => {
+export const setAccounts = (payload) => {
   return {
     type: "SET_ACCOUNTS",
+    payload,
+  };
+};
+
+export const setAccount = (payload) => {
+  return {
+    type: "SET_ACCOUNT",
     payload,
   };
 };

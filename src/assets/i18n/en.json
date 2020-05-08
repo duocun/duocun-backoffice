@@ -52,5 +52,10 @@
     "Category Name (Chinese)": "Category Name (Chinese)",
     "Display Order": "Display Order",
     "Add Category": "Add Category",
-    "All products under selected category will be deleted!": "All products under selected category will be deleted!"
+    "All products under selected category will be deleted!": "All products under selected category will be deleted!",
+    "Allow negative quantity": "Allow negative quantity",
+    "Food": "Food",
+    "Grocery": "Grocery",
+    "Out of stock Message (English)": "Out of stock Message (English)",
+    "Out of stock Message (Chinese)": "Out of stock Message (Chinese)"
 }

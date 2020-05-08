@@ -1,13 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 
-import { LocalMall as LocalMallIcon,
-          FormatListBulleted as FormatListBulletedIcon,
-          Edit as EditIcon,
-          Delete as DeleteIcon,
-        } from "@material-ui/icons";
-import { Tooltip, IconButton, Avatar, Button, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel }  from "@material-ui/core";
+import { LocalMall as LocalMallIcon, Edit as EditIcon, Delete as DeleteIcon, } from "@material-ui/icons";
+import { IconButton, Avatar, Chip, Table, TableBody, 
+    TableCell, TableContainer, TableHead, TableRow, TableSortLabel }  from "@material-ui/core";
 
 import TableBodySkeleton from "components/Table/TableBodySkeleton";
 
@@ -57,14 +54,14 @@ export default function MerchantsTable({ merchants, rowsPerPage, toggleSort, sor
                 label={ MerchantType[row.type] || row.type } /> : null }</TableCell>
               <TableCell>{row.order}</TableCell>
               <TableCell>
-                <table>
+                {/* <table>
                   <tr><td>下单</td><td></td><td>配送</td></tr>
                   {
                     row.phases && row.phases.map((item) => {
                       return <tr><td>{ item.orderEnd }</td><td>,</td><td>{ item.pickup }</td></tr>
                     })
                   }
-                </table>
+                </table> */}
                 {row.dow ? `星期 ${row.dow}` : null}</TableCell>
                 <TableCell>
                   <IconButton aria-label="edit" href={`merchants/${row._id}`}>

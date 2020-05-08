@@ -1,4 +1,5 @@
 import queryString from "query-string";
+import * as moment from 'moment';
 
 export const getQueryParam = (location, key) => {
   if (location.search) {
@@ -100,7 +101,7 @@ export const getAllCombinations = (groupData) => {
 //dateString parser
 
 export const toDateString = (s = null) => {
-  return s ? s.split("T")[0] : "";
+  return s ? moment.utc(s).local().format('YYYY-MM-DD') : "";
 };
 
 //debounce not really good

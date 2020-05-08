@@ -7,4 +7,12 @@ export const statisticsSummary = (state = {}, action) => {
   return state;
 };
 
+export const driverSummary = (state = [], action) => {
+  if (action && action.type === "SET_DRIVER_SUMMARY") {
+    return action.payload;
+  }
+  return state;
+};
+
+
 

@@ -1,78 +1,113 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { Delete as DeleteIcon,  Add as AddIcon, } from "@material-ui/icons";
-import { TextField, ButtonGroup, Button, List, ListItem, 
-    ListItemText, ListItemSecondaryAction, IconButton } from "@material-ui/core";
+import { Save as SaveIcon, FormatListBulleted as FormatListBulletedIcon } from "@material-ui/icons";
+import { TextField, ButtonGroup, Button, List, ListItem,
+    Select, MenuItem, InputLabel, FormControl } from "@material-ui/core";
+import { Alert } from "@material-ui/lab"
 
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-import CustomInput from "components/CustomInput/CustomInput";
+import CardFooter from "components/Card/CardFooter.js";
 
-import EditSkeleton from "../Common/EditSkeleton";
+import EditSkeleton, { EditSkeletonShort } from "../Common/EditSkeleton";
+import ApiAccountService from "services/api/ApiAccountService";
+import ApiMerchantService from "services/api/ApiMerchantService";
 
 const defaultMerchantsModelState = {
   _id: 'new',
   name: "",
   nameEN: "",
   description: "",
-  address: {},
+  descriptionEN: "",
   accountId: "",
-  mallId: "",
   pictures: [],
-  closed: [],
   dow: "",          // day of week opening, eg. '1,2,3,4,5'
-  type: "",
-  mall : { },
-  ownerId: [],
-  location: {
-    lat: 0, 
-    lng: 0
-  },      // lat lng
-  malls: [],        // mall id
-  order: 0,
-  // inRange: boolean;
-  onSchedule: false,
-  phases: [{
-    "orderEnd" : "10:30",
-    "pickup" : "11:20"
-  }],
-  rules: []
+  type: "G",
+  rank: 0,
+  status: false,
+  _orderEnd: "23:59",
+  _orderEndTimeArr: ["", "", "", "", "", "", ""],
+  rules: [{
+      "orderEnd" : {
+        "dow" : "1",
+        "time" : "23:59"
+      } 
+    },{
+      "orderEnd" : {
+        "dow" : "3",
+        "time" : "23:59"
+      }
+  }]
 }
 const MerchantsForm = ({}) => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [processing, setProcessing] = useState(false);
+
+  // for accounts
+  const [accounts, setAccounts] = useState([]);
+  const [accountLoading, setAccountLoading] = useState(true);
+  const [accountFilter, setAccountFilter] = useState("");
+
+  // for model
   const [model, setModel] = useState(defaultMerchantsModelState);
-  const [phaseIndex, setPhaseIndex] = useState(-1);
-  const [orderEnd, setOrderEnd] = useState("");
-  const [pickup, setPickup] = useState("");
+  const [ruleSimple, setRuleSimple] = useState(true);
+  const [alert, setAlert] = useState({ message: "", severity: "info" });
+
+  ////////////////////////////////////
+  // For data fetch
+  const getMerchantData = () => {
+
+  }
+  const getAccountsData = () => {
+    ApiAccountService.getAccountList(0, 1000, {type: "merchant"}).then(
+      ({ data }) => {
+        setAccounts(data.data);
+        setAccountLoading(false);
+      }
+    );
+  }
+  useEffect( ()=> {
+    // only call once
+    getAccountsData() 
+  }, []);
+
+  ////////////////////////////////////
+  // For render and events 
 
   const _renderUserInfo = ()=> {
     return <React.Fragment>
       <GridItem xs={12}>
         <h5>{t("Basic Information")}</h5>
       </GridItem>
-      <GridItem xs={12} lg={6}>
-        <CustomInput labelText={t("Merchant Name (Chinese)")} id="merchant-name"
-          formControlProps={{ fullWidth: true }}
-          inputProps={{ value: model.name, onChange: e => {
-            setModel({ ...model, name: e.target.value });
-          }}}
+      <GridItem xs={12} lg={12} >
+        <FormControl className="dc-full-select">
+          <InputLabel id="merchant-type-label">Type</InputLabel>
+          <Select required labelId="merchant-type-label" id="merchant-type"
+            value={model.type} onChange={ e => setModel({...model, type: e.target.value})} >
+            <MenuItem value={'G'}>Grocery</MenuItem>
+            <MenuItem value={'2'}>Restaurant</MenuItem>
+          </Select>
+        </FormControl>
+      </GridItem>
+      <GridItem xs={12} md={6} lg={6}>
+        <TextField id="merchant-name" label={`${t("Merchant Name (CN)")}`}
+          required className="dc-full" value={model.name}
+          onChange={e => { setModel({  ...model, name: e.target.value }); }}
         />
       </GridItem>
-      <GridItem xs={12} lg={6}>
-        <CustomInput labelText={t("Merchant Name (English)")} id="merchant-nameEN"
-          formControlProps={{ fullWidth: true }}
-          inputProps={{ value: model.nameEN, onChange: e => {
-            setModel({ ...model, nameEN: e.target.value });
-          }}}
+      <GridItem xs={12} md={6} lg={6}>
+        <TextField id="merchant-nameEN" label={`${t("Merchant Name (EN)")}`}
+          required className="dc-full" value={model.nameEN}
+          onChange={e => { setModel({  ...model, nameEN: e.target.value }); }}
         />
       </GridItem>
-      <GridItem xs={12} lg={12}>
+      <GridItem xs={12} md={6} lg={12}>
+        <br />
         <TextField id="merchant-description" label={t("Description")}
           multiline rowsMax={4} variant="outlined" 
           className="dc-full-textarea" value={model.description}
@@ -81,191 +116,205 @@ const MerchantsForm = ({}) => {
           }}
         />
       </GridItem>
-    </React.Fragment>
-  }
-
-  const _renderAddress = () => {
-    return <React.Fragment>
-      <GridItem xs={12}>
-        <h5>{t("Address")}</h5>
-      </GridItem>
-      <GridItem xs={12} lg={6}>
-        <CustomInput labelText={t("Street Name")} id="street-name"
-          formControlProps={{ fullWidth: true }}
-          inputProps={{ value: model.address.streetName, onChange: e => {
-            setModel({ ...model, ['address.streetName']: e.target.value });
-          }}}
-        />
-      </GridItem>
-      <GridItem xs={12} lg={6}>
-        <CustomInput labelText={t("Street Number")} id="street-number"
-          formControlProps={{ fullWidth: true }}
-          inputProps={{ value: model.address.streetNumber, onChange: e => {
-            setModel({ ...model, ['address.streetNumber']: e.target.value });
-          }}}
-        />
-      </GridItem>
-      <GridItem xs={12} lg={6}>
-        <CustomInput labelText={t("Sublocality")} id="sub-locality"
-          formControlProps={{ fullWidth: true }}
-          inputProps={{ value: model.address.sublocality, onChange: e => {
-            setModel({ ...model, ['address.sublocality']: e.target.value });
-          }}}
-        />
-      </GridItem>
-      <GridItem xs={12} lg={6}>
-        <CustomInput labelText={t("City")} id="city"
-          formControlProps={{ fullWidth: true }}
-          inputProps={{ value: model.address.city, onChange: e => {
-            setModel({ ...model, ['address.city']: e.target.value });
-          }}}
-        />
-      </GridItem>
-      <GridItem xs={12} lg={6}>
-        <CustomInput labelText={t("Province")} id="province"
-          formControlProps={{ fullWidth: true }}
-          inputProps={{ value: model.address.province, onChange: e => {
-            setModel({ ...model, ['address.province']: e.target.value });
-          }}}
-        />
-      </GridItem>
-      <GridItem xs={12} lg={6}>
-        <CustomInput labelText={t("Unit")} id="unit"
-          formControlProps={{ fullWidth: true }}
-          inputProps={{ value: model.address.unit, onChange: e => {
-            setModel({ ...model, ['address.unit']: e.target.value });
-          }}}
-        />
-      </GridItem>
-      <GridItem xs={12} lg={6}>
-        <CustomInput labelText={t("Unit")} id="unit"
-          formControlProps={{ fullWidth: true }}
-          inputProps={{ value: model.address.unit, onChange: e => {
-            setModel({ ...model, ['address.unit']: e.target.value });
-          }}}
-        />
-      </GridItem>
-      <GridItem xs={12} lg={6}>
-        <CustomInput labelText={t("Postal Code")} id="postalCode"
-          formControlProps={{ fullWidth: true }}
-          inputProps={{ value: model.address.postalCode, onChange: e => {
-            setModel({ ...model, ['address.postalCode']: e.target.value });
-          }}}
+      <GridItem xs={12} lg={12}>
+        <br />
+        <TextField id="merchant-description-en" label={t("DescriptionEN")}
+          multiline rowsMax={4} variant="outlined" 
+          className="dc-full-textarea" value={model.descriptionEN}
+          onChange={e => {
+            setModel({  ...model, descriptionEN: e.target.value });
+          }}
         />
       </GridItem>
     </React.Fragment>
   }
-
   const _clickDow = (e, _key) => {
-    let _dow =  model.dow;
+    const _dow =  model.dow.split(",")
+      .filter(a=>{ return a && a!==',' });
     const index = _dow.indexOf(_key);
     if ( index >= 0 ) {
-      _dow = _dow.substr(0, index-1) + _dow.substr(index+2);
+      _dow.splice(index, 1);
     } else {
-      _dow = `${_dow}${_dow ? ',' : ''}${_key}`
+      _dow.push(_key);
     }
-    setModel({ ...model, dow: _dow });
+    
+    setModel({ ...model, 
+      dow: _dow.sort( (a, b) => a > b ).join(",") });
   }
-  const _renderDow = () => {
-    const DOWS = {
-      1: 'Mon',
-      2: 'Tue',
-      3: 'Wed',
-      4: "Thu",
-      5: 'Fri',
-      6: 'Sat',
-      7: "Sun"
-    }
+  const _DOWS_MAPPING = {
+    0: "Sun",
+    1: 'Mon',
+    2: 'Tue',
+    3: 'Wed',
+    4: "Thu",
+    5: 'Fri',
+    6: 'Sat'
+  }
+  const _dowRulesComplexTimeChange = (e, _key) => {
+    const _arr = model._orderEndTimeArr;
+    _arr[_key] = e.target.value;
+    setModel({...model, _orderEndTimeArr: _arr} )
+  }
+  const _renderDowRulesComplex = () => {
+    return <React.Fragment>  
+        <GridItem xs={12}>
+          <h5>
+            {t("Dow and OrderEnd Complex")}
+            <Button color="primary" size="small" onClick={ () => { setRuleSimple(true) } }>
+              To simple mode
+            </Button>
+          </h5>
+        </GridItem>
+        <GridItem xs={12}>
+          <List dense>
+            {
+              Object.keys(_DOWS_MAPPING).map( (_key) => {
+                return <ListItem key={`_${_key}`}>
+                  <Button onClick={(e) => _clickDow(e, _key)} color="primary" size="small"
+                    variant={ model.dow.indexOf(`${_key}`) >= 0 ? "contained":"outlined"}>
+                      {_DOWS_MAPPING[_key]}
+                  </Button>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  {  model.dow.indexOf(`${_key}`) >= 0 && 
+                      <TextField label="OrderEnd Time" type="time" InputLabelProps={{ shrink: true, }} 
+                        inputProps={{ step: 300,  }} value={model._orderEndTimeArr[_key]}
+                        onChange={ e => _dowRulesComplexTimeChange(e, _key)} />
+                  }
+                </ListItem>
+              })
+            }
+          </List>
+        </GridItem>
+      </React.Fragment>
+  }
+  const _renderDowRulesSimple = () => {
     return <React.Fragment>
       <GridItem xs={12}>
-        <h5>{t("Dow")}</h5>
+        <h5>
+          {t("Dow and OrderEnd Simple")}
+          <Button color="primary" size="small" onClick={ () => { setRuleSimple(false) } }>
+            To complex mode
+          </Button>
+      </h5>   
       </GridItem>
-      <GridItem xs={12}>
-        <ButtonGroup color="primary" aria-label="outlined primary button group">
-          { Object.keys(DOWS).map( (_key) => {
-             return <Button key={`${DOWS[_key] || "-" }`} onClick={(e) => _clickDow(e, _key) }
+      <GridItem xs={3}>
+        <TextField label="OrderEnd Time" type="time" value={ model._orderEnd }
+          InputLabelProps={{ shrink: true, }} inputProps={{ step: 300,  }} 
+          onChange={(e) => {setModel({...model, _orderEnd: e.target.value})}}
+        />
+      </GridItem>
+      <GridItem xs={9} style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+        <ButtonGroup color="primary"  size="small" aria-label="outlined primary button group">
+          { Object.keys(_DOWS_MAPPING).map( (_key) => {
+             return <Button key={`${_DOWS_MAPPING[_key] || "-" }`} onClick={(e) => _clickDow(e, _key) }
                 variant={ model.dow.indexOf(`${_key}`) >= 0 ? "contained":"outlined"}>
-               {DOWS[_key]}
+               {_DOWS_MAPPING[_key]}
               </Button>
           })}
         </ButtonGroup>
       </GridItem>
     </React.Fragment>
   }
-
-  const _renderPhaseDelete = (e, index) => {
-    const _phases = model.phases;
-    _phases.splice(index, 1);
-    setModel({...model, phases: _phases});
-  }
-  const _renderPhaseAdd = () => {
-    if ( orderEnd && pickup ) {
-      const _phases = model.phases;
-      _phases.push({ orderEnd, pickup })
-      setModel({...model, phases: _phases});
-      setOrderEnd("");
-      setPickup("");
-    }
-  }
-  const _renderPhaseItem = () => {
-    return <React.Fragment>
-      <List>
-        {
-          model.phases.map( (item, index) => {
-            return <ListItem key={`${index}_${item.orderEnd}`}>
-              <TextField label="End Time" type="time" value={ item.orderEnd }
-                InputLabelProps={{ shrink: true, }} inputProps={{ step: 300,  }}
-              /> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              <TextField label="Pick Time" type="time" value={ item.pickup }
-                InputLabelProps={{ shrink: true, }} inputProps={{ step: 300,  }}
-              />
-              <IconButton edge="end" aria-label="delete" onClick={(e)=>_renderPhaseDelete(e, index)} >
-                <DeleteIcon />
-              </IconButton>
-            </ListItem>
-          })
-        }
-        <ListItem key="_add">
-          <TextField label="End Time" type="time" value={ orderEnd }
-            onChange={(e) => setOrderEnd(e.target.value) }
-            InputLabelProps={{ shrink: true, }} inputProps={{ step: 300,  }}
-          /> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <TextField label="Pick Time" type="time" value={ pickup } 
-            onChange={(e) => setPickup(e.target.value) }
-            InputLabelProps={{ shrink: true, }} inputProps={{ step: 300,  }}
-          />
-          <IconButton edge="end" aria-label="add" onClick={_renderPhaseAdd}>
-            <AddIcon />
-          </IconButton>
-        </ListItem>
-      </List>
-    </React.Fragment>
-  }
-  const _renderPhase = () => {
-    return <React.Fragment>
+  const _renderAccount = () => {
+    return  <React.Fragment>
       <GridItem xs={12}>
-        <h5>{t("Phase")}</h5>
+        <h5>{t("Associated Account")}</h5>
       </GridItem>
-      <GridItem xs={12}>
-        {_renderPhaseItem()}
-      </GridItem>
+      {accountLoading && <EditSkeletonShort />}
+      {!accountLoading && <React.Fragment>
+          <GridItem xs={9}>
+            <FormControl className="dc-full-select">
+              <InputLabel id="merchant-type-label">Choose an account to associate</InputLabel>
+              <Select labelId="merchant-type-label" id="merchant-type" 
+                value={model.accountId} onChange={(e) => setModel({...model, accountId: e.target.value}) } >
+                { accounts.filter( 
+                    (item) => item.username.indexOf(accountFilter) >=0 ).map( 
+                    (item) => <MenuItem value={item._id}>{item.username}</MenuItem> )}
+              </Select>
+            </FormControl>
+          </GridItem>
+          <GridItem xs={3}>
+            <TextField id="standard-search" label="Filter" type="search"
+              value={accountFilter} onChange={(e) => setAccountFilter(e.target.value)}/>
+          </GridItem>
+          <GridItem xs={12}>No result? <a target="_blank" href="../accounts/new">Create one</a> and refresh</GridItem>
+        </React.Fragment>
+      }
     </React.Fragment>
   }
 
   const renderRight = () => {
     return <GridContainer>
-      {_renderAddress()}
+      {_renderAccount()}
+      {ruleSimple ? _renderDowRulesSimple() :  _renderDowRulesComplex() }
     </GridContainer>
   }
-
   const renderLeft = () => {
     return <GridContainer>
         {_renderUserInfo()}
-        {_renderDow()}
-        {_renderPhase()}
       </GridContainer>
   }
 
+  const removeAlert = () => {
+    setAlert({
+      message: "",
+      severity: "info"
+    });
+  };
+
+  ////////////////////////////////////
+  // For submit
+  // For submit
+  const saveModel = () => {
+    setProcessing(true);
+    const _mData = {...model};
+    const _dows = model.dow.split(",")
+      .filter(a=>{ return a && a!==',' })
+      .sort( (a, b) => a > b);
+    const _rules = [];
+    if (ruleSimple) { 
+      // simple mode 
+      _dows.map( item => {
+        _rules.push({
+          orderEnd: {
+            dow: item,
+            time: model._orderEnd
+          }
+        })
+      });
+    } else {  
+      // complex
+      _dows.map( item => {
+        _rules.push({
+          orderEnd: {
+            dow: item,
+            time: model._orderEndTimeArr[item]
+          }
+        })
+      });
+    }
+    _mData.dow = _dows.join(",");
+    _mData.rules = _rules;
+    setModel( {..._mData} );
+    ApiMerchantService.createMerchant(_mData).then(
+      ({ data }) => {
+        setProcessing(false);
+        if ( data.code === "success" ) {
+          // success 
+          setAlert({
+            message: "Created success!",
+            severity: "success"
+          });
+        } else {
+          // failure
+          setAlert({
+            message: data.data,
+            severity: "error"
+          });
+        }
+      }
+    );
+  }
 
   return (
     <GridContainer>
@@ -283,11 +332,30 @@ const MerchantsForm = ({}) => {
           </CardHeader>
           <CardBody>
             {loading && <EditSkeleton />}
+            {!!alert.message && (
+              <Alert severity={alert.severity} onClose={removeAlert}>
+                {alert.message}
+              </Alert>
+            )}
             {!loading && <GridContainer>
-              <GridItem xs={6}>{renderLeft()}</GridItem>
-              <GridItem xs={6}>{renderRight()}</GridItem>
+              <GridItem xs={12} md={6} lg={6}>{renderLeft()}</GridItem>
+              <GridItem xs={12} md={6} lg={6}>{renderRight()} </GridItem>
             </GridContainer>}
           </CardBody>
+          <CardFooter direction="row-reverse">
+            <GridContainer>
+              <GridItem xs={12} >
+                <Button color="primary" variant="contained"
+                  disabled={loading || processing } onClick={saveModel} >
+                  <SaveIcon /> {t("Save")}
+                </Button>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <Button variant="contained" href="../Merchants">
+                  <FormatListBulletedIcon /> {t("Back")}
+                </Button>
+              </GridItem>
+            </GridContainer>
+          </CardFooter>
         </Card>
       </GridItem>
     </GridContainer>

@@ -38,11 +38,13 @@ import Icons from "views/Icons/Icons.js";
 import Maps from "views/Maps/Maps.js";
 import NotificationsPage from "views/Notifications/Notifications.js";
 import CategoriesPage from "views/Categories/Categories.js";
-import FinancePage from "views/Finance/FinancePage.js";
+import FinanceRoute from "views/Finance/FinanceRoute.js";
 import ProductPage from "views/Products/Products.js";
 import AttributePage from "views/Attributes/Attributes.js";
 import OrderPage from "views/Orders/OrderPage.js";
+
 import Assignment from "views/Assignment/AssignmentRoute";
+import DashboardRoute from "views/Dashboard/DashboardRoute.js";
 
 import AccountsPage from "views/Accounts/AccountsPage";
 import MerchantsPage from "views/Merchants/MerchantsPage";
@@ -52,7 +54,7 @@ const dashboardRoutes = [
     path: "/dashboard",
     name: "Dashboard",
     icon: Dashboard,
-    component: DashboardPage,
+    component: DashboardRoute,
     layout: "/"
   },
   {
@@ -66,7 +68,7 @@ const dashboardRoutes = [
     path: "/finance",
     name: "Finance",
     icon: "content_paste",
-    component: FinancePage,
+    component: FinanceRoute,
     layout: "/"
   },
   {
@@ -153,7 +155,6 @@ const dashboardRoutes = [
     component: NotificationsPage,
     layout: "/"
   }
-
 ];
 
 export default dashboardRoutes;

@@ -138,7 +138,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   signIn: () => dispatch(signIn()),
-  signOut: () => dispatch(signOut())
+  signOut: () => dispatch(signOut()),
 });
 
 export default connect(

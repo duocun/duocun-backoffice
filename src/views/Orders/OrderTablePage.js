@@ -17,9 +17,13 @@ import Searchbar from "components/Searchbar/Searchbar";
 import { getQueryParam } from "helper/index";
 import FlashStorage from "services/FlashStorage";
 import { Box } from "@material-ui/core";
+import Alert from "@material-ui/lab/Alert";
 
 import ApiOrderService from "services/api/ApiOrderService";
 import { OrderTable } from './OrderTable';
+
+import TimePicker from "components/TimePicker/TimePicker";
+import * as moment from "moment";
 
 const styles = {
   cardCategoryWhite: {
@@ -82,6 +86,47 @@ export default function OrderTablePage({ location }) {
       }
     );
   };
+  const removeAlert = () => {
+    setAlert({
+      message: "",
+      severity: "info"
+    });
+  };
+
+  const [processing, setProcessing] = useState(false);
+
+  const removeOrder = (_id) => {
+    removeAlert();
+    setProcessing(true);
+    ApiOrderService.removeOrder(_id)
+      .then(({ data }) => {
+        if (data.code === 'success') {
+          setAlert({
+            message: t("Removed successfully"),
+            severtiy: "success"
+          });
+          updateData();
+        } else {
+          setAlert({
+            message: t("Remove failed"),
+            severity: "error"
+          });
+        }
+      })
+      .catch(e => {
+        console.error(e);
+        setAlert({
+          message: t("Remove failed"),
+          severity: "error"
+        });
+      })
+      .finally(() => {
+        setProcessing(false);
+      });
+  }
+  // const [deliverDate, setDeliverDate] = useState(
+  //   moment.utc().toISOString()
+  // );
 
   useEffect(() => {
     updateData();
@@ -107,6 +152,12 @@ export default function OrderTablePage({ location }) {
                       {t("New Order")}
                     </Button> */}
                 </Box>
+
+                {/* <TimePicker
+                    label="Start Date"
+                    date={deliverDate}
+                    getDate={setDeliverDate}
+                  /> */}
                 <Searchbar
                   onChange={e => {
                     const { target } = e;
@@ -125,6 +176,13 @@ export default function OrderTablePage({ location }) {
             </GridContainer>
           </CardHeader>
           <CardBody>
+          {!!alert.message && (
+              <GridItem xs={12}>
+                <Alert severity={alert.severity} onClose={removeAlert}>
+                  {alert.message}
+                </Alert>
+              </GridItem>
+            )}
             <OrderTable rows={orders}
               page={page}
               rowsPerPage={rowsPerPage}
@@ -133,7 +191,8 @@ export default function OrderTablePage({ location }) {
               loading={loading}
               setRowsPerPage={setRowsPerPage}
               setSort={setSort}
-              setPage={setPage} />
+              setPage={setPage}
+              removeData={removeOrder} />
           </CardBody>
         </Card>
       </GridItem>

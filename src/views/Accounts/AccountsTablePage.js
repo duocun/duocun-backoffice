@@ -45,7 +45,7 @@ export default function AccountsTablePage({ location }) {
   }, [page, rowsPerPage, sort]);
 
   const updateData = () => {
-    ApiAccountService.getAccountList(page, rowsPerPage, query, [sort]).then(
+    ApiAccountService.getAccountList(page, rowsPerPage, {username:query}, [sort]).then(
       ({ data }) => {
         setAccounts(data.data);
         setTotalRows(data.count);

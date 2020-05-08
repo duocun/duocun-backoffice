@@ -2,11 +2,8 @@ const AuthService = () => {
   const TOKEN_KEY = "duocun_admin_token";
   const ADMIN_ROLE_ID = 1;
   return {
-    login: r => {
-      if(r.code === 'success'){
-        const token = r.data;
-        window.localStorage.setItem(TOKEN_KEY, token);
-      }
+    login: token => {
+      window.localStorage.setItem(TOKEN_KEY, token);
     },
     logout: () => {
       window.localStorage.removeItem(TOKEN_KEY);

@@ -19,7 +19,6 @@ import TableHead from "@material-ui/core/TableHead";
 import TablePagination from "components/Table/TablePagniation.js";
 import TableRow from "@material-ui/core/TableRow";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
-
 import IconButton from "@material-ui/core/IconButton";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -27,22 +26,45 @@ import CheckIcon from "@material-ui/icons/Check";
 import CloseIcon from "@material-ui/icons/Close";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 import LocalMallIcon from "@material-ui/icons/LocalMall";
-
+import ToggleOffIcon from "@material-ui/icons/ToggleOff";
+import ToggleOnIcon from "@material-ui/icons/ToggleOn";
 import Avatar from "@material-ui/core/Avatar";
 import Alert from "@material-ui/lab/Alert";
 import TableBodySkeleton from "components/Table/TableBodySkeleton";
 import Searchbar from "components/Searchbar/Searchbar";
+import Tooltip from "@material-ui/core/Tooltip";
 
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
+// import FormHelperText from '@material-ui/core/FormHelperText';
+import FormControl from "@material-ui/core/FormControl";
+import Select from "@material-ui/core/Select";
+import { Button, Box } from "@material-ui/core";
+
+import ApiCategoryService from "services/api/ApiCategoryService";
 import ApiProductService from "services/api/ApiProductService";
 import { getQueryParam } from "helper/index";
 import FlashStorage from "services/FlashStorage";
-import { Button, Box } from "@material-ui/core";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(theme => ({
   table: {
     minWidth: 750
+  },
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120
+  },
+  selectEmpty: {
+    marginTop: theme.spacing(2)
   }
 }));
+
+const defaultProduct = {
+  name: "",
+  description: "",
+  category: { _id: "", name: "" }
+};
+
 export default function Product({ location }) {
   const { t } = useTranslation();
   const classes = useStyles();
@@ -59,20 +81,51 @@ export default function Product({ location }) {
   const [query, setQuery] = useState(getQueryParam(location, "search") || "");
   const [sort, setSort] = useState(["_id", 1]);
 
+  // set model
+  const [model, setModel] = useState(defaultProduct);
+
+  // type
+  const [productType, setType] = useState("G"); // grocery
+  const handleTypeChange = type => {
+    setType(type);
+    updateData(type);
+  };
+
+  // categories
+  const [categories, setCategories] = useState([]);
+  useEffect(() => {
+    ApiCategoryService.getCategories({ type: "G" }).then(({ data }) => {
+      const cats = data.data;
+      setCategories(cats);
+    });
+  }, []);
+
+  const handleCategoryChange = (catId, productType, row) => {
+    updateProduct(row._id, productType, { categoryId: catId });
+    setModel({ ...model, category: { _id: catId } });
+  };
+
   // states related to processing
   const [alert, setAlert] = useState(
     FlashStorage.get("PRODUCT_ALERT") || { message: "", severity: "info" }
   );
   const [processing, setProcessing] = useState(false);
 
-  const updateData = () => {
-    ApiProductService.getProductList(page, rowsPerPage, query, [sort]).then(
-      ({ data }) => {
-        setProducts(data.data);
-        setTotalRows(data.count);
-        setLoading(false);
-      }
+  const onChangeProductStatus = (rowId, currentStatus) => {
+    ApiProductService.changeStatus(rowId, currentStatus).then(
+      updateData(productType)
     );
+  };
+
+  const updateData = type => {
+    const params = { type };
+    ApiProductService.getProductList(page, rowsPerPage, query, params, [
+      sort
+    ]).then(({ data }) => {
+      setProducts(data.data);
+      setTotalRows(data.count);
+      setLoading(false);
+    });
   };
   const toggleSort = fieldName => {
     // sort only one field
@@ -89,7 +142,38 @@ export default function Product({ location }) {
     });
   };
 
-  const toggleFeature = productId => {
+  const updateProduct = (productId, productType, params) => {
+    removeAlert();
+    setProcessing(true);
+    ApiProductService.updateProduct(productId, params)
+      .then(({ data }) => {
+        if (data.code === "success") {
+          setAlert({
+            message: t("Saved successfully"),
+            severtiy: "success"
+          });
+          updateData(productType);
+        } else {
+          setAlert({
+            message: t("Save failed"),
+            severity: "error"
+          });
+        }
+      })
+      .catch(e => {
+        console.error(e);
+        setAlert({
+          message: t("Save exception"),
+          severity: "error"
+        });
+      })
+      .finally(() => {
+        setProcessing(false);
+      });
+  };
+
+  // change status
+  const toggleFeature = (productId, type) => {
     removeAlert();
     setProcessing(true);
     ApiProductService.toggleFeature(productId)
@@ -99,7 +183,7 @@ export default function Product({ location }) {
             message: t("Saved successfully"),
             severtiy: "success"
           });
-          updateData();
+          updateData(type);
         } else {
           setAlert({
             message: t("Save failed"),
@@ -122,7 +206,7 @@ export default function Product({ location }) {
     if (!rows.length) {
       return (
         <TableRow>
-          <TableCell align="center" colSpan={7} size="medium">
+          <TableCell align="center" colSpan={9} size="medium">
             {t("No data to display")}
           </TableCell>
         </TableRow>
@@ -145,13 +229,36 @@ export default function Product({ location }) {
               </Avatar>
             </TableCell>
             <TableCell>{row.name}</TableCell>
+            <TableCell>
+              <FormControl className={classes.formControl}>
+                {/* <InputLabel id="category-select-label">Category</InputLabel> */}
+                <Select
+                  required
+                  labelId="category-select-label"
+                  id="category-select"
+                  value={row.categoryId}
+                  onChange={e =>
+                    handleCategoryChange(e.target.value, productType, row)
+                  }
+                >
+                  {categories &&
+                    categories.length > 0 &&
+                    categories.map(cat => (
+                      <MenuItem key={cat._id} value={cat._id}>
+                        {cat.name}
+                      </MenuItem>
+                    ))}
+                </Select>
+              </FormControl>
+            </TableCell>
             <TableCell>{row.price}</TableCell>
             <TableCell>{row.cost}</TableCell>
+            <TableCell>{row.status}</TableCell>
             <TableCell>
               <IconButton
                 disabled={processing}
                 onClick={() => {
-                  toggleFeature(row._id);
+                  toggleFeature(row._id, productType);
                 }}
               >
                 {row.featured ? (
@@ -162,12 +269,26 @@ export default function Product({ location }) {
               </IconButton>
             </TableCell>
             <TableCell>
-              <IconButton aria-label="edit" href={`products/${row._id}`}>
-                <EditIcon />
-              </IconButton>
-              <IconButton aria-label="delete" disabled={processing}>
-                <DeleteIcon />
-              </IconButton>
+              <Tooltip title="修改">
+                <IconButton aria-label="edit" href={`products/${row._id}`}>
+                  <EditIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="删除">
+                <IconButton aria-label="delete" disabled={processing}>
+                  <DeleteIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="上架/下架">
+                <IconButton
+                  size="medium"
+                  aria-label="status"
+                  disabled={processing}
+                  onClick={() => onChangeProductStatus(row._id, row.status)}
+                >
+                  {row.status === "A" ? <ToggleOffIcon /> : <ToggleOnIcon />}
+                </IconButton>
+              </Tooltip>
             </TableCell>
           </TableRow>
         ))}
@@ -187,7 +308,7 @@ export default function Product({ location }) {
   };
 
   useEffect(() => {
-    updateData();
+    updateData(productType);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, rowsPerPage, sort]);
 
@@ -212,6 +333,25 @@ export default function Product({ location }) {
                       {t("New Product")}
                     </Button>
                   </Box>
+
+                  {
+                    <FormControl className={classes.formControl}>
+                      <InputLabel id="type-select-label">
+                        {t("Type")}
+                      </InputLabel>
+                      <Select
+                        required
+                        labelId="type-select-label"
+                        id="type-select"
+                        value={productType}
+                        onChange={e => handleTypeChange(e.target.value)}
+                      >
+                        <MenuItem value={"F"}>{t("Food")}</MenuItem>
+                        <MenuItem value={"G"}>{t("Grocery")}</MenuItem>
+                      </Select>
+                    </FormControl>
+                  }
+
                   <Searchbar
                     onChange={e => {
                       const { target } = e;
@@ -220,7 +360,7 @@ export default function Product({ location }) {
                     onSearch={() => {
                       setLoading(true);
                       if (page === 0) {
-                        updateData();
+                        updateData(productType);
                       } else {
                         setPage(0);
                       }
@@ -258,6 +398,17 @@ export default function Product({ location }) {
                             {t("Product Name")}
                             {renderSort("name")}
                           </TableCell>
+                          <TableCell>
+                            <TableCell
+                              onClick={() => {
+                                toggleSort("category");
+                              }}
+                              style={{ cursor: "pointer" }}
+                            >
+                              {t("Category")}
+                              {renderSort("category")}
+                            </TableCell>
+                          </TableCell>
                           <TableCell
                             onClick={() => {
                               toggleSort("price");
@@ -278,6 +429,16 @@ export default function Product({ location }) {
                           </TableCell>
                           <TableCell
                             onClick={() => {
+                              toggleSort("status");
+                            }}
+                            style={{ cursor: "pointer" }}
+                          >
+                            {t("Status")}
+                            {renderSort("status")}
+                          </TableCell>
+
+                          <TableCell
+                            onClick={() => {
                               toggleSort("featured");
                             }}
                             style={{ cursor: "pointer" }}
@@ -291,7 +452,7 @@ export default function Product({ location }) {
                       <TableBody>
                         {loading ? (
                           <TableBodySkeleton
-                            colCount={7}
+                            colCount={9}
                             rowCount={rowsPerPage}
                           />
                         ) : (

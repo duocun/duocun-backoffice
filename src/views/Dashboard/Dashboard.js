@@ -1,13 +1,16 @@
 import React, {useEffect} from "react";
+import { Link } from "react-router-dom";
 // react plugin for creating charts
 import ChartistGraph from "react-chartist";
 // @material-ui/core
 import { makeStyles } from "@material-ui/core/styles";
 import Icon from "@material-ui/core/Icon";
 // @material-ui/icons
-
+import IconButton from "@material-ui/core/IconButton";
+import AccountBoxOutlinedIcon from '@material-ui/icons/AccountBoxOutlined';
 import * as moment from 'moment';
 import {connect} from 'react-redux';
+
 
 import Store from "@material-ui/icons/Store";
 import Warning from "@material-ui/icons/Warning";
@@ -48,7 +51,7 @@ import { loadStatisticsSummaryAsync } from 'redux/actions/statistics';
 
 const useStyles = makeStyles(styles);
 
-const Dashboard = ({summary, loadStatisticsSummary}) => {
+const Dashboard = ({summary, loadStatisticsSummary, history}) => {
   const classes = useStyles();
 
   useEffect(() => {
@@ -67,14 +70,10 @@ const Dashboard = ({summary, loadStatisticsSummary}) => {
                 <Icon>content_copy</Icon>
               </CardIcon>
               <p className={classes.cardCategory}>
-                <span>Orders</span>
-                <span>/</span>
-                <span>Products</span>
+                Orders
               </p>
               <h3 className={classes.cardTitle}>
-                <span>{summary.nOrders}</span>
-                <span>/</span>
-                <span>{summary.nProducts}</span>
+                {summary.nOrders}
               </h3>
             </CardHeader>
             <CardFooter stats>
@@ -100,7 +99,7 @@ const Dashboard = ({summary, loadStatisticsSummary}) => {
                 <Store />
               </CardIcon>
               <p className={classes.cardCategory}>
-                <span>Sales</span>
+                Sales
               </p>
               <h3 className={classes.cardTitle}>
                 <span>${summary.totalPrice}</span>
@@ -116,17 +115,22 @@ const Dashboard = ({summary, loadStatisticsSummary}) => {
         </GridItem>
         <GridItem xs={12} sm={6} md={3}>
           <Card>
-            <CardHeader color="danger" stats icon>
+            <CardHeader href="/products" color="danger" stats icon onClick={()=>{history.push("/dashboard/pickup")}}>
               <CardIcon color="danger">
                 <Icon>info_outline</Icon>
               </CardIcon>
-              <p className={classes.cardCategory}>Fixed Issues</p>
-              <h3 className={classes.cardTitle}>75</h3>
+              {/* <IconButton aria-label="driverSummary" href="dashboard/pickup">
+                <AccountBoxOutlinedIcon />
+              </IconButton> */}
+
+              <p className={classes.cardCategory}>Products</p>
+              <h3 className={classes.cardTitle}>{summary.nProducts}</h3>
+
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
                 <LocalOffer />
-                Tracked from Github
+                By drivers
               </div>
             </CardFooter>
           </Card>

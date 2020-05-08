@@ -2,17 +2,8 @@ import Axios from "axios";
 import queryString from "query-string";
 import Auth from "../AuthService";
 
-export const API_HOST =
-  process.env.NODE_ENV === "production"
-    ? "https://duocun.com.cn/api/admin"
-    : "http://localhost:8001/api/admin";
-
-
-export const API_V2_HOST = 
-  process.env.NODE_ENV === "production"
-    ? "https://duocun.com.cn/api/admin"
-    : "http://localhost:8001/api/admin";
-
+export const API_HOST = process.env.REACT_APP_API_HOST;
+export const API_V2_HOST = API_HOST;
 export default class ApiService {
   apiHost = "";
 
