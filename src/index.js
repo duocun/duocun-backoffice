@@ -7,7 +7,7 @@ import { composeWithDevTools } from "redux-devtools-extension";
 import thunk from "redux-thunk";
 //time picker
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
-import MomentUtils from '@date-io/moment';
+import MomentUtils from "@date-io/moment";
 // i18n
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
@@ -19,11 +19,11 @@ import "assets/css/duocun.css";
 
 i18n.use(initReactI18next).init({
   resources: lang,
-  lng: process.env.NODE_ENV === "production" ? "zh" : "en",
+  lng: "zh",
   fallbackLng: "en",
   interpolation: {
-    escapeValue: false,
-  },
+    escapeValue: false
+  }
 });
 
 const store = createStore(
