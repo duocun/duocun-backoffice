@@ -42,7 +42,10 @@ import FinanceRoute from "views/Finance/FinanceRoute.js";
 import ProductPage from "views/Products/Products.js";
 import AttributePage from "views/Attributes/Attributes.js";
 import OrderPage from "views/Orders/OrderPage.js";
+
+import Assignment from "views/Assignment/AssignmentRoute";
 import DashboardRoute from "views/Dashboard/DashboardRoute.js";
+
 import AccountsPage from "views/Accounts/AccountsPage";
 import MerchantsPage from "views/Merchants/MerchantsPage";
 
@@ -102,6 +105,13 @@ const dashboardRoutes = [
     icon: "content_paste",
     component: OrderPage,
     layout: "/"
+  },
+  {
+    path:"/assignment",
+    name:"Assignment",
+    icon:LocationOn,
+    component: Assignment,
+    layout:"/"
   },
   {
     path: "/table",

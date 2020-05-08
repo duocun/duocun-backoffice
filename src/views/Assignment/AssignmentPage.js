@@ -7,7 +7,6 @@ import moment from "moment";
 
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
-import SearchDropDown from "components/SearchDropDown/SearchDropDown.js";
 
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
@@ -16,30 +15,34 @@ import Searchbar from "components/Searchbar/Searchbar";
 import TimePicker from "components/TimePicker/TimePicker";
 
 import Alert from "@material-ui/lab/Alert";
-import ApiTransactionService from "services/api/ApiTransactionService";
+import ApiOrderService from "services/api/ApiOrderService";
 
 import { getQueryParam } from "helper/index";
 import FlashStorage from "services/FlashStorage";
 
-import { FinanceTable } from "./FinanceTable";
-import SecondaryNav from "components/SecondaryNav/SecondaryNav";
+import { OrderTable } from "./OrderTable";
+import DriverTable from "./DriverTable";
+import AssignmentMap from "./Map";
 
 //redux actions
-// import { loadAccountsAsync } from "redux/actions/account";
+import { loadDriversAsync } from "redux/actions/driver";
 
 import { Throttle } from "react-throttle";
 
-const useStyles = makeStyles(() => ({
-  table: {
-    minWidth: 750,
+const useStyles = makeStyles({
+  flexCard: {
+    display: "flex",
+    justifyContent: "space-between",
+    flexDirection: "row",
+    width: "100%",
   },
-}));
+});
 
-export const FinanceException = ({ location, history }) => {
+function AssignmentPage({ location, accounts, loadDrivers, history, drivers }) {
   const { t } = useTranslation();
   const classes = useStyles();
   // states related to list and pagniation
-  const [transactions, setTransactions] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(
     getQueryParam(location, "page")
@@ -48,15 +51,20 @@ export const FinanceException = ({ location, history }) => {
   );
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalRows, setTotalRows] = useState(0);
-  // const [query, setQuery] = useState(getQueryParam(location, "search") || "");
+  const [query, setQuery] = useState(getQueryParam(location, "search") || "");
   const [sort, setSort] = useState(["_id", 1]);
   const [selectUserId, setSelectUserId] = useState("");
-  const [showList, setShowList] = useState(false);
 
-  const [startDate, setStartDate] = useState(moment().utc().toISOString());
-  const [endDate, setEndDate] = useState(moment().utc().toISOString());
-
-
+  const [startDate, setStartDate] = useState(
+    moment()
+      .utc()
+      .toISOString()
+  );
+  const [endDate, setEndDate] = useState(
+    moment()
+      .utc()
+      .toISOString()
+  );
 
   // states related to processing
   const [alert, setAlert] = useState(
@@ -68,29 +76,23 @@ export const FinanceException = ({ location, history }) => {
   }, [page, rowsPerPage, sort, selectUserId, startDate, endDate]);
 
   useEffect(() => {
-    if (query) {
-      loadAccounts(query);
-    }
-  }, [query]);
-
-  const handleOnchange = (e) => {
-    const { target } = e;
-    setQuery(target.value);
-  };
+    loadDrivers();
+  }, []);
 
   const updateData = () => {
-    ApiTransactionService.getTransactionList(page, rowsPerPage, selectUserId, startDate, endDate, [
-      sort,
-    ]).then(({ data }) => {
-      setTransactions(data.data);
+    ApiOrderService.getOrderListByDate(
+      page,
+      rowsPerPage,
+      query,
+      startDate,
+      endDate,
+      [sort]
+    ).then(({ data }) => {
+      console.log(data);
+      setOrders(data.data);
       setTotalRows(data.count);
       setLoading(false);
     });
-  };
-
-  const handleSelectSearch = (id, name) => {
-    setSelectUserId(id);
-    setQuery(name);
   };
 
   const removeAlert = () => {
@@ -98,16 +100,6 @@ export const FinanceException = ({ location, history }) => {
       message: "",
       severity: "info",
     });
-  };
-
-  const handleShowList = () => {
-    setShowList(true);
-  };
-
-  const handleHideList = () => {
-    setTimeout(() => {
-      setShowList(false);
-    }, 500);
   };
 
   return (
@@ -118,14 +110,7 @@ export const FinanceException = ({ location, history }) => {
             <CardHeader color="primary">
               <GridContainer>
                 <GridItem xs={12} lg={6}>
-                  <h4>{t("Exception")}</h4>
-                  <SecondaryNav
-                    tabs={[
-                      { title: "Finance", route: "/finance" },
-                      { title: "Exception", route: "/finance/exception" },
-                    ]}
-                    history={history}
-                  />
+                  <h4>{t("Assignment")}</h4>
                 </GridItem>
                 <GridItem xs={12} lg={6} align="right">
                   <div
@@ -148,8 +133,10 @@ export const FinanceException = ({ location, history }) => {
                   </div>
                   <Throttle time="1000" handler="onChange">
                     <Searchbar
-                      value={query}
-                      onChange={handleOnchange}
+                      onChange={(e) => {
+                        const { target } = e;
+                        setQuery(target.value);
+                      }}
                       onSearch={() => {
                         setLoading(true);
                         if (page === 0) {
@@ -158,18 +145,8 @@ export const FinanceException = ({ location, history }) => {
                           setPage(0);
                         }
                       }}
-                      onFocus={handleShowList}
-                      onBlur={handleHideList}
-                      ifSearch = {false}
                     />
                   </Throttle>
-                  <SearchDropDown
-                    data={accounts}
-                    hasMore={hasMoreAccounts}
-                    fetchData={fetchAccounts}
-                    onClick={handleSelectSearch}
-                    show={showList}
-                  />
                 </GridItem>
               </GridContainer>
             </CardHeader>
@@ -183,17 +160,23 @@ export const FinanceException = ({ location, history }) => {
                   </GridItem>
                 )}
                 <GridItem xs={12}>
-                  <FinanceTable
-                    rows={transactions}
-                    page={page}
-                    rowsPerPage={rowsPerPage}
-                    totalRows={totalRows}
-                    // sort={sort}
-                    loading={loading}
-                    setRowsPerPage={setRowsPerPage}
-                    // setSort={setSort}
-                    setPage={setPage}
-                  />
+                  <div className={classes.flexCard}>
+                    <OrderTable
+                      rows={orders}
+                      page={page}
+                      rowsPerPage={rowsPerPage}
+                      totalRows={totalRows}
+                      sort={sort}
+                      loading={loading}
+                      setRowsPerPage={setRowsPerPage}
+                      setSort={setSort}
+                      setPage={setPage}
+                    />
+                    <div style={{width:'50%' ,display:'flex', justifyContent:'center'}}>
+                      <AssignmentMap orders={orders}/>
+                      <DriverTable drivers={drivers} />
+                    </div>
+                  </div>
                 </GridItem>
               </GridContainer>
             </CardBody>
@@ -204,21 +187,24 @@ export const FinanceException = ({ location, history }) => {
   );
 }
 
-FinanceException.propTypes = {
+AssignmentPage.propTypes = {
   location: PropTypes.object,
   loadAccounts: PropTypes.func,
   accounts: PropTypes.array,
-  history: PropTypes.object
+  history: PropTypes.object,
+  drivers: PropTypes.array,
 };
 
-
-// const mapStateToProps = (state) => ({ accounts: state.accounts });
-// const mapDispatchToProps = (dispatch) => ({
-//   loadAccounts: (payload) => {
-//     dispatch(loadAccountsAsync(payload));
-//   },
-// });
-// export default connect(
-//   mapStateToProps,
-//   mapDispatchToProps
-// )(FinanceException);
+const mapStateToProps = (state) => ({
+  accounts: state.accounts,
+  drivers: state.drivers,
+});
+const mapDispatchToProps = (dispatch) => ({
+  loadDrivers: () => {
+    dispatch(loadDriversAsync());
+  },
+});
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AssignmentPage);

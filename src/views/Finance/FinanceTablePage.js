@@ -31,7 +31,11 @@ import SecondaryNav from "components/SecondaryNav/SecondaryNav";
 
 import AccountSearch from "./AccountSearch";
 //redux actions
+
+// import { loadAccountsSearchAsync } from "redux/actions/account";
+
 // import { loadAccountsAsync } from "redux/actions/account";
+
 
 
 const useStyles = makeStyles(() => ({
@@ -229,6 +233,7 @@ FinanceTablePage.propTypes = {
   accounts: PropTypes.array,
   history: PropTypes.object
 };
+
 
 // const mapStateToProps = (state) => ({ accounts: state.accounts });
 // const mapDispatchToProps = (dispatch) => ({
