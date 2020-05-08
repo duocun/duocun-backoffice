@@ -63,5 +63,10 @@
     "Category Name (Chinese)": "分类名称 (中文)",
     "Display Order": "位置",
     "Add Category": "添加新类别",
-    "All products under selected category will be deleted!": "所选类别下的所有产品将被删除！"
+    "All products under selected category will be deleted!": "所选类别下的所有产品将被删除！",
+    "Allow negative quantity": "允许负数",
+    "Food": "餐饮",
+    "Grocery": "商超",
+    "Out of stock Message (English)": "缺货消息（英文）",
+    "Out of stock Message (Chinese)": "缺货留言（中文）"
 }

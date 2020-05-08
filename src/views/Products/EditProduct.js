@@ -76,6 +76,9 @@ const useStyles = makeStyles(() => ({
     border: "1px solid #eee",
     borderRadius: 5,
     padding: 5
+  },
+  combinationTable: {
+    display: "none"
   }
 }));
 
@@ -90,6 +93,7 @@ const defaultProductModelState = {
   categoryId: "",
   stock: {
     enabled: false,
+    allowNegative: false,
     quantity: 0,
     outofstockMessage: "",
     outofstockMessageEN: ""
@@ -391,11 +395,12 @@ const EditProduct = ({ match, history }) => {
   };
 
   const saveModel = () => {
+    console.log(model);
     removeAlert();
     setProcessing(true);
     ApiProductService.saveProduct(model)
       .then(({ data }) => {
-        if (data.success) {
+        if (data.code === "success") {
           const newAlert = {
             message: t("Saved successfully"),
             severity: "success"
@@ -431,7 +436,6 @@ const EditProduct = ({ match, history }) => {
     updatePage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
   return (
     <GridContainer>
       <GridItem xs={12} lg={8}>
@@ -571,7 +575,7 @@ const EditProduct = ({ match, history }) => {
                           />
                         </Box>
                       </GridItem>
-                      <GridItem xs={12}>
+                      <GridItem xs={12} lg={6}>
                         <h5 className={classes.heading}>{t("Stock")}</h5>
                       </GridItem>
                       <GridItem xs={12} lg={6}>
@@ -583,7 +587,7 @@ const EditProduct = ({ match, history }) => {
                             <Select
                               labelId="product-stock-enabled-label"
                               id="product-stock-enabled"
-                              value={model.stock.enabled}
+                              value={model.stock.enabled || false}
                               onChange={e => {
                                 const newModel = { ...model };
                                 newModel.stock.enabled = e.target.value;
@@ -596,62 +600,92 @@ const EditProduct = ({ match, history }) => {
                           </FormControl>
                         </Box>
                       </GridItem>
-                      <GridItem xs={12} lg={6}>
-                        <Box pb={2}>
-                          <CustomInput
-                            labelText={t("Quantity")}
-                            id="product-quantity"
-                            formControlProps={{
-                              fullWidth: true
-                            }}
-                            inputProps={{
-                              value: model.stock.quantity,
-                              onChange: e => {
-                                const newModel = { ...model };
-                                newModel.stock.quantity = e.target.value;
-                                setModel(newModel);
-                              }
-                            }}
-                          />
-                        </Box>
-                      </GridItem>
-                      <GridItem xs={12} lg={6}>
-                        <Box py={2}>
-                          <TextField
-                            id="product-outofstock-message"
-                            label={t("Out of stock Message (Chinese)")}
-                            multiline
-                            rowsMax={4}
-                            onChange={e => {
-                              const newModel = { ...model };
-                              newModel.stock.outofstockMessage = e.target.value;
-                              setModel(newModel);
-                            }}
-                            variant="outlined"
-                            value={model.stock.outofstockMessage}
-                            className={classes.textarea}
-                          />
-                        </Box>
-                      </GridItem>
-                      <GridItem xs={12} lg={6}>
-                        <Box py={2}>
-                          <TextField
-                            id="product-outofstock-message-english"
-                            label={t("Out of stock Message (English)")}
-                            multiline
-                            rowsMax={4}
-                            onChange={e => {
-                              const newModel = { ...model };
-                              newModel.stock.outofstockMessageEN =
-                                e.target.value;
-                              setModel(newModel);
-                            }}
-                            variant="outlined"
-                            value={model.stock.outofstockMessageEN}
-                            className={classes.textarea}
-                          />
-                        </Box>
-                      </GridItem>
+                      {model.stock.enabled && (
+                        <>
+                          <GridItem xs={12} lg={6}>
+                            <Box pb={2}>
+                              <FormControl className={classes.select}>
+                                <InputLabel id="product-stock-allow-negative-label">
+                                  {t("Allow negative quantity")}
+                                </InputLabel>
+                                <Select
+                                  labelId="product-stock-allow-negative-label"
+                                  id="product-stock-allow-negative"
+                                  value={model.stock.allowNegative || false}
+                                  onChange={e => {
+                                    const newModel = { ...model };
+                                    newModel.stock.allowNegative =
+                                      e.target.value;
+                                    setModel(newModel);
+                                  }}
+                                >
+                                  <MenuItem value={false}>{t("No")}</MenuItem>
+                                  <MenuItem value={true}>{t("Yes")}</MenuItem>
+                                </Select>
+                              </FormControl>
+                            </Box>
+                          </GridItem>
+                          <GridItem xs={12} lg={6}>
+                            <Box pb={2}>
+                              <CustomInput
+                                labelText={t("Quantity")}
+                                id="product-quantity"
+                                formControlProps={{
+                                  fullWidth: true
+                                }}
+                                inputProps={{
+                                  value: model.stock.quantity || 0,
+                                  onChange: e => {
+                                    const newModel = { ...model };
+                                    newModel.stock.quantity = parseInt(
+                                      e.target.value
+                                    );
+                                    setModel(newModel);
+                                  }
+                                }}
+                              />
+                            </Box>
+                          </GridItem>
+                          <GridItem xs={12} lg={6}>
+                            <Box py={2}>
+                              <TextField
+                                id="product-outofstock-message"
+                                label={t("Out of stock Message (Chinese)")}
+                                multiline
+                                rowsMax={4}
+                                onChange={e => {
+                                  const newModel = { ...model };
+                                  newModel.stock.outofstockMessage =
+                                    e.target.value;
+                                  setModel(newModel);
+                                }}
+                                variant="outlined"
+                                value={model.stock.outofstockMessage || ""}
+                                className={classes.textarea}
+                              />
+                            </Box>
+                          </GridItem>
+                          <GridItem xs={12} lg={6}>
+                            <Box py={2}>
+                              <TextField
+                                id="product-outofstock-message-english"
+                                label={t("Out of stock Message (English)")}
+                                multiline
+                                rowsMax={4}
+                                onChange={e => {
+                                  const newModel = { ...model };
+                                  newModel.stock.outofstockMessageEN =
+                                    e.target.value;
+                                  setModel(newModel);
+                                }}
+                                variant="outlined"
+                                value={model.stock.outofstockMessageEN || ""}
+                                className={classes.textarea}
+                              />
+                            </Box>
+                          </GridItem>
+                        </>
+                      )}
                     </GridContainer>
                   </GridItem>
                 </React.Fragment>
@@ -659,7 +693,8 @@ const EditProduct = ({ match, history }) => {
             </GridContainer>
           </CardBody>
         </Card>
-        <Card>
+        {/* Hide combination table until it's used in production mode */}
+        <Card className={classes.combinationTable}>
           <CardHeader>
             <h5 className={classes.heading}>{t("Combinations")}</h5>
           </CardHeader>
