@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import { connect } from "react-redux";
+
+import * as moment from 'moment';
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 import { useTranslation } from "react-i18next";
 import PropTypes from "prop-types";
 
 // core components
-import * as moment from 'moment';
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
 import CustomInput from "components/CustomInput/CustomInput.js";
@@ -15,7 +18,7 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardAvatar from "components/Card/CardAvatar.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
-import { connect } from 'react-redux';
+
 import avatar from "assets/img/faces/marc.jpg";
 // import { loadSalaryAsync } from 'redux/actions/statistics';
 
@@ -35,17 +38,18 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 
-import Table from "@material-ui/core/Table";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
+import FlashStorage from "services/FlashStorage";
+import Alert from "@material-ui/lab/Alert";
+import { getQueryParam } from "helper/index";
 
 import ApiAuthService from 'services/api/ApiAuthService';
 import ApiAccountService from 'services/api/ApiAccountService';
 import ApiTransaction from 'services/api/ApiTransactionService';
 import Auth from "services/AuthService";
-import FlashStorage from "services/FlashStorage";
+import ApiTransactionService from "services/api/ApiTransactionService";
+import { FinanceTable } from "./FinanceTable";
+
+
 const useStyles = makeStyles((theme) => ({
   cardCategoryWhite: {
     color: "rgba(255,255,255,.62)",
@@ -78,20 +82,52 @@ const useStyles = makeStyles((theme) => ({
 const TD_BANK_ID = "5c95019e0851a5096e044d0c";
 const TD_BANK_NAME = "TD Bank";
 
-const SalaryPage = ({history}) => {
+const useQuery = () => {
+  return new URLSearchParams(useLocation().search);
+}
+
+const SalaryPage = ({ history, location}) => {
   const classes = useStyles();
   const { t } = useTranslation();
 
-  const [account, setAccount] = useState({_id:'', username:''});
+
+  // form related
   const [fromId, setFromId] = useState('');
-
-  const [driverSummary, setSalary] = useState({});
   const [drivers, setDriverList] = useState([]);
-  const [driver, setDriver] = useState({ _id: '', username: '' });
+  const [driver, setDriver] = useState({ _id: '', username: '', type: 'driver' });
 
-  const [model, setModel] = useState({actionCode:'PS', amount:0, fromId:'', toId: '', notes:'', modifyBy:''});
+  const [account, setAccount] = useState({_id: '', username: ''});
+
+  const [model, setModel] = useState({
+    actionCode:'PS', 
+    amount:0, 
+    fromId:'',
+    // toId: EXPENSE_ID, 
+    notes:'', 
+    staffId:'',
+    staffName:'',
+    modifyBy: '',
+  });
 
   const [processing, setProcessing] = useState(false);
+
+
+  // table related
+  const searchParams = useQuery();
+
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(
+    getQueryParam(location, "page")
+      ? parseInt(getQueryParam(location, "page"))
+      : 0
+  );
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [totalRows, setTotalRows] = useState(0);
+  const [query, setQuery] = useState(getQueryParam(location, "search") || "");
+  const [sort, setSort] = useState(["_id", 1]);
+
+
   const removeAlert = () => {
     setAlert({
       message: "",
@@ -102,10 +138,11 @@ const SalaryPage = ({history}) => {
     FlashStorage.get("SALARY_ALERT") || { message: "", severity: "info" }
   );
 
-  const handleDriverChange = (driverId) => {
-    const d = drivers.find(d => d._id === driverId);
-    setDriver({ _id: driverId, username: d ? d._id : '' });
-    setModel({...model, toId: driverId});
+  const handleDriverChange = (staffId) => {
+    const d = drivers.find(d => d._id === staffId);
+    const staffName = d ? d.username : '';
+    setDriver({ _id: staffId, username: staffName });
+    setModel({...model, staffId, staffName });
   }
 
   const handleFromChange = (fromId)=> {
@@ -113,19 +150,56 @@ const SalaryPage = ({history}) => {
     setModel({...model, fromId});
   }
 
-  const handleSubmit = () => {
-    if(model.fromId && model.toId && model.modifyBy){
+  const handleUpdate = () => {
+    if(model.staffId){
       removeAlert();
       setProcessing(true);
-      ApiTransaction.saveTransaction(model).then(({ data }) => {
-        if (data.success) {
+      ApiTransaction.updateTransactions(model.staffId).then(({ data }) => {
+        if (data.code === 'success') {
+          const newAlert = {
+            message: t("Update successfully"),
+            severity: "success"
+          };
+          if (model._id === "new") {
+            FlashStorage.set("SALARY_ALERT", newAlert);
+            history.push("../finance/salary");
+            return;
+          } else {
+            setAlert(newAlert);
+            // updatePage();
+          }
+        } else {
+          setAlert({
+            message: t("Update failed"),
+            severity: "error"
+          });
+        }
+        setProcessing(false);
+      })
+      .catch(e => {
+        console.error(e);
+        setAlert({
+          message: t("Update failed"),
+          severity: "error"
+        });
+        setProcessing(false);
+      });
+    }
+  };
+
+  const handleSubmit = () => {
+    if(model.fromId && model.staffId){
+      removeAlert();
+      setProcessing(true);
+      ApiTransaction.createTransaction(model).then(({ data }) => {
+        if (data.code === 'success') {
           const newAlert = {
             message: t("Saved successfully"),
             severity: "success"
           };
           if (model._id === "new") {
-            FlashStorage.set("PRODUCT_ALERT", newAlert);
-            history.push("../products");
+            FlashStorage.set("SALARY_ALERT", newAlert);
+            history.push("../finance");
             return;
           } else {
             setAlert(newAlert);
@@ -150,23 +224,57 @@ const SalaryPage = ({history}) => {
     }
   };
 
+  // useEffect(() => {
+  //   const token = Auth.getAuthToken();
+  //   ApiAuthService.getCurrentUser(token).then(({data}) => {
+  //     setAccount(data);
+  //     setModel({...model, modifyBy: data._id});
+  //   });
+  // },[]);
+
   useEffect(() => {
     const token = Auth.getAuthToken();
     ApiAuthService.getCurrentUser(token).then(({data}) => {
-      setAccount(data);
-      setModel({...model, modifyBy: data._id});
+      const account = {...data};
+      setAccount(account);
+      ApiAccountService.getAccountList(null, null, { type: 'driver' }).then(({ data }) => {
+        setDriverList(data.data);
+        if (data.data && data.data.length > 0) {
+          const staff = data.data[0];
+          setDriver(staff);
+          setModel({...model, staffId: staff._id, staffName: staff.username, modifyBy: account._id});
+        } else{
+          setModel({...model, modifyBy: account._id});
+        }
+      });
     });
   }, []);
 
-  useEffect(() => {
-    ApiAccountService.getAccountList(null, null, { type: 'driver' }).then(({ data }) => {
-      setDriverList(data.data);
-      if (data.data && data.data.length > 0) {
-        setDriver(data.data[0]);
-      }
-      // dispatch(setSalary(data.data));
+  const updateData = (accountId) => {
+    ApiTransactionService.getTransactionList(
+      page,
+      rowsPerPage,
+      accountId,
+      new Date(), // startDate,
+      new Date(), // endDate,
+      [sort]
+    ).then(({ data }) => {
+      setTransactions(data.data);
+      setTotalRows(data.count);
+      setLoading(false);
     });
-  }, []);
+  };
+
+  useEffect(() => {
+    if(searchParams.has('accountId')){
+      const accountId = searchParams.get('accountId');
+      updateData(accountId);
+    }else{
+      updateData(driver._id);
+    }
+  }, [page, rowsPerPage, sort, driver]);
+
+
   return (
 
     <div>
@@ -208,8 +316,12 @@ const SalaryPage = ({history}) => {
                   <InputLabel id="driver-select-label">From</InputLabel>
                   <Select required labelId="driver-select-label" id="driver-select"
                     value={fromId} onChange={e => handleFromChange(e.target.value)} >
-                      <MenuItem key={account? account._id : ''} value={account? account._id : ''}>My Account</MenuItem>
+                      {/* <MenuItem key={account? account._id : ''} value={account? account._id : ''}>{account? account.username: 'My Account'}</MenuItem> */}
                       <MenuItem key={TD_BANK_ID} value={TD_BANK_ID}>Company</MenuItem>
+                      {
+                        drivers && drivers.length > 0 &&
+                        drivers.map(d => <MenuItem key={d._id} value={d._id}>{d.username}</MenuItem>)
+                      }
                   </Select>
                 </FormControl>
               }
@@ -234,31 +346,33 @@ const SalaryPage = ({history}) => {
               <Button onClick={() => handleSubmit()} color="secondary" autoFocus>
                 {t("Submit")}
               </Button>
+              <Button onClick={() => handleUpdate()} color="secondary" autoFocus>
+                {t("Update")}
+              </Button>
             </CardHeader>
             <CardBody>
-              <GridContainer>
-                {
-                  driverSummary && Object.keys(driverSummary).length > 0 && driver && driverSummary[driver._id] &&
-                  driverSummary[driver._id].merchants.map(m =>
-                    <div key={m.merchantName}>
-                      <div>{m.merchantName}</div>
-                      <Table>
-                        <TableBody>
-                          {m.items.map((prop, key) =>
-                            <TableRow key={key} >
-                              <TableCell>
-                                {prop.productName}
-                              </TableCell>
-                              <TableCell>
-                                x{prop.quantity}
-                              </TableCell>
-                            </TableRow>
-                          )}
-                        </TableBody>
-                      </Table>
-                    </div>
-                  )
-                }
+            <GridContainer>
+                {!!alert.message && (
+                  <GridItem xs={12}>
+                    <Alert severity={alert.severity} onClose={removeAlert}>
+                      {alert.message}
+                    </Alert>
+                  </GridItem>
+                )}
+                <GridItem xs={12}>
+                  <FinanceTable
+                    account={driver}
+                    rows={transactions}
+                    page={page}
+                    rowsPerPage={rowsPerPage}
+                    totalRows={totalRows}
+                    sort={sort}
+                    loading={loading}
+                    setRowsPerPage={setRowsPerPage}
+                    setSort={setSort}
+                    setPage={setPage}
+                  />
+                </GridItem>
               </GridContainer>
             </CardBody>
           </Card>
@@ -284,3 +398,11 @@ SalaryPage.propTypes = {
   history: PropTypes.object
 };
 export default SalaryPage;
+
+// const mapStateToProps = state => ({
+//   account: state.account
+// });
+
+// export default connect(
+//   mapStateToProps
+// )(SalaryPage);

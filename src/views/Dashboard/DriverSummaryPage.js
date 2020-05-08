@@ -6,25 +6,9 @@ import { makeStyles } from "@material-ui/core/styles";
 import * as moment from 'moment';
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import CustomInput from "components/CustomInput/CustomInput.js";
-import Button from "components/CustomButtons/Button.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
-import CardAvatar from "components/Card/CardAvatar.js";
 import CardBody from "components/Card/CardBody.js";
-import CardFooter from "components/Card/CardFooter.js";
-import { connect } from 'react-redux';
-import avatar from "assets/img/faces/marc.jpg";
-import { loadDriverSummaryAsync } from 'redux/actions/statistics';
-
-
-//drop down menu
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-// import MenuItem from '@material-ui/core/MenuItem';
-import Menu from '@material-ui/core/Menu';
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 
 
 import InputLabel from '@material-ui/core/InputLabel';
@@ -34,7 +18,6 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 
 import Table from "@material-ui/core/Table";
-import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -78,27 +61,27 @@ const DriverSummaryPage = ({}) => {
   const [drivers, setDriverList] = useState([]);
   const [driver, setDriver] = useState({_id: '', name: ''});
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [selectedDriver, setSelectedDriver] = React.useState(null);
-  const [selectedIndex, setSelectedIndex] = React.useState(1);
-  const handleClickListItem = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+  // const [anchorEl, setAnchorEl] = React.useState(null);
+  // const [selectedDriver, setSelectedDriver] = React.useState(null);
+  // const [selectedIndex, setSelectedIndex] = React.useState(1);
+  // const handleClickListItem = (event) => {
+  //   setAnchorEl(event.currentTarget);
+  // };
 
-  const handleMenuItemClick = (event, driver, index) => {
-    setSelectedIndex(index)
-    setSelectedDriver(driver);
-    setAnchorEl(null);
-  };
+  // const handleMenuItemClick = (event, driver, index) => {
+  //   setSelectedIndex(index)
+  //   setSelectedDriver(driver);
+  //   setAnchorEl(null);
+  // };
 
   const handleDriverChange = (driverId) => {
     const d = drivers.find(d => d._id === driverId);
     setDriver({_id: driverId, name: d? d._id: ''});
   }
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  // const handleClose = () => {
+  //   setAnchorEl(null);
+  // };
 
   useEffect(() => {
     const startDate = moment().format('YYYY-MM-DD');

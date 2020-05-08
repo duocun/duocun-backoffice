@@ -21,9 +21,16 @@ export const loadAccountsAsync = (page, pageSize, payload, option) => {
   };
 };
 
-const setAccounts = (payload) => {
+export const setAccounts = (payload) => {
   return {
     type: "SET_ACCOUNTS",
+    payload,
+  };
+};
+
+export const setAccount = (payload) => {
+  return {
+    type: "SET_ACCOUNT",
     payload,
   };
 };
