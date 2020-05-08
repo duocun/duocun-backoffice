@@ -68,7 +68,6 @@ export const FinanceTablePage = ({ location, history }) => {
   const [selectedAccount, setAccount] = useState({_id:'', type: ''});
   const [showList, setShowList] = useState(false);
   const [searchOption, setSearchOption] = useState('name');
-
   const [startDate, setStartDate] = useState(
     moment()
       .utc()
@@ -80,7 +79,8 @@ export const FinanceTablePage = ({ location, history }) => {
       .toISOString()
   );
 
-  // states related to processing
+  const [processing, setProcessing] = useState(false);
+
   const [alert, setAlert] = useState(
     FlashStorage.get("TRANSACTION_ALERT") || { message: "", severity: "info" }
   );
@@ -103,8 +103,6 @@ export const FinanceTablePage = ({ location, history }) => {
   //     // loadAccounts(query, searchOption);
   //   }
   // }, [query]);
-
-
 
   const updateData = (accountId) => {
     ApiTransactionService.getTransactionList(
@@ -140,6 +138,35 @@ export const FinanceTablePage = ({ location, history }) => {
     setAccount({_id: account? account._id: '', type});
     setQuery(account? account.username:'');
   }
+
+  const handleUpdateAccount = () => {
+    if(selectedAccount && selectedAccount._id){
+      removeAlert();
+      setProcessing(true);
+      ApiTransactionService.updateTransactions(selectedAccount._id).then(({ data }) => {
+        if (data.code === 'success') {
+          setAlert({
+            message: t("Update account balance successfully"),
+            severity: "success"
+          });
+        } else {
+          setAlert({
+            message: t("Update account balance failed"),
+            severity: "error"
+          });
+        }
+        setProcessing(false);
+      })
+      .catch(e => {
+        console.error(e);
+        setAlert({
+          message: t("Update account balance failed"),
+          severity: "error"
+        });
+        setProcessing(false);
+      });
+    }
+  };
 
   return (
     <div>
@@ -192,6 +219,15 @@ export const FinanceTablePage = ({ location, history }) => {
                     handleSelectAccount={handleSelectAccount}
                   />
 
+                </GridItem>
+                <GridItem>
+                  <Button
+                    variant="contained"
+                    color="default"
+                    onClick={()=>handleUpdateAccount()}
+                    >
+                    {t("Update")}
+                  </Button>
                 </GridItem>
               </GridContainer>
             </CardHeader>
