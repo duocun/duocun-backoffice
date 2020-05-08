@@ -206,7 +206,7 @@ export default function Product({ location }) {
     if (!rows.length) {
       return (
         <TableRow>
-          <TableCell align="center" colSpan={7} size="medium">
+          <TableCell align="center" colSpan={9} size="medium">
             {t("No data to display")}
           </TableCell>
         </TableRow>
@@ -336,7 +336,9 @@ export default function Product({ location }) {
 
                   {
                     <FormControl className={classes.formControl}>
-                      <InputLabel id="type-select-label">Type</InputLabel>
+                      <InputLabel id="type-select-label">
+                        {t("Type")}
+                      </InputLabel>
                       <Select
                         required
                         labelId="type-select-label"
@@ -344,8 +346,8 @@ export default function Product({ location }) {
                         value={productType}
                         onChange={e => handleTypeChange(e.target.value)}
                       >
-                        <MenuItem value={"F"}>餐饮</MenuItem>
-                        <MenuItem value={"G"}>商超</MenuItem>
+                        <MenuItem value={"F"}>{t("Food")}</MenuItem>
+                        <MenuItem value={"G"}>{t("Grocery")}</MenuItem>
                       </Select>
                     </FormControl>
                   }
