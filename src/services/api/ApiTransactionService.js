@@ -44,10 +44,15 @@ export default {
   //   getProduct: id => {
   //     return ApiService.v2().get(`products/${id}`);
   //   },
-  // saveTransaction: model => {
-  //   // model._id = model._id || "new";
-  //   // if(model._id === 'new'){
-  //   //   return ApiService.v2().post(`Transactions/`, model);
-  //   // }
-  // }
+
+
+  createTransaction: model => {
+    return ApiService.v2().post(`Transactions/`, model);
+  },
+  updateSalary: model => {
+    return ApiService.v2().put(`Transactions/salary`, model);
+  },
+  updateTransactions: accountId => {
+    return ApiService.v2().put(`Transactions/?accountId=${accountId}`);
+  }
 };

@@ -74,15 +74,6 @@ export const FinanceTable = ({
 }) => {
   const { t } = useTranslation();
   const classes = useStyles();
-  // const [page, setPage] = useState(
-  //   getQueryParam(location, "page")
-  //     ? parseInt(getQueryParam(location, "page"))
-  //     : 0
-  // );
-  // const [sort, setSort] = useState(["_id", 1]);
-
-  // const [rowsPerPage, setRowsPerPage] = useState(10);
-  // const [totalRows, setTotalRows] = useState(0);
 
   const [processing, setProcessing] = useState(false);
 
@@ -101,36 +92,6 @@ export const FinanceTable = ({
       severity: "info",
     });
   };
-
-//   const toggleFeature = (productId) => {
-//     removeAlert();
-//     setProcessing(true);
-//     ApiTransactionService.toggleFeature(productId)
-//       .then(({ data }) => {
-//         if (data.success) {
-//           setAlert({
-//             message: t("Saved successfully"),
-//             severtiy: "success",
-//           });
-//           updateData();
-//         } else {
-//           setAlert({
-//             message: t("Save failed"),
-//             severity: "error",
-//           });
-//         }
-//       })
-//       .catch((e) => {
-//         console.error(e);
-//         setAlert({
-//           message: t("Save failed"),
-//           severity: "error",
-//         });
-//       })
-//       .finally(() => {
-//         setProcessing(false);
-//       });
-//   };
 
   const renderRows = (account, rows) => {
 
@@ -158,17 +119,6 @@ export const FinanceTable = ({
         {rows.map((row, idx) => (
           <TableRow key={idx}>
             <TableCell>{page * rowsPerPage + idx + 1}</TableCell>
-            {/* <TableCell>
-              <Avatar
-                variant="square"
-                alt="product"
-                src={
-                  row.pictures && row.pictures[0] ? row.pictures[0].url : "#"
-                }
-              >
-                <LocalMallIcon></LocalMallIcon>
-              </Avatar>
-            </TableCell> */}
             <TableCell>{toDateString(row.created)}</TableCell>
             <TableCell>{toDateString(row.modified)}</TableCell>
             <TableCell>{row.fromName}</TableCell>
@@ -177,27 +127,13 @@ export const FinanceTable = ({
             <TableCell>{row.amount}</TableCell>
             <TableCell>{getBalance(account, row)}</TableCell>
             <TableCell>{row.note}</TableCell>
-            {/* <TableCell>
-              <IconButton
-                disabled={processing}
-                onClick={() => {
-                  toggleFeature(row._id);
-                }}
-              >
-                {row.featured ? (
-                  <CheckIcon color="primary"></CheckIcon>
-                ) : (
-                  <CloseIcon color="error"></CloseIcon>
-                )}
-              </IconButton>
-            </TableCell> */}
             <TableCell>
-              <IconButton aria-label="edit" href={`finance/${row._id}`}>
+              {/* <IconButton aria-label="edit" href={`finance/${row._id}`}>
                 <EditIcon />
               </IconButton>
               <IconButton aria-label="delete" disabled={processing}>
                 <DeleteIcon />
-              </IconButton>
+              </IconButton> */}
             </TableCell>
           </TableRow>
         ))}
@@ -210,10 +146,9 @@ export const FinanceTable = ({
       <TableSortLabel
         active={sort && sort[0] === fieldName}
         direction={sort && sort[1] === -1 ? "desc" : "asc"}
-        onClick={() => {
-          toggleSort(fieldName);
-        }}
-      ></TableSortLabel>
+        onClick={() => {toggleSort(fieldName);}}
+      >
+      </TableSortLabel>
     );
   };
 
@@ -227,7 +162,6 @@ export const FinanceTable = ({
         <TableHead>
           <TableRow>
             <TableCell>#</TableCell>
-            {/* <TableCell>{t("Image")}</TableCell> */}
             <TableCell
               onClick={() => {
                 toggleSort("created");

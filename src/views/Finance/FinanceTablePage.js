@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
+
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
@@ -38,12 +40,16 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
+const useQuery = () => {
+  return new URLSearchParams(useLocation().search);
+}
+
 export const FinanceTablePage = ({ location, history }) => {
   const { t } = useTranslation();
   const classes = useStyles();
   // states related to list and pagniation
+  const searchParams = useQuery();
   const [transactions, setTransactions] = useState([]);
-  
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(
     getQueryParam(location, "page")
@@ -76,7 +82,13 @@ export const FinanceTablePage = ({ location, history }) => {
   );
 
   useEffect(() => {
-    updateData();
+    
+    if(searchParams.has('accountId')){
+      const accountId = searchParams.get('accountId');
+      updateData(accountId);
+    }else{
+      updateData(selectedAccount._id);
+    }
   }, [page, rowsPerPage, sort, selectedAccount, startDate, endDate]);
 
   // useEffect(() => {
@@ -90,14 +102,14 @@ export const FinanceTablePage = ({ location, history }) => {
 
 
 
-  const updateData = () => {
+  const updateData = (accountId) => {
     ApiTransactionService.getTransactionList(
       page,
       rowsPerPage,
-      selectedAccount._id,
+      accountId,
       startDate,
       endDate,
-      [] // sort
+      [sort]
     ).then(({ data }) => {
       setTransactions(data.data);
       setTotalRows(data.count);
