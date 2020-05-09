@@ -1,5 +1,5 @@
 import queryString from "query-string";
-import * as moment from 'moment';
+import moment, * as moments from "moment";
 
 export const getQueryParam = (location, key) => {
   if (location.search) {
@@ -32,12 +32,12 @@ export const buildPaginationQuery = (
     where: condition,
     options: {
       limit: pageSize,
-      skip: page * pageSize,
-    },
+      skip: page * pageSize
+    }
   };
   if (fields && fields.length) {
     const projection = {};
-    fields.forEach((field) => {
+    fields.forEach(field => {
       projection[field] = true;
     });
     query.options.projection = projection;
@@ -48,11 +48,11 @@ export const buildPaginationQuery = (
   return JSON.stringify(query);
 };
 
-export const groupAttributeData = (flatData) => {
+export const groupAttributeData = flatData => {
   const groupData = [];
-  flatData.forEach((data) => {
+  flatData.forEach(data => {
     const dataInGroup = groupData.find(
-      (groupData) => groupData.attrIdx === data.attrIdx
+      groupData => groupData.attrIdx === data.attrIdx
     );
     if (dataInGroup) {
       if (dataInGroup.valIndices) {
@@ -63,23 +63,23 @@ export const groupAttributeData = (flatData) => {
     } else {
       groupData.push({
         attrIdx: data.attrIdx,
-        valIndices: [data.valIdx],
+        valIndices: [data.valIdx]
       });
     }
   });
   return groupData;
 };
 
-export const getAllCombinations = (groupData) => {
+export const getAllCombinations = groupData => {
   if (!groupData.length) {
     return [];
   }
   if (groupData.length === 1) {
-    return groupData[0].valIndices.map((valIdx) => [
+    return groupData[0].valIndices.map(valIdx => [
       {
         attrIdx: groupData[0].attrIdx,
-        valIdx,
-      },
+        valIdx
+      }
     ]);
   }
   const result = [];
@@ -89,19 +89,37 @@ export const getAllCombinations = (groupData) => {
       result.push([
         {
           attrIdx: groupData[0].attrIdx,
-          valIdx: groupData[0].valIndices[j],
+          valIdx: groupData[0].valIndices[j]
         },
-        ...restCombinations[i],
+        ...restCombinations[i]
       ]);
     }
   }
   return result;
 };
 
+export const getDateRangeStrings = (days, startDate = undefined) => {
+  const ret = [];
+
+  for (let i = 0; i < days; i++) {
+    ret.push(
+      moment(startDate)
+        .add(i, "days")
+        .format("YYYY-MM-DD")
+    );
+  }
+  return ret;
+};
+
 //dateString parser
 
 export const toDateString = (s = null) => {
-  return s ? moment.utc(s).local().format('YYYY-MM-DD') : "";
+  return s
+    ? moments
+        .utc(s)
+        .local()
+        .format("YYYY-MM-DD")
+    : "";
 };
 
 //debounce not really good

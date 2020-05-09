@@ -44,7 +44,13 @@ import FlashStorage from "services/FlashStorage";
 import ApiProductService from "services/api/ApiProductService";
 import ApiCategoryService from "services/api/ApiCategoryService";
 import CategoryTree from "views/Categories/CategoryTree";
-import { groupAttributeData, getAllCombinations } from "helper/index";
+import moment from "moment";
+import "moment/locale/zh-cn";
+import {
+  groupAttributeData,
+  getAllCombinations,
+  getDateRangeStrings
+} from "helper/index";
 const useStyles = makeStyles(() => ({
   textarea: {
     width: "100%"
@@ -121,6 +127,22 @@ const getCombinationDescription = (attributes, { values }) => {
     }
   });
   return descriptions.join(", ");
+};
+
+const countProductFromDate = (date, orders, productId) => {
+  let count = 0;
+  orders
+    .filter(order => order.deliverDate >= date)
+    .forEach(order => {
+      if (order.items && order.items.length) {
+        order.items
+          .filter(item => item.productId === productId)
+          .forEach(item => {
+            count += item.quantity;
+          });
+      }
+    });
+  return count;
 };
 
 const EditProductSkeleton = () => (
@@ -346,6 +368,56 @@ const CombinationGenerator = ({ attributes, onGenerate }) => {
   );
 };
 
+const ProductQuantitySchedule = ({ productId, productQuantity, days = 7 }) => {
+  const { t } = useTranslation();
+  const [orders, setOrders] = useState([]);
+  const [dates] = useState(getDateRangeStrings(days));
+  useEffect(() => {
+    ApiProductService.getProductDeliveries(productId).then(async ({ data }) => {
+      moment.locale("zh-cn");
+      if (data.code && data.code === "success") {
+        setOrders(data.data);
+      }
+    });
+  }, []);
+
+  return (
+    <Card>
+      <CardHeader color="primary">{t("Product Quantity Schedule")}</CardHeader>
+      <CardBody>
+        <GridContainer>
+          <GridItem xs={12}>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    {dates.map(date => (
+                      <TableCell key={date}>
+                        {moment(date)
+                          .format("MM-DD ddd")}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow>
+                    {dates.map(date => (
+                      <TableCell key={date}>
+                        {parseInt(productQuantity) +
+                          countProductFromDate(date, orders, productId)}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </GridItem>
+        </GridContainer>
+      </CardBody>
+    </Card>
+  );
+};
+
 const EditProduct = ({ match, history }) => {
   const { t } = useTranslation();
   const classes = useStyles();
@@ -395,7 +467,6 @@ const EditProduct = ({ match, history }) => {
   };
 
   const saveModel = () => {
-    console.log(model);
     removeAlert();
     setProcessing(true);
     ApiProductService.saveProduct(model)
@@ -749,6 +820,13 @@ const EditProduct = ({ match, history }) => {
             </GridContainer>
           </CardBody>
         </Card>
+        {!loading && model.stock && model.stock.enabled && (
+          <ProductQuantitySchedule
+            productId={match.params.id}
+            productQuantity={model.stock.quantity ? model.stock.quantity : 0}
+            days={10}
+          />
+        )}
       </GridItem>
       <GridItem xs={12} lg={4}>
         <Card>
@@ -791,6 +869,12 @@ const EditProduct = ({ match, history }) => {
       </GridItem>
     </GridContainer>
   );
+};
+
+ProductQuantitySchedule.propTypes = {
+  productId: PropTypes.string,
+  productQuantity: PropTypes.number,
+  days: PropTypes.number
 };
 
 EditCombinationRow.propTypes = {
