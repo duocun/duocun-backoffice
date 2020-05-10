@@ -13,7 +13,9 @@ export default {
     query.query = buildPaginationQuery(page, pageSize, conditions, [], sort);
     return ApiService.v2().get("accounts", query);
   },
-
+  getAccount: (accountId) => {
+    return ApiService.v2().get("accounts/" + accountId);
+  },
   getAccountByKeyword: (page, pageSize, keyword = "", sort = []) => {
     let query = {};
     const condition = {
