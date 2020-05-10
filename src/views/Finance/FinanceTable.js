@@ -128,10 +128,10 @@ export const FinanceTable = ({
             <TableCell>{getBalance(account, row)}</TableCell>
             <TableCell>{row.note}</TableCell>
             <TableCell>
-              {/* <IconButton aria-label="edit" href={`finance/${row._id}`}>
+              <IconButton aria-label="edit" href={`finance/${row._id}`}>
                 <EditIcon />
               </IconButton>
-              <IconButton aria-label="delete" disabled={processing}>
+              {/* <IconButton aria-label="delete" disabled={processing}>
                 <DeleteIcon />
               </IconButton> */}
             </TableCell>

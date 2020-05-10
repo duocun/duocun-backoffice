@@ -108,25 +108,25 @@ const SalaryPage = ({ history, location}) => {
     modifyBy: '',
   });
 
-  const [processing, setProcessing] = useState(false);
-
-
+  
+  
   // table related
   const searchParams = useQuery();
-
+  
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(
     getQueryParam(location, "page")
-      ? parseInt(getQueryParam(location, "page"))
-      : 0
+    ? parseInt(getQueryParam(location, "page"))
+    : 0
   );
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalRows, setTotalRows] = useState(0);
   const [query, setQuery] = useState(getQueryParam(location, "search") || "");
   const [sort, setSort] = useState(["_id", 1]);
-
-
+  
+  
+  const [processing, setProcessing] = useState(false);
   const removeAlert = () => {
     setAlert({
       message: "",

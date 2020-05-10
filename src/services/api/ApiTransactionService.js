@@ -45,9 +45,16 @@ export default {
   //     return ApiService.v2().get(`products/${id}`);
   //   },
 
-
+  getTransaction: (id) => {
+    return ApiService.v2().get("Transactions/" + id);
+  },
   createTransaction: model => {
     return ApiService.v2().post(`Transactions/`, model);
+  },
+  updateTransaction: model => {
+    const data = {...model};
+    delete data._id;
+    return ApiService.v2().put(`Transactions/${model._id}`, data);
   },
   updateSalary: model => {
     return ApiService.v2().put(`Transactions/salary`, model);
