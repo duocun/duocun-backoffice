@@ -16,8 +16,8 @@ import TableBodySkeleton from "components/Table/TableBodySkeleton";
 import IconButton from "@material-ui/core/IconButton";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
-import CheckIcon from "@material-ui/icons/Check";
-import CloseIcon from "@material-ui/icons/Close";
+// import CheckIcon from "@material-ui/icons/Check";
+// import CloseIcon from "@material-ui/icons/Close";
 
 //helper function
 import { toDateString } from "../../helper";
@@ -70,7 +70,8 @@ export const FinanceTable = ({
   setRowsPerPage,
   setSort,
   setPage,
-  setAlert
+  setAlert,
+  deleteRow
 }) => {
   const { t } = useTranslation();
   const classes = useStyles();
@@ -84,13 +85,6 @@ export const FinanceTable = ({
     } else {
       setSort([fieldName, 1]);
     }
-  };
-
-  const removeAlert = () => {
-    setAlert({
-      message: "",
-      severity: "info",
-    });
   };
 
   const renderRows = (account, rows) => {
@@ -128,12 +122,16 @@ export const FinanceTable = ({
             <TableCell>{getBalance(account, row)}</TableCell>
             <TableCell>{row.note}</TableCell>
             <TableCell>
-              <IconButton aria-label="edit" href={`finance/${row._id}`}>
+              <IconButton aria-label="edit" 
+                href={`finance/${row._id}`}>
                 <EditIcon />
               </IconButton>
-              {/* <IconButton aria-label="delete" disabled={processing}>
+              <IconButton aria-label="delete"
+                disabled={processing}
+                onClick={() => deleteRow(row._id)}
+                >
                 <DeleteIcon />
-              </IconButton> */}
+              </IconButton>
             </TableCell>
           </TableRow>
         ))}

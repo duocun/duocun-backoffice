@@ -216,13 +216,37 @@ const SalaryPage = ({ history, location}) => {
     }
   };
 
-  // useEffect(() => {
-  //   const token = Auth.getAuthToken();
-  //   ApiAuthService.getCurrentUser(token).then(({data}) => {
-  //     setAccount(data);
-  //     setModel({...model, modifyBy: data._id});
-  //   });
-  // },[]);
+
+  const handleDeleteTransaction = (transactionId) => {
+    if(window.confirm('Are you sure to delete this transaction?')){
+      if(transactionId){
+        removeAlert();
+        setProcessing(true);
+        ApiTransactionService.deleteTransaction(transactionId).then(({ data }) => {
+          if (data.code === 'success') {
+            setAlert({
+              message: t("Delete transaction successfully"),
+              severity: "success"
+            });
+          } else {
+            setAlert({
+              message: t("Delete transaction failed"),
+              severity: "error"
+            });
+          }
+          setProcessing(false);
+        })
+        .catch(e => {
+          console.error(e);
+          setAlert({
+            message: t("Delete transaction failed"),
+            severity: "error"
+          });
+          setProcessing(false);
+        });
+      }
+    }
+  };
 
   useEffect(() => {
     const token = Auth.getAuthToken();
@@ -243,12 +267,25 @@ const SalaryPage = ({ history, location}) => {
   }, []);
 
   const updateData = (accountId) => {
+    const condition = {
+      $or: [
+        {
+          fromId: accountId
+        },
+        {
+          toId: accountId
+        },
+        {
+          staffId: accountId
+        }
+      ],
+      actionCode: {$in:['T', 'PS']},
+      status: { $nin: ['bad', 'tmp'] }
+    };
     ApiTransactionService.getTransactionList(
       page,
       rowsPerPage,
-      accountId,
-      new Date(), // startDate,
-      new Date(), // endDate,
+      condition,
       [sort]
     ).then(({ data }) => {
       setTransactions(data.data);
@@ -363,6 +400,7 @@ const SalaryPage = ({ history, location}) => {
                     setRowsPerPage={setRowsPerPage}
                     setSort={setSort}
                     setPage={setPage}
+                    deleteRow={handleDeleteTransaction}
                   />
                 </GridItem>
               </GridContainer>

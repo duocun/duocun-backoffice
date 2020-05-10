@@ -105,12 +105,21 @@ export const FinanceTablePage = ({ location, history }) => {
   // }, [query]);
 
   const updateData = (accountId) => {
+    const condition = {
+      $or: [
+        {
+          fromId: accountId,
+        },
+        {
+          toId: accountId,
+        },
+      ],
+      status: { $nin: ['bad', 'tmp'] }
+    };
     ApiTransactionService.getTransactionList(
       page,
       rowsPerPage,
-      accountId,
-      startDate,
-      endDate,
+      condition,
       [sort]
     ).then(({ data }) => {
       setTransactions(data.data);
@@ -165,6 +174,39 @@ export const FinanceTablePage = ({ location, history }) => {
         });
         setProcessing(false);
       });
+    }
+  };
+
+
+
+  const handleDeleteTransaction = (transactionId) => {
+    if(window.confirm('Are you sure to delete this transaction?')){
+      if(transactionId){
+        removeAlert();
+        setProcessing(true);
+        ApiTransactionService.deleteTransaction(transactionId).then(({ data }) => {
+          if (data.code === 'success') {
+            setAlert({
+              message: t("Delete transaction successfully"),
+              severity: "success"
+            });
+          } else {
+            setAlert({
+              message: t("Delete transaction failed"),
+              severity: "error"
+            });
+          }
+          setProcessing(false);
+        })
+        .catch(e => {
+          console.error(e);
+          setAlert({
+            message: t("Delete transaction failed"),
+            severity: "error"
+          });
+          setProcessing(false);
+        });
+      }
     }
   };
 
@@ -252,6 +294,7 @@ export const FinanceTablePage = ({ location, history }) => {
                     setRowsPerPage={setRowsPerPage}
                     setSort={setSort}
                     setPage={setPage}
+                    deleteRow={handleDeleteTransaction}
                   />
                 </GridItem>
               </GridContainer>

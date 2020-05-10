@@ -79,9 +79,18 @@ export const FinanceException = ({ location, history }) => {
   };
 
   const updateData = () => {
-    ApiTransactionService.getTransactionList(page, rowsPerPage, selectUserId, startDate, endDate, [
-      sort,
-    ]).then(({ data }) => {
+    const condition = {
+      $or: [
+        {
+          fromId: selectUserId,
+        },
+        {
+          toId: selectUserId,
+        },
+      ],
+      status: { $nin: ['bad', 'tmp'] }
+    };
+    ApiTransactionService.getTransactionList(page, rowsPerPage, condition, [sort,]).then(({ data }) => {
       setTransactions(data.data);
       setTotalRows(data.count);
       setLoading(false);

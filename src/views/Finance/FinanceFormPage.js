@@ -133,7 +133,7 @@ export const FinanceFormPage = ({ match }) => {
   const handleStaffChange = (staffId) => {
     const account = accounts.find(a => a._id === staffId);
     const staffName = account ? account.username : ''
-    setModel({ ...model, staffId, staffName, note: `Pay ${staffName}` });
+    setModel({ ...model, staffId, staffName, note: `Pay salary to ${staffName}` });
   }
 
   const handleSave = () => {
@@ -306,7 +306,7 @@ export const FinanceFormPage = ({ match }) => {
                   <Button
                     variant="contained"
                     // href={"finance?accountId=" + model.fromId}
-                    href="finance"
+                    href="finance/salary"
                     onClick={handleBack}
                   >
                     <FormatListBulletedIcon />
