@@ -37,12 +37,14 @@ import { useDebounce } from "index";
 
 import moment from "moment";
 import "moment/locale/zh-cn";
+import ApiCategoryService from "services/api/ApiCategoryService";
+import { InputLabel, MenuItem, Select, Box } from "@material-ui/core";
 
 moment.locale("zh-cn");
 
 const useStyles = makeStyles(theme => ({
   table: {
-    minWidth: 750
+    minWidth: 1024
   },
   formControl: {
     margin: theme.spacing(1),
@@ -63,6 +65,23 @@ const useStyles = makeStyles(theme => ({
   },
   linkLabel: {
     color: "#3f51b5"
+  },
+  headerLabel: {
+    color: "#eeeeee",
+    display: "inline-block",
+    marginRight: "1rem"
+  },
+  headerSelect: {
+    "&:before": {
+      borderColor: "#eeeeee"
+    },
+    "&:after": {
+      borderColor: "#eeeeee"
+    },
+    color: "#eeeeee"
+  },
+  headerSelectIcon: {
+    fill: "#eeeeee"
   }
 }));
 
@@ -71,6 +90,15 @@ const dates = getDateRangeStrings(7);
 const isQuantityDeficient = product => {
   if (!product.stock || !product.stock.enabled) return false;
   return (product.stock.warningThreshold || 0) >= (product.stock.quantity || 0);
+};
+
+const getCategoryName = (categories, product) => {
+  let category = categories.find(c => c._id === product.categoryId);
+  if (category) {
+    return category.name;
+  } else {
+    return "";
+  }
 };
 
 const StockRow = ({
@@ -96,6 +124,7 @@ const StockRow = ({
   return (
     <TableRow className={classes.textCenter}>
       <TableCell>{number}</TableCell>
+      <TableCell>{product.categoryName}</TableCell>
       <TableCell>
         <Link to={`products/${product._id}`}>
           <span className={classes.linkLabel}>{product.name}</span>
@@ -193,7 +222,8 @@ export default function ListProductStock({ location }) {
   const [totalRows, setTotalRows] = useState(0);
   const [query, setQuery] = useState(getQueryParam(location, "search") || "");
   const [sort, setSort] = useState(["_id", 1]);
-
+  const [categories, setCategories] = useState([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState("");
   // states related to processing
   const [alert, setAlert] = useState(
     FlashStorage.get("PRODUCT_ALERT") || { message: "", severity: "info" }
@@ -281,9 +311,17 @@ export default function ListProductStock({ location }) {
   };
 
   const updateData = () => {
-    ApiStockService.getStockList(page, rowsPerPage, query, {}, [sort]).then(
+    const params = {};
+    if (selectedCategoryId) {
+      params.categoryId = selectedCategoryId;
+    }
+    ApiStockService.getStockList(page, rowsPerPage, query, params, [sort]).then(
       ({ data }) => {
         if (data.code === "success") {
+          data.data = data.data.map(product => {
+            product.categoryName = getCategoryName(categories, product);
+            return product;
+          });
           setProducts(data.data);
           setTotalRows(data.count);
           setLoading(false);
@@ -298,9 +336,17 @@ export default function ListProductStock({ location }) {
   };
 
   useEffect(() => {
+    ApiCategoryService.getCategories({ type: "G" }).then(({ data }) => {
+      if (data.code === "success") {
+        setCategories(data.data);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
     updateData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, rowsPerPage, sort]);
+  }, [page, rowsPerPage, sort, categories, selectedCategoryId]);
 
   return (
     <GridContainer>
@@ -308,24 +354,57 @@ export default function ListProductStock({ location }) {
         <Card>
           <CardHeader color="primary">
             <GridContainer>
-              <GridItem xs={12} lg={6}>
+              <GridItem xs={12} lg={3}>
                 <h4>{t("Stock")}</h4>
               </GridItem>
-              <GridItem xs={12} lg={6} align="right">
-                <Searchbar
-                  onChange={e => {
-                    const { target } = e;
-                    setQuery(target.value);
-                  }}
-                  onSearch={() => {
-                    setLoading(true);
-                    if (page === 0) {
-                      updateData();
-                    } else {
-                      setPage(0);
-                    }
-                  }}
-                />
+              <GridItem xs={12} lg={9} align="right">
+                <GridContainer>
+                  <GridItem xs={12} md={6}>
+                    <Box style={{ marginTop: "28px" }}>
+                      <InputLabel
+                        className={classes.headerLabel}
+                        id="labelCategory"
+                      >
+                        {t("Category")}
+                      </InputLabel>
+                      <Select
+                        className={classes.headerSelect}
+                        labelId="labelCategory"
+                        inputProps={{
+                          classes: {
+                            icon: classes.headerSelectIcon
+                          },
+                          placeholder: t("Category")
+                        }}
+                        value={selectedCategoryId}
+                        onChange={e => setSelectedCategoryId(e.target.value)}
+                      >
+                        <MenuItem value="">{t("Select")}</MenuItem>
+                        {categories.map(category => (
+                          <MenuItem key={category._id} value={category._id}>
+                            {category.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </Box>
+                  </GridItem>
+                  <GridItem xs={12} md={6}>
+                    <Searchbar
+                      onChange={e => {
+                        const { target } = e;
+                        setQuery(target.value);
+                      }}
+                      onSearch={() => {
+                        setLoading(true);
+                        if (page === 0) {
+                          updateData();
+                        } else {
+                          setPage(0);
+                        }
+                      }}
+                    />
+                  </GridItem>
+                </GridContainer>
               </GridItem>
             </GridContainer>
           </CardHeader>
@@ -348,6 +427,7 @@ export default function ListProductStock({ location }) {
                     <TableHead>
                       <TableRow>
                         <TableCell>#</TableCell>
+                        <TableCell>{t("Category")}</TableCell>
                         <TableCell>{t("Product Name")}</TableCell>
                         <TableCell>{t("Stock Enabled")}</TableCell>
                         <TableCell>{t("Allow negative quantity")}</TableCell>
