@@ -111,6 +111,34 @@ export const getDateRangeStrings = (days, startDate = undefined) => {
   return ret;
 };
 
+export const countProductQuantityFromOrders = (orders, productId) => {
+  let count = 0;
+  orders.forEach(order => {
+    if (order.items && order.items.length) {
+      order.items
+        .filter(item => item.productId === productId)
+        .forEach(item => {
+          count += item.quantity;
+        });
+    }
+  });
+  return count;
+};
+
+export const countProductFromDate = (
+  date,
+  orders,
+  productId,
+  dir = "after"
+) => {
+  return countProductQuantityFromOrders(
+    dir === "after"
+      ? orders.filter(order => order.deliverDate >= date)
+      : orders.filter(order => order.deliverDate <= date),
+    productId
+  );
+};
+
 //dateString parser
 
 export const toDateString = (s = null) => {

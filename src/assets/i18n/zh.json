@@ -69,5 +69,6 @@
     "Grocery": "商超",
     "Out of stock Message (English)": "缺货消息（英文）",
     "Out of stock Message (Chinese)": "缺货留言（中文）",
-    "Product Quantity Schedule": "产品数量表"
+    "Product Quantity Schedule": "产品数量表",
+    "Stock Enabled": "库存功能已启用"
 }

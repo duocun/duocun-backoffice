@@ -18,28 +18,17 @@
 // @material-ui/icons
 import Dashboard from "@material-ui/icons/Dashboard";
 import Person from "@material-ui/icons/Person";
-import LibraryBooks from "@material-ui/icons/LibraryBooks";
-import BubbleChart from "@material-ui/icons/BubbleChart";
 import LocationOn from "@material-ui/icons/LocationOn";
-import Notifications from "@material-ui/icons/Notifications";
 import LocalMallIcon from "@material-ui/icons/LocalMall";
-import EditAttributesIcon from '@material-ui/icons/EditAttributes';
-import CategoryIcon from '@material-ui/icons/Category';
-import StoreIcon from '@material-ui/icons/Store';
+import EditAttributesIcon from "@material-ui/icons/EditAttributes";
+import CategoryIcon from "@material-ui/icons/Category";
+import StoreIcon from "@material-ui/icons/Store";
 
 // core components/views for Admin layout
-import DashboardPage from "views/Dashboard/Dashboard.js";
-import UserProfile from "views/UserProfile/UserProfile.js";
-
-import TableList from "views/TableList/TableList.js";
-
-import Typography from "views/Typography/Typography.js";
-import Icons from "views/Icons/Icons.js";
-import Maps from "views/Maps/Maps.js";
-import NotificationsPage from "views/Notifications/Notifications.js";
 import CategoriesPage from "views/Categories/Categories.js";
 import FinanceRoute from "views/Finance/FinanceRoute.js";
 import ProductPage from "views/Products/Products.js";
+import StockPage from "views/Stock/ListProductStock.js";
 import AttributePage from "views/Attributes/Attributes.js";
 import OrderPage from "views/Orders/OrderPage.js";
 
@@ -48,6 +37,7 @@ import DashboardRoute from "views/Dashboard/DashboardRoute.js";
 
 import AccountsPage from "views/Accounts/AccountsPage";
 import MerchantsPage from "views/Merchants/MerchantsPage";
+import WidgetsIcon from "@material-ui/icons/Widgets";
 
 const dashboardRoutes = [
   {
@@ -79,6 +69,13 @@ const dashboardRoutes = [
     layout: "/"
   },
   {
+    path: "/stocks",
+    name: "Stock",
+    icon: WidgetsIcon,
+    component: StockPage,
+    layout: "/"
+  },
+  {
     path: "/attributes",
     name: "Attributes",
     icon: EditAttributesIcon,
@@ -107,54 +104,54 @@ const dashboardRoutes = [
     layout: "/"
   },
   {
-    path:"/assignment",
-    name:"Assignment",
-    icon:LocationOn,
-    component: Assignment,
-    layout:"/"
-  },
-  {
-    path: "/table",
-    name: "Table List",
-    icon: "content_paste",
-    component: TableList,
-    layout: "/"
-  },
-  {
-    path: "/typography",
-    name: "Typography",
-    icon: LibraryBooks,
-    component: Typography,
-    layout: "/"
-  },
-  {
-    path: "/icons",
-    name: "Icons",
-    icon: BubbleChart,
-    component: Icons,
-    layout: "/"
-  },
-  {
-    path: "/maps",
-    name: "Maps",
+    path: "/assignment",
+    name: "Assignment",
     icon: LocationOn,
-    component: Maps,
-    layout: "/"
-  },
-  {
-    path: "/user",
-    name: "User Profile",
-    icon: Person,
-    component: UserProfile,
-    layout: "/"
-  },
-  {
-    path: "/notifications",
-    name: "Notifications",
-    icon: Notifications,
-    component: NotificationsPage,
+    component: Assignment,
     layout: "/"
   }
+  // {
+  //   path: "/table",
+  //   name: "Table List",
+  //   icon: "content_paste",
+  //   component: TableList,
+  //   layout: "/"
+  // },
+  // {
+  //   path: "/typography",
+  //   name: "Typography",
+  //   icon: LibraryBooks,
+  //   component: Typography,
+  //   layout: "/"
+  // },
+  // {
+  //   path: "/icons",
+  //   name: "Icons",
+  //   icon: BubbleChart,
+  //   component: Icons,
+  //   layout: "/"
+  // },
+  // {
+  //   path: "/maps",
+  //   name: "Maps",
+  //   icon: LocationOn,
+  //   component: Maps,
+  //   layout: "/"
+  // },
+  // {
+  //   path: "/user",
+  //   name: "User Profile",
+  //   icon: Person,
+  //   component: UserProfile,
+  //   layout: "/"
+  // },
+  // {
+  //   path: "/notifications",
+  //   name: "Notifications",
+  //   icon: Notifications,
+  //   component: NotificationsPage,
+  //   layout: "/"
+  // }
 ];
 
 export default dashboardRoutes;
