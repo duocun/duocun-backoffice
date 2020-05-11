@@ -26,7 +26,7 @@
     "Description (English)": "说明（英文）",
     "Dsecription (Chinese)": "说明（中文）",
     "Basic Information": "基本设置",
-    "Stock": "存货",
+    "Stock": "库存",
     "Enabled": "启用",
     "Quantity": "数量",
     "Combination": "组合",
@@ -59,6 +59,7 @@
     "Yes": "是",
     "No": "否",
     "Categories": "分类",
+    "Category": "分类",
     "Category Name (English)": "分类名称 (英文)",
     "Category Name (Chinese)": "分类名称 (中文)",
     "Display Order": "位置",
@@ -69,5 +70,7 @@
     "Grocery": "商超",
     "Out of stock Message (English)": "缺货消息（英文）",
     "Out of stock Message (Chinese)": "缺货留言（中文）",
-    "Product Quantity Schedule": "产品数量表"
+    "Product Quantity Schedule": "产品数量表",
+    "Stock Enabled": "库存功能已启用",
+    "Warning Threshold": "库存预警值"
 }

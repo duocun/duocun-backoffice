@@ -48,6 +48,7 @@
     "Yes": "Yes",
     "No": "No",
     "Categories": "Categories",
+    "Category": "Category",
     "Category Name (English)": "Category Name (English)",
     "Category Name (Chinese)": "Category Name (Chinese)",
     "Display Order": "Display Order",
@@ -58,5 +59,7 @@
     "Grocery": "Grocery",
     "Out of stock Message (English)": "Out of stock Message (English)",
     "Out of stock Message (Chinese)": "Out of stock Message (Chinese)",
-    "Product Quantity Schedule": "Product Quantity Schedule"
+    "Product Quantity Schedule": "Product Quantity Schedule",
+    "Stock Enabled": "Stock Enabled",
+    "Warning Threshold": "Warning Threshold"
 }

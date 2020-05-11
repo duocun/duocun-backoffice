@@ -44,6 +44,9 @@ import FlashStorage from "services/FlashStorage";
 import ApiProductService from "services/api/ApiProductService";
 import ApiCategoryService from "services/api/ApiCategoryService";
 import CategoryTree from "views/Categories/CategoryTree";
+
+import { countProductFromDate } from "helper/index";
+
 import moment from "moment";
 import "moment/locale/zh-cn";
 import {
@@ -127,22 +130,6 @@ const getCombinationDescription = (attributes, { values }) => {
     }
   });
   return descriptions.join(", ");
-};
-
-const countProductFromDate = (date, orders, productId) => {
-  let count = 0;
-  orders
-    .filter(order => order.deliverDate >= date)
-    .forEach(order => {
-      if (order.items && order.items.length) {
-        order.items
-          .filter(item => item.productId === productId)
-          .forEach(item => {
-            count += item.quantity;
-          });
-      }
-    });
-  return count;
 };
 
 const EditProductSkeleton = () => (
@@ -393,8 +380,7 @@ const ProductQuantitySchedule = ({ productId, productQuantity, days = 7 }) => {
                   <TableRow>
                     {dates.map(date => (
                       <TableCell key={date}>
-                        {moment(date)
-                          .format("MM-DD ddd")}
+                        {moment(date).format("MM-DD ddd")}
                       </TableCell>
                     ))}
                   </TableRow>
@@ -696,7 +682,7 @@ const EditProduct = ({ match, history }) => {
                               </FormControl>
                             </Box>
                           </GridItem>
-                          <GridItem xs={12} lg={6}>
+                          {/* <GridItem xs={12} lg={6}>
                             <Box pb={2}>
                               <CustomInput
                                 labelText={t("Quantity")}
@@ -705,12 +691,31 @@ const EditProduct = ({ match, history }) => {
                                   fullWidth: true
                                 }}
                                 inputProps={{
+                                  type: "number",
                                   value: model.stock.quantity || 0,
                                   onChange: e => {
                                     const newModel = { ...model };
-                                    newModel.stock.quantity = parseInt(
-                                      e.target.value
-                                    );
+                                    newModel.stock.quantity = e.target.value;
+                                    setModel(newModel);
+                                  }
+                                }}
+                              />
+                            </Box>
+                          </GridItem> */}
+                          <GridItem xs={12} lg={6}>
+                            <Box pb={2}>
+                              <CustomInput
+                                labelText={t("Warning Threshold")}
+                                id="product-warning-threshold"
+                                formControlProps={{
+                                  fullWidth: true
+                                }}
+                                inputProps={{
+                                  type: "number",
+                                  value: model.stock.warningThreshold || 0,
+                                  onChange: e => {
+                                    const newModel = { ...model };
+                                    newModel.stock.warningThreshold = e.target.value;
                                     setModel(newModel);
                                   }
                                 }}
@@ -820,13 +825,13 @@ const EditProduct = ({ match, history }) => {
             </GridContainer>
           </CardBody>
         </Card>
-        {!loading && model.stock && model.stock.enabled && (
+        {/* {!loading && model.stock && model.stock.enabled && (
           <ProductQuantitySchedule
             productId={match.params.id}
             productQuantity={model.stock.quantity ? model.stock.quantity : 0}
             days={10}
           />
-        )}
+        )} */}
       </GridItem>
       <GridItem xs={12} lg={4}>
         <Card>
