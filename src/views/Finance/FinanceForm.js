@@ -102,7 +102,7 @@ const defaultActions = [
 ];
 
 
-export const FinanceFormPage = ({ match }) => {
+export const FinanceForm = ({ transaction, match }) => {
   const { t } = useTranslation();
   const classes = useStyles();
 
@@ -110,7 +110,7 @@ export const FinanceFormPage = ({ match }) => {
   const [actions, setActions] = useState(defaultActions);
   const [fromAccount, setFromAccount] = useState({ _id: '', username: '' });
   const [accounts, setAccounts] = useState([]);
-  const [model, setModel] = useState(defaultTransaction);
+  const [model, setModel] = useState(transaction);
   const [processing, setProcessing] = useState(false);
   const removeAlert = () => {
     setAlert({
@@ -169,26 +169,31 @@ export const FinanceFormPage = ({ match }) => {
   const handleBack = () => {
 
   }
+  
+  useEffect(() => {
+    setModel(transaction);
+  },[transaction]);
 
   useEffect(() => {
     const token = AuthService.getAuthToken();
     ApiAuthService.getCurrentUser(token).then(({ data }) => {
       const account = { ...data };
-      ApiTransactionService.getTransaction(match.params.id).then(({ data }) => {
-        if (data.code === 'success') {
-          const tr = data.data;
-          setModel({ ...tr, modifyBy: account._id });
-        }
-        ApiAccountService.getAccountList(null, null, { type: 'driver' }).then(({ data }) => {
+      // ApiTransactionService.getTransaction(match.params.id).then(({ data }) => {
+      //   if (data.code === 'success') {
+      //     const tr = data.data;
+      //     setModel({ ...tr, modifyBy: account._id });
+      //   }
+        setModel({ ...model, modifyBy: account._id });
+        ApiAccountService.getAccountList(null, null, { type: {$in: ['driver', 'system']}}).then(({ data }) => {
           setAccounts(data.data);
         });
-      });
+      // });
     });
   }, []);
 
   return (
     <GridContainer>
-      <GridItem xs={12} lg={8}>
+      <GridItem xs={12} sm={12} lg={12}>
         <Card>
           <CardHeader color="primary">
             <GridContainer>
@@ -227,19 +232,20 @@ export const FinanceFormPage = ({ match }) => {
 
               <GridItem xs={12} lg={6}>
                 <Box pb={2}>
-                  <CustomInput
-                    labelText={t("To Account")}
-                    id="to-account"
-                    formControlProps={{
-                      fullWidth: true
-                    }}
-                    inputProps={{
-                      value: model.toName,
-                      onChange: e => {
-                        setModel({ ...model, toName: e.target.value });
+                  <FormControl className={classes.select}>
+                    <InputLabel id="to-select-label">To Account</InputLabel>
+                    <Select required
+                      labelId="to-select-label"
+                      id="to-select"
+                      value={model.toId}
+                      onChange={e => handleToAccountChange(e.target.value)}
+                    >
+                      {
+                        accounts && accounts.length > 0 &&
+                        accounts.map(d => <MenuItem key={d._id} value={d._id}>{d.username}</MenuItem>)
                       }
-                    }}
-                  />
+                    </Select>
+                  </FormControl>
                 </Box>
               </GridItem>
 
@@ -335,7 +341,7 @@ export const FinanceFormPage = ({ match }) => {
 }
 
 
-FinanceFormPage.propTypes = {
+FinanceForm.propTypes = {
   match: PropTypes.shape({
     params: PropTypes.shape({
       id: PropTypes.string

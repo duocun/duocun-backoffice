@@ -46,8 +46,9 @@ import ApiAuthService from 'services/api/ApiAuthService';
 import ApiAccountService from 'services/api/ApiAccountService';
 import Auth from "services/AuthService";
 import ApiTransactionService from "services/api/ApiTransactionService";
-import { FinanceTable } from "./FinanceTable";
 
+import { FinanceTable } from "./FinanceTable";
+import { FinanceForm } from "./FinanceForm";
 
 const useStyles = makeStyles((theme) => ({
   cardCategoryWhite: {
@@ -216,6 +217,9 @@ const SalaryPage = ({ history, location}) => {
     }
   };
 
+  const handelEditTransaction = (tr) => {
+    setModel(tr);
+  }
 
   const handleDeleteTransaction = (transactionId) => {
     if(window.confirm('Are you sure to delete this transaction?')){
@@ -308,10 +312,13 @@ const SalaryPage = ({ history, location}) => {
 
     <div>
       <GridContainer>
+        <GridItem xs={12} sm={12} md={4}>
+          <FinanceForm transaction={model}/>
+        </GridItem>
         <GridItem xs={12} sm={12} md={8}>
           <Card>
             <CardHeader color="primary">
-              {
+              {/* {
                 <FormControl className={classes.formControl}>
                   <InputLabel id="driver-select-label">Driver</InputLabel>
                   <Select required labelId="driver-select-label" id="driver-select"
@@ -345,7 +352,7 @@ const SalaryPage = ({ history, location}) => {
                   <InputLabel id="driver-select-label">From</InputLabel>
                   <Select required labelId="driver-select-label" id="driver-select"
                     value={fromId} onChange={e => handleFromChange(e.target.value)} >
-                      {/* <MenuItem key={account? account._id : ''} value={account? account._id : ''}>{account? account.username: 'My Account'}</MenuItem> */}
+                      <MenuItem key={account? account._id : ''} value={account? account._id : ''}>{account? account.username: 'My Account'}</MenuItem>
                       <MenuItem key={TD_BANK_ID} value={TD_BANK_ID}>Company</MenuItem>
                       {
                         drivers && drivers.length > 0 &&
@@ -370,11 +377,11 @@ const SalaryPage = ({ history, location}) => {
                     }}
                   />
                 </FormControl>
-              }
+              } */}
 
-              <Button onClick={() => handleSubmit()} color="secondary" autoFocus>
+              {/* <Button onClick={() => handleSubmit()} color="secondary" autoFocus>
                 {t("Submit")}
-              </Button>
+              </Button> */}
               <Button onClick={() => handleUpdate()} color="secondary" autoFocus>
                 {t("Update")}
               </Button>
@@ -400,6 +407,7 @@ const SalaryPage = ({ history, location}) => {
                     setRowsPerPage={setRowsPerPage}
                     setSort={setSort}
                     setPage={setPage}
+                    editRow={handelEditTransaction}
                     deleteRow={handleDeleteTransaction}
                   />
                 </GridItem>
@@ -407,6 +415,7 @@ const SalaryPage = ({ history, location}) => {
             </CardBody>
           </Card>
         </GridItem>
+
       </GridContainer>
     </div>
   );
