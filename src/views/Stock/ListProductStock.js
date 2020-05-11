@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
@@ -26,6 +27,7 @@ import Searchbar from "components/Searchbar/Searchbar";
 import CheckIcon from "@material-ui/icons/Check";
 import CloseIcon from "@material-ui/icons/Close";
 import RemoveIcon from "@material-ui/icons/Remove";
+import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
 
 import ApiStockService from "services/api/ApiStockService";
 import FlashStorage from "services/FlashStorage";
@@ -58,10 +60,18 @@ const useStyles = makeStyles(theme => ({
   inputInRow: {
     maxWidth: "3.5rem",
     textAlign: "center"
+  },
+  linkLabel: {
+    color: "#3f51b5"
   }
 }));
 
 const dates = getDateRangeStrings(7);
+
+const isQuantityDeficient = product => {
+  if (!product.stock || !product.stock.enabled) return false;
+  return (product.stock.warningThreshold || 0) >= (product.stock.quantity || 0);
+};
 
 const StockRow = ({
   number,
@@ -86,7 +96,14 @@ const StockRow = ({
   return (
     <TableRow className={classes.textCenter}>
       <TableCell>{number}</TableCell>
-      <TableCell>{product.name}</TableCell>
+      <TableCell>
+        <Link to={`products/${product._id}`}>
+          <span className={classes.linkLabel}>{product.name}</span>
+          {isQuantityDeficient(product) && (
+            <ErrorOutlineIcon color="secondary" fontSize="small" />
+          )}
+        </Link>
+      </TableCell>
       <TableCell className={classes.textCenter}>
         {product.stock && product.stock.enabled ? (
           <CheckIcon
@@ -250,16 +267,18 @@ export default function ListProductStock({ location }) {
     }
     removeAlert();
     setProcessing(true);
-    ApiStockService.setQuantity(product, quantity).then(resp => {
-      handleServerResponse(resp, product);
-    }).catch(e => {
-      console.error(e);
-      setAlert({
-        message: t("Save failed"),
-        severity: "error"
+    ApiStockService.setQuantity(product, quantity)
+      .then(resp => {
+        handleServerResponse(resp, product);
+      })
+      .catch(e => {
+        console.error(e);
+        setAlert({
+          message: t("Save failed"),
+          severity: "error"
+        });
       });
-    });
-  }
+  };
 
   const updateData = () => {
     ApiStockService.getStockList(page, rowsPerPage, query, {}, [sort]).then(

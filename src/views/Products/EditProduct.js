@@ -682,7 +682,7 @@ const EditProduct = ({ match, history }) => {
                               </FormControl>
                             </Box>
                           </GridItem>
-                          <GridItem xs={12} lg={6}>
+                          {/* <GridItem xs={12} lg={6}>
                             <Box pb={2}>
                               <CustomInput
                                 labelText={t("Quantity")}
@@ -696,6 +696,26 @@ const EditProduct = ({ match, history }) => {
                                   onChange: e => {
                                     const newModel = { ...model };
                                     newModel.stock.quantity = e.target.value;
+                                    setModel(newModel);
+                                  }
+                                }}
+                              />
+                            </Box>
+                          </GridItem> */}
+                          <GridItem xs={12} lg={6}>
+                            <Box pb={2}>
+                              <CustomInput
+                                labelText={t("Warning Threshold")}
+                                id="product-warning-threshold"
+                                formControlProps={{
+                                  fullWidth: true
+                                }}
+                                inputProps={{
+                                  type: "number",
+                                  value: model.stock.warningThreshold || 0,
+                                  onChange: e => {
+                                    const newModel = { ...model };
+                                    newModel.stock.warningThreshold = e.target.value;
                                     setModel(newModel);
                                   }
                                 }}
@@ -805,13 +825,13 @@ const EditProduct = ({ match, history }) => {
             </GridContainer>
           </CardBody>
         </Card>
-        {!loading && model.stock && model.stock.enabled && (
+        {/* {!loading && model.stock && model.stock.enabled && (
           <ProductQuantitySchedule
             productId={match.params.id}
             productQuantity={model.stock.quantity ? model.stock.quantity : 0}
             days={10}
           />
-        )}
+        )} */}
       </GridItem>
       <GridItem xs={12} lg={4}>
         <Card>
