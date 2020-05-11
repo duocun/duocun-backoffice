@@ -72,5 +72,6 @@
     "Out of stock Message (Chinese)": "缺货留言（中文）",
     "Product Quantity Schedule": "产品数量表",
     "Stock Enabled": "库存功能已启用",
-    "Warning Threshold": "库存预警值"
+    "Warning Threshold": "库存预警值",
+    "Add Quantity": "添加数量"
 }
