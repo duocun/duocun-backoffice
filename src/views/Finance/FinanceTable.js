@@ -71,6 +71,7 @@ export const FinanceTable = ({
   setSort,
   setPage,
   setAlert,
+  editRow,
   deleteRow
 }) => {
   const { t } = useTranslation();
@@ -123,7 +124,9 @@ export const FinanceTable = ({
             <TableCell>{row.note}</TableCell>
             <TableCell>
               <IconButton aria-label="edit" 
-                href={`finance/${row._id}`}>
+                onClick={() => editRow(row)}
+                // href={`finance/${row._id}`}
+                >
                 <EditIcon />
               </IconButton>
               <IconButton aria-label="delete"

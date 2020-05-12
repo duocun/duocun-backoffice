@@ -177,7 +177,9 @@ export const FinanceTablePage = ({ location, history }) => {
     }
   };
 
-
+  const handelEditTransaction = () => {
+    
+  }
 
   const handleDeleteTransaction = (transactionId) => {
     if(window.confirm('Are you sure to delete this transaction?')){
@@ -294,6 +296,7 @@ export const FinanceTablePage = ({ location, history }) => {
                     setRowsPerPage={setRowsPerPage}
                     setSort={setSort}
                     setPage={setPage}
+                    editRow={handelEditTransaction}
                     deleteRow={handleDeleteTransaction}
                   />
                 </GridItem>

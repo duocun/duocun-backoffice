@@ -7,13 +7,6 @@ import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
 import Box from "@material-ui/core/Box";
 
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
@@ -36,14 +29,11 @@ import IconButton from "@material-ui/core/IconButton";
 
 import FormatListBulletedIcon from "@material-ui/icons/FormatListBulleted";
 import SaveIcon from "@material-ui/icons/Save";
-import EditIcon from "@material-ui/icons/Edit";
-import DeleteIcon from "@material-ui/icons/Delete";
-import CancelIcon from "@material-ui/icons/Cancel";
+// import EditIcon from "@material-ui/icons/Edit";
+// import DeleteIcon from "@material-ui/icons/Delete";
+// import CancelIcon from "@material-ui/icons/Cancel";
 
 import FlashStorage from "services/FlashStorage";
-import ApiProductService from "services/api/ApiProductService";
-import CategoryTree from "views/Categories/CategoryTree";
-import { groupAttributeData, getAllCombinations } from "helper/index";
 
 import AuthService from "services/AuthService";
 import ApiAuthService from 'services/api/ApiAuthService';
@@ -98,19 +88,19 @@ const defaultTransaction = {
 
 const defaultActions = [
   { code: 'PS', text: 'Pay Salary' },
-  { code: 'PDCH', text: 'Pay Driver Cash' }
+  { code: 'PDCH', text: 'Pay Driver Cash' },
+  { code: 'T', text: 'Transfer'}
 ];
 
 
-export const FinanceFormPage = ({ match }) => {
+export const FinanceForm = ({ account, transaction, match, update }) => {
   const { t } = useTranslation();
   const classes = useStyles();
 
-
   const [actions, setActions] = useState(defaultActions);
-  const [fromAccount, setFromAccount] = useState({ _id: '', username: '' });
+  const [modifyByAccount, setModifyByAccount] = useState({ _id: '', username: '' });
   const [accounts, setAccounts] = useState([]);
-  const [model, setModel] = useState(defaultTransaction);
+  const [model, setModel] = useState(transaction);
   const [processing, setProcessing] = useState(false);
   const removeAlert = () => {
     setAlert({
@@ -121,13 +111,19 @@ export const FinanceFormPage = ({ match }) => {
   const [alert, setAlert] = useState(
     FlashStorage.get("FINANCE_ALERT") || { message: "", severity: "info" }
   );
-  const handleActionChange = (actionCode) => {
 
+  const handleActionChange = (actionCode) => {
+    setModel({ ...model, actionCode });
   }
 
   const handleFromAccountChange = (fromId) => {
     const account = accounts.find(a => a._id === fromId);
     setModel({ ...model, fromId, fromName: account ? account.username : '' });
+  }
+
+  const handleToAccountChange = (toId) => {
+    const account = accounts.find(a => a._id === toId);
+    setModel({ ...model, toId, toName: account ? account.username : '' });
   }
 
   const handleStaffChange = (staffId) => {
@@ -146,7 +142,7 @@ export const FinanceFormPage = ({ match }) => {
             message: t("Update successfully"),
             severity: "success"
           });
-          // updatePage();
+          update(account._id);
         } else {
           setAlert({
             message: t("Update failed"),
@@ -169,26 +165,43 @@ export const FinanceFormPage = ({ match }) => {
   const handleBack = () => {
 
   }
+  
+  useEffect(() => {
+    if(transaction._id){
+      if(transaction.actionCode === 'PS'){
+        setModel({...transaction,
+          staffId: account._id,
+          staffName: account.username,
+          note: `Pay salary to ${account.username}`,
+          modifyBy: modifyByAccount._id
+        });
+      }else{
+        setModel(transaction);
+      }
+    }
+  },[transaction]);
 
   useEffect(() => {
     const token = AuthService.getAuthToken();
     ApiAuthService.getCurrentUser(token).then(({ data }) => {
       const account = { ...data };
-      ApiTransactionService.getTransaction(match.params.id).then(({ data }) => {
-        if (data.code === 'success') {
-          const tr = data.data;
-          setModel({ ...tr, modifyBy: account._id });
-        }
-        ApiAccountService.getAccountList(null, null, { type: 'driver' }).then(({ data }) => {
+      setModifyByAccount(account);
+      // ApiTransactionService.getTransaction(match.params.id).then(({ data }) => {
+      //   if (data.code === 'success') {
+      //     const tr = data.data;
+      //     setModel({ ...tr, modifyBy: account._id });
+      //   }
+        // setModel({ ...model, modifyBy: account._id });
+        ApiAccountService.getAccountList(null, null, { type: {$in: ['driver', 'system']}}).then(({ data }) => {
           setAccounts(data.data);
         });
-      });
+      // });
     });
   }, []);
 
   return (
     <GridContainer>
-      <GridItem xs={12} lg={8}>
+      <GridItem xs={12} sm={12} lg={12}>
         <Card>
           <CardHeader color="primary">
             <GridContainer>
@@ -227,19 +240,20 @@ export const FinanceFormPage = ({ match }) => {
 
               <GridItem xs={12} lg={6}>
                 <Box pb={2}>
-                  <CustomInput
-                    labelText={t("To Account")}
-                    id="to-account"
-                    formControlProps={{
-                      fullWidth: true
-                    }}
-                    inputProps={{
-                      value: model.toName,
-                      onChange: e => {
-                        setModel({ ...model, toName: e.target.value });
+                  <FormControl className={classes.select}>
+                    <InputLabel id="to-select-label">To Account</InputLabel>
+                    <Select required
+                      labelId="to-select-label"
+                      id="to-select"
+                      value={model.toId}
+                      onChange={e => handleToAccountChange(e.target.value)}
+                    >
+                      {
+                        accounts && accounts.length > 0 &&
+                        accounts.map(d => <MenuItem key={d._id} value={d._id}>{d.username}</MenuItem>)
                       }
-                    }}
-                  />
+                    </Select>
+                  </FormControl>
                 </Box>
               </GridItem>
 
@@ -335,7 +349,7 @@ export const FinanceFormPage = ({ match }) => {
 }
 
 
-FinanceFormPage.propTypes = {
+FinanceForm.propTypes = {
   match: PropTypes.shape({
     params: PropTypes.shape({
       id: PropTypes.string
