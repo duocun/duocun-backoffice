@@ -74,18 +74,6 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-const defaultTransaction = {
-  _id: 'new',
-  fromId: '',
-  fromName: '',
-  toId: '',
-  toName: '',
-  amount: 0,
-  actionCode: '',
-  modifyBy: '',
-  note: ''
-}
-
 const defaultActions = [
   { code: 'PS', text: 'Pay Salary' },
   { code: 'PDCH', text: 'Pay Driver Cash' },
@@ -132,7 +120,44 @@ export const FinanceForm = ({ account, transaction, match, update }) => {
     setModel({ ...model, staffId, staffName, note: `Pay salary to ${staffName}` });
   }
 
-  const handleSave = () => {
+
+  const handleCreate = () => {
+    if (model.fromId && model.staffId) {
+      removeAlert();
+      setProcessing(true);
+      ApiTransactionService.createTransaction(model).then(({ data }) => {
+        if (data.code === 'success') {
+          const newAlert = {
+            message: t("Saved successfully"),
+            severity: "success"
+          };
+          if (model._id === "new") {
+            FlashStorage.set("SALARY_ALERT", newAlert);
+            return;
+          } else {
+            setAlert(newAlert);
+            update(account._id);
+          }
+        } else {
+          setAlert({
+            message: t("Save failed"),
+            severity: "error"
+          });
+        }
+        setProcessing(false);
+      })
+        .catch(e => {
+          console.error(e);
+          setAlert({
+            message: t("Save failed"),
+            severity: "error"
+          });
+          setProcessing(false);
+        });
+    }
+  };
+
+  const handleUpdate = () => {
     if (model.fromId && model.toId) {
       removeAlert();
       setProcessing(true);
@@ -162,12 +187,20 @@ export const FinanceForm = ({ account, transaction, match, update }) => {
     }
   }
 
+  const handleSubmit = () => {
+    if(model._id){
+      handleUpdate();
+    }else{
+      handleCreate();
+    }
+  }
+
   const handleBack = () => {
 
   }
   
   useEffect(() => {
-    if(transaction._id){
+    // if(transaction._id){
       if(transaction.actionCode === 'PS'){
         setModel({...transaction,
           staffId: account._id,
@@ -178,7 +211,7 @@ export const FinanceForm = ({ account, transaction, match, update }) => {
       }else{
         setModel(transaction);
       }
-    }
+    // }
   },[transaction]);
 
   useEffect(() => {
@@ -206,7 +239,7 @@ export const FinanceForm = ({ account, transaction, match, update }) => {
           <CardHeader color="primary">
             <GridContainer>
               <GridItem xs={12} lg={6}>
-                <h4>{t("Edit Transaction")}</h4>
+                <h4>{t(transaction._id ? "Edit Transaction" : "New Transaction")}</h4>
               </GridItem>
             </GridContainer>
           </CardHeader>
@@ -315,6 +348,24 @@ export const FinanceForm = ({ account, transaction, match, update }) => {
                 </Box>
               </GridItem>
 
+              <GridItem xs={12} lg={6}>
+                <Box pb={2}>
+                  <CustomInput
+                    labelText={t("Note")}
+                    id="note"
+                    formControlProps={{
+                      fullWidth: true
+                    }}
+                    inputProps={{
+                      value: model.note,
+                      onChange: e => {
+                        setModel({ ...model, note: e.target.value });
+                      }
+                    }}
+                  />
+                </Box>
+              </GridItem>
+
               <GridItem xs={12} container direction="row-reverse">
                 <Box mt={2}>
                   <Button
@@ -332,7 +383,7 @@ export const FinanceForm = ({ account, transaction, match, update }) => {
                     color="primary"
                     variant="contained"
                     disabled={processing}
-                    onClick={handleSave}
+                    onClick={handleSubmit}
                   >
                     <SaveIcon />
                     {t("Save")}
