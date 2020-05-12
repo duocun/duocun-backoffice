@@ -74,6 +74,11 @@ const useStyles = makeStyles(theme => ({
   linkLabel: {
     color: "#3f51b5"
   },
+  headerBox: {
+    marginTop: "28px",
+    marginRight: "2rem",
+    display: "inline-block"
+  },
   headerLabel: {
     color: "#eeeeee",
     display: "inline-block",
@@ -222,13 +227,12 @@ const StockRow = ({
           <Input
             inputProps={{ type: "number", className: classes.textCenter }}
             className={classes.inputInRow}
-            onChange={e =>{
-              const newQuantity = (product.stock.quantity || 0) + parseInt(e.target.value);
+            onChange={e => {
+              const newQuantity =
+                (product.stock.quantity || 0) + parseInt(e.target.value);
               setAdd(e.target.value);
               setQuantity(newQuantity);
-            }
-            
-            }
+            }}
             value={add}
           ></Input>
         ) : (
@@ -280,7 +284,7 @@ export default function ListProductStock({ location }) {
   const [query, setQuery] = useState(getQueryParam(location, "search") || "");
   const [sort, setSort] = useState(["_id", 1]);
   const [categories, setCategories] = useState([]);
-  const [selectedCategoryId, setSelectedCategoryId] = useState("");
+  const [filterParams, setFilterParams] = useState({});
   // states related to processing
   const [alert, setAlert] = useState(
     FlashStorage.get("PRODUCT_ALERT") || { message: "", severity: "info" }
@@ -368,28 +372,24 @@ export default function ListProductStock({ location }) {
   };
 
   const updateData = () => {
-    const params = {};
-    if (selectedCategoryId) {
-      params.categoryId = selectedCategoryId;
-    }
-    ApiStockService.getStockList(page, rowsPerPage, query, params, [sort]).then(
-      ({ data }) => {
-        if (data.code === "success") {
-          data.data = data.data.map(product => {
-            product.categoryName = getCategoryName(categories, product);
-            return product;
-          });
-          setProducts(data.data);
-          setTotalRows(data.count);
-          setLoading(false);
-        } else {
-          setAlert({
-            message: t("Cannnot load data"),
-            severity: "error"
-          });
-        }
+    ApiStockService.getStockList(page, rowsPerPage, query, filterParams, [
+      sort
+    ]).then(({ data }) => {
+      if (data.code === "success") {
+        data.data = data.data.map(product => {
+          product.categoryName = getCategoryName(categories, product);
+          return product;
+        });
+        setProducts(data.data);
+        setTotalRows(data.count);
+        setLoading(false);
+      } else {
+        setAlert({
+          message: t("Cannnot load data"),
+          severity: "error"
+        });
       }
-    );
+    });
   };
 
   useEffect(() => {
@@ -403,7 +403,7 @@ export default function ListProductStock({ location }) {
   useEffect(() => {
     updateData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, rowsPerPage, sort, categories, selectedCategoryId]);
+  }, [page, rowsPerPage, sort, categories, filterParams]);
 
   return (
     <GridContainer>
@@ -416,8 +416,8 @@ export default function ListProductStock({ location }) {
               </GridItem>
               <GridItem xs={12} lg={9} align="right">
                 <GridContainer>
-                  <GridItem xs={12} md={6}>
-                    <Box style={{ marginTop: "28px" }}>
+                  <GridItem xs={12} md={8}>
+                    <Box className={classes.headerBox}>
                       <InputLabel
                         className={classes.headerLabel}
                         id="labelCategory"
@@ -433,8 +433,16 @@ export default function ListProductStock({ location }) {
                           },
                           placeholder: t("Category")
                         }}
-                        value={selectedCategoryId}
-                        onChange={e => setSelectedCategoryId(e.target.value)}
+                        value={filterParams.categoryId}
+                        onChange={e => {
+                          const newParams = { ...filterParams };
+                          if (e.target.value) {
+                            newParams.categoryId = e.target.value;
+                          } else {
+                            delete newParams.categoryId;
+                          }
+                          setFilterParams(newParams);
+                        }}
                       >
                         <MenuItem value="">{t("All")}</MenuItem>
                         {categories.map(category => (
@@ -444,8 +452,80 @@ export default function ListProductStock({ location }) {
                         ))}
                       </Select>
                     </Box>
+                    <Box className={classes.headerBox}>
+                      <InputLabel
+                        className={classes.headerLabel}
+                        id="labelStockEnabled"
+                      >
+                        {t("Stock Enabled")}
+                      </InputLabel>
+                      <Select
+                        className={classes.headerSelect}
+                        labelId="labelStockEnabled"
+                        inputProps={{
+                          classes: {
+                            icon: classes.headerSelectIcon
+                          },
+                          placeholder: t("Stock Enabled")
+                        }}
+                        value={filterParams["stock.enabled"]}
+                        onChange={e => {
+                          const newParams = { ...filterParams };
+                          if (e.target.value) {
+                            if (e.target.value === "true") {
+                              newParams["stock.enabled"] = true;
+                            } else {
+                              newParams["stock.enabled"] = false;
+                            }
+                          } else {
+                            delete newParams["stock.enabled"];
+                          }
+                          setFilterParams(newParams);
+                        }}
+                      >
+                        <MenuItem value="">{t("All")}</MenuItem>
+                        <MenuItem value="true">{t("Yes")}</MenuItem>
+                        <MenuItem value="false">{t("No")}</MenuItem>
+                      </Select>
+                    </Box>
+                    <Box className={classes.headerBox}>
+                      <InputLabel
+                        className={classes.headerLabel}
+                        id="labelAllowNegative"
+                      >
+                        {t("Allow negative quantity")}
+                      </InputLabel>
+                      <Select
+                        className={classes.headerSelect}
+                        labelId="labelAllowNegative"
+                        inputProps={{
+                          classes: {
+                            icon: classes.headerSelectIcon
+                          },
+                          placeholder: t("Allow negative quantity")
+                        }}
+                        value={filterParams["stock.allowNegative"]}
+                        onChange={e => {
+                          const newParams = { ...filterParams };
+                          if (e.target.value) {
+                            if (e.target.value === "true") {
+                              newParams["stock.allowNegative"] = true;
+                            } else {
+                              newParams["stock.allowNegative"] = false;
+                            }
+                          } else {
+                            delete newParams["stock.allowNegative"];
+                          }
+                          setFilterParams(newParams);
+                        }}
+                      >
+                        <MenuItem value="">{t("All")}</MenuItem>
+                        <MenuItem value="true">{t("Yes")}</MenuItem>
+                        <MenuItem value="false">{t("No")}</MenuItem>
+                      </Select>
+                    </Box>
                   </GridItem>
-                  <GridItem xs={12} md={6}>
+                  <GridItem xs={12} md={4}>
                     <Searchbar
                       onChange={e => {
                         const { target } = e;

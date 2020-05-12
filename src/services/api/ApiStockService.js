@@ -22,10 +22,23 @@ export default {
               }
             };
     }
+    condition = { ...condition };
     // show only groceries
     condition.type = "G";
     // show only active products
     condition.status = "A";
+    // stock disabled
+    if (condition["stock.enabled"] === false) {
+      const enabled = condition["stock.enabled"];
+      delete condition["stock.enabled"];
+      condition["$or"] = [
+        ...(condition["$or"] || []),
+        {
+          stock: { $exists: false }
+        },
+        { "stock.enabled": enabled }
+      ];
+    }
     query.query = buildPaginationQuery(page, pageSize, condition, [], sort);
     return ApiService.v2().get("productStock", query);
   },
