@@ -403,7 +403,16 @@ export default function ListProductStock({ location }) {
   useEffect(() => {
     updateData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, rowsPerPage, sort, categories, filterParams]);
+  }, [page, rowsPerPage, sort, categories]);
+
+  useEffect(() => {
+    if (page === 0) {
+      updateData();
+    } else {
+      setPage(0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterParams]);
 
   return (
     <GridContainer>
