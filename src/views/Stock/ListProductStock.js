@@ -44,7 +44,15 @@ moment.locale("zh-cn");
 
 const useStyles = makeStyles(theme => ({
   table: {
-    minWidth: 1024
+    minWidth: 1024,
+    "& td": {
+      minWidth: "50px",
+      padding: "0.5rem"
+    },
+    "& th": {
+      minWidth: "50px",
+      padding: "0.5rem"
+    }
   },
   formControl: {
     margin: theme.spacing(1),
@@ -82,14 +90,32 @@ const useStyles = makeStyles(theme => ({
   },
   headerSelectIcon: {
     fill: "#eeeeee"
+  },
+  textDanger: {
+    color: "#f44336"
   }
 }));
 
-const dates = getDateRangeStrings(7);
+const dates = getDateRangeStrings(14);
 
-const isQuantityDeficient = product => {
+const isQuantityDeficient = (quantity, product) => {
   if (!product.stock || !product.stock.enabled) return false;
-  return (product.stock.warningThreshold || 0) >= (product.stock.quantity || 0);
+  return (product.stock.warningThreshold || 0) >= quantity;
+};
+
+const isProductQuantityDeficient = product => {
+  if (!product.stock || !product.stock.enabled) return false;
+  let quantity = product.stock.quantity || 0;
+  if (product.delivery) {
+    product.delivery.forEach(order => {
+      order.items
+        .filter(item => item.productId === product._id)
+        .forEach(item => {
+          quantity -= item.quantity;
+        });
+    });
+  }
+  return isQuantityDeficient(quantity || 0, product);
 };
 
 const getCategoryName = (categories, product) => {
@@ -112,7 +138,11 @@ const StockRow = ({
   const [quantity, setQuantity] = useState(
     product.stock ? product.stock.quantity || 0 : 0
   );
-  const debouncedQuantity = useDebounce(quantity, 500);
+  const [add, setAdd] = useState(0);
+  const debouncedQuantity = useDebounce(quantity, 1000);
+  // useEffect(() => {
+  //   setAdd(quantity - product.stock ? product.stock.quantity || 0 : 0);
+  // }, [quantity]);
   useEffect(() => {
     if (!product.stock) {
       return;
@@ -120,6 +150,7 @@ const StockRow = ({
     if (product.stock.quantity != debouncedQuantity) {
       onSetQuantity(product, debouncedQuantity);
     }
+    setAdd(0);
   }, [debouncedQuantity]);
   return (
     <TableRow className={classes.textCenter}>
@@ -128,7 +159,7 @@ const StockRow = ({
       <TableCell>
         <Link to={`products/${product._id}`}>
           <span className={classes.linkLabel}>{product.name}</span>
-          {isQuantityDeficient(product) && (
+          {isProductQuantityDeficient(product) && (
             <ErrorOutlineIcon color="secondary" fontSize="small" />
           )}
         </Link>
@@ -186,23 +217,49 @@ const StockRow = ({
           <>- - -</>
         )}
       </TableCell>
-      {dates.map(date => (
-        <TableCell key={date} className={classes.textCenter}>
-          {product.stock && product.stock.enabled ? (
-            <>
-              {quantity -
-                countProductFromDate(
-                  date,
-                  product.delivery,
-                  product._id,
-                  "before"
-                )}
-            </>
-          ) : (
-            <>- - -</>
-          )}
-        </TableCell>
-      ))}
+      <TableCell className={classes.textCenter}>
+        {product.stock && product.stock.enabled ? (
+          <Input
+            inputProps={{ type: "number", className: classes.textCenter }}
+            className={classes.inputInRow}
+            onChange={e =>{
+              const newQuantity = (product.stock.quantity || 0) + parseInt(e.target.value);
+              setAdd(e.target.value);
+              setQuantity(newQuantity);
+            }
+            
+            }
+            value={add}
+          ></Input>
+        ) : (
+          <>- - -</>
+        )}
+      </TableCell>
+      {dates.map(date => {
+        const dateQuantity = product.stock
+          ? quantity -
+            countProductFromDate(date, product.delivery, product._id, "before")
+          : null;
+        return (
+          <TableCell key={date} className={classes.textCenter}>
+            {product.stock && product.stock.enabled ? (
+              <span
+                className={
+                  product.stock &&
+                  product.stock.enabled &&
+                  isQuantityDeficient(dateQuantity, product)
+                    ? classes.textDanger
+                    : null
+                }
+              >
+                {dateQuantity}
+              </span>
+            ) : (
+              <>- - -</>
+            )}
+          </TableCell>
+        );
+      })}
     </TableRow>
   );
 };
@@ -379,7 +436,7 @@ export default function ListProductStock({ location }) {
                         value={selectedCategoryId}
                         onChange={e => setSelectedCategoryId(e.target.value)}
                       >
-                        <MenuItem value="">{t("Select")}</MenuItem>
+                        <MenuItem value="">{t("All")}</MenuItem>
                         {categories.map(category => (
                           <MenuItem key={category._id} value={category._id}>
                             {category.name}
@@ -432,6 +489,7 @@ export default function ListProductStock({ location }) {
                         <TableCell>{t("Stock Enabled")}</TableCell>
                         <TableCell>{t("Allow negative quantity")}</TableCell>
                         <TableCell>{t("Quantity")}</TableCell>
+                        <TableCell>{t("Add Quantity")}</TableCell>
                         {dates.map(date => (
                           <TableCell key={date}>
                             {moment(date).format("MM-DD ddd")}
@@ -442,7 +500,7 @@ export default function ListProductStock({ location }) {
                     <TableBody>
                       {loading ? (
                         <TableBodySkeleton
-                          colCount={12}
+                          colCount={20}
                           rowCount={rowsPerPage}
                         />
                       ) : (
