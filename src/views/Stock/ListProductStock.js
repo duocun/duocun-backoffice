@@ -43,6 +43,9 @@ import { InputLabel, MenuItem, Select, Box } from "@material-ui/core";
 moment.locale("zh-cn");
 
 const useStyles = makeStyles(theme => ({
+  tableContainer: {
+    maxHeight: "calc(100vh - 240px)"
+  },
   table: {
     minWidth: 1024,
     "& td": {
@@ -564,8 +567,9 @@ export default function ListProductStock({ location }) {
                 </GridItem>
               )}
               <GridItem xs={12}>
-                <TableContainer>
+                <TableContainer className={classes.tableContainer}>
                   <Table
+                    stickyHeader
                     className={classes.table}
                     aria-label="Stock Table"
                     size="small"

@@ -513,15 +513,17 @@ footer ul li a:hover {
 ::-webkit-scrollbar {
   width: 5px;
   height: 7px;
-  border-radius: 5px;
 }
 
 ::-webkit-scrollbar-button {
-  background: #222; 
+  visibility: hidden;
+  width: 0px;
+  height: 0px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #333; 
+  background: #ccc; 
+  border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
