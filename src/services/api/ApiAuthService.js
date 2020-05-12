@@ -12,8 +12,6 @@ export default {
     );
   },
   getCurrentUser: tokenId => {
-    return ApiService.v1().get("accounts/current", {
-      tokenId
-    });
+    return ApiService.v1().get("accounts/current", {tokenId});
   }
 };

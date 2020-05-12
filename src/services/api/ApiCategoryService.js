@@ -19,6 +19,13 @@ export default {
     }
     return ApiService.v2().get("categories", query);
   },
+
+  getCategories: params => {
+    const query = {};
+    query.query = buildPaginationQuery(null, null, params, [], []);
+    return ApiService.v2().get("categories", query);
+  },
+
   getCategoryTree: () => {
     return ApiService.v2().get("categories/category-tree");
   },

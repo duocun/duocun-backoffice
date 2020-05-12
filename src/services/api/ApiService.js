@@ -2,16 +2,8 @@ import Axios from "axios";
 import queryString from "query-string";
 import Auth from "../AuthService";
 
-export const API_HOST =
-  process.env.NODE_ENV === "production"
-    ? "https://1fcee761-fa67-402e-aca9-d57991a9f60c.mock.pstmn.io"
-    : "http://localhost:8001/api/admin";
-
-export const API_V2_HOST =
-  process.env.NODE_ENV === "production"
-    ? "https://1fcee761-fa67-402e-aca9-d57991a9f60c.mock.pstmn.io"
-    : "http://localhost:8001/api/v2";
-
+export const API_HOST = process.env.REACT_APP_API_HOST;
+export const API_V2_HOST = API_HOST;
 export default class ApiService {
   apiHost = "";
 
@@ -26,7 +18,7 @@ export default class ApiService {
   static v2() {
     return new ApiService(API_HOST); // API_V2_HOST
   }
-
+  
   buildUrl(url, param = null) {
     url = this.apiHost + (url.startsWith("/") ? url : `/${url}`);
     if (!param) {

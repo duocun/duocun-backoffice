@@ -1,4 +1,5 @@
 import queryString from "query-string";
+import moment, * as moments from "moment";
 
 export const getQueryParam = (location, key) => {
   if (location.search) {
@@ -96,3 +97,72 @@ export const getAllCombinations = groupData => {
   }
   return result;
 };
+
+export const getDateRangeStrings = (days, startDate = undefined) => {
+  const ret = [];
+
+  for (let i = 0; i < days; i++) {
+    ret.push(
+      moment(startDate)
+        .add(i, "days")
+        .format("YYYY-MM-DD")
+    );
+  }
+  return ret;
+};
+
+export const countProductQuantityFromOrders = (orders, productId) => {
+  let count = 0;
+  orders.forEach(order => {
+    if (order.items && order.items.length) {
+      order.items
+        .filter(item => item.productId === productId)
+        .forEach(item => {
+          count += item.quantity;
+        });
+    }
+  });
+  return count;
+};
+
+export const countProductFromDate = (
+  date,
+  orders,
+  productId,
+  dir = "after"
+) => {
+  return countProductQuantityFromOrders(
+    dir === "after"
+      ? orders.filter(order => order.deliverDate >= date)
+      : orders.filter(order => order.deliverDate <= date),
+    productId
+  );
+};
+
+//dateString parser
+
+export const toDateString = (s = null) => {
+  return s
+    ? moments
+        .utc(s)
+        .local()
+        .format("YYYY-MM-DD")
+    : "";
+};
+
+//debounce not really good
+
+// export function debounce(func, args, wait, immediate = false) {
+// 	var timeout;
+// 	return function() {
+// 		var context = this;
+// 		var later = function() {
+//       timeout = null;
+// 			if (!immediate) func.call(context, args);
+// 		};
+// 		var callNow = immediate && !timeout;
+// 		clearTimeout(timeout);
+// 		timeout = setTimeout(later, wait);
+// 		if (callNow) func.call(context, args);
+// 	};
+// };

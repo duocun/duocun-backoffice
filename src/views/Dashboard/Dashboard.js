@@ -1,10 +1,17 @@
-import React from "react";
+import React, {useEffect} from "react";
+import { Link } from "react-router-dom";
 // react plugin for creating charts
 import ChartistGraph from "react-chartist";
 // @material-ui/core
 import { makeStyles } from "@material-ui/core/styles";
 import Icon from "@material-ui/core/Icon";
 // @material-ui/icons
+import IconButton from "@material-ui/core/IconButton";
+import AccountBoxOutlinedIcon from '@material-ui/icons/AccountBoxOutlined';
+import * as moment from 'moment';
+import {connect} from 'react-redux';
+
+
 import Store from "@material-ui/icons/Store";
 import Warning from "@material-ui/icons/Warning";
 import DateRange from "@material-ui/icons/DateRange";
@@ -39,10 +46,20 @@ import {
 
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
 
+
+import { loadStatisticsSummaryAsync } from 'redux/actions/statistics';
+
 const useStyles = makeStyles(styles);
 
-export default function Dashboard() {
+const Dashboard = ({summary, loadStatisticsSummary, history}) => {
   const classes = useStyles();
+
+  useEffect(() => {
+    const startDate = moment().format('YYYY-MM-DD');
+    const endDate = moment().format('YYYY-MM-DD');
+    loadStatisticsSummary(startDate, endDate);
+  }, []);
+
   return (
     <div>
       <GridContainer>
@@ -52,19 +69,25 @@ export default function Dashboard() {
               <CardIcon color="warning">
                 <Icon>content_copy</Icon>
               </CardIcon>
-              <p className={classes.cardCategory}>Used Space</p>
+              <p className={classes.cardCategory}>
+                Orders
+              </p>
               <h3 className={classes.cardTitle}>
-                49/50 <small>GB</small>
+                {summary.nOrders}
               </h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
-                <Danger>
+                {/* <Danger>
                   <Warning />
                 </Danger>
                 <a href="#pablo" onClick={e => e.preventDefault()}>
                   Get more space
-                </a>
+                </a> */}
+                <div className={classes.stats}>
+                  <DateRange />
+                  Last 24 Hours
+                </div>
               </div>
             </CardFooter>
           </Card>
@@ -75,8 +98,12 @@ export default function Dashboard() {
               <CardIcon color="success">
                 <Store />
               </CardIcon>
-              <p className={classes.cardCategory}>Revenue</p>
-              <h3 className={classes.cardTitle}>$34,245</h3>
+              <p className={classes.cardCategory}>
+                Sales
+              </p>
+              <h3 className={classes.cardTitle}>
+                <span>${summary.totalPrice}</span>
+              </h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -88,17 +115,22 @@ export default function Dashboard() {
         </GridItem>
         <GridItem xs={12} sm={6} md={3}>
           <Card>
-            <CardHeader color="danger" stats icon>
+            <CardHeader href="/products" color="danger" stats icon onClick={()=>{history.push("/dashboard/pickup")}}>
               <CardIcon color="danger">
                 <Icon>info_outline</Icon>
               </CardIcon>
-              <p className={classes.cardCategory}>Fixed Issues</p>
-              <h3 className={classes.cardTitle}>75</h3>
+              {/* <IconButton aria-label="driverSummary" href="dashboard/pickup">
+                <AccountBoxOutlinedIcon />
+              </IconButton> */}
+
+              <p className={classes.cardCategory}>Products</p>
+              <h3 className={classes.cardTitle}>{summary.nProducts}</h3>
+
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
                 <LocalOffer />
-                Tracked from Github
+                By drivers
               </div>
             </CardFooter>
           </Card>
@@ -263,3 +295,15 @@ export default function Dashboard() {
     </div>
   );
 }
+
+
+const mapStateToProps = (state) => ({ summary: state.statisticsSummary });
+const mapDispatchToProps = (dispatch) => ({
+  loadStatisticsSummary: (startDate, endDate) => {
+    dispatch(loadStatisticsSummaryAsync(startDate, endDate));
+  },
+});
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Dashboard);

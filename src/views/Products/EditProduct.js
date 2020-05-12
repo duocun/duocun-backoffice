@@ -42,8 +42,18 @@ import CancelIcon from "@material-ui/icons/Cancel";
 
 import FlashStorage from "services/FlashStorage";
 import ApiProductService from "services/api/ApiProductService";
+import ApiCategoryService from "services/api/ApiCategoryService";
 import CategoryTree from "views/Categories/CategoryTree";
-import { groupAttributeData, getAllCombinations } from "helper/index";
+
+import { countProductFromDate } from "helper/index";
+
+import moment from "moment";
+import "moment/locale/zh-cn";
+import {
+  groupAttributeData,
+  getAllCombinations,
+  getDateRangeStrings
+} from "helper/index";
 const useStyles = makeStyles(() => ({
   textarea: {
     width: "100%"
@@ -75,6 +85,9 @@ const useStyles = makeStyles(() => ({
     border: "1px solid #eee",
     borderRadius: 5,
     padding: 5
+  },
+  combinationTable: {
+    display: "none"
   }
 }));
 
@@ -89,6 +102,7 @@ const defaultProductModelState = {
   categoryId: "",
   stock: {
     enabled: false,
+    allowNegative: false,
     quantity: 0,
     outofstockMessage: "",
     outofstockMessageEN: ""
@@ -341,6 +355,55 @@ const CombinationGenerator = ({ attributes, onGenerate }) => {
   );
 };
 
+const ProductQuantitySchedule = ({ productId, productQuantity, days = 7 }) => {
+  const { t } = useTranslation();
+  const [orders, setOrders] = useState([]);
+  const [dates] = useState(getDateRangeStrings(days));
+  useEffect(() => {
+    ApiProductService.getProductDeliveries(productId).then(async ({ data }) => {
+      moment.locale("zh-cn");
+      if (data.code && data.code === "success") {
+        setOrders(data.data);
+      }
+    });
+  }, []);
+
+  return (
+    <Card>
+      <CardHeader color="primary">{t("Product Quantity Schedule")}</CardHeader>
+      <CardBody>
+        <GridContainer>
+          <GridItem xs={12}>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    {dates.map(date => (
+                      <TableCell key={date}>
+                        {moment(date).format("MM-DD ddd")}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow>
+                    {dates.map(date => (
+                      <TableCell key={date}>
+                        {parseInt(productQuantity) +
+                          countProductFromDate(date, orders, productId)}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </GridItem>
+        </GridContainer>
+      </CardBody>
+    </Card>
+  );
+};
+
 const EditProduct = ({ match, history }) => {
   const { t } = useTranslation();
   const classes = useStyles();
@@ -362,11 +425,14 @@ const EditProduct = ({ match, history }) => {
 
   const updatePage = () => {
     ApiProductService.getProduct(match.params.id)
-      .then(({ data }) => {
-        if (data.success) {
+      .then(async ({ data }) => {
+        if (data.code === "success") {
           setModel({ ...model, ...data.data });
-          setCategoryTreeData(data.meta.categoryTree);
-          setAttributes(data.meta.attributes);
+          const categoryResp = await ApiCategoryService.getCategoryTree();
+          if (categoryResp.data && categoryResp.data.code === "success") {
+            setCategoryTreeData(categoryResp.data.data);
+          }
+          setAttributes(data.meta?.attributes || []);
         } else {
           setAlert({
             message: t("Data not found"),
@@ -391,7 +457,7 @@ const EditProduct = ({ match, history }) => {
     setProcessing(true);
     ApiProductService.saveProduct(model)
       .then(({ data }) => {
-        if (data.success) {
+        if (data.code === "success") {
           const newAlert = {
             message: t("Saved successfully"),
             severity: "success"
@@ -427,7 +493,6 @@ const EditProduct = ({ match, history }) => {
     updatePage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
   return (
     <GridContainer>
       <GridItem xs={12} lg={8}>
@@ -567,7 +632,7 @@ const EditProduct = ({ match, history }) => {
                           />
                         </Box>
                       </GridItem>
-                      <GridItem xs={12}>
+                      <GridItem xs={12} lg={6}>
                         <h5 className={classes.heading}>{t("Stock")}</h5>
                       </GridItem>
                       <GridItem xs={12} lg={6}>
@@ -579,7 +644,7 @@ const EditProduct = ({ match, history }) => {
                             <Select
                               labelId="product-stock-enabled-label"
                               id="product-stock-enabled"
-                              value={model.stock.enabled}
+                              value={model.stock.enabled || false}
                               onChange={e => {
                                 const newModel = { ...model };
                                 newModel.stock.enabled = e.target.value;
@@ -592,62 +657,111 @@ const EditProduct = ({ match, history }) => {
                           </FormControl>
                         </Box>
                       </GridItem>
-                      <GridItem xs={12} lg={6}>
-                        <Box pb={2}>
-                          <CustomInput
-                            labelText={t("Quantity")}
-                            id="product-quantity"
-                            formControlProps={{
-                              fullWidth: true
-                            }}
-                            inputProps={{
-                              value: model.stock.quantity,
-                              onChange: e => {
-                                const newModel = { ...model };
-                                newModel.stock.quantity = e.target.value;
-                                setModel(newModel);
-                              }
-                            }}
-                          />
-                        </Box>
-                      </GridItem>
-                      <GridItem xs={12} lg={6}>
-                        <Box py={2}>
-                          <TextField
-                            id="product-outofstock-message"
-                            label={t("Out of stock Message (Chinese)")}
-                            multiline
-                            rowsMax={4}
-                            onChange={e => {
-                              const newModel = { ...model };
-                              newModel.stock.outofstockMessage = e.target.value;
-                              setModel(newModel);
-                            }}
-                            variant="outlined"
-                            value={model.stock.outofstockMessage}
-                            className={classes.textarea}
-                          />
-                        </Box>
-                      </GridItem>
-                      <GridItem xs={12} lg={6}>
-                        <Box py={2}>
-                          <TextField
-                            id="product-outofstock-message-english"
-                            label={t("Out of stock Message (English)")}
-                            multiline
-                            rowsMax={4}
-                            onChange={e => {
-                              const newModel = { ...model };
-                              newModel.stock.outofstockMessageEN =
-                                e.target.value;
-                              setModel(newModel);
-                            }}
-                            variant="outlined"
-                            value={model.stock.outofstockMessageEN}
-                            className={classes.textarea}
-                          />
-                        </Box>
-                      </GridItem>
+                      {model.stock.enabled && (
+                        <>
+                          <GridItem xs={12} lg={6}>
+                            <Box pb={2}>
+                              <FormControl className={classes.select}>
+                                <InputLabel id="product-stock-allow-negative-label">
+                                  {t("Allow negative quantity")}
+                                </InputLabel>
+                                <Select
+                                  labelId="product-stock-allow-negative-label"
+                                  id="product-stock-allow-negative"
+                                  value={model.stock.allowNegative || false}
+                                  onChange={e => {
+                                    const newModel = { ...model };
+                                    newModel.stock.allowNegative =
+                                      e.target.value;
+                                    setModel(newModel);
+                                  }}
+                                >
+                                  <MenuItem value={false}>{t("No")}</MenuItem>
+                                  <MenuItem value={true}>{t("Yes")}</MenuItem>
+                                </Select>
+                              </FormControl>
+                            </Box>
+                          </GridItem>
+                          {/* <GridItem xs={12} lg={6}>
+                            <Box pb={2}>
+                              <CustomInput
+                                labelText={t("Quantity")}
+                                id="product-quantity"
+                                formControlProps={{
+                                  fullWidth: true
+                                }}
+                                inputProps={{
+                                  type: "number",
+                                  value: model.stock.quantity || 0,
+                                  onChange: e => {
+                                    const newModel = { ...model };
+                                    newModel.stock.quantity = e.target.value;
+                                    setModel(newModel);
+                                  }
+                                }}
+                              />
+                            </Box>
+                          </GridItem> */}
+                          <GridItem xs={12} lg={6}>
+                            <Box pb={2}>
+                              <CustomInput
+                                labelText={t("Warning Threshold")}
+                                id="product-warning-threshold"
+                                formControlProps={{
+                                  fullWidth: true
+                                }}
+                                inputProps={{
+                                  type: "number",
+                                  value: model.stock.warningThreshold || 0,
+                                  onChange: e => {
+                                    const newModel = { ...model };
+                                    newModel.stock.warningThreshold = e.target.value;
+                                    setModel(newModel);
+                                  }
+                                }}
+                              />
+                            </Box>
+                          </GridItem>
+                          <GridItem xs={12} lg={6}>
+                            <Box py={2}>
+                              <TextField
+                                id="product-outofstock-message"
+                                label={t("Out of stock Message (Chinese)")}
+                                multiline
+                                rowsMax={4}
+                                onChange={e => {
+                                  const newModel = { ...model };
+                                  newModel.stock.outofstockMessage =
+                                    e.target.value;
+                                  setModel(newModel);
+                                }}
+                                variant="outlined"
+                                value={model.stock.outofstockMessage || ""}
+                                className={classes.textarea}
+                              />
+                            </Box>
+                          </GridItem>
+                          <GridItem xs={12} lg={6}>
+                            <Box py={2}>
+                              <TextField
+                                id="product-outofstock-message-english"
+                                label={t("Out of stock Message (English)")}
+                                multiline
+                                rowsMax={4}
+                                onChange={e => {
+                                  const newModel = { ...model };
+                                  newModel.stock.outofstockMessageEN =
+                                    e.target.value;
+                                  setModel(newModel);
+                                }}
+                                variant="outlined"
+                                value={model.stock.outofstockMessageEN || ""}
+                                className={classes.textarea}
+                              />
+                            </Box>
+                          </GridItem>
+                        </>
+                      )}
                     </GridContainer>
                   </GridItem>
                 </React.Fragment>
@@ -655,7 +769,8 @@ const EditProduct = ({ match, history }) => {
             </GridContainer>
           </CardBody>
         </Card>
-        <Card>
+        {/* Hide combination table until it's used in production mode */}
+        <Card className={classes.combinationTable}>
           <CardHeader>
             <h5 className={classes.heading}>{t("Combinations")}</h5>
           </CardHeader>
@@ -710,6 +825,13 @@ const EditProduct = ({ match, history }) => {
             </GridContainer>
           </CardBody>
         </Card>
+        {/* {!loading && model.stock && model.stock.enabled && (
+          <ProductQuantitySchedule
+            productId={match.params.id}
+            productQuantity={model.stock.quantity ? model.stock.quantity : 0}
+            days={10}
+          />
+        )} */}
       </GridItem>
       <GridItem xs={12} lg={4}>
         <Card>
@@ -752,6 +874,12 @@ const EditProduct = ({ match, history }) => {
       </GridItem>
     </GridContainer>
   );
+};
+
+ProductQuantitySchedule.propTypes = {
+  productId: PropTypes.string,
+  productQuantity: PropTypes.number,
+  days: PropTypes.number
 };
 
 EditCombinationRow.propTypes = {

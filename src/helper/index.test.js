@@ -171,5 +171,21 @@ describe("helper", () => {
         ]
       ]);
     });
+  });
+  describe("getDateRangeStrings", () => {
+    it("should return date range strings", () => {
+      let startDate = "2020-05-09";
+      expect(helper.getDateRangeStrings(3, startDate)).to.eqls([
+        "2020-05-09",
+        "2020-05-10",
+        "2020-05-11"
+      ]);
+    });
+  });
+  describe("toDateString", () => {
+    it("should convert date to string", () => {
+      let date = "2020-05-09";
+      expect(helper.toDateString(new Date(date))).to.eql(date);
+    });
   })
 });

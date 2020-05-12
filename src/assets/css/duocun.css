@@ -1,0 +1,8 @@
+
+/** table */
+table.dc-table {
+  min-width: 750
+}
+.dc-full, .dc-full-select, .dc-full-textarea {
+  width: 100%
+}
