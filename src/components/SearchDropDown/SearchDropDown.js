@@ -54,7 +54,9 @@ const useStyles = makeStyles((theme) => ({
   // },
 }));
 
-const SearchDropDown = ({ data, hasMore, fetchData, selectData, show = false }) => {
+const SearchDropDown = ({ data, hasMore, fetchData, selectData,
+  show = false, 
+}) => {
   const classes = useStyles();
   const { t } = useTranslation();
 
@@ -79,6 +81,7 @@ const SearchDropDown = ({ data, hasMore, fetchData, selectData, show = false }) 
   const getVisibility = (show) => (show ? "visible" : "hidden");
 
   return (
+
     <FormControl 
       className={classes.list}
       style={{ visibility: getVisibility(show) }}

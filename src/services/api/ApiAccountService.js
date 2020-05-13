@@ -16,12 +16,18 @@ export default {
   getAccount: (accountId) => {
     return ApiService.v2().get("accounts/" + accountId);
   },
+
   getAccountByKeyword: (page, pageSize, keyword = "", sort = []) => {
     let query = {};
     const condition = {
-      username: {
-        $regex: keyword,
-      },
+      $or: [
+        {
+          username: { $regex: keyword }
+        },
+        {
+          phone: { $regex: keyword }
+        }
+      ]
     };
     query.keyword = query.query = buildPaginationQuery(
       page,
