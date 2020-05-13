@@ -177,7 +177,11 @@ const SalaryPage = ({ history, location }) => {
   
 
   const handelEditTransaction = (tr) => {
-    setModel(tr);
+    if(tr.note){
+      setModel(tr);
+    }else{
+      setModel({...tr, note: ''});
+    }
   }
 
   const handleDeleteTransaction = (transactionId) => {

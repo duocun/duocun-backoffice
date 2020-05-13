@@ -3,8 +3,8 @@ import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
 import * as moment from 'moment';
-
-import TimePicker from "components/TimePicker/TimePicker";
+import { KeyboardDatePicker } from "@material-ui/pickers";
+// import TimePicker from "components/TimePicker/TimePicker";
 
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
@@ -42,6 +42,9 @@ import AuthService from "services/AuthService";
 import ApiAuthService from 'services/api/ApiAuthService';
 import ApiAccountService from 'services/api/ApiAccountService';
 import ApiTransactionService from 'services/api/ApiTransactionService';
+
+// import moment from 'moment-timezone/moment-timezone';
+
 
 const useStyles = makeStyles(() => ({
   textarea: {
@@ -86,6 +89,14 @@ const defaultActions = [
 
 
 export const FinanceForm = ({ account, transaction, match, update }) => {
+
+  // moment.tz.add("America/Toronto|EST EDT EWT EPT|50 40 40 40|01010101010101010101010101010101010101010101012301010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010|-25TR0 1in0 11Wu 1nzu 1fD0 WJ0 1wr0 Nb0 1Ap0 On0 1zd0 On0 1wp0 TX0 1tB0 TX0 1tB0 TX0 1tB0 WL0 1qN0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 WL0 1qN0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 WL0 1qN0 4kM0 8x40 iv0 1o10 11z0 1nX0 11z0 1o10 11z0 1o10 1qL0 11D0 1nX0 11B0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 11z0 1o10 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0|65e5");
+
+  // // localTime --- 'YYYY-MM-DDTHH:mm:ss'
+  // const getMomentFromLocal = (localTime, zone='America/Toronto') => {
+  //   return moment.tz(localTime, zone);
+  // }
+
   const { t } = useTranslation();
   const classes = useStyles();
   const [actions, setActions] = useState(defaultActions);
@@ -104,7 +115,19 @@ export const FinanceForm = ({ account, transaction, match, update }) => {
   );
 
   const handleActionChange = (actionCode) => {
-    setModel({ ...model, actionCode });
+    if(model._id){
+      if(actionCode === transaction.actionCode){
+        setModel({ ...model, actionCode, note: transaction.note? transaction.note : '' });
+      } else {
+        setModel({ ...model, actionCode, note: '' });
+      }
+    }else{
+      if(actionCode === 'PS'){
+        setModel({ ...model, actionCode });
+      } else {
+        setModel({ ...model, actionCode, note: '' });
+      }
+    }
   }
 
   const handleFromAccountChange = (fromId) => {
@@ -203,7 +226,6 @@ export const FinanceForm = ({ account, transaction, match, update }) => {
   }
 
   useEffect(() => {
-    // if(transaction._id){
     if (transaction.actionCode === 'PS') {
       setModel({
         ...transaction,
@@ -213,9 +235,8 @@ export const FinanceForm = ({ account, transaction, match, update }) => {
         modifyBy: modifyByAccount._id
       });
     } else {
-      setModel(transaction);
+      setModel({...transaction, modifyBy: modifyByAccount._id});
     }
-    // }
   }, [transaction]);
 
   useEffect(() => {
@@ -370,10 +391,13 @@ export const FinanceForm = ({ account, transaction, match, update }) => {
                 </Box>
               </GridItem>
               <GridItem>
-                <TimePicker
+                <KeyboardDatePicker
+                  variant="inline"
                   label="Date"
-                  date={model.created}
-                  getDate={(created) => setModel({...model, created})}
+                  format="YYYY-MM-DD"
+                  // format={format}
+                  value={moment.utc(model.created)}
+                  onChange={(m) => setModel({...model, created: m.toISOString()})}
                 />
               </GridItem>
               <GridItem xs={12} container direction="row-reverse">

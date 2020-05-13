@@ -115,7 +115,7 @@ export const FinanceTable = ({
           <TableRow key={idx}>
             <TableCell>{page * rowsPerPage + idx + 1}</TableCell>
             <TableCell>{toDateString(row.created)}</TableCell>
-            <TableCell>{toDateString(row.modified)}</TableCell>
+            {/* <TableCell>{toDateString(row.modified)}</TableCell> */}
             <TableCell>{row.fromName}</TableCell>
             <TableCell>{row.toName}</TableCell>
             <TableCell>{row.actionCode}</TableCell>
@@ -172,7 +172,7 @@ export const FinanceTable = ({
               {t("Created")}
               {renderSort("created")}
             </TableCell>
-            <TableCell
+            {/* <TableCell
               onClick={() => {
                 toggleSort("modified");
               }}
@@ -180,7 +180,7 @@ export const FinanceTable = ({
             >
               {t("Modified")}
               {renderSort("modified")}
-            </TableCell>
+            </TableCell> */}
             <TableCell
               onClick={() => {
                 toggleSort("fromName");
