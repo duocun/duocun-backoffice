@@ -15,6 +15,7 @@ import Button from "components/CustomButtons/Button.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
+import CardFooter from "components/Card/CardFooter.js";
 
 import Box from "@material-ui/core/Box";
 import SaveIcon from "@material-ui/icons/Save";
@@ -22,6 +23,7 @@ import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
+import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 
 import FlashStorage from "services/FlashStorage";
 import Alert from "@material-ui/lab/Alert";
@@ -36,22 +38,6 @@ import { FinanceTable } from "./FinanceTable";
 import { FinanceForm } from "./FinanceForm";
 
 const useStyles = makeStyles((theme) => ({
-  // cardCategoryWhite: {
-  //   color: "rgba(255,255,255,.62)",
-  //   margin: "0",
-  //   fontSize: "14px",
-  //   marginTop: "0",
-  //   marginBottom: "0"
-  // },
-  // cardTitleWhite: {
-  //   color: "#FFFFFF",
-  //   marginTop: "0px",
-  //   minHeight: "auto",
-  //   fontWeight: "300",
-  //   fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
-  //   marginBottom: "3px",
-  //   textDecoration: "none"
-  // },
   table: {
     minWidth: 750
   },
@@ -68,7 +54,18 @@ const useQuery = () => {
   return new URLSearchParams(useLocation().search);
 }
 
-const SalaryPage = ({ history, location}) => {
+const defaultTransaction = {
+  actionCode: '',
+  amount: 0,
+  fromId: '',
+  toId: '',
+  note: '',
+  staffId: '',
+  staffName: '',
+  modifyBy: '',
+}
+
+const SalaryPage = ({ history, location }) => {
   const classes = useStyles();
   const { t } = useTranslation();
 
@@ -77,36 +74,25 @@ const SalaryPage = ({ history, location}) => {
   const [fromId, setFromId] = useState('');
   const [drivers, setDriverList] = useState([]);
   const [driver, setDriver] = useState({ _id: '', username: '', type: 'driver' });
-
-  const [account, setAccount] = useState({_id: '', username: ''});
-
-  const [model, setModel] = useState({
-    actionCode:'', 
-    amount:0, 
-    fromId:'',
-    toId: '', 
-    notes:'', 
-    staffId:'',
-    staffName:'',
-    modifyBy: '',
-  });
+  const [account, setAccount] = useState({ _id: '', username: '' });
+  const [model, setModel] = useState(defaultTransaction);
 
   // table related
   const searchParams = useQuery();
-  
+
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(
     getQueryParam(location, "page")
-    ? parseInt(getQueryParam(location, "page"))
-    : 0
+      ? parseInt(getQueryParam(location, "page"))
+      : 0
   );
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalRows, setTotalRows] = useState(0);
   const [query, setQuery] = useState(getQueryParam(location, "search") || "");
   const [sort, setSort] = useState(["_id", 1]);
-  
-  
+
+
   const [processing, setProcessing] = useState(false);
   const removeAlert = () => {
     setAlert({
@@ -128,9 +114,38 @@ const SalaryPage = ({ history, location}) => {
   //   setFromId(fromId);
   //   setModel({...model, fromId});
   // }
+  const handleNewSalary = () => {
+    const staffName = driver ? driver.username : '';
+    ApiAccountService.getAccountList(null, null, { username: 'Expense', type: 'system' }).then(({ data }) => {
+      if (data.data && data.data.length > 0) {
+        const expense = data.data[0];
+        setModel({
+          ...defaultTransaction,
+          actionCode: 'PS',
+          toId: expense._id,
+          toName: expense.username,
+          staffId: driver ? driver._id : '',
+          staffName,
+          note: `Pay salary to ${staffName}`,
+          modifyBy: account ? account._id : '',
+          created: moment.utc().toISOString()
+        });
+      } else {
+        setModel({
+          ...defaultTransaction,
+          actionCode: 'PS',
+          staffId: driver ? driver._id : '',
+          staffName,
+          note: `Pay salary to ${staffName}`,
+          modifyBy: account ? account._id : '',
+          created: moment.utc().toISOString()
+        });
+      }
+    });
+  }
 
   const handleUpdate = () => {
-    if(driver._id){
+    if (driver._id) {
       removeAlert();
       setProcessing(true);
       ApiTransactionService.updateTransactions(driver._id).then(({ data }) => {
@@ -148,61 +163,30 @@ const SalaryPage = ({ history, location}) => {
         }
         setProcessing(false);
       })
-      .catch(e => {
-        console.error(e);
-        setAlert({
-          message: t("Update failed"),
-          severity: "error"
-        });
-        setProcessing(false);
-      });
-    }
-  };
-
-  const handleSubmit = () => {
-    if(model.fromId && model.staffId){
-      removeAlert();
-      setProcessing(true);
-      ApiTransactionService.createTransaction(model).then(({ data }) => {
-        if (data.code === 'success') {
-          const newAlert = {
-            message: t("Saved successfully"),
-            severity: "success"
-          };
-          if (model._id === "new") {
-            FlashStorage.set("SALARY_ALERT", newAlert);
-            history.push("../finance");
-            return;
-          } else {
-            setAlert(newAlert);
-            updateData(driver._id);
-          }
-        } else {
+        .catch(e => {
+          console.error(e);
           setAlert({
-            message: t("Save failed"),
+            message: t("Update failed"),
             severity: "error"
           });
-        }
-        setProcessing(false);
-      })
-      .catch(e => {
-        console.error(e);
-        setAlert({
-          message: t("Save failed"),
-          severity: "error"
+          setProcessing(false);
         });
-        setProcessing(false);
-      });
     }
   };
 
+  
+
   const handelEditTransaction = (tr) => {
-    setModel(tr);
+    if(tr.note){
+      setModel(tr);
+    }else{
+      setModel({...tr, note: ''});
+    }
   }
 
   const handleDeleteTransaction = (transactionId) => {
-    if(window.confirm('Are you sure to delete this transaction?')){
-      if(transactionId){
+    if (window.confirm('Are you sure to delete this transaction?')) {
+      if (transactionId) {
         removeAlert();
         setProcessing(true);
         ApiTransactionService.deleteTransaction(transactionId).then(({ data }) => {
@@ -220,22 +204,22 @@ const SalaryPage = ({ history, location}) => {
           }
           setProcessing(false);
         })
-        .catch(e => {
-          console.error(e);
-          setAlert({
-            message: t("Delete transaction failed"),
-            severity: "error"
+          .catch(e => {
+            console.error(e);
+            setAlert({
+              message: t("Delete transaction failed"),
+              severity: "error"
+            });
+            setProcessing(false);
           });
-          setProcessing(false);
-        });
       }
     }
   };
 
   useEffect(() => {
     const token = Auth.getAuthToken();
-    ApiAuthService.getCurrentUser(token).then(({data}) => {
-      const account = {...data};
+    ApiAuthService.getCurrentUser(token).then(({ data }) => {
+      const account = { ...data };
       setAccount(account);
       // try to load default form
       ApiAccountService.getAccountList(null, null, { type: 'driver' }).then(({ data }) => {
@@ -246,7 +230,7 @@ const SalaryPage = ({ history, location}) => {
           setDriver(staff);
           updateData(staff._id);
           // setModel({...model, staffId: staff._id, staffName: staff.username, modifyBy: account._id});
-        } else{
+        } else {
           // setModel({...model, modifyBy: account._id});
         }
       });
@@ -271,7 +255,7 @@ const SalaryPage = ({ history, location}) => {
           staffId: accountId
         }
       ],
-      actionCode: {$in:['T', 'PS']},
+      actionCode: { $in: ['T', 'PS'] },
       status: { $nin: ['bad', 'tmp'] }
     };
     ApiTransactionService.getTransactionList(
@@ -292,77 +276,26 @@ const SalaryPage = ({ history, location}) => {
 
     <div>
       <GridContainer>
-
         <GridItem xs={12} sm={12} md={8}>
           <Card>
             <CardHeader color="primary">
-              {
-                <FormControl className={classes.formControl}>
-                  <InputLabel id="driver-select-label">Driver</InputLabel>
-                  <Select required labelId="driver-select-label" id="driver-select"
-                    value={driver ? driver._id : ''} onChange={e => handleDriverChange(e.target.value)} >
-                    {
-                      drivers && drivers.length > 0 &&
-                      drivers.map(d => <MenuItem key={d._id} value={d._id}>{d.username}</MenuItem>)
-                    }
-                  </Select>
-                </FormControl>
-              }
-              {/* {
-                <FormControl className={classes.formControl}>
-                  <CustomInput
-                    labelText={t("Amount")}
-                    id="amount"
-                    formControlProps={{
-                      fullWidth: true
-                    }}
-                    inputProps={{
-                      value: model.amount,
-                      onChange: e => {
-                        setModel({ ...model, amount: e.target.value });
-                      }
-                    }}
-                  />
-                </FormControl>
-              }
-              {
-                <FormControl className={classes.formControl}>
-                  <InputLabel id="driver-select-label">From</InputLabel>
-                  <Select required labelId="driver-select-label" id="driver-select"
-                    value={fromId} onChange={e => handleFromChange(e.target.value)} >
-                      <MenuItem key={account? account._id : ''} value={account? account._id : ''}>{account? account.username: 'My Account'}</MenuItem>
-                      <MenuItem key={TD_BANK_ID} value={TD_BANK_ID}>Company</MenuItem>
+              <GridItem xs={12} lg={6} align="left">
+                <Box mr={2} style={{ display: "inline-block" }}>
+                  <FormControl className={classes.formControl}>
+                    <InputLabel id="driver-select-label">Driver</InputLabel>
+                    <Select required labelId="driver-select-label" id="driver-select"
+                      value={driver ? driver._id : ''} onChange={e => handleDriverChange(e.target.value)} >
                       {
                         drivers && drivers.length > 0 &&
                         drivers.map(d => <MenuItem key={d._id} value={d._id}>{d.username}</MenuItem>)
                       }
-                  </Select>
-                </FormControl>
-              }
-             {
-                <FormControl className={classes.formControl}>
-                  <CustomInput
-                    labelText={t("Notes")}
-                    id="notes"
-                    formControlProps={{
-                      fullWidth: true
-                    }}
-                    inputProps={{
-                      value: model.notes,
-                      onChange: e => {
-                        setModel({ ...model, notes: e.target.value });
-                      }
-                    }}
-                  />
-                </FormControl>
-              } */}
-
-              {/* <Button onClick={() => handleSubmit()} color="secondary" autoFocus>
-                {t("Submit")}
-              </Button> */}
+                    </Select>
+                  </FormControl>
+                </Box>
+              </GridItem>
             </CardHeader>
             <CardBody>
-            <GridContainer>
+              <GridContainer>
                 {!!alert.message && (
                   <GridItem xs={12}>
                     <Alert severity={alert.severity} onClose={removeAlert}>
@@ -386,36 +319,40 @@ const SalaryPage = ({ history, location}) => {
                     deleteRow={handleDeleteTransaction}
                   />
                 </GridItem>
-
-                <GridItem xs={12} container direction="row-reverse">
-                {/* <Box mt={2}>
-                  <Button
-                    variant="contained"
-                    href="finance"
-                    onClick={handleBack}
-                  >
-                    <FormatListBulletedIcon />
-                    {t("Back")}
-                  </Button>
-                </Box> */}
-                <Box mt={2} mr={2}>
-                  <Button
-                    color="primary"
-                    variant="contained"
-                    disabled={processing}
-                    onClick={handleUpdate}
-                  >
-                    <SaveIcon />
-                    {t("Update")}
-                  </Button>
-                </Box>
-              </GridItem>
               </GridContainer>
             </CardBody>
+            <CardFooter>
+              <GridContainer>
+                <GridItem xs={12} container direction="row-reverse">
+                  <Box mt={2}>
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      disabled={processing}
+                      onClick={handleNewSalary}
+                    >
+                      <AddCircleOutlineIcon />
+                      {t("New Salary")}
+                    </Button>
+                  </Box>
+                  <Box mt={2} mr={2}>
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      disabled={processing}
+                      onClick={handleUpdate}
+                    >
+                      <SaveIcon />
+                      {t("Update")}
+                    </Button>
+                  </Box>
+                </GridItem>
+              </GridContainer>
+            </CardFooter>
           </Card>
         </GridItem>
         <GridItem xs={12} sm={12} md={4}>
-          <FinanceForm account={driver} transaction={model} update={updateData}/>
+          <FinanceForm account={driver} transaction={model} update={updateData} />
         </GridItem>
       </GridContainer>
     </div>

@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
+import * as moment from 'moment';
+import { KeyboardDatePicker } from "@material-ui/pickers";
+// import TimePicker from "components/TimePicker/TimePicker";
 
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
@@ -40,6 +43,9 @@ import ApiAuthService from 'services/api/ApiAuthService';
 import ApiAccountService from 'services/api/ApiAccountService';
 import ApiTransactionService from 'services/api/ApiTransactionService';
 
+// import moment from 'moment-timezone/moment-timezone';
+
+
 const useStyles = makeStyles(() => ({
   textarea: {
     width: "100%"
@@ -74,29 +80,25 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-const defaultTransaction = {
-  _id: 'new',
-  fromId: '',
-  fromName: '',
-  toId: '',
-  toName: '',
-  amount: 0,
-  actionCode: '',
-  modifyBy: '',
-  note: ''
-}
-
 const defaultActions = [
   { code: 'PS', text: 'Pay Salary' },
   { code: 'PDCH', text: 'Pay Driver Cash' },
-  { code: 'T', text: 'Transfer'}
+  { code: 'T', text: 'Transfer' }
 ];
 
 
+
 export const FinanceForm = ({ account, transaction, match, update }) => {
+
+  // moment.tz.add("America/Toronto|EST EDT EWT EPT|50 40 40 40|01010101010101010101010101010101010101010101012301010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010|-25TR0 1in0 11Wu 1nzu 1fD0 WJ0 1wr0 Nb0 1Ap0 On0 1zd0 On0 1wp0 TX0 1tB0 TX0 1tB0 TX0 1tB0 WL0 1qN0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 WL0 1qN0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 WL0 1qN0 4kM0 8x40 iv0 1o10 11z0 1nX0 11z0 1o10 11z0 1o10 1qL0 11D0 1nX0 11B0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 11z0 1o10 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0|65e5");
+
+  // // localTime --- 'YYYY-MM-DDTHH:mm:ss'
+  // const getMomentFromLocal = (localTime, zone='America/Toronto') => {
+  //   return moment.tz(localTime, zone);
+  // }
+
   const { t } = useTranslation();
   const classes = useStyles();
-
   const [actions, setActions] = useState(defaultActions);
   const [modifyByAccount, setModifyByAccount] = useState({ _id: '', username: '' });
   const [accounts, setAccounts] = useState([]);
@@ -113,7 +115,19 @@ export const FinanceForm = ({ account, transaction, match, update }) => {
   );
 
   const handleActionChange = (actionCode) => {
-    setModel({ ...model, actionCode });
+    if(model._id){
+      if(actionCode === transaction.actionCode){
+        setModel({ ...model, actionCode, note: transaction.note? transaction.note : '' });
+      } else {
+        setModel({ ...model, actionCode, note: '' });
+      }
+    }else{
+      if(actionCode === 'PS'){
+        setModel({ ...model, actionCode });
+      } else {
+        setModel({ ...model, actionCode, note: '' });
+      }
+    }
   }
 
   const handleFromAccountChange = (fromId) => {
@@ -132,7 +146,44 @@ export const FinanceForm = ({ account, transaction, match, update }) => {
     setModel({ ...model, staffId, staffName, note: `Pay salary to ${staffName}` });
   }
 
-  const handleSave = () => {
+
+  const handleCreate = () => {
+    if (model.fromId && model.staffId) {
+      removeAlert();
+      setProcessing(true);
+      ApiTransactionService.createTransaction(model).then(({ data }) => {
+        if (data.code === 'success') {
+          const newAlert = {
+            message: t("Saved successfully"),
+            severity: "success"
+          };
+          if (model._id === "new") {
+            FlashStorage.set("SALARY_ALERT", newAlert);
+            return;
+          } else {
+            setAlert(newAlert);
+            update(account._id);
+          }
+        } else {
+          setAlert({
+            message: t("Save failed"),
+            severity: "error"
+          });
+        }
+        setProcessing(false);
+      })
+        .catch(e => {
+          console.error(e);
+          setAlert({
+            message: t("Save failed"),
+            severity: "error"
+          });
+          setProcessing(false);
+        });
+    }
+  };
+
+  const handleUpdate = () => {
     if (model.fromId && model.toId) {
       removeAlert();
       setProcessing(true);
@@ -162,24 +213,31 @@ export const FinanceForm = ({ account, transaction, match, update }) => {
     }
   }
 
+  const handleSubmit = () => {
+    if (model._id) {
+      handleUpdate();
+    } else {
+      handleCreate();
+    }
+  }
+
   const handleBack = () => {
 
   }
-  
+
   useEffect(() => {
-    if(transaction._id){
-      if(transaction.actionCode === 'PS'){
-        setModel({...transaction,
-          staffId: account._id,
-          staffName: account.username,
-          note: `Pay salary to ${account.username}`,
-          modifyBy: modifyByAccount._id
-        });
-      }else{
-        setModel(transaction);
-      }
+    if (transaction.actionCode === 'PS') {
+      setModel({
+        ...transaction,
+        staffId: account._id,
+        staffName: account.username,
+        note: `Pay salary to ${account.username}`,
+        modifyBy: modifyByAccount._id
+      });
+    } else {
+      setModel({...transaction, modifyBy: modifyByAccount._id});
     }
-  },[transaction]);
+  }, [transaction]);
 
   useEffect(() => {
     const token = AuthService.getAuthToken();
@@ -191,10 +249,10 @@ export const FinanceForm = ({ account, transaction, match, update }) => {
       //     const tr = data.data;
       //     setModel({ ...tr, modifyBy: account._id });
       //   }
-        // setModel({ ...model, modifyBy: account._id });
-        ApiAccountService.getAccountList(null, null, { type: {$in: ['driver', 'system']}}).then(({ data }) => {
-          setAccounts(data.data);
-        });
+      // setModel({ ...model, modifyBy: account._id });
+      ApiAccountService.getAccountList(null, null, { type: { $in: ['driver', 'system'] } }).then(({ data }) => {
+        setAccounts(data.data);
+      });
       // });
     });
   }, []);
@@ -206,7 +264,7 @@ export const FinanceForm = ({ account, transaction, match, update }) => {
           <CardHeader color="primary">
             <GridContainer>
               <GridItem xs={12} lg={6}>
-                <h4>{t("Edit Transaction")}</h4>
+                <h4>{t(transaction._id ? "Edit Transaction" : "New Transaction")}</h4>
               </GridItem>
             </GridContainer>
           </CardHeader>
@@ -315,6 +373,33 @@ export const FinanceForm = ({ account, transaction, match, update }) => {
                 </Box>
               </GridItem>
 
+              <GridItem xs={12} lg={6}>
+                <Box pb={2}>
+                  <CustomInput
+                    labelText={t("Note")}
+                    id="note"
+                    formControlProps={{
+                      fullWidth: true
+                    }}
+                    inputProps={{
+                      value: model.note,
+                      onChange: e => {
+                        setModel({ ...model, note: e.target.value });
+                      }
+                    }}
+                  />
+                </Box>
+              </GridItem>
+              <GridItem>
+                <KeyboardDatePicker
+                  variant="inline"
+                  label="Date"
+                  format="YYYY-MM-DD"
+                  // format={format}
+                  value={moment.utc(model.created)}
+                  onChange={(m) => setModel({...model, created: m.toISOString()})}
+                />
+              </GridItem>
               <GridItem xs={12} container direction="row-reverse">
                 <Box mt={2}>
                   <Button
@@ -332,7 +417,7 @@ export const FinanceForm = ({ account, transaction, match, update }) => {
                     color="primary"
                     variant="contained"
                     disabled={processing}
-                    onClick={handleSave}
+                    onClick={handleSubmit}
                   >
                     <SaveIcon />
                     {t("Save")}
