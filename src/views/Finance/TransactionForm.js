@@ -88,6 +88,7 @@ const defaultActions = [
   { code: 'RC', text: 'Refund to Client' },
   { code: 'PMCH', text: 'Pay Merchant Cash' },
   { code: 'PMC', name: 'Pay Merchant from Bank' },
+  { code: 'POR', name: 'Pay Office Rent' },
   { code: 'D', name: 'Discount' }
 ];
 
