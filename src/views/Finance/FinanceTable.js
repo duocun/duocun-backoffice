@@ -95,7 +95,9 @@ export const FinanceTable = ({
         return row.toId === account._id ? row.toBalance : row.fromBalance;
       }else if(account.type === 'client'){
         return row.toId === account._id ? row.toBalance : row.fromBalance;
-      }else{
+      }else if(account.type === 'merchant'){
+        return row.fromId === account._id ? row.fromBalance: row.toBalance;
+      } else{
         return row.toBalance;
       }
     }
@@ -115,7 +117,6 @@ export const FinanceTable = ({
           <TableRow key={idx}>
             <TableCell>{page * rowsPerPage + idx + 1}</TableCell>
             <TableCell>{toDateString(row.created)}</TableCell>
-            {/* <TableCell>{toDateString(row.modified)}</TableCell> */}
             <TableCell>{row.fromName}</TableCell>
             <TableCell>{row.toName}</TableCell>
             <TableCell>{row.actionCode}</TableCell>

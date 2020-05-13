@@ -16,26 +16,16 @@ import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 
 import SaveIcon from "@material-ui/icons/Save";
-// import Searchbar from "components/Searchbar/Searchbar";
-
 import { Button, Box } from "@material-ui/core";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 
 import Alert from "@material-ui/lab/Alert";
 import ApiTransactionService from "services/api/ApiTransactionService";
-// import ApiAccountService from "services/api/ApiAccountService";
-
 import { getQueryParam } from "helper/index";
 import FlashStorage from "services/FlashStorage";
 
-// import SecondaryNav from "components/SecondaryNav/SecondaryNav";
-
 import AccountSearch from "./AccountSearch";
-//redux actions
 
-// import { loadAccountsSearchAsync } from "redux/actions/account";
-
-// import { loadAccountsAsync } from "redux/actions/account";
 import { FinanceTable } from "./FinanceTable";
 import { TransactionForm } from "./TransactionForm";
 
