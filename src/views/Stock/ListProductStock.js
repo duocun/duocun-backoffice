@@ -152,7 +152,7 @@ const StockRow = ({
   //   setAdd(quantity - product.stock ? product.stock.quantity || 0 : 0);
   // }, [quantity]);
   useEffect(() => {
-    if (!product.stock) {
+    if (!product.stock || !product.stock.enabled) {
       return;
     }
     if (product.stock.quantity != debouncedQuantity) {
@@ -598,15 +598,14 @@ export default function ListProductStock({ location }) {
                         />
                       ) : (
                         products.map((product, index) => (
-                          <React.Fragment key={index}>
-                            <StockRow
-                              number={rowsPerPage * page + index + 1}
-                              product={product}
-                              onToggleStockEnabled={handleToggleStockEnabled}
-                              onToggleAllowNegative={handleToggleAllowNegative}
-                              onSetQuantity={handleSetQuantity}
-                            />
-                          </React.Fragment>
+                          <StockRow
+                            key={product._id}
+                            number={rowsPerPage * page + index + 1}
+                            product={product}
+                            onToggleStockEnabled={handleToggleStockEnabled}
+                            onToggleAllowNegative={handleToggleAllowNegative}
+                            onSetQuantity={handleSetQuantity}
+                          />
                         ))
                       )}
                     </TableBody>
