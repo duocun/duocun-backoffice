@@ -52,7 +52,7 @@ const AccountSearch = ({handleSelectAccount, val}) => {
   const updateSelect = (account) => {
     handleSelectAccount(account);
     setShowList(false);
-    // setKeyword(account.username + account.phone? account.phone:'');
+    setKeyword(account.username + account.phone? account.phone:'');
   }
   const [searchOption, setSearchOption] = useState('name');
 

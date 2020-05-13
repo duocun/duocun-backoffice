@@ -26,7 +26,6 @@ import ApiAccountService from "services/api/ApiAccountService";
 import { getQueryParam } from "helper/index";
 import FlashStorage from "services/FlashStorage";
 
-import { FinanceTable } from "./FinanceTable";
 import SecondaryNav from "components/SecondaryNav/SecondaryNav";
 
 import AccountSearch from "./AccountSearch";
@@ -35,6 +34,8 @@ import AccountSearch from "./AccountSearch";
 // import { loadAccountsSearchAsync } from "redux/actions/account";
 
 // import { loadAccountsAsync } from "redux/actions/account";
+import { FinanceTable } from "./FinanceTable";
+import { FinanceForm } from "./FinanceForm";
 
 
 
@@ -48,7 +49,18 @@ const useQuery = () => {
   return new URLSearchParams(useLocation().search);
 }
 
-export const FinanceTablePage = ({ location, history }) => {
+const defaultTransaction = {
+  actionCode: '',
+  amount: 0,
+  fromId: '',
+  toId: '',
+  note: '',
+  staffId: '',
+  staffName: '',
+  modifyBy: '',
+}
+
+export const TransactionPage = ({ location, history }) => {
   const { t } = useTranslation();
   const classes = useStyles();
   // states related to list and pagniation
@@ -65,19 +77,12 @@ export const FinanceTablePage = ({ location, history }) => {
   const [query, setQuery] = useState(getQueryParam(location, "search") || "");
   const [sort, setSort] = useState(["_id", 1]);
 
-  const [selectedAccount, setAccount] = useState({_id:'', type: ''});
+  const [account, setAccount] = useState({_id:'', type: ''}); // selected account
   const [showList, setShowList] = useState(false);
   const [searchOption, setSearchOption] = useState('name');
-  const [startDate, setStartDate] = useState(
-    moment()
-      .utc()
-      .toISOString()
-  );
-  const [endDate, setEndDate] = useState(
-    moment()
-      .utc()
-      .toISOString()
-  );
+
+  const [model, setModel] = useState(defaultTransaction);
+
 
   const [processing, setProcessing] = useState(false);
 
@@ -91,9 +96,9 @@ export const FinanceTablePage = ({ location, history }) => {
       const accountId = searchParams.get('accountId');
       updateData(accountId);
     }else{
-      updateData(selectedAccount._id);
+      updateData(account._id);
     }
-  }, [page, rowsPerPage, sort, selectedAccount, startDate, endDate]);
+  }, [page, rowsPerPage, sort, account]);
 
   // useEffect(() => {
   //   if (query) {
@@ -142,6 +147,18 @@ export const FinanceTablePage = ({ location, history }) => {
     // setQuery(name);
   };
 
+  const handleNewTransaction = () => {
+    setModel({
+      ...defaultTransaction,
+      modifyBy: account ? account._id : '',
+      created: moment.utc().toISOString()
+    });
+  }
+
+  const handelEditTransaction = (tr) => {
+    setModel({...tr, modifyBy: account ? account._id : ''});
+  }
+
   const handleSelectAccount = account => {
     const type = account ? account.type : 'client';
     setAccount({_id: account? account._id: '', type});
@@ -149,10 +166,10 @@ export const FinanceTablePage = ({ location, history }) => {
   }
 
   const handleUpdateAccount = () => {
-    if(selectedAccount && selectedAccount._id){
+    if(account && account._id){
       removeAlert();
       setProcessing(true);
-      ApiTransactionService.updateTransactions(selectedAccount._id).then(({ data }) => {
+      ApiTransactionService.updateTransactions(account._id).then(({ data }) => {
         if (data.code === 'success') {
           setAlert({
             message: t("Update account balance successfully"),
@@ -177,9 +194,7 @@ export const FinanceTablePage = ({ location, history }) => {
     }
   };
 
-  const handelEditTransaction = () => {
-    
-  }
+
 
   const handleDeleteTransaction = (transactionId) => {
     if(window.confirm('Are you sure to delete this transaction?')){
@@ -215,7 +230,7 @@ export const FinanceTablePage = ({ location, history }) => {
   return (
     <div>
       <GridContainer>
-        <GridItem xs={12}>
+        <GridItem xs={12} lg={8}>
           <Card>
             <CardHeader color="primary">
               <GridContainer>
@@ -232,10 +247,10 @@ export const FinanceTablePage = ({ location, history }) => {
                       // href="finance/salary"
                       variant="contained"
                       color="default"
-                      onClick={()=>{history.push("/finance/salary")}}
+                      onClick={handleNewTransaction}
                     >
                       <AddCircleOutlineIcon />
-                      {t("Pay Salary")}
+                      {t("New Transaction")}
                     </Button>
                 </GridItem>
                 <GridItem xs={12} lg={6} align="right">
@@ -246,16 +261,6 @@ export const FinanceTablePage = ({ location, history }) => {
                       alignItems: "center",
                     }}
                   >
-                    {/* <TimePicker
-                      label="Start Date"
-                      date={startDate}
-                      getDate={setStartDate}
-                    />
-                    <TimePicker
-                      label="End Date"
-                      date={endDate}
-                      getDate={setEndDate}
-                    /> */}
                   </div>
 
                   <AccountSearch
@@ -286,7 +291,7 @@ export const FinanceTablePage = ({ location, history }) => {
                 )}
                 <GridItem xs={12}>
                   <FinanceTable
-                    account={selectedAccount}
+                    account={account}
                     rows={transactions}
                     page={page}
                     rowsPerPage={rowsPerPage}
@@ -304,12 +309,17 @@ export const FinanceTablePage = ({ location, history }) => {
             </CardBody>
           </Card>
         </GridItem>
+        <GridItem xs={12} sm={12} md={4}>
+          <FinanceForm account={account} 
+            transaction={model}
+            update={updateData} />
+        </GridItem>
       </GridContainer>
     </div>
   );
 }
 
-FinanceTablePage.propTypes = {
+TransactionPage.propTypes = {
   location: PropTypes.object,
   loadAccounts: PropTypes.func,
   accounts: PropTypes.array,
@@ -326,4 +336,4 @@ FinanceTablePage.propTypes = {
 // export default connect(
 //   mapStateToProps,
 //   mapDispatchToProps
-// )(FinanceTablePage);
+// )(TransactionPage);

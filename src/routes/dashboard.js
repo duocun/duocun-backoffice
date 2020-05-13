@@ -23,6 +23,8 @@ import LocalMallIcon from "@material-ui/icons/LocalMall";
 import EditAttributesIcon from "@material-ui/icons/EditAttributes";
 import CategoryIcon from "@material-ui/icons/Category";
 import StoreIcon from "@material-ui/icons/Store";
+import TransactionIcon from "@material-ui/icons/AttachMoney";
+import SalaryIcon from "@material-ui/icons/PeopleAlt";
 
 // core components/views for Admin layout
 import CategoriesPage from "views/Categories/Categories.js";
@@ -54,10 +56,24 @@ const dashboardRoutes = [
     component: CategoriesPage,
     layout: "/"
   },
+  // {
+  //   path: "/finance",
+  //   name: "Finance",
+  //   icon: "content_paste",
+  //   component: FinanceRoute,
+  //   layout: "/"
+  // },
   {
-    path: "/finance",
-    name: "Finance",
-    icon: "content_paste",
+    path: "/finance/transaction",
+    name: "Transaction",
+    icon: TransactionIcon,
+    component: FinanceRoute,
+    layout: "/"
+  },
+  {
+    path: "/finance/salary",
+    name: "Salary",
+    icon: SalaryIcon,
     component: FinanceRoute,
     layout: "/"
   },
