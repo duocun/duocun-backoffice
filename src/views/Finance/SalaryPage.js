@@ -127,7 +127,8 @@ const SalaryPage = ({ history, location }) => {
           staffId: driver ? driver._id : '',
           staffName,
           note: `Pay salary to ${staffName}`,
-          modifyBy: account ? account._id : ''
+          modifyBy: account ? account._id : '',
+          created: moment.utc().toISOString()
         });
       } else {
         setModel({
@@ -136,7 +137,8 @@ const SalaryPage = ({ history, location }) => {
           staffId: driver ? driver._id : '',
           staffName,
           note: `Pay salary to ${staffName}`,
-          modifyBy: account ? account._id : ''
+          modifyBy: account ? account._id : '',
+          created: moment.utc().toISOString()
         });
       }
     });

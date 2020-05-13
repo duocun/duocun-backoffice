@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
+import * as moment from 'moment';
+
+import TimePicker from "components/TimePicker/TimePicker";
 
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
@@ -77,14 +80,14 @@ const useStyles = makeStyles(() => ({
 const defaultActions = [
   { code: 'PS', text: 'Pay Salary' },
   { code: 'PDCH', text: 'Pay Driver Cash' },
-  { code: 'T', text: 'Transfer'}
+  { code: 'T', text: 'Transfer' }
 ];
+
 
 
 export const FinanceForm = ({ account, transaction, match, update }) => {
   const { t } = useTranslation();
   const classes = useStyles();
-
   const [actions, setActions] = useState(defaultActions);
   const [modifyByAccount, setModifyByAccount] = useState({ _id: '', username: '' });
   const [accounts, setAccounts] = useState([]);
@@ -188,9 +191,9 @@ export const FinanceForm = ({ account, transaction, match, update }) => {
   }
 
   const handleSubmit = () => {
-    if(model._id){
+    if (model._id) {
       handleUpdate();
-    }else{
+    } else {
       handleCreate();
     }
   }
@@ -198,21 +201,22 @@ export const FinanceForm = ({ account, transaction, match, update }) => {
   const handleBack = () => {
 
   }
-  
+
   useEffect(() => {
     // if(transaction._id){
-      if(transaction.actionCode === 'PS'){
-        setModel({...transaction,
-          staffId: account._id,
-          staffName: account.username,
-          note: `Pay salary to ${account.username}`,
-          modifyBy: modifyByAccount._id
-        });
-      }else{
-        setModel(transaction);
-      }
+    if (transaction.actionCode === 'PS') {
+      setModel({
+        ...transaction,
+        staffId: account._id,
+        staffName: account.username,
+        note: `Pay salary to ${account.username}`,
+        modifyBy: modifyByAccount._id
+      });
+    } else {
+      setModel(transaction);
+    }
     // }
-  },[transaction]);
+  }, [transaction]);
 
   useEffect(() => {
     const token = AuthService.getAuthToken();
@@ -224,10 +228,10 @@ export const FinanceForm = ({ account, transaction, match, update }) => {
       //     const tr = data.data;
       //     setModel({ ...tr, modifyBy: account._id });
       //   }
-        // setModel({ ...model, modifyBy: account._id });
-        ApiAccountService.getAccountList(null, null, { type: {$in: ['driver', 'system']}}).then(({ data }) => {
-          setAccounts(data.data);
-        });
+      // setModel({ ...model, modifyBy: account._id });
+      ApiAccountService.getAccountList(null, null, { type: { $in: ['driver', 'system'] } }).then(({ data }) => {
+        setAccounts(data.data);
+      });
       // });
     });
   }, []);
@@ -365,7 +369,13 @@ export const FinanceForm = ({ account, transaction, match, update }) => {
                   />
                 </Box>
               </GridItem>
-
+              <GridItem>
+                <TimePicker
+                  label="Date"
+                  date={model.created}
+                  getDate={(created) => setModel({...model, created})}
+                />
+              </GridItem>
               <GridItem xs={12} container direction="row-reverse">
                 <Box mt={2}>
                   <Button
