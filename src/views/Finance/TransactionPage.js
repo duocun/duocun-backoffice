@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
-import { connect } from "react-redux";
+// import { connect } from "react-redux";
 import moment from "moment";
 
 import GridContainer from "components/Grid/GridContainer.js";
@@ -13,21 +13,22 @@ import GridItem from "components/Grid/GridItem.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-import Searchbar from "components/Searchbar/Searchbar";
-import TimePicker from "components/TimePicker/TimePicker";
+import CardFooter from "components/Card/CardFooter.js";
+
+import SaveIcon from "@material-ui/icons/Save";
+// import Searchbar from "components/Searchbar/Searchbar";
 
 import { Button, Box } from "@material-ui/core";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 
 import Alert from "@material-ui/lab/Alert";
 import ApiTransactionService from "services/api/ApiTransactionService";
-import ApiAccountService from "services/api/ApiAccountService";
+// import ApiAccountService from "services/api/ApiAccountService";
 
 import { getQueryParam } from "helper/index";
 import FlashStorage from "services/FlashStorage";
 
-import { FinanceTable } from "./FinanceTable";
-import SecondaryNav from "components/SecondaryNav/SecondaryNav";
+// import SecondaryNav from "components/SecondaryNav/SecondaryNav";
 
 import AccountSearch from "./AccountSearch";
 //redux actions
@@ -35,6 +36,8 @@ import AccountSearch from "./AccountSearch";
 // import { loadAccountsSearchAsync } from "redux/actions/account";
 
 // import { loadAccountsAsync } from "redux/actions/account";
+import { FinanceTable } from "./FinanceTable";
+import { TransactionForm } from "./TransactionForm";
 
 
 
@@ -48,7 +51,18 @@ const useQuery = () => {
   return new URLSearchParams(useLocation().search);
 }
 
-export const FinanceTablePage = ({ location, history }) => {
+const defaultTransaction = {
+  actionCode: '',
+  amount: 0,
+  fromId: '',
+  toId: '',
+  note: '',
+  staffId: '',
+  staffName: '',
+  modifyBy: '',
+}
+
+export const TransactionPage = ({ location, history }) => {
   const { t } = useTranslation();
   const classes = useStyles();
   // states related to list and pagniation
@@ -65,19 +79,10 @@ export const FinanceTablePage = ({ location, history }) => {
   const [query, setQuery] = useState(getQueryParam(location, "search") || "");
   const [sort, setSort] = useState(["_id", 1]);
 
-  const [selectedAccount, setAccount] = useState({_id:'', type: ''});
-  const [showList, setShowList] = useState(false);
-  const [searchOption, setSearchOption] = useState('name');
-  const [startDate, setStartDate] = useState(
-    moment()
-      .utc()
-      .toISOString()
-  );
-  const [endDate, setEndDate] = useState(
-    moment()
-      .utc()
-      .toISOString()
-  );
+  const [account, setAccount] = useState({ _id: '', type: '' }); // selected account
+
+  const [model, setModel] = useState(defaultTransaction);
+
 
   const [processing, setProcessing] = useState(false);
 
@@ -86,23 +91,13 @@ export const FinanceTablePage = ({ location, history }) => {
   );
 
   useEffect(() => {
-    
-    if(searchParams.has('accountId')){
+    if (searchParams.has('accountId')) {
       const accountId = searchParams.get('accountId');
       updateData(accountId);
-    }else{
-      updateData(selectedAccount._id);
+    } else {
+      updateData(account._id);
     }
-  }, [page, rowsPerPage, sort, selectedAccount, startDate, endDate]);
-
-  // useEffect(() => {
-  //   if (query) {
-  //     // ApiAccountService.getAccountByKeyword(page, pageSize, keyword = "").then(({data}) => {
-
-  //     // });
-  //     // loadAccounts(query, searchOption);
-  //   }
-  // }, [query]);
+  }, [page, rowsPerPage, sort, account]);
 
   const updateData = (accountId) => {
     const condition = {
@@ -135,24 +130,33 @@ export const FinanceTablePage = ({ location, history }) => {
     });
   };
 
-  const handleSelectSearch = (id, name) => {
-    // const account = accounts.find(a => a._id === id);
-    // const type = account ? account.type : 'client';
-    // setAccount({_id:id, type});
-    // setQuery(name);
-  };
+  const handleNewTransaction = () => {
+    setModel({
+      ...defaultTransaction,
+      modifyBy: account ? account._id : '',
+      created: moment.utc().toISOString()
+    });
+  }
+
+  const handelEditTransaction = (tr) => {
+    if (tr.note) {
+      setModel({ ...tr, modifyBy: account ? account._id : '' });
+    } else {
+      setModel({ ...tr, note: '', modifyBy: account ? account._id : '' });
+    }
+  }
 
   const handleSelectAccount = account => {
     const type = account ? account.type : 'client';
-    setAccount({_id: account? account._id: '', type});
-    setQuery(account? account.username:'');
+    setAccount({ _id: account ? account._id : '', type });
+    setQuery(account ? account.username : '');
   }
 
   const handleUpdateAccount = () => {
-    if(selectedAccount && selectedAccount._id){
+    if (account && account._id) {
       removeAlert();
       setProcessing(true);
-      ApiTransactionService.updateTransactions(selectedAccount._id).then(({ data }) => {
+      ApiTransactionService.updateTransactions(account._id).then(({ data }) => {
         if (data.code === 'success') {
           setAlert({
             message: t("Update account balance successfully"),
@@ -166,24 +170,20 @@ export const FinanceTablePage = ({ location, history }) => {
         }
         setProcessing(false);
       })
-      .catch(e => {
-        console.error(e);
-        setAlert({
-          message: t("Update account balance failed"),
-          severity: "error"
+        .catch(e => {
+          console.error(e);
+          setAlert({
+            message: t("Update account balance failed"),
+            severity: "error"
+          });
+          setProcessing(false);
         });
-        setProcessing(false);
-      });
     }
   };
 
-  const handelEditTransaction = () => {
-    
-  }
-
   const handleDeleteTransaction = (transactionId) => {
-    if(window.confirm('Are you sure to delete this transaction?')){
-      if(transactionId){
+    if (window.confirm('Are you sure to delete this transaction?')) {
+      if (transactionId) {
         removeAlert();
         setProcessing(true);
         ApiTransactionService.deleteTransaction(transactionId).then(({ data }) => {
@@ -200,14 +200,14 @@ export const FinanceTablePage = ({ location, history }) => {
           }
           setProcessing(false);
         })
-        .catch(e => {
-          console.error(e);
-          setAlert({
-            message: t("Delete transaction failed"),
-            severity: "error"
+          .catch(e => {
+            console.error(e);
+            setAlert({
+              message: t("Delete transaction failed"),
+              severity: "error"
+            });
+            setProcessing(false);
           });
-          setProcessing(false);
-        });
       }
     }
   };
@@ -215,63 +215,30 @@ export const FinanceTablePage = ({ location, history }) => {
   return (
     <div>
       <GridContainer>
-        <GridItem xs={12}>
+        <GridItem xs={12} lg={8}>
           <Card>
             <CardHeader color="primary">
               <GridContainer>
                 <GridItem xs={12} lg={6}>
-                  <h4>{t("Finance")}</h4>
-                  {/* <SecondaryNav
-                    tabs={[
-                      { title: "Finance", route: "/finance" },
-                      { title: "Exception", route: "/finance/exception" },
-                    ]}
-                    history={history}
-                  /> */}
-                    <Button
-                      // href="finance/salary"
-                      variant="contained"
-                      color="default"
-                      onClick={()=>{history.push("/finance/salary")}}
-                    >
-                      <AddCircleOutlineIcon />
-                      {t("Pay Salary")}
-                    </Button>
+                  <h4>{t("Transaction")}</h4>
                 </GridItem>
-                <GridItem xs={12} lg={6} align="right">
-                  <div
+                <GridItem xs={12} sm={12} lg={6} align="right">
+                  {/* <div
                     style={{
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
                     }}
                   >
-                    {/* <TimePicker
-                      label="Start Date"
-                      date={startDate}
-                      getDate={setStartDate}
-                    />
-                    <TimePicker
-                      label="End Date"
-                      date={endDate}
-                      getDate={setEndDate}
-                    /> */}
-                  </div>
+                  </div> */}
 
                   <AccountSearch
+                    label="Account"
+                    placeholder="Search name or phone"
                     val={query}
                     handleSelectAccount={handleSelectAccount}
                   />
 
-                </GridItem>
-                <GridItem>
-                  <Button
-                    variant="contained"
-                    color="default"
-                    onClick={()=>handleUpdateAccount()}
-                    >
-                    {t("Update")}
-                  </Button>
                 </GridItem>
               </GridContainer>
             </CardHeader>
@@ -286,7 +253,7 @@ export const FinanceTablePage = ({ location, history }) => {
                 )}
                 <GridItem xs={12}>
                   <FinanceTable
-                    account={selectedAccount}
+                    account={account}
                     rows={transactions}
                     page={page}
                     rowsPerPage={rowsPerPage}
@@ -302,14 +269,47 @@ export const FinanceTablePage = ({ location, history }) => {
                 </GridItem>
               </GridContainer>
             </CardBody>
+            <CardFooter>
+              <GridContainer>
+                <GridItem xs={12} container direction="row-reverse">
+                  <Box mt={2}>
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      disabled={processing}
+                      onClick={handleNewTransaction}
+                    >
+                      <AddCircleOutlineIcon />
+                      {t("New Transaction")}
+                    </Button>
+                  </Box>
+                  <Box mt={2} mr={2}>
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      disabled={processing}
+                      onClick={handleUpdateAccount}
+                    >
+                      <SaveIcon />
+                      {t("Update")}
+                    </Button>
+                  </Box>
+                </GridItem>
+              </GridContainer>
+            </CardFooter>
           </Card>
+        </GridItem>
+        <GridItem xs={12} sm={12} md={4}>
+          <TransactionForm account={account}
+            transaction={model}
+            update={updateData} />
         </GridItem>
       </GridContainer>
     </div>
   );
 }
 
-FinanceTablePage.propTypes = {
+TransactionPage.propTypes = {
   location: PropTypes.object,
   loadAccounts: PropTypes.func,
   accounts: PropTypes.array,
@@ -326,4 +326,4 @@ FinanceTablePage.propTypes = {
 // export default connect(
 //   mapStateToProps,
 //   mapDispatchToProps
-// )(FinanceTablePage);
+// )(TransactionPage);

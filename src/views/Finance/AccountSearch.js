@@ -1,60 +1,79 @@
 import React, {useState, useEffect} from 'react';
 import PropTypes from "prop-types";
+import { useTranslation } from "react-i18next";
+import { makeStyles } from "@material-ui/core/styles";
 
+// import InputLabel from "@material-ui/core/InputLabel";
+// import Search from "@material-ui/icons/Search";
+
+// import styles from "assets/jss/material-dashboard-react/components/searchBarStyle.js";
+
+import CustomInput from "components/CustomInput/CustomInput.js";
+// import Button from "components/CustomButtons/Button.js";
 import SearchDropDown from "components/SearchDropDown/SearchDropDown.js";
-import { Throttle } from "react-throttle";
-import FlashStorage from "services/FlashStorage";
-import { getQueryParam } from "helper/index";
-import Searchbar from "components/Searchbar/Searchbar";
+// import { Throttle } from "react-throttle";
+// import FlashStorage from "services/FlashStorage";
+// import { getQueryParam } from "helper/index";
+// import Searchbar from "components/Searchbar/Searchbar";
 
 import ApiAccountService from "services/api/ApiAccountService";
 
-const AccountSearch = ({handleSelectAccount, val}) => {
-  const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(0
-    // getQueryParam(location, "page")
-    // ? parseInt(getQueryParam(location, "page"))
-    // : 0
-  );
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [totalRows, setTotalRows] = useState(0);
-  
-  const [keyword, setKeyword] = useState(val);// getQueryParam(location, "search") || "");
+const useStyles = makeStyles((styles) => ({
+  searchWrapper: {
+    width: "320px"
+  },
+  inputBox: {
+    width: "100%"
+  }
+}));
+const rowsPerPage = 10;
 
-  const [sort, setSort] = useState(["_id", 1]);
-  const [bShowList, setShowList] = useState(false);
+const AccountSearch = ({label, placeholder, handleSelectAccount, val, id=""}) => {
+  const classes = useStyles();
+  const { t } = useTranslation();
+  const [page, setPage] = useState(0);
+  const [keyword, setKeyword] = useState("");// getQueryParam(location, "search") || "");
+
+  const [accountId, setAccountId] = useState(id);
+  // const [sort, setSort] = useState(["_id", 1]);
+  const [searching, setSearching] = useState(false);
   const [accounts, setAccounts] = useState([]);
   const [count, setCount] = useState(10);
-  useEffect(() => {
+
+  const handleSearch = (keyword) => {
     if (keyword) {
-      // setPage(0);
       ApiAccountService.getAccountByKeyword(0, rowsPerPage, keyword).then(({data}) => {
         setAccounts(data.data);
         setCount(data.count);
         setPage(1);
-        setHasMoreAccounts(true);
-        setShowList(true);
+        if(data.data.length<data.count){
+          setHasMoreAccounts(true);
+        }else{
+          setHasMoreAccounts(false);
+        }
       });
-      // loadAccounts(query, searchOption);
+    } else {
+      setPage(1);
+      setHasMoreAccounts(true);
+    }
+  }
+
+  useEffect(() => {
+    if(accountId){
+
+    }else{
+      handleSearch(keyword);
     }
   }, [keyword]);
 
-  const handleShowList = () => {
-    setShowList(true);
-  };
-
-  const handleHideList = () => {
-    setTimeout(() => {
-      setShowList(false);
-    }, 500);
-  };
-
-  const updateSelect = (account) => {
+  const handleSelectData = (account) => {
     handleSelectAccount(account);
-    setShowList(false);
-    // setKeyword(account.username + account.phone? account.phone:'');
+    setAccountId(account._id);
+    // setShowList(false);
+    const str = account.username + ' ' + (account.phone ? account.phone:'');
+    setKeyword(str);
+    setSearching(false);
   }
-  const [searchOption, setSearchOption] = useState('name');
 
   const [hasMoreAccounts, setHasMoreAccounts] = useState(true);
 
@@ -70,38 +89,77 @@ const AccountSearch = ({handleSelectAccount, val}) => {
     });
   }
 
-  const handleSearchChange = ({target}) => {
-    setKeyword(target.value);
-  };
+  // const handleSearchChange = ({target}) => {
+  //   setKeyword(target.value);
+  // };
 
-  return <div>
+  const handleKeywordChange = ({target}) => {
+    const str = target.value;
+    setKeyword(str);
+    setAccountId("");
+    setSearching(true);
+    handleSearch(str);
+  }
+
+  const handleFocus = () => {
+
+  }
+
+  const handleBlur = () => {
+
+  }
+
+  const divStyle = {
+    // position: "absolute",
+    // zIndex:"3000"
+  }
+  return <div className={classes.searchWrapper}>
   {/* <Throttle time="1000" handler="onChange"> */}
-  <Searchbar
-    value={keyword}
-    onChange={handleSearchChange}
-    onSearch={() => {
-      setLoading(true);
-      if (page === 0) {
-        // updateData();
-      } else {
-        setPage(0);
-      }
-    }}
-    onFocus={handleShowList}
-    onBlur={handleHideList}
-    ifSearch = {false}
-    options = {['name', 'phone']}
-    getOption = {setSearchOption}
-  />
 {/* </Throttle> */}
+      <CustomInput
+        className={classes.inputBox}
+        labelText={t(label)}
+        formControlProps={{
+          className: classes.margin + " " + classes.search,
+        }}
+        inputProps={{
+          value: keyword,
+          placeholder: t(placeholder),
+          inputProps: {
+            "aria-label": t(placeholder),
+          },
+          style: { color: "black" },
+          onChange: handleKeywordChange,
+          onKeyDown: (event) => {
+            const { key } = event;
+            if (key === "Enter") {
+              return handleSearch(keyword);
+            }
+          },
+          onFocus: handleFocus,
+          onBlur: handleBlur,
+        }}
+      />
+      {/* <Button
+        color="white"
+        aria-label="edit"
+        justIcon
+        round
+        // onClick={() => handleSearch(keyword)}
+        // style={{ visibility: ifSearch ? "visible" : "hidden" }}
+      >
+        <Search />
+      </Button> */}
 
-<SearchDropDown
-  data={accounts}
-  hasMore={hasMoreAccounts}
-  fetchData={fetchAccounts}
-  selectData={updateSelect}
-  show={bShowList}
-/>
+    <div style={divStyle}>
+    <SearchDropDown
+      data={accounts}
+      hasMore={hasMoreAccounts}
+      fetchData={fetchAccounts}
+      selectData={handleSelectData}
+      show={searching}
+    />
+    </div>
 </div>
 }
 
