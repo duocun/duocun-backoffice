@@ -27,56 +27,20 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   list: {
-    width: "100%",
+    // width: "100%",
     // marginTop: 27,
     // display: "block",
     backgroundColor: "white",
     color: "black",
-    borderRadius: "3px"
+    borderRadius: "3px",
+    width: "320px"
   },
-  // list: {
-  //   backgroundColor: "gray",
-  //   width: "182px",
-  //   right: "43px",
-  //   boxShadow: "0px 0px 5px 0px rgba(0,0,0,0.75)",
-  //   maxHeight: "250px",
-  //   overflow: "scroll",
-  //   [theme.breakpoints.down("sm")]: {
-  //     width: "60%",
-  //     right: "58px",
-  //   },
-  // },
-  // ListItem: {
-  //   color: "black",
-  //   "& :hover": {
-  //     cursor: "pointer",
-  //   },
-  // },
 }));
 
 const SearchDropDown = ({ data, hasMore, fetchData, selectData,
   show = false, 
 }) => {
   const classes = useStyles();
-  const { t } = useTranslation();
-
-  const [dense, setDense] = React.useState(false);
-  const [secondary, setSecondary] = React.useState(false);
-
-  // function generate(data) {
-  //   return data.map((item) => {
-  //     let text = item.phone ? item.username + " " + item.phone : item.username;
-  //     //avoid pass in an arrow function to avoid redundant render
-  //     function handleAccountClick(){
-  //       onClick(item._id, item.username)
-  //     }
-  //     return (
-  //       <ListItem key={item._id} onClick={handleAccountClick}>
-  //         <ListItemText primary={text} className={classes.ListItem} />
-  //       </ListItem>
-  //     );
-  //   });
-  // }
 
   const getVisibility = (show) => (show ? "visible" : "hidden");
 
@@ -107,10 +71,6 @@ const SearchDropDown = ({ data, hasMore, fetchData, selectData,
           //   <h3 style={{textAlign: 'center'}}>&#8593; Release to refresh</h3>
         // }
         >
-                {/* <Box pb={2}>
-                </Box> */}
-
-
         {
           data && data.length > 0 &&
           data.map(d => 
