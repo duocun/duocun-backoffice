@@ -133,8 +133,12 @@ export const countProductFromDate = (
 ) => {
   return countProductQuantityFromOrders(
     dir === "after"
-      ? orders.filter(order => order.deliverDate >= date)
-      : orders.filter(order => order.deliverDate <= date),
+      ? orders.filter(
+          order => moment(order.delivered).format("YYYY-MM-DD") >= date
+        )
+      : orders.filter(
+          order => moment(order.delivered).format("YYYY-MM-DD") <= date
+        ),
     productId
   );
 };
