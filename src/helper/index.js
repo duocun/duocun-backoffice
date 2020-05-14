@@ -111,6 +111,17 @@ export const getDateRangeStrings = (days, startDate = undefined) => {
   return ret;
 };
 
+export const getDateStrArrayBetween = (startDate, endDate) => {
+  for (
+    var arr = [], dt = new Date(moment(startDate).format("YYYY-MM-DD"));
+    dt <= endDate;
+    dt.setDate(dt.getDate() + 1)
+  ) {
+    arr.push(moment(dt).format("YYYY-MM-DD"));
+  }
+  return arr;
+};
+
 export const countProductQuantityFromOrders = (orders, productId) => {
   let count = 0;
   orders.forEach(order => {
