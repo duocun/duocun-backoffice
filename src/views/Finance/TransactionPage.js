@@ -15,6 +15,10 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 
+import MenuItem from "@material-ui/core/MenuItem";
+import FormControl from "@material-ui/core/FormControl";
+import InputLabel from "@material-ui/core/InputLabel";
+import Select from "@material-ui/core/Select";
 import SaveIcon from "@material-ui/icons/Save";
 import { Button, Box } from "@material-ui/core";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
@@ -52,6 +56,21 @@ const defaultTransaction = {
   modifyBy: '',
 }
 
+const defaultActions = [
+  { code: 'A', text: 'All'},
+  { code: 'PS', text: 'Pay Salary' },
+  { code: 'PDCH', text: 'Pay Driver Cash' },
+  { code: 'T', text: 'Transfer' },
+  { code: 'RC', text: 'Refund to Client' },
+  { code: 'PMCH', text: 'Pay Merchant Cash' },
+  { code: 'PMC', text: 'Pay Merchant from Bank' },
+  { code: 'POR', text: 'Pay Office Rent' },
+  { code: 'D', text: 'Discount' },
+  { code: 'BM', text: 'Buy Material'},
+  { code: 'BE', text: 'Buy Equipment'},
+  { code: 'BA', text: 'Buy Advertisement'}
+];
+
 export const TransactionPage = ({ location, history }) => {
   const { t } = useTranslation();
   const classes = useStyles();
@@ -70,9 +89,9 @@ export const TransactionPage = ({ location, history }) => {
   const [sort, setSort] = useState(["_id", 1]);
 
   const [account, setAccount] = useState({ _id: '', type: '' }); // selected account
+  const [actionCode, setActionCode] = useState('A');
 
   const [model, setModel] = useState(defaultTransaction);
-
 
   const [processing, setProcessing] = useState(false);
 
@@ -83,14 +102,14 @@ export const TransactionPage = ({ location, history }) => {
   useEffect(() => {
     if (searchParams.has('accountId')) {
       const accountId = searchParams.get('accountId');
-      updateData(accountId);
+      updateData(accountId, actionCode);
     } else {
-      updateData(account._id);
+      updateData(account._id, actionCode);
     }
-  }, [page, rowsPerPage, sort, account]);
+  }, [page, rowsPerPage, sort, account, actionCode]);
 
-  const updateData = (accountId) => {
-    const condition = {
+  const updateData = (accountId, actionCode) => {
+    const condition = actionCode==='A'? {
       $or: [
         {
           fromId: accountId,
@@ -100,7 +119,21 @@ export const TransactionPage = ({ location, history }) => {
         },
       ],
       status: { $nin: ['bad', 'tmp'] }
+    }
+    :
+    {
+      $or: [
+        {
+          fromId: accountId,
+        },
+        {
+          toId: accountId,
+        },
+      ],
+      status: { $nin: ['bad', 'tmp'] },
+      actionCode
     };
+
     ApiTransactionService.getTransactionList(
       page,
       rowsPerPage,
@@ -140,6 +173,15 @@ export const TransactionPage = ({ location, history }) => {
     const type = account ? account.type : 'client';
     setAccount({ _id: account ? account._id : '', type });
     setQuery(account ? account.username : '');
+  }
+
+  const handleActionChange = (actionCode) => {
+    setActionCode(actionCode);
+    // updateData(accountId, actionCode);
+  }
+
+  const handleUpdateData = (accountId) => {
+    updateData(accountId, actionCode);
   }
 
   const handleUpdateAccount = () => {
@@ -209,26 +251,33 @@ export const TransactionPage = ({ location, history }) => {
           <Card>
             <CardHeader color="primary">
               <GridContainer>
-                <GridItem xs={12} lg={6}>
+                <GridItem xs={12}  sm={12} lg={12}>
                   <h4>{t("Transaction")}</h4>
                 </GridItem>
-                <GridItem xs={12} sm={12} lg={6} align="right">
-                  {/* <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                  </div> */}
-
+                <GridItem xs={12} sm={6} lg={4} align="right">
+                <Box pb={2}>
+                  <FormControl className={classes.select}>
+                    <InputLabel id="action-label">Action</InputLabel>
+                    <Select required
+                      labelId="action-label"
+                      id="action-select"
+                      value={actionCode}
+                      onChange={e => handleActionChange(e.target.value)}
+                    >
+                      {
+                        defaultActions.map(d => <MenuItem key={d.code} value={d.code}>{d.text}</MenuItem>)
+                      }
+                    </Select>
+                  </FormControl>
+                </Box>
+                </GridItem>
+                <GridItem xs={12} sm={6} lg={6} align="right">
                   <AccountSearch
                     label="Account"
                     placeholder="Search name or phone"
                     val={query}
                     handleSelectAccount={handleSelectAccount}
                   />
-
                 </GridItem>
               </GridContainer>
             </CardHeader>
@@ -292,7 +341,7 @@ export const TransactionPage = ({ location, history }) => {
         <GridItem xs={12} sm={12} md={4}>
           <TransactionForm account={account}
             transaction={model}
-            update={updateData} />
+            update={handleUpdateData} />
         </GridItem>
       </GridContainer>
     </div>
