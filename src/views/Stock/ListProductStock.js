@@ -19,10 +19,12 @@ import TableHead from "@material-ui/core/TableHead";
 import TablePagination from "components/Table/TablePagniation.js";
 import TableRow from "@material-ui/core/TableRow";
 import Input from "@material-ui/core/Input";
+import { InputLabel, MenuItem, Select, Box } from "@material-ui/core";
 
 import Alert from "@material-ui/lab/Alert";
 import TableBodySkeleton from "components/Table/TableBodySkeleton";
 import Searchbar from "components/Searchbar/Searchbar";
+import DateRangePicker from "components/DateRangePicker/DateRangePicker";
 
 import CheckIcon from "@material-ui/icons/Check";
 import CloseIcon from "@material-ui/icons/Close";
@@ -32,17 +34,20 @@ import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
 import ApiStockService from "services/api/ApiStockService";
 import FlashStorage from "services/FlashStorage";
 import { getQueryParam, countProductFromDate } from "helper/index";
-import { getDateRangeStrings } from "helper";
+import { getDateStrArrayBetween } from "helper";
 import { useDebounce } from "index";
 
 import moment from "moment";
 import "moment/locale/zh-cn";
 import ApiCategoryService from "services/api/ApiCategoryService";
-import { InputLabel, MenuItem, Select, Box } from "@material-ui/core";
 
 moment.locale("zh-cn");
 
 const useStyles = makeStyles(theme => ({
+  heading: {
+    marginTop: "0.5rem",
+    marginBottom: "0.5rem"
+  },
   tableContainer: {
     maxHeight: "calc(100vh - 240px)"
   },
@@ -104,8 +109,6 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const dates = getDateRangeStrings(14);
-
 const isQuantityDeficient = (quantity, product) => {
   if (!product.stock || !product.stock.enabled) return false;
   return (product.stock.warningThreshold || 0) >= quantity;
@@ -140,7 +143,8 @@ const StockRow = ({
   product,
   onToggleStockEnabled,
   onToggleAllowNegative,
-  onSetQuantity
+  onSetQuantity,
+  dates
 }) => {
   const classes = useStyles();
   const [quantity, setQuantity] = useState(
@@ -282,12 +286,18 @@ export default function ListProductStock({ location }) {
       ? parseInt(getQueryParam(location, "page"))
       : 0
   );
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(50);
   const [totalRows, setTotalRows] = useState(0);
   const [query, setQuery] = useState(getQueryParam(location, "search") || "");
   const [sort, setSort] = useState(["_id", 1]);
   const [categories, setCategories] = useState([]);
-  const [filterParams, setFilterParams] = useState({});
+  const [filterParams, setFilterParams] = useState({
+    "stock.enabled": true,
+    "stock.allowNegative": true
+  });
+  // states related to stock dates
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(moment().add("+14", "days"));
   // states related to processing
   const [alert, setAlert] = useState(
     FlashStorage.get("PRODUCT_ALERT") || { message: "", severity: "info" }
@@ -423,12 +433,12 @@ export default function ListProductStock({ location }) {
         <Card>
           <CardHeader color="primary">
             <GridContainer>
-              <GridItem xs={12} lg={3}>
-                <h4>{t("Stock")}</h4>
+              <GridItem xs={12} lg={12}>
+                <h4 className={classes.heading}>{t("Stock")}</h4>
               </GridItem>
-              <GridItem xs={12} lg={9} align="right">
+              <GridItem xs={12} lg={12}>
                 <GridContainer>
-                  <GridItem xs={12} md={8}>
+                  <GridItem xs={12} md={9}>
                     <Box className={classes.headerBox}>
                       <InputLabel
                         className={classes.headerLabel}
@@ -536,8 +546,20 @@ export default function ListProductStock({ location }) {
                         <MenuItem value="false">{t("No")}</MenuItem>
                       </Select>
                     </Box>
+                    <Box className={classes.headerBox}>
+                      <DateRangePicker
+                        defaultStartDate={new Date()}
+                        defaultEndDate={moment().add("+13", "days")}
+                        onChange={(start, end) => {
+                          setStartDate(start);
+                          setEndDate(end);
+                          console.log(startDate);
+                          console.log(endDate);
+                        }}
+                      />
+                    </Box>
                   </GridItem>
-                  <GridItem xs={12} md={4}>
+                  <GridItem xs={12} md={3} align="right">
                     <Searchbar
                       onChange={e => {
                         const { target } = e;
@@ -583,11 +605,13 @@ export default function ListProductStock({ location }) {
                         <TableCell>{t("Allow negative quantity")}</TableCell>
                         <TableCell>{t("Quantity")}</TableCell>
                         <TableCell>{t("Add Quantity")}</TableCell>
-                        {dates.map(date => (
-                          <TableCell key={date}>
-                            {moment(date).format("MM-DD ddd")}
-                          </TableCell>
-                        ))}
+                        {getDateStrArrayBetween(startDate, endDate).map(
+                          date => (
+                            <TableCell key={date}>
+                              {moment(date).format("MM-DD ddd")}
+                            </TableCell>
+                          )
+                        )}
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -602,6 +626,7 @@ export default function ListProductStock({ location }) {
                             key={product._id}
                             number={rowsPerPage * page + index + 1}
                             product={product}
+                            dates={getDateStrArrayBetween(startDate, endDate)}
                             onToggleStockEnabled={handleToggleStockEnabled}
                             onToggleAllowNegative={handleToggleAllowNegative}
                             onSetQuantity={handleSetQuantity}
@@ -639,7 +664,8 @@ StockRow.propTypes = {
   product: PropTypes.object,
   onToggleStockEnabled: PropTypes.func,
   onToggleAllowNegative: PropTypes.func,
-  onSetQuantity: PropTypes.func
+  onSetQuantity: PropTypes.func,
+  dates: PropTypes.array
 };
 
 ListProductStock.propTypes = {

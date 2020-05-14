@@ -182,10 +182,20 @@ describe("helper", () => {
       ]);
     });
   });
+  describe("getDateStrArrayBetween", () => {
+    it("should return date string array between two dates", () => {
+      let startDate = new Date("1993-06-19");
+      let endDate = new Date("1993-12-17");
+      const arr = helper.getDateStrArrayBetween(startDate, endDate);
+      expect(arr.length).not.to.eql(0);
+      expect(arr[0]).to.eql("1993-06-19");
+      expect(arr[arr.length - 1]).to.eql("1993-12-17");
+    });
+  });
   describe("toDateString", () => {
     it("should convert date to string", () => {
       let date = "2020-05-09";
       expect(helper.toDateString(new Date(date))).to.eql(date);
     });
-  })
+  });
 });
