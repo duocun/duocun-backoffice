@@ -33,6 +33,7 @@ import ProductPage from "views/Products/Products.js";
 import StockPage from "views/Stock/ListProductStock.js";
 import AttributePage from "views/Attributes/Attributes.js";
 import OrderPage from "views/Orders/OrderPage.js";
+import TableList from "views/TableList/TableList.js";
 
 import Assignment from "views/Assignment/AssignmentRoute";
 import DashboardRoute from "views/Dashboard/DashboardRoute.js";
@@ -125,14 +126,14 @@ const dashboardRoutes = [
     icon: LocationOn,
     component: Assignment,
     layout: "/"
-  }
-  // {
-  //   path: "/table",
-  //   name: "Table List",
-  //   icon: "content_paste",
-  //   component: TableList,
-  //   layout: "/"
-  // },
+  },
+  {
+    path: "/table",
+    name: "Table List",
+    icon: "content_paste",
+    component: TableList,
+    layout: "/"
+  },
   // {
   //   path: "/typography",
   //   name: "Typography",

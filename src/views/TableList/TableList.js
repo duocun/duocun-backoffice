@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 // core components
@@ -8,6 +8,9 @@ import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
+
+import * as uuid from 'uuid';
+import ApiService from "services/api/ApiService";
 
 const styles = {
   cardCategoryWhite: {
@@ -43,8 +46,109 @@ const useStyles = makeStyles(styles);
 
 export default function TableList() {
   const classes = useStyles();
+  const [fname, setFileName] = useState('');
+  const size = {};
+  const uploadUrl = '/files/upload';
+
+  const onFileChange = (event) => {
+    const image = new Image();
+    const reader = new FileReader();
+    if (event.target.files && event.target.files.length > 0) {
+      const file = event.target.files[0];
+
+      image.onload = function (imageEvent) {
+        const blob = getBlob(image, 'sm'); // type:x, size:y
+        const picFile = new File([blob], file.name);
+        const ext = file.name.split('.').pop();
+        const fname = uuid.v4();
+        postFile(uploadUrl, fname, ext, picFile).then((x) => {
+          setFileName(fname + '.' + ext);
+          // if (x) {
+          //   self.afterUpload.emit({
+          //     fname: fname + '.' + ext,
+          //     file: picFile
+          //   });
+          // } else {
+          //   // self.snackBar.open('', 'upload file failed.', { duration: 1000 });
+          // }
+        });
+      };
+
+      reader.onload = (readerEvent) => {
+        // use for trigger image.onload event
+        image.src = readerEvent.target.result;
+      };
+
+      reader.readAsDataURL(file);
+    }
+  }
+
+  // ---------------------------------------------------------------------
+  // url --- api/files/upload
+  // file --- { name:x, size:y, type: z }
+  const postFile = (url, fname, ext, file) => {
+    const formData = new FormData();
+    formData.append('fname', fname);
+    formData.append('ext', ext);
+    formData.append('file', file);
+    return ApiService.v2().post(url, formData);
+  }
+
+  const dataURLToBlob = (dataURL) => {
+    const BASE64_MARKER = ';base64,';
+    if (dataURL.indexOf(BASE64_MARKER) === -1) {
+      const parts = dataURL.split(',');
+      const contentType = parts[0].split(':')[1];
+      const raw = parts[1];
+
+      return new Blob([raw], { type: contentType });
+    } else {
+      const parts = dataURL.split(BASE64_MARKER);
+      const contentType = parts[0].split(':')[1];
+      const raw = window.atob(parts[1]);
+      const rawLength = raw.length;
+
+      const uInt8Array = new Uint8Array(rawLength);
+
+      for (let i = 0; i < rawLength; ++i) {
+        uInt8Array[i] = raw.charCodeAt(i);
+      }
+      return new Blob([uInt8Array], { type: contentType });
+    }
+  }
+
+  // scale image inside frame
+  const resizeImage = (frame_w, frame_h, w, h) => {
+    return { 'w': Math.round(frame_w), 'h': Math.round(frame_h), 'padding_top': 0 };
+  }
+
+  const getBlob = (image, size = 'sm') => {
+    const canvas = document.createElement('canvas');
+    if (size === 'sm') {
+      const d = resizeImage(480, 360, image.width, image.height);
+      canvas.width = d.w;
+      canvas.height = d.h;
+    } else if (size === 'lg') {
+      const d = resizeImage(480, 360, image.width, image.height);
+      canvas.width = d.w;
+      canvas.height = d.h;
+    } else {
+      const d = resizeImage(480, 360, image.width, image.height);
+      canvas.width = image.width;
+      canvas.height = image.height;
+    }
+    canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+    const dataUrl = canvas.toDataURL('image/jpeg');
+    return dataURLToBlob(dataUrl);
+  }
+
+
   return (
     <GridContainer>
+      <GridItem xs={12} sm={12} md={12}>
+        {fname}
+        <input type="file" onChange={onFileChange} />
+      </GridItem>
       <GridItem xs={12} sm={12} md={12}>
         <Card>
           <CardHeader color="primary">
