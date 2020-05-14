@@ -18,7 +18,7 @@ export default class ApiService {
   static v2() {
     return new ApiService(API_HOST); // API_V2_HOST
   }
-  
+
   buildUrl(url, param = null) {
     url = this.apiHost + (url.startsWith("/") ? url : `/${url}`);
     if (!param) {
@@ -60,15 +60,6 @@ export default class ApiService {
       : Axios.post(url, param);
   }
 
-  postV2(url, param = null, auth = true, isRelative = true) {
-    if (isRelative) {
-      url = 'https://duocun.com.cn/api' + url;//this.buildUrl(url);
-    }
-    return auth
-      ? Axios.post(url, param, this.buildAuthHeader())
-      : Axios.post(url, param);
-  }
-
   put(url, param = null, auth = true, isRelative = true) {
     if (isRelative) {
       url = this.buildUrl(url);
@@ -77,6 +68,7 @@ export default class ApiService {
       ? Axios.put(url, param, this.buildAuthHeader())
       : Axios.put(url, param);
   }
+  
   delete(url, param = null, auth = true, isRelative = true) {
     if (isRelative) {
       url = this.buildUrl(url, param);
