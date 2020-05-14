@@ -65,7 +65,7 @@ const Dashboard = ({summary, loadStatisticsSummary, history}) => {
       <GridContainer>
         <GridItem xs={12} sm={6} md={3}>
           <Card>
-            <CardHeader color="warning" stats icon>
+            <CardHeader color="warning" stats icon onClick={()=>{history.push("/dashboard/products")}}>
               <CardIcon color="warning">
                 <Icon>content_copy</Icon>
               </CardIcon>
@@ -94,7 +94,7 @@ const Dashboard = ({summary, loadStatisticsSummary, history}) => {
         </GridItem>
         <GridItem xs={12} sm={6} md={3}>
           <Card>
-            <CardHeader color="success" stats icon>
+            <CardHeader color="success" stats icon onClick={()=>{history.push("/dashboard/sales")}}>
               <CardIcon color="success">
                 <Store />
               </CardIcon>

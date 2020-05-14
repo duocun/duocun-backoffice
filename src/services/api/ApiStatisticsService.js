@@ -5,6 +5,10 @@ export default {
     let query = {startDate, endDate};
     return ApiService.v2().get("statistics/summary", query);
   },
+  getSales: (startDate, endDate = null ) => {
+    let query = {startDate, endDate};
+    return ApiService.v2().get("statistics/sales", query);
+  },
   getMerchantStatistic: (startDate, endDate) => {
     let query = {startDate, endDate};
     return ApiService.v2().get("statistics/merchant", query);
