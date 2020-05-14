@@ -91,7 +91,7 @@ export default function TableList() {
     formData.append('fname', fname);
     formData.append('ext', ext);
     formData.append('file', file);
-    return ApiService.v2().post(url, formData);
+    return ApiService.v2().postV2(url, formData);
   }
 
   const dataURLToBlob = (dataURL) => {
