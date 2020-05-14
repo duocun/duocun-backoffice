@@ -75,4 +75,14 @@ export default class ApiService {
     }
     return auth ? Axios.delete(url, this.buildAuthHeader()) : Axios.delete(url);
   }
+
+  // don't remove, temply need here until new upload tools finish
+  postV2(url, param = null, auth = true, isRelative = true) {
+    if (isRelative) {
+      url = 'https://duocun.com.cn/api' + url;//this.buildUrl(url);
+    }
+    return auth
+      ? Axios.post(url, param, this.buildAuthHeader())
+      : Axios.post(url, param);
+  }
 }
