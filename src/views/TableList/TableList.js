@@ -124,19 +124,11 @@ export default function TableList() {
 
   const getBlob = (image, size = 'sm') => {
     const canvas = document.createElement('canvas');
-    if (size === 'sm') {
-      const d = resizeImage(480, 360, image.width, image.height);
-      canvas.width = d.w;
-      canvas.height = d.h;
-    } else if (size === 'lg') {
-      const d = resizeImage(480, 360, image.width, image.height);
-      canvas.width = d.w;
-      canvas.height = d.h;
-    } else {
-      const d = resizeImage(480, 360, image.width, image.height);
-      canvas.width = image.width;
-      canvas.height = image.height;
-    }
+
+    const d = resizeImage(600, 450, image.width, image.height);
+    canvas.width = image.width;
+    canvas.height = image.height;
+
     canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
     const dataUrl = canvas.toDataURL('image/jpeg');
     return dataURLToBlob(dataUrl);
