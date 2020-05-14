@@ -14,21 +14,21 @@ import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 
-import FormLabel from "@material-ui/core/FormLabel";
+// import FormLabel from "@material-ui/core/FormLabel";
 import FormControl from "@material-ui/core/FormControl";
-import FormGroup from "@material-ui/core/FormGroup";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
+// import FormGroup from "@material-ui/core/FormGroup";
+// import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Select from "@material-ui/core/Select";
-import Checkbox from "@material-ui/core/Checkbox";
+// import Checkbox from "@material-ui/core/Checkbox";
 
-import Skeleton from "@material-ui/lab/Skeleton";
+// import Skeleton from "@material-ui/lab/Skeleton";
 import Alert from "@material-ui/lab/Alert";
 import CustomInput from "components/CustomInput/CustomInput";
-import TextField from "@material-ui/core/TextField";
+// import TextField from "@material-ui/core/TextField";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import Button from "@material-ui/core/Button";
-import IconButton from "@material-ui/core/IconButton";
+// import IconButton from "@material-ui/core/IconButton";
 
 import FormatListBulletedIcon from "@material-ui/icons/FormatListBulleted";
 import SaveIcon from "@material-ui/icons/Save";
@@ -89,7 +89,10 @@ const defaultActions = [
   { code: 'PMCH', text: 'Pay Merchant Cash' },
   { code: 'PMC', text: 'Pay Merchant from Bank' },
   { code: 'POR', text: 'Pay Office Rent' },
-  { code: 'D', text: 'Discount' }
+  { code: 'D', text: 'Discount' },
+  { code: 'BM', text: 'Buy Material'},
+  { code: 'BE', text: 'Buy Equipment'},
+  { code: 'BA', text: 'Buy Advertisement'}
 ];
 
 
