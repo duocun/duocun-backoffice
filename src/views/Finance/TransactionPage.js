@@ -57,18 +57,20 @@ const defaultTransaction = {
 }
 
 const defaultActions = [
-  { code: 'A', text: 'All'},
+  { code: 'A', text: 'All' },
   { code: 'PS', text: 'Pay Salary' },
   { code: 'PDCH', text: 'Pay Driver Cash' },
+  { code: 'PC', text: 'Client Pay by card' },
+  { code: 'PW', text: 'Client Pay by Wechat' },
   { code: 'T', text: 'Transfer' },
   { code: 'RC', text: 'Refund to Client' },
   { code: 'PMCH', text: 'Pay Merchant Cash' },
   { code: 'PMC', text: 'Pay Merchant from Bank' },
   { code: 'POR', text: 'Pay Office Rent' },
   { code: 'D', text: 'Discount' },
-  { code: 'BM', text: 'Buy Material'},
-  { code: 'BE', text: 'Buy Equipment'},
-  { code: 'BA', text: 'Buy Advertisement'}
+  { code: 'BM', text: 'Buy Material' },
+  { code: 'BE', text: 'Buy Equipment' },
+  { code: 'BA', text: 'Buy Advertisement' }
 ];
 
 export const TransactionPage = ({ location, history }) => {
@@ -109,7 +111,8 @@ export const TransactionPage = ({ location, history }) => {
   }, [page, rowsPerPage, sort, account, actionCode]);
 
   const updateData = (accountId, actionCode) => {
-    const condition = actionCode==='A'? {
+
+    const accountQuery = accountId ? {
       $or: [
         {
           fromId: accountId,
@@ -117,19 +120,17 @@ export const TransactionPage = ({ location, history }) => {
         {
           toId: accountId,
         },
-      ],
+      ]
+    } : {};
+
+    const condition = actionCode === 'A' ? 
+    {
+      ...accountQuery,
       status: { $nin: ['bad', 'tmp'] }
     }
     :
     {
-      $or: [
-        {
-          fromId: accountId,
-        },
-        {
-          toId: accountId,
-        },
-      ],
+      ...accountQuery,
       status: { $nin: ['bad', 'tmp'] },
       actionCode
     };
@@ -177,7 +178,7 @@ export const TransactionPage = ({ location, history }) => {
 
   const handleActionChange = (actionCode) => {
     setActionCode(actionCode);
-    // updateData(accountId, actionCode);
+    updateData(account._id, actionCode);
   }
 
   const handleUpdateData = (accountId) => {
@@ -251,25 +252,25 @@ export const TransactionPage = ({ location, history }) => {
           <Card>
             <CardHeader color="primary">
               <GridContainer>
-                <GridItem xs={12}  sm={12} lg={12}>
+                <GridItem xs={12} sm={12} lg={12}>
                   <h4>{t("Transaction")}</h4>
                 </GridItem>
                 <GridItem xs={12} sm={6} lg={4} align="right">
-                <Box pb={2}>
-                  <FormControl className={classes.select}>
-                    <InputLabel id="action-label">Action</InputLabel>
-                    <Select required
-                      labelId="action-label"
-                      id="action-select"
-                      value={actionCode}
-                      onChange={e => handleActionChange(e.target.value)}
-                    >
-                      {
-                        defaultActions.map(d => <MenuItem key={d.code} value={d.code}>{d.text}</MenuItem>)
-                      }
-                    </Select>
-                  </FormControl>
-                </Box>
+                  <Box pb={2}>
+                    <FormControl className={classes.select}>
+                      <InputLabel id="action-label">Action</InputLabel>
+                      <Select required
+                        labelId="action-label"
+                        id="action-select"
+                        value={actionCode}
+                        onChange={e => handleActionChange(e.target.value)}
+                      >
+                        {
+                          defaultActions.map(d => <MenuItem key={d.code} value={d.code}>{d.text}</MenuItem>)
+                        }
+                      </Select>
+                    </FormControl>
+                  </Box>
                 </GridItem>
                 <GridItem xs={12} sm={6} lg={6} align="right">
                   <AccountSearch
