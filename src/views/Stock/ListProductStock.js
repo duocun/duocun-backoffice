@@ -292,11 +292,10 @@ export default function ListProductStock({ location }) {
   const [sort, setSort] = useState(["_id", 1]);
   const [categories, setCategories] = useState([]);
   const [filterParams, setFilterParams] = useState({
-    "stock.enabled": true,
-    "stock.allowNegative": true
+    "stock.enabled": true
   });
   // states related to stock dates
-  const [startDate, setStartDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(moment());
   const [endDate, setEndDate] = useState(moment().add("+14", "days"));
   // states related to processing
   const [alert, setAlert] = useState(
@@ -548,13 +547,11 @@ export default function ListProductStock({ location }) {
                     </Box>
                     <Box className={classes.headerBox}>
                       <DateRangePicker
-                        defaultStartDate={new Date()}
+                        defaultStartDate={moment()}
                         defaultEndDate={moment().add("+13", "days")}
                         onChange={(start, end) => {
                           setStartDate(start);
                           setEndDate(end);
-                          console.log(startDate);
-                          console.log(endDate);
                         }}
                       />
                     </Box>

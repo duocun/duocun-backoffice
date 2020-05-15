@@ -1,4 +1,5 @@
 import * as helper from "./index.js";
+import moment from "moment";
 import { expect } from "chai";
 
 describe("helper", () => {
@@ -184,8 +185,8 @@ describe("helper", () => {
   });
   describe("getDateStrArrayBetween", () => {
     it("should return date string array between two dates", () => {
-      let startDate = new Date("1993-06-19");
-      let endDate = new Date("1993-12-17");
+      let startDate = moment("1993-06-19").local();
+      let endDate = moment("1993-12-17").local();
       const arr = helper.getDateStrArrayBetween(startDate, endDate);
       expect(arr.length).not.to.eql(0);
       expect(arr[0]).to.eql("1993-06-19");

@@ -113,11 +113,19 @@ export const getDateRangeStrings = (days, startDate = undefined) => {
 
 export const getDateStrArrayBetween = (startDate, endDate) => {
   for (
-    var arr = [], dt = new Date(moment(startDate).format("YYYY-MM-DD"));
+    var arr = [],
+      dt = new Date(
+        moment(startDate)
+          
+      );
     dt <= endDate;
     dt.setDate(dt.getDate() + 1)
   ) {
-    arr.push(moment(dt).format("YYYY-MM-DD"));
+    arr.push(
+      moment(dt)
+        .local()
+        .format("YYYY-MM-DD")
+    );
   }
   return arr;
 };
