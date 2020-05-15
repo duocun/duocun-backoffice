@@ -33,16 +33,16 @@ const useStyles = makeStyles((theme) => ({
 
 const defaultChart = {
   series: [{
-    name: 'Orders',
+    name: 'Sales',
     data: []
   }, {
-    name: 'Products',
+    name: 'Cost',
     data: []
   }],
   options: {
     chart: {
       type: 'bar',
-      height: 400
+      height: 500
     },
     plotOptions: {
       bar: {
@@ -109,7 +109,7 @@ const getChart = (series, categories, height) => {
       },
       yaxis: {
         title: {
-          text: '(items)'
+          text: '$(thousand)'
         }
       },
       fill: {
@@ -118,7 +118,7 @@ const getChart = (series, categories, height) => {
       tooltip: {
         y: {
           formatter: function (val) {
-            return val + " items"
+            return "$" + val + " thousands"
           }
         }
       }
@@ -137,15 +137,15 @@ const SalesPage = ({}) => {
     ApiStatisticsService.getSales(fromDate).then(({data}) => {
       const salesMap = data.data;
       const dates = Object.keys(salesMap).sort();
-      const nOrdersList = dates.map(d => salesMap[d].nOrders);
-      const nProductsList = dates.map(d => salesMap[d].nProducts);
+      const totalList = dates.map(d => Math.round(salesMap[d].total/10)/100);
+      const costList = dates.map(d => Math.round(salesMap[d].cost/10)/100);
 
       const series = [{
-        name: 'Orders',
-        data: nOrdersList
+        name: 'Sales',
+        data: totalList
       }, {
-        name: 'Products',
-        data: nProductsList
+        name: 'Cost',
+        data: costList
       }];
 
       const c = getChart(series, dates, 400);
