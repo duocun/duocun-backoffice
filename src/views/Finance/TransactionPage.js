@@ -5,7 +5,9 @@ import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
 // import { connect } from "react-redux";
-import moment from "moment";
+
+import * as moment from 'moment';
+import { KeyboardDatePicker } from "@material-ui/pickers";
 
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
@@ -32,6 +34,7 @@ import AccountSearch from "./AccountSearch";
 
 import { FinanceTable } from "./FinanceTable";
 import { TransactionForm } from "./TransactionForm";
+import { StayCurrentLandscapeTwoTone } from "../../../node_modules/@material-ui/icons";
 
 
 
@@ -58,6 +61,7 @@ const defaultTransaction = {
 
 const defaultActions = [
   { code: 'A', text: 'All' },
+  { code: 'ACTC', text: 'Add Credit to Client' },
   { code: 'PS', text: 'Pay Salary' },
   { code: 'PDCH', text: 'Pay Driver Cash' },
   { code: 'PC', text: 'Client Pay by card' },
@@ -90,11 +94,13 @@ export const TransactionPage = ({ location, history }) => {
   const [query, setQuery] = useState(getQueryParam(location, "search") || "");
   const [sort, setSort] = useState(["_id", 1]);
 
+  // filters
   const [account, setAccount] = useState({ _id: '', type: '' }); // selected account
   const [actionCode, setActionCode] = useState('A');
+  const [startDate, setStartDate] = useState(moment.utc().toISOString());
+  const [endDate, setEndDate] = useState(moment.utc().toISOString());
 
   const [model, setModel] = useState(defaultTransaction);
-
   const [processing, setProcessing] = useState(false);
 
   const [alert, setAlert] = useState(
@@ -104,32 +110,30 @@ export const TransactionPage = ({ location, history }) => {
   useEffect(() => {
     if (searchParams.has('accountId')) {
       const accountId = searchParams.get('accountId');
-      updateData(accountId, actionCode);
+      updateData(accountId, actionCode, startDate, endDate);
     } else {
-      updateData(account._id, actionCode);
+      updateData(account._id, actionCode, startDate, endDate);
     }
-  }, [page, rowsPerPage, sort, account, actionCode]);
+  }, [page, rowsPerPage, sort, account, actionCode, startDate, endDate]);
 
-  const updateData = (accountId, actionCode) => {
-
+  const updateData = (accountId, actionCode, startDate, endDate) => {
+    const createdQuery = (startDate && endDate) ? {created: {$gte: startDate, $lte: endDate}} : {};
     const accountQuery = accountId ? {
       $or: [
-        {
-          fromId: accountId,
-        },
-        {
-          toId: accountId,
-        },
+        {fromId: accountId},
+        {toId: accountId},
       ]
     } : {};
 
     const condition = actionCode === 'A' ? 
     {
+      ...createdQuery,
       ...accountQuery,
       status: { $nin: ['bad', 'tmp'] }
     }
     :
     {
+      ...createdQuery,
       ...accountQuery,
       status: { $nin: ['bad', 'tmp'] },
       actionCode
@@ -178,11 +182,21 @@ export const TransactionPage = ({ location, history }) => {
 
   const handleActionChange = (actionCode) => {
     setActionCode(actionCode);
-    updateData(account._id, actionCode);
+    updateData(account._id, actionCode, startDate, endDate);
   }
 
   const handleUpdateData = (accountId) => {
-    updateData(accountId, actionCode);
+    updateData(accountId, actionCode, startDate, endDate);
+  }
+
+  const handleStartDateChange = (s) => {
+    setStartDate(s);
+    updateData(account._id, actionCode, startDate, endDate);
+  }
+
+  const handleEndDateChange = (s) => {
+    setEndDate(s);
+    updateData(account._id, actionCode, startDate, endDate);
   }
 
   const handleUpdateAccount = () => {
@@ -245,6 +259,38 @@ export const TransactionPage = ({ location, history }) => {
     }
   };
 
+  const handleExportRevenu = () => {
+    if (window.confirm(`Are you sure to export the revenue from ${startDate}?`)) {
+      if (startDate) {
+        removeAlert();
+        setProcessing(true);
+        ApiTransactionService.exportRevenue(startDate, endDate).then(({ data }) => {
+          if (data.code === 'success') {
+            setAlert({
+              message: t("Export Revenue successfully"),
+              severity: "success"
+            });
+          } else {
+            setAlert({
+              message: t("Export Revenue failed"),
+              severity: "error"
+            });
+          }
+          setProcessing(false);
+        })
+        .catch(e => {
+          console.error(e);
+          setAlert({
+            message: t("Export Revenue failed"),
+            severity: "error"
+          });
+          setProcessing(false);
+        });
+      }
+    }
+  };
+  
+
   return (
     <div>
       <GridContainer>
@@ -255,7 +301,8 @@ export const TransactionPage = ({ location, history }) => {
                 <GridItem xs={12} sm={12} lg={12}>
                   <h4>{t("Transaction")}</h4>
                 </GridItem>
-                <GridItem xs={12} sm={6} lg={4} align="right">
+                <GridItem xs={12} sm={12} lg={6} align="left">
+                <GridItem xs={12} sm={12} lg={12} align="left">
                   <Box pb={2}>
                     <FormControl className={classes.select}>
                       <InputLabel id="action-label">Action</InputLabel>
@@ -271,8 +318,27 @@ export const TransactionPage = ({ location, history }) => {
                       </Select>
                     </FormControl>
                   </Box>
+                  </GridItem>
+                  <GridItem xs={12} sm={12} lg={12} align="left">
+                  <KeyboardDatePicker
+                  variant="inline"
+                  label="Start Date"
+                  format="YYYY-MM-DD"
+                  value={moment.utc(startDate)}
+                  onChange={(m) => handleStartDateChange(m.toISOString())}
+                />
+                  </GridItem>
+                  <GridItem xs={12} sm={12} lg={12} align="left">
+                  <KeyboardDatePicker
+                  variant="inline"
+                  label="End Date"
+                  format="YYYY-MM-DD"
+                  value={moment.utc(endDate)}
+                  onChange={(m) => handleEndDateChange(m.toISOString()) }
+                />
+                  </GridItem>
                 </GridItem>
-                <GridItem xs={12} sm={6} lg={6} align="right">
+                <GridItem xs={12} sm={12} lg={6} align="left">
                   <AccountSearch
                     label="Account"
                     placeholder="Search name or phone"
@@ -332,6 +398,17 @@ export const TransactionPage = ({ location, history }) => {
                     >
                       <SaveIcon />
                       {t("Update")}
+                    </Button>
+                  </Box>
+                  <Box mt={2} mr={2}>
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      disabled={processing}
+                      onClick={handleExportRevenu}
+                    >
+                      <SaveIcon />
+                      {t("Export Revenue")}
                     </Button>
                   </Box>
                 </GridItem>
