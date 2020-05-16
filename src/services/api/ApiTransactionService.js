@@ -1,5 +1,5 @@
 import ApiService from "services/api/ApiService";
-import { buildPaginationQuery } from "helper/index";
+import { buildPaginationQuery, buildQuery } from "helper/index";
 export default {
   getTransactionList: (page, pageSize, condition, sort = []) => {
     let query = {};
@@ -37,4 +37,8 @@ export default {
   deleteTransaction: id => {
     return ApiService.v2().delete(`Transactions/${id}`);
   },
+  exportRevenue: (startDate, endDate) => {
+    const query = {query: buildQuery({startDate, endDate})};
+    return ApiService.v2().get("Transactions/revenue", query);
+  }
 };

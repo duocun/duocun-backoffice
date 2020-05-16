@@ -82,6 +82,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const defaultActions = [
+  { code: 'ACTC', text: 'Add Credit to Client' },
   { code: 'PS', text: 'Pay Salary' },
   { code: 'PDCH', text: 'Pay Driver Cash' },
   { code: 'T', text: 'Transfer' },

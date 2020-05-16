@@ -395,7 +395,6 @@ export const FinanceForm = ({ account, transaction, match, update }) => {
                   variant="inline"
                   label="Date"
                   format="YYYY-MM-DD"
-                  // format={format}
                   value={moment.utc(model.created)}
                   onChange={(m) => setModel({...model, created: m.toISOString()})}
                 />

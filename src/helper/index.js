@@ -48,6 +48,12 @@ export const buildPaginationQuery = (
   return JSON.stringify(query);
 };
 
+// build query without pagination
+export const buildQuery = (params) => {
+  return buildPaginationQuery(null, null, params, [], []);
+}
+
+
 export const groupAttributeData = flatData => {
   const groupData = [];
   flatData.forEach(data => {
