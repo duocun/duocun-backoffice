@@ -62,5 +62,11 @@
     "Product Quantity Schedule": "Product Quantity Schedule",
     "Stock Enabled": "Stock Enabled",
     "Warning Threshold": "Warning Threshold",
-    "Add Quantity": "Add Quantity"
+    "Add Quantity": "Add Quantity",
+    "Static Page": "Static Page",
+    "Add New Page": "Add New Page",
+    "Edit Page": "Edit Page",
+    "New Product": "New Product",
+    "Error: title is duplicated": "Error: title is duplicated",
+    "Error: slug is duplicated": "Error: slug is duplicated"
 }
