@@ -177,6 +177,9 @@ const DriverSummaryPage = ({}) => {
                                 <TableCell>
                                   x{prop.quantity}
                                 </TableCell>
+                                <TableCell>
+                                  {prop.status==='P' ? '已提' : '未提'}
+                                </TableCell>
                               </TableRow>
                           )}
                         </TableBody>
