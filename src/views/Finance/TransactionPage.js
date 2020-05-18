@@ -411,7 +411,7 @@ export const TransactionPage = ({ location, history }) => {
                       <SaveIcon />
                       {t("Export Revenue")}
                     </Button>
-                    <a href="http://localhost:8001/uploads/revenue.csv" download="revenue.csv">Download revenue.csv</a>
+                    {/* <a href="http://localhost:8001/uploads/revenue.csv" download="revenue.csv">Download revenue.csv</a> */}
                   </Box>
                 </GridItem>
               </GridContainer>
