@@ -91,6 +91,7 @@ const defaultActions = [
   { code: 'PMC', text: 'Pay Merchant from Bank' },
   { code: 'POR', text: 'Pay Office Rent' },
   { code: 'D', text: 'Discount' },
+  { code: 'S', text: 'Supplies' },
   { code: 'BM', text: 'Buy Material'},
   { code: 'BE', text: 'Buy Equipment'},
   { code: 'BA', text: 'Buy Advertisement'}
