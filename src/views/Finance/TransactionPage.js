@@ -259,23 +259,24 @@ export const TransactionPage = ({ location, history }) => {
     }
   };
 
-  const handleExportRevenu = () => {
+  const handleExportRevenue = () => {
     if (window.confirm(`Are you sure to export the revenue from ${startDate}?`)) {
       if (startDate) {
         removeAlert();
         setProcessing(true);
         ApiTransactionService.exportRevenue(startDate, endDate).then(({ data }) => {
-          if (data.code === 'success') {
+
+          // if (data.code === 'success') {
             setAlert({
               message: t("Export Revenue successfully"),
               severity: "success"
             });
-          } else {
-            setAlert({
-              message: t("Export Revenue failed"),
-              severity: "error"
-            });
-          }
+          // } else {
+          //   setAlert({
+          //     message: t("Export Revenue failed"),
+          //     severity: "error"
+          //   });
+          // }
           setProcessing(false);
         })
         .catch(e => {
@@ -405,11 +406,12 @@ export const TransactionPage = ({ location, history }) => {
                       color="primary"
                       variant="contained"
                       disabled={processing}
-                      onClick={handleExportRevenu}
+                      onClick={handleExportRevenue}
                     >
                       <SaveIcon />
                       {t("Export Revenue")}
                     </Button>
+                    <a href="http://localhost:8001/uploads/revenue.csv" download="revenue.csv">Download revenue.csv</a>
                   </Box>
                 </GridItem>
               </GridContainer>
