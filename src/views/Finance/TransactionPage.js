@@ -117,7 +117,7 @@ export const TransactionPage = ({ location, history }) => {
   }, [page, rowsPerPage, sort, account, actionCode, startDate, endDate]);
 
   const updateData = (accountId, actionCode, startDate, endDate) => {
-    const createdQuery = (startDate && endDate) ? {created: {$gte: startDate, $lte: endDate}} : {};
+    const createdQuery = {}; // (startDate && endDate) ? {created: {$gte: startDate, $lte: endDate}} : {};
     const accountQuery = accountId ? {
       $or: [
         {fromId: accountId},
@@ -319,7 +319,7 @@ export const TransactionPage = ({ location, history }) => {
                     </FormControl>
                   </Box>
                   </GridItem>
-                  <GridItem xs={12} sm={12} lg={12} align="left">
+                  {/* <GridItem xs={12} sm={12} lg={12} align="left">
                   <KeyboardDatePicker
                   variant="inline"
                   label="Start Date"
@@ -336,7 +336,7 @@ export const TransactionPage = ({ location, history }) => {
                   value={moment.utc(endDate)}
                   onChange={(m) => handleEndDateChange(m.toISOString()) }
                 />
-                  </GridItem>
+                  </GridItem> */}
                 </GridItem>
                 <GridItem xs={12} sm={12} lg={6} align="left">
                   <AccountSearch

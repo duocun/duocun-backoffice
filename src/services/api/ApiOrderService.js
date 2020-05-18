@@ -32,6 +32,28 @@ export default {
     }
     return ApiService.v2().get("orders", query);
   },
+
+  getOrdersByKeyword: (page, pageSize, keyword = "", sort = []) => {
+    let query = {};
+    const condition = {
+      $or: [
+        {clientName: { $regex: keyword }},
+        {code: { $regex: keyword }}, 
+        {'client.phone': { $regex: keyword }}
+      ],
+      status: {
+        $nin: [OrderStatus.BAD, OrderStatus.DELETED, OrderStatus.TEMP],
+      }
+    };
+    query.keyword = query.query = buildPaginationQuery(
+      page,
+      pageSize,
+      condition,
+      [],
+      []
+    );
+    return ApiService.v2().get("orders", query);
+  },
   getOrderListByDate: (page, pageSize, search = "",startDate = new Date(), endDate = new Date(), sort = []) => {
     let query = {};
     if (!search) {

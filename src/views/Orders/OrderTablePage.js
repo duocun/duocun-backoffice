@@ -78,7 +78,7 @@ export default function OrderTablePage({ location }) {
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const updateData = () => {
-    ApiOrderService.getOrderList(page, rowsPerPage, query, [sort]).then(
+    ApiOrderService.getOrdersByKeyword(page, rowsPerPage, query, [sort]).then(
       ({ data }) => {
         setOrders(data.data);
         setTotalRows(data.count);
@@ -95,42 +95,45 @@ export default function OrderTablePage({ location }) {
 
   const [processing, setProcessing] = useState(false);
 
-  const removeOrder = (_id) => {
-    removeAlert();
-    setProcessing(true);
-    ApiOrderService.removeOrder(_id)
-      .then(({ data }) => {
-        if (data.code === 'success') {
-          setAlert({
-            message: t("Removed successfully"),
-            severtiy: "success"
+  const handleDeleteOrder = (_id) => {
+    if (window.confirm('Are you sure to delete ?')) {
+      if (_id) {
+        removeAlert();
+        setProcessing(true);
+        ApiOrderService.removeOrder(_id).then(({ data }) => {
+          if (data.code === 'success') {
+            setAlert({
+              message: t("Delete successfully"),
+              severity: "success"
+            });
+            updateData();
+          } else {
+            setAlert({
+              message: t("Delete failed"),
+              severity: "error"
+            });
+          }
+          setProcessing(false);
+        })
+          .catch(e => {
+            console.error(e);
+            setAlert({
+              message: t("Delete transaction failed"),
+              severity: "error"
+            });
+            setProcessing(false);
           });
-          updateData();
-        } else {
-          setAlert({
-            message: t("Remove failed"),
-            severity: "error"
-          });
-        }
-      })
-      .catch(e => {
-        console.error(e);
-        setAlert({
-          message: t("Remove failed"),
-          severity: "error"
-        });
-      })
-      .finally(() => {
-        setProcessing(false);
-      });
-  }
+      }
+    }
+  };
+
   // const [deliverDate, setDeliverDate] = useState(
   //   moment.utc().toISOString()
   // );
 
   useEffect(() => {
     updateData();
-  }, [page, rowsPerPage, sort]);
+  }, [page, rowsPerPage, sort, query]);
 
   return (
     <GridContainer>
@@ -192,7 +195,7 @@ export default function OrderTablePage({ location }) {
               setRowsPerPage={setRowsPerPage}
               setSort={setSort}
               setPage={setPage}
-              removeData={removeOrder} />
+              removeData={handleDeleteOrder} />
           </CardBody>
         </Card>
       </GridItem>
