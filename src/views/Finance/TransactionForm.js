@@ -117,6 +117,7 @@ export const TransactionForm = ({ account, transaction, update }) => {
   const [model, setModel] = useState(transaction);
   const [fromQuery, setFromQuery] = useState("");
   const [toQuery, setToQuery] = useState("");
+  const [clientQuery, setClientQuery] = useState("");
 
   const [processing, setProcessing] = useState(false);
   const removeAlert = () => {
@@ -149,6 +150,11 @@ export const TransactionForm = ({ account, transaction, update }) => {
   const handleToAccountChange = (toAccount) => {
     setToQuery(toAccount ? toAccount.username : '');
     setModel({ ...model, toId: toAccount._id, toName: toAccount.username });
+  }
+
+  const handleClientChange = (client) => {
+    setClientQuery(client ? client.username : '');
+    setModel({ ...model, clientId: client._id, toName: client.username });
   }
 
   const handleStaffChange = (staffId) => {
@@ -311,6 +317,21 @@ export const TransactionForm = ({ account, transaction, update }) => {
                 </Box>
               </GridItem>
 
+              {
+                model.actionCode === 'RC' &&
+                <GridItem xs={12} lg={6}>
+                  <Box pb={2}>
+                    <AccountSearch
+                      label="Client"
+                      placeholder="Name or phone"
+                      val={clientQuery}
+                      id={model.clientId}
+                      handleSelectAccount={handleClientChange}
+                    />
+                  </Box>
+                </GridItem>
+              }
+
               <GridItem xs={12} lg={6}>
                 <Box pb={2}>
                   <FormControl className={classes.select}>
@@ -350,6 +371,8 @@ export const TransactionForm = ({ account, transaction, update }) => {
                   </Box>
                 </GridItem>
               }
+
+
 
               <GridItem xs={12} lg={6}>
                 <Box pb={2}>
