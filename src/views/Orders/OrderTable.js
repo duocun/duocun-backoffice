@@ -236,12 +236,12 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
                       <TableCell>{row.cost}</TableCell>
                       <TableCell>{row.driver ? row.driver.username : 'N/A'}</TableCell>
                       <TableCell>{row.driver ? row.driver.phone: 'N/A'}</TableCell>
-                      <TableCell>
+                      {/* <TableCell>
                         <IconButton
                           disabled={processing}
-                        // onClick={() => {
-                        //   toggleFeature(row._id);
-                        // }}
+                        onClick={() => {
+                          toggleFeature(row._id);
+                        }}
                         >
                           {row.featured ? (
                             <CheckIcon color="primary"></CheckIcon>
@@ -249,7 +249,7 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
                               <CloseIcon color="error"></CloseIcon>
                             )}
                         </IconButton>
-                      </TableCell>
+                      </TableCell> */}
                       <TableCell>
                         <IconButton aria-label="edit" href={`orders/${row._id}`}>
                           <EditIcon />
