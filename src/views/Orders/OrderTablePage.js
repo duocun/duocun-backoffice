@@ -27,7 +27,7 @@ import FlashStorage from "services/FlashStorage";
 import { Box } from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
 
-import ApiOrderService from "services/api/ApiOrderService";
+import ApiOrderService, {OrderStatus} from "services/api/ApiOrderService";
 import { OrderTable } from './OrderTable';
 
 import * as moment from "moment";
@@ -89,8 +89,19 @@ const OrderTablePage = ({ deliverDate, setDeliverDate, location }) => {
 
   const updateData = () => {
     const qDeliverDate = deliverDate ? {deliverDate} : {};
-    const condition = {...query, ...qDeliverDate}
-    ApiOrderService.getOrdersByKeyword(page, rowsPerPage, condition, [sort]).then(
+    const keyword = query;
+    const condition = {
+      $or: [
+        {clientName: { $regex: keyword }},
+        {code: { $regex: keyword }}, 
+        {'client.phone': { $regex: keyword }}
+      ],
+      status: {
+        $nin: [OrderStatus.BAD, OrderStatus.DELETED, OrderStatus.TEMP],
+      },
+      ...qDeliverDate
+    };
+    ApiOrderService.getOrders(page, rowsPerPage, condition, [sort]).then(
       ({ data }) => {
         setOrders(data.data);
         setTotalRows(data.count);
@@ -185,29 +196,22 @@ const OrderTablePage = ({ deliverDate, setDeliverDate, location }) => {
               <GridItem xs={12} sm={12} lg={6} align="left">
                 <KeyboardDatePicker
                   variant="inline"
-                  label="Deliver Date"
+                  label={t("Deliver Date")}
                   format="YYYY-MM-DD"
                   value={deliverDate ? moment.utc(deliverDate) : null}
                   onChange={handleDeliverDateChange}
-
                   KeyboardButtonProps={{
                     'aria-label': 'change date',
                   }}
-                  // keyboardIcon={<Icon>add_circle</Icon>}
-
                   keyboardIcon={
                     deliverDate ? (
-                      // <InputAdornment position="end">
                         <IconButton onClick={handleDeliverDateClear}>
                           <ClearIcon />
                         </IconButton>
-                      // </InputAdornment>
                     ) : (
-                      // <InputAdornment position="end">
                         <IconButton>
                           <CalendarIcon />
                         </IconButton>
-                      // </InputAdornment>
                     )
                   }
                 />

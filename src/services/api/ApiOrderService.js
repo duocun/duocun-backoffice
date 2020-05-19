@@ -33,18 +33,9 @@ export default {
     return ApiService.v2().get("orders", query);
   },
 
-  getOrdersByKeyword: (page, pageSize, keyword = "", sort = []) => {
+  getOrders: (page, pageSize, condition = {}, sort = []) => {
     let query = {};
-    const condition = {
-      $or: [
-        {clientName: { $regex: keyword }},
-        {code: { $regex: keyword }}, 
-        {'client.phone': { $regex: keyword }}
-      ],
-      status: {
-        $nin: [OrderStatus.BAD, OrderStatus.DELETED, OrderStatus.TEMP],
-      }
-    };
+
     query.keyword = query.query = buildPaginationQuery(
       page,
       pageSize,
