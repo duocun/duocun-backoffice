@@ -49,6 +49,13 @@ export const setAccount = (payload) => {
   };
 };
 
+export const setLoggedInAccount = (payload) => {
+  return {
+    type: "SET_LOGGED_IN_ACCOUNT",
+    payload,
+  };
+};
+
 // export const getOrdersAsync = d => {
 //   const orderSvc = new OrderAPI();
 //   const mm = d.getMonth() + 1;

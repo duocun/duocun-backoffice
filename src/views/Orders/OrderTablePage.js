@@ -33,8 +33,11 @@ import { OrderTable } from './OrderTable';
 import * as moment from "moment";
 // import { deliverDate } from "redux/reducers/order";
 import { setDeliverDate } from 'redux/actions/order';
-import { KeyboardDatePicker } from "@material-ui/pickers";
+import {setLoggedInAccount} from 'redux/actions/account';
 
+import { KeyboardDatePicker } from "@material-ui/pickers";
+import {OrderForm} from './OrderForm';
+import ApiAuthService from 'services/api/ApiAuthService';
 const styles = {
   cardCategoryWhite: {
     "&,& a,& a:hover,& a:focus": {
@@ -67,9 +70,10 @@ const styles = {
 
 const useStyles = makeStyles(styles);
 
-const OrderTablePage = ({ deliverDate, setDeliverDate, location }) => {
+const OrderTablePage = ({ account, deliverDate, setDeliverDate, setLoggedInAccount, location }) => {
   const { t } = useTranslation();
   
+  const [model, setModel] = useState({});
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(
@@ -106,6 +110,9 @@ const OrderTablePage = ({ deliverDate, setDeliverDate, location }) => {
         setOrders(data.data);
         setTotalRows(data.count);
         setLoading(false);
+        if(data.data && data.data.length>0){
+          setModel(data.data[0]);
+        }
       }
     );
   };
@@ -128,6 +135,14 @@ const OrderTablePage = ({ deliverDate, setDeliverDate, location }) => {
   const handleDeliverDateChange = (m) => {
     const date = m ? m.format('YYYY-MM-DD') : null;
     setDeliverDate(date);
+  }
+
+  const handleUpdateData = () => {
+
+  }
+
+  const handleEditOrder = (data) => {
+    setModel(data);
   }
 
   const handleDeleteOrder = (_id) => {
@@ -167,7 +182,14 @@ const OrderTablePage = ({ deliverDate, setDeliverDate, location }) => {
   // );
 
   useEffect(() => {
-    updateData();
+    if(!account){
+      ApiAuthService.getCurrentAccount().then(({ data }) => {
+        setLoggedInAccount(data);
+        updateData();
+      });
+    }else{
+      updateData();
+    }
   }, [page, rowsPerPage, sort, query, deliverDate]);
 
 
@@ -251,12 +273,16 @@ const OrderTablePage = ({ deliverDate, setDeliverDate, location }) => {
               setRowsPerPage={setRowsPerPage}
               setSort={setSort}
               setPage={setPage}
+              editData={handleEditOrder}
               removeData={handleDeleteOrder} />
           </CardBody>
         </Card>
       </GridItem>
       <GridItem xs={12} sm={12} md={4}>
-      </GridItem>
+          <OrderForm account={account}
+            order={model}
+            update={handleUpdateData} />
+        </GridItem>
     </GridContainer>
   );
 }
@@ -266,7 +292,10 @@ OrderTablePage.propTypes = {
 };
 
 
-const mapStateToProps = (state) => ({ deliverDate: state.deliverDate });
+const mapStateToProps = (state) => ({ 
+  deliverDate: state.deliverDate,
+  account: state.loggedInAccount
+});
 // const mapDispatchToProps = (dispatch) => ({
 //   loadAccounts: (payload, searchOption) => {
 //     dispatch(loadAccountsAsync(payload, searchOption));
@@ -274,5 +303,5 @@ const mapStateToProps = (state) => ({ deliverDate: state.deliverDate });
 // });
 export default connect(
   mapStateToProps,
-  {setDeliverDate}
+  {setDeliverDate, setLoggedInAccount}
 )(OrderTablePage);
