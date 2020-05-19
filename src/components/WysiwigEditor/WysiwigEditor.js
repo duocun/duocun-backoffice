@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import CKEditor from "@ckeditor/ckeditor5-react";
 import CustomEditor from "@bravemaster619/ckeditor5-custom-build/build/ckeditor";
+import AuthService from "services/AuthService";
 
 export default function WysiwigEditor({ initialValue, onChange }) {
   return (
@@ -47,7 +48,13 @@ export default function WysiwigEditor({ initialValue, onChange }) {
         table: {
           contentToolbar: ["tableColumn", "tableRow", "mergeTableCells"]
         },
-        licenseKey: ""
+        licenseKey: "",
+        simpleUpload: {
+          uploadUrl: process.env.REACT_APP_API_HOST + `/pages/imageUpload`,
+          headers: {
+            Authorization: `Bearer ${AuthService.getAuthToken()}`
+          }
+        }
       }}
       onChange={onChange}
     />

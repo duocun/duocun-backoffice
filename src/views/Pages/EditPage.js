@@ -206,8 +206,6 @@ export default function EditPage({ match, history }) {
             updatePage();
           }
         } else {
-          console.log(data.message);
-          console.log(t(data.message));
           setAlert({
             message: t(data.message || "Save failed"),
             severity: "error"

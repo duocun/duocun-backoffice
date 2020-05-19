@@ -86,5 +86,7 @@
     "Edit Page": "编辑页面",
     "New Product": "添加产品",
     "Error: title is duplicated": " Error：标题重复",
-    "Error: slug is duplicated": "Error：slug重复"
+    "Error: slug is duplicated": "Error：slug重复",
+    "Do you really want to remove this image?": "您真的要删除该图像吗？",
+    "Product Image": "产品图片"
 }
