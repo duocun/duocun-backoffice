@@ -421,21 +421,28 @@ export const OrderForm = ({ account, order, match, update }) => {
               } */}
 
               <GridItem xs={12} lg={6}>
-                {/* <Box pb={2}>
-                  <CustomInput
-                    labelText={t("Amount")}
-                    id="amount"
-                    formControlProps={{
-                      fullWidth: true
-                    }}
-                    inputProps={{
-                      value: model.amount,
-                      onChange: e => {
-                        setModel({ ...model, amount: e.target.value });
-                      }
-                    }}
-                  />
-                </Box> */}
+                <Box pb={2}>
+                <TextField id="order-driver"
+                  label={`${t("Driver")}`}
+                  value={model.driver ? model.driver.username : ''}
+                  InputLabelProps={{ shrink: model.driver ? true : false }}
+                  InputProps={{
+                    readOnly: true,
+                  }}
+                />
+                </Box>
+              </GridItem>
+              <GridItem xs={12} lg={6}>
+                <Box pb={2}>
+                <TextField id="order-driver-phone"
+                  label={`${t("Driver Phone")}`}
+                  value={model.driver ? model.driver.phone : ''}
+                  InputLabelProps={{ shrink: model.driver ? true : false }}
+                  InputProps={{
+                    readOnly: true,
+                  }}
+                />
+                </Box>
               </GridItem>
 
               <GridItem xs={12} lg={12}>
