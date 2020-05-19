@@ -22,6 +22,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import FlashStorage from "services/FlashStorage";
 
 import ApiOrderService from "services/api/ApiOrderService";
+import { AirlineSeatLegroomReducedOutlined } from "../../../node_modules/@material-ui/icons";
 
 const styles = {
   cardCategoryWhite: {
@@ -60,7 +61,7 @@ const useStyles = makeStyles(styles);
 //   }
 // }));
 
-export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, setRowsPerPage, setSort, setPage, removeData }) => {
+export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, setRowsPerPage, setSort, setPage, editData, removeData }) => {
   const { t } = useTranslation();
   const classes = useStyles();
   // const [page, setPage] = useState(
@@ -71,7 +72,6 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
   // const [sort, setSort] = useState(["_id", 1]);
   // const [rowsPerPage, setRowsPerPage] = useState(10);
   // const [totalRows, setTotalRows] = useState(0);
-
 
   const renderSort = fieldName => {
     return (
@@ -98,14 +98,11 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
     return s ? s.split('T')[0] : '';
   }
 
-  const getClientDescription = (row) => {
-    let clientName = row.client ? row.client.username : '';
-    let phone = row.client ? row.client.phone : '';
-    return `${clientName}\n${phone}`;
+  const handleOrderEdit = (row) => {
+    
   }
 
   const [processing, setProcessing] = useState(false);
-
 
   if (!rows.length) {
     return (
@@ -263,7 +260,7 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
                         </IconButton>
                       </TableCell> */}
                       <TableCell>
-                        <IconButton aria-label="edit" href={`orders/${row._id}`}>
+                        <IconButton aria-label="edit" onClick={() => editData(row)}>
                           <EditIcon />
                         </IconButton>
                         <IconButton aria-label="delete" disabled={processing} onClick={() => removeData(row._id)}>

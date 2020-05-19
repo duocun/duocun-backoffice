@@ -41,10 +41,11 @@ export default {
       pageSize,
       condition,
       [],
-      []
+      sort
     );
     return ApiService.v2().get("orders", query);
   },
+
   getOrderListByDate: (page, pageSize, search = "",startDate = new Date(), endDate = new Date(), sort = []) => {
     let query = {};
     if (!search) {
