@@ -88,7 +88,7 @@ const OrderTablePage = ({ account, deliverDate, setDeliverDate, setLoggedInAccou
   );
 
   const [totalRows, setTotalRows] = useState(0);
-  const [sort, setSort] = useState(["_id", 1]);
+  const [sort, setSort] = useState(["_id", -1]);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const updateData = () => {
