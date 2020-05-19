@@ -97,6 +97,13 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
   const toDateString = s => {
     return s ? s.split('T')[0] : '';
   }
+
+  const getClientDescription = (row) => {
+    let clientName = row.client ? row.client.username : '';
+    let phone = row.client ? row.client.phone : '';
+    return `${clientName}\n${phone}`;
+  }
+
   const [processing, setProcessing] = useState(false);
 
 
@@ -121,14 +128,14 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
         >
           <TableHead>
             <TableRow>
-              <TableCell>#</TableCell>
+              {/* <TableCell>#</TableCell> */}
               <TableCell
                 onClick={() => {
                   toggleSort("code");
                 }}
                 style={{ cursor: "pointer" }}
               >
-                {t("code")}
+                {t("Code")}
                 {renderSort("code")}
               </TableCell>
               <TableCell
@@ -149,7 +156,7 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
                 {t("Client")}
                 {renderSort("clientName")}
               </TableCell>
-              <TableCell
+              {/* <TableCell
                 onClick={() => {
                   toggleSort("client");
                 }}
@@ -157,7 +164,7 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
               >
                 {t("Client Phone")}
                 {renderSort("client")}
-              </TableCell>
+              </TableCell> */}
               <TableCell
                 onClick={() => {
                   toggleSort("merchantName");
@@ -167,7 +174,7 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
                 {t("Merchant")}
                 {renderSort("merchantName")}
               </TableCell>
-              <TableCell
+              {/* <TableCell
                 onClick={() => {
                   toggleSort("price");
                 }}
@@ -175,8 +182,8 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
               >
                 {t("Price")}
                 {renderSort("price")}
-              </TableCell>
-              <TableCell
+              </TableCell> */}
+              {/* <TableCell
                 onClick={() => {
                   toggleSort("cost");
                 }}
@@ -184,8 +191,8 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
               >
                 {t("Cost")}
                 {renderSort("cost")}
-              </TableCell>
-              <TableCell
+              </TableCell> */}
+              {/* <TableCell
                 onClick={() => {
                   toggleSort("driver");
                 }}
@@ -193,8 +200,8 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
               >
                 {t("Driver Name")}
                 {renderSort("driver")}
-              </TableCell>
-              <TableCell
+              </TableCell> */}
+              {/* <TableCell
                 onClick={() => {
                   toggleSort("driver phone");
                 }}
@@ -202,7 +209,7 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
               >
                 {t("Driver Phone")}
                 {renderSort("driver phone")}
-              </TableCell>
+              </TableCell> */}
               {/* <TableCell
                             onClick={() => {
                               toggleSort("featured");
@@ -226,16 +233,21 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
                 <React.Fragment>
                   {rows.map((row, idx) => (
                     <TableRow key={idx}>
-                      <TableCell>{page * rowsPerPage + idx + 1}</TableCell>
+                      {/* <TableCell>{page * rowsPerPage + idx + 1}</TableCell> */}
                       <TableCell>{row.code}</TableCell>
                       <TableCell>{toDateString(row.delivered)}</TableCell>
-                      <TableCell>{row.client ? row.client.username : 'N/A'}</TableCell>
-                      <TableCell>{row.client ? row.client.phone : 'N/A'}</TableCell>
+                      
+                      <TableCell>
+                        <div>{row.client ? row.client.username : ''}</div>
+                        <div>{row.client ? row.client.phone : 'N/A'}</div>
+                      </TableCell>
+
+                      {/* <TableCell>{row.client ? row.client.phone : 'N/A'}</TableCell> */}
                       <TableCell>{row.merchant ? row.merchant.name: 'N/A'}</TableCell>
-                      <TableCell>{row.price}</TableCell>
-                      <TableCell>{row.cost}</TableCell>
-                      <TableCell>{row.driver ? row.driver.username : 'N/A'}</TableCell>
-                      <TableCell>{row.driver ? row.driver.phone: 'N/A'}</TableCell>
+                      {/* <TableCell>{row.price}</TableCell> */}
+                      {/* <TableCell>{row.cost}</TableCell> */}
+                      {/* <TableCell>{row.driver ? row.driver.username : 'N/A'}</TableCell> */}
+                      {/* <TableCell>{row.driver ? row.driver.phone: 'N/A'}</TableCell> */}
                       {/* <TableCell>
                         <IconButton
                           disabled={processing}

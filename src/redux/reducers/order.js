@@ -1,4 +1,4 @@
-export const deliverDate = (state = {}, action) => {
+export const deliverDate = (state = null, action) => {
   if (action && action.type === "SET_DELIVER_DATE") {
     return action.payload;
   }
