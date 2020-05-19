@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import {connect} from "react-redux";
 import { useLocation } from "react-router-dom";
 
 import PropTypes from "prop-types";
@@ -34,9 +35,8 @@ import AccountSearch from "./AccountSearch";
 
 import { FinanceTable } from "./FinanceTable";
 import { TransactionForm } from "./TransactionForm";
-import { StayCurrentLandscapeTwoTone } from "../../../node_modules/@material-ui/icons";
 
-
+import { setAccount } from "redux/actions/account";
 
 const useStyles = makeStyles(() => ({
   table: {
@@ -44,9 +44,9 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const useQuery = () => {
-  return new URLSearchParams(useLocation().search);
-}
+// const useQuery = () => {
+//   return new URLSearchParams(useLocation().search);
+// }
 
 const defaultTransaction = {
   actionCode: '',
@@ -78,11 +78,13 @@ const defaultActions = [
   { code: 'BA', text: 'Buy Advertisement' }
 ];
 
-export const TransactionPage = ({ location, history }) => {
+const TransactionPage = ({ account, setAccount, location, history }) => {
   const { t } = useTranslation();
   const classes = useStyles();
   // states related to list and pagniation
-  const searchParams = useQuery();
+  // const searchParams = useQuery();
+
+
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(
@@ -92,11 +94,11 @@ export const TransactionPage = ({ location, history }) => {
   );
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalRows, setTotalRows] = useState(0);
-  const [query, setQuery] = useState(getQueryParam(location, "search") || "");
+  const [query, setQuery] = useState(account ? account.username : (getQueryParam(location, "search") || ""));
   const [sort, setSort] = useState(["_id", 1]);
 
   // filters
-  const [account, setAccount] = useState({ _id: '', type: '' }); // selected account
+  // const [account, setAccount] = useState({ _id: '', type: '' }); // selected account
   const [actionCode, setActionCode] = useState('A');
   const [startDate, setStartDate] = useState(moment.utc().toISOString());
   const [endDate, setEndDate] = useState(moment.utc().toISOString());
@@ -109,11 +111,10 @@ export const TransactionPage = ({ location, history }) => {
   );
 
   useEffect(() => {
-    if (searchParams.has('accountId')) {
-      const accountId = searchParams.get('accountId');
-      updateData(accountId, actionCode, startDate, endDate);
-    } else {
+    if (account && account._id) {
       updateData(account._id, actionCode, startDate, endDate);
+    } else {
+      updateData(null, actionCode, startDate, endDate);
     }
   }, [page, rowsPerPage, sort, account, actionCode, startDate, endDate]);
 
@@ -437,13 +438,16 @@ TransactionPage.propTypes = {
 };
 
 
-// const mapStateToProps = (state) => ({ accounts: state.accounts });
+const mapStateToProps = (state) => ({ 
+  // accounts: state.accounts,
+  account: state.account
+});
 // const mapDispatchToProps = (dispatch) => ({
 //   loadAccounts: (payload, searchOption) => {
 //     dispatch(loadAccountsAsync(payload, searchOption));
 //   },
 // });
-// export default connect(
-//   mapStateToProps,
-//   mapDispatchToProps
-// )(TransactionPage);
+export default connect(
+  mapStateToProps, 
+  {setAccount}
+)(TransactionPage);

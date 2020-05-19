@@ -7,7 +7,7 @@ import { connect } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 // core components
 import { IconButton, InputAdornment } from "@material-ui/core";
-
+import { KeyboardDatePicker } from "@material-ui/pickers";
 import {
   Clear as ClearIcon,
   InsertInvitation as CalendarIcon
@@ -33,11 +33,11 @@ import { OrderTable } from './OrderTable';
 import * as moment from "moment";
 // import { deliverDate } from "redux/reducers/order";
 import { setDeliverDate } from 'redux/actions/order';
-import {setLoggedInAccount} from 'redux/actions/account';
+import {setAccount, setLoggedInAccount} from 'redux/actions/account';
 
-import { KeyboardDatePicker } from "@material-ui/pickers";
 import {OrderForm} from './OrderForm';
 import ApiAuthService from 'services/api/ApiAuthService';
+
 const styles = {
   cardCategoryWhite: {
     "&,& a,& a:hover,& a:focus": {
@@ -70,7 +70,7 @@ const styles = {
 
 const useStyles = makeStyles(styles);
 
-const OrderTablePage = ({ account, deliverDate, setDeliverDate, setLoggedInAccount, location }) => {
+const OrderTablePage = ({ account, deliverDate, setDeliverDate, setAccount, setLoggedInAccount, location, history }) => {
   const { t } = useTranslation();
   
   const [model, setModel] = useState({});
@@ -111,7 +111,11 @@ const OrderTablePage = ({ account, deliverDate, setDeliverDate, setLoggedInAccou
         setTotalRows(data.count);
         setLoading(false);
         if(data.data && data.data.length>0){
-          setModel(data.data[0]);
+          const order = data.data[0];
+          setModel(order);
+          const _id = order.clientId ? order.clientId : '';
+          const username = order.clientName ? order.clientName: '';
+          setAccount({_id, username, type: 'client'});
         }
       }
     );
@@ -136,13 +140,22 @@ const OrderTablePage = ({ account, deliverDate, setDeliverDate, setLoggedInAccou
     const date = m ? m.format('YYYY-MM-DD') : null;
     setDeliverDate(date);
   }
+  const handleToTransactionHistory = () => {
+    history.push('/finance/transaction');
+  }
+  const handleDeliverDateClick = () => {
+
+  }
 
   const handleUpdateData = () => {
 
   }
 
-  const handleEditOrder = (data) => {
+  const handleSelectOrder = (data) => {
     setModel(data);
+    const _id = data.client ? data.client._id : '';
+    const username = data.client ? data.client.username : '';
+    setAccount({_id, username, type:'client'});
   }
 
   const handleDeleteOrder = (_id) => {
@@ -222,6 +235,7 @@ const OrderTablePage = ({ account, deliverDate, setDeliverDate, setLoggedInAccou
                   format="YYYY-MM-DD"
                   value={deliverDate ? moment.utc(deliverDate) : null}
                   onChange={handleDeliverDateChange}
+                  onClick={handleDeliverDateClick}
                   KeyboardButtonProps={{
                     'aria-label': 'change date',
                   }}
@@ -273,22 +287,26 @@ const OrderTablePage = ({ account, deliverDate, setDeliverDate, setLoggedInAccou
               setRowsPerPage={setRowsPerPage}
               setSort={setSort}
               setPage={setPage}
-              editData={handleEditOrder}
+              selectData={handleSelectOrder}
               removeData={handleDeleteOrder} />
           </CardBody>
         </Card>
       </GridItem>
       <GridItem xs={12} sm={12} md={4}>
-          <OrderForm account={account}
+          <OrderForm
+            account={account}
             order={model}
-            update={handleUpdateData} />
+            update={handleUpdateData}
+            toTransactionHistory={handleToTransactionHistory}
+             />
         </GridItem>
     </GridContainer>
   );
 }
 
 OrderTablePage.propTypes = {
-  location: PropTypes.object
+  location: PropTypes.object,
+  history: PropTypes.object
 };
 
 
@@ -303,5 +321,5 @@ const mapStateToProps = (state) => ({
 // });
 export default connect(
   mapStateToProps,
-  {setDeliverDate, setLoggedInAccount}
+  {setDeliverDate, setAccount, setLoggedInAccount}
 )(OrderTablePage);

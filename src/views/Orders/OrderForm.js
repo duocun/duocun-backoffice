@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import { useHistory } from "react-router-dom";
+
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
 import * as moment from 'moment';
@@ -121,7 +123,7 @@ const defaultActions = [
 
 
 
-export const OrderForm = ({ account, order, match, update }) => {
+export const OrderForm = ({ account, order, update, toTransactionHistory }) => {
   // const { register, handleSubmit, watch, errors } = useForm();
   // moment.tz.add("America/Toronto|EST EDT EWT EPT|50 40 40 40|01010101010101010101010101010101010101010101012301010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010|-25TR0 1in0 11Wu 1nzu 1fD0 WJ0 1wr0 Nb0 1Ap0 On0 1zd0 On0 1wp0 TX0 1tB0 TX0 1tB0 TX0 1tB0 WL0 1qN0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 WL0 1qN0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 WL0 1qN0 4kM0 8x40 iv0 1o10 11z0 1nX0 11z0 1o10 11z0 1o10 1qL0 11D0 1nX0 11B0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 11z0 1o10 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0|65e5");
 
@@ -129,6 +131,9 @@ export const OrderForm = ({ account, order, match, update }) => {
   // const getMomentFromLocal = (localTime, zone='America/Toronto') => {
   //   return moment.tz(localTime, zone);
   // }
+  // const history = useHistory({
+  //   basename: "admin2" // backoffice
+  // });
 
   const { t } = useTranslation();
   const classes = useStyles();
@@ -148,14 +153,14 @@ export const OrderForm = ({ account, order, match, update }) => {
   );
 
   const handleActionChange = (actionCode) => {
-    if(model._id){
-      if(actionCode === order.actionCode){
-        setModel({ ...model, actionCode, note: order.note? order.note : '' });
+    if (model._id) {
+      if (actionCode === order.actionCode) {
+        setModel({ ...model, actionCode, note: order.note ? order.note : '' });
       } else {
         setModel({ ...model, actionCode, note: '' });
       }
-    }else{
-      if(actionCode === 'PS'){
+    } else {
+      if (actionCode === 'PS') {
         setModel({ ...model, actionCode });
       } else {
         setModel({ ...model, actionCode, note: '' });
@@ -276,7 +281,7 @@ export const OrderForm = ({ account, order, match, update }) => {
         modifyBy: modifyByAccount._id
       });
     } else {
-      setModel({...order, modifyBy: modifyByAccount._id});
+      setModel({ ...order, modifyBy: modifyByAccount._id });
     }
   }, [order]);
 
@@ -312,72 +317,72 @@ export const OrderForm = ({ account, order, match, update }) => {
                 </GridItem>
               )}
               <GridItem xs={12} lg={6}>
-              <Box pb={2}>
-                <TextField id="order-code"
-                  label={`${t("Code")}`}
-                  value={model.code}
-                  InputLabelProps={{ shrink: model.code ? true : false }}
-                  InputProps={{
-                    readOnly: true,
-                  }}
-                />
-                </Box>
-              </GridItem>
-              <GridItem xs={12} lg={6}>
-              <Box pb={2}>
-                <TextField id="order-client"
-                  label={`${t("Client")}`}
-                  value={model.client ? model.client.username: 'N/A' }
-                  InputLabelProps={{ shrink: model.client ? true : false }}
-                  InputProps={{
-                    readOnly: true,
-                  }}
-                />
+                <Box pb={2}>
+                  <TextField id="order-code"
+                    label={`${t("Code")}`}
+                    value={model.code}
+                    InputLabelProps={{ shrink: model.code ? true : false }}
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                  />
                 </Box>
               </GridItem>
               <GridItem xs={12} lg={6}>
                 <Box pb={2}>
-                <TextField id="order-client-phone"
-                  label={`${t("Client Phone")}`}
-                  value={model.client ? model.client.phone : 'N/A'}
-                  InputLabelProps={{ shrink: model.client ? true : false }}
-                  InputProps={{
-                    readOnly: true,
-                  }}
-                />
+                  <TextField id="order-client"
+                    label={`${t("Client")}`}
+                    value={model.client ? model.client.username : 'N/A'}
+                    InputLabelProps={{ shrink: model.client ? true : false }}
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                  />
+                </Box>
+              </GridItem>
+              <GridItem xs={12} lg={6}>
+                <Box pb={2}>
+                  <TextField id="order-client-phone"
+                    label={`${t("Client Phone")}`}
+                    value={model.client ? model.client.phone : 'N/A'}
+                    InputLabelProps={{ shrink: model.client ? true : false }}
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                  />
                 </Box>
               </GridItem>
               <GridItem xs={12} lg={12}>
                 <Box pb={2}>
-                <TextField id="order-client-addr"
-                  fullWidth
-                  label={`${t("Address")}`}
-                  value={getAddrString(model.location)}
-                  InputLabelProps={{ shrink: model.location ? true : false }}
-                  InputProps={{
-                    readOnly: true,
-                  }}
-                />
+                  <TextField id="order-client-addr"
+                    fullWidth
+                    label={`${t("Address")}`}
+                    value={getAddrString(model.location)}
+                    InputLabelProps={{ shrink: model.location ? true : false }}
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                  />
                 </Box>
               </GridItem>
               <GridItem xs={12} lg={12}>
-              <Box pb={2}>
-              {
-                model.items && model.items.length > 0 &&
-                model.items.map(it => <div key={it.productId}>{it.productName} x {it.quantity}</div>)
-              }
-              </Box>
+                <Box pb={2}>
+                  {
+                    model.items && model.items.length > 0 &&
+                    model.items.map(it => <div key={it.productId}>{it.productName} x {it.quantity}</div>)
+                  }
+                </Box>
               </GridItem>
               <GridItem xs={12} lg={6}>
                 <Box pb={2}>
-                <TextField id="order-total"
-                  label={`${t("Total")}`}
-                  value={model.total ? model.total : ''}
-                  InputLabelProps={{ shrink: model.total ? true : false }}
-                  InputProps={{
-                    readOnly: true,
-                  }}
-                />
+                  <TextField id="order-total"
+                    label={`${t("Total")}`}
+                    value={model.total ? model.total : ''}
+                    InputLabelProps={{ shrink: model.total ? true : false }}
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                  />
                 </Box>
               </GridItem>
               <GridItem xs={12} lg={6}>
@@ -422,43 +427,43 @@ export const OrderForm = ({ account, order, match, update }) => {
 
               <GridItem xs={12} lg={6}>
                 <Box pb={2}>
-                <TextField id="order-driver"
-                  label={`${t("Driver")}`}
-                  value={model.driver ? model.driver.username : ''}
-                  InputLabelProps={{ shrink: model.driver ? true : false }}
-                  InputProps={{
-                    readOnly: true,
-                  }}
-                />
+                  <TextField id="order-driver"
+                    label={`${t("Driver")}`}
+                    value={model.driver ? model.driver.username : ''}
+                    InputLabelProps={{ shrink: model.driver ? true : false }}
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                  />
                 </Box>
               </GridItem>
               <GridItem xs={12} lg={6}>
                 <Box pb={2}>
-                <TextField id="order-driver-phone"
-                  label={`${t("Driver Phone")}`}
-                  value={model.driver ? model.driver.phone : ''}
-                  InputLabelProps={{ shrink: model.driver ? true : false }}
-                  InputProps={{
-                    readOnly: true,
-                  }}
-                />
+                  <TextField id="order-driver-phone"
+                    label={`${t("Driver Phone")}`}
+                    value={model.driver ? model.driver.phone : ''}
+                    InputLabelProps={{ shrink: model.driver ? true : false }}
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                  />
                 </Box>
               </GridItem>
 
               <GridItem xs={12} lg={12}>
-              <Box pb={2}>
-                <TextField id="order-note"
-                  label={`${t("Note")}`}
-                  fullWidth
-                  value={model.note ? model.note : ''}
-                  InputLabelProps={{ shrink: model.note ? true : false }}
-                  InputProps={{
-                    readOnly: true,
-                  }}
-                  onChange={e => {
-                    setModel({ ...model, note: e.target.value });
-                  }}
-                />
+                <Box pb={2}>
+                  <TextField id="order-note"
+                    label={`${t("Note")}`}
+                    fullWidth
+                    value={model.note ? model.note : ''}
+                    InputLabelProps={{ shrink: model.note ? true : false }}
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                    onChange={e => {
+                      setModel({ ...model, note: e.target.value });
+                    }}
+                  />
                 </Box>
                 {/* <Box pb={2}>
                   <CustomInput
@@ -483,18 +488,17 @@ export const OrderForm = ({ account, order, match, update }) => {
                   label={t("Deliver Date")}
                   format="YYYY-MM-DD"
                   value={moment.utc(model.created)}
-                  onChange={(m) => setModel({...model, created: m.toISOString()})}
+                  onChange={(m) => setModel({ ...model, created: m.toISOString() })}
                 />
               </GridItem>
               <GridItem xs={12} container direction="row-reverse">
                 <Box mt={2}>
                   <Button
                     variant="contained"
-                    // href="finance/salary"
-                    // onClick={handleBack}
+                    onClick={toTransactionHistory}
                   >
                     <FormatListBulletedIcon />
-                    {t("Back")}
+                    {t("Transaction History")}
                   </Button>
                 </Box>
                 <Box mt={2} mr={2}>
@@ -502,7 +506,7 @@ export const OrderForm = ({ account, order, match, update }) => {
                     color="primary"
                     variant="contained"
                     disabled={processing}
-                    // onClick={handleSubmit}
+                  // onClick={handleSubmit}
                   >
                     <SaveIcon />
                     {t("Save")}
@@ -520,10 +524,10 @@ export const OrderForm = ({ account, order, match, update }) => {
 
 
 OrderForm.propTypes = {
-  match: PropTypes.shape({
-    params: PropTypes.shape({
-      id: PropTypes.string
-    })
-  }),
+  // match: PropTypes.shape({
+  //   params: PropTypes.shape({
+  //     id: PropTypes.string
+  //   })
+  // }),
   history: PropTypes.object
 };
