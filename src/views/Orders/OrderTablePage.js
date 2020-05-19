@@ -159,6 +159,7 @@ const OrderTablePage = ({ deliverDate, setDeliverDate, location }) => {
     updateData();
   }, [page, rowsPerPage, sort, query, deliverDate]);
 
+
   return (
     <GridContainer>
       <GridItem xs={12} sm={12} md={8}>
