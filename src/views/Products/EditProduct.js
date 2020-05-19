@@ -44,7 +44,7 @@ import FlashStorage from "services/FlashStorage";
 import ApiProductService from "services/api/ApiProductService";
 import ApiCategoryService from "services/api/ApiCategoryService";
 import CategoryTree from "views/Categories/CategoryTree";
-
+import ProductImage from "views/Products/ProductImage";
 import { countProductFromDate } from "helper/index";
 
 import moment from "moment";
@@ -54,6 +54,7 @@ import {
   getAllCombinations,
   getDateRangeStrings
 } from "helper/index";
+import ImageUploader from "react-images-upload";
 const useStyles = makeStyles(() => ({
   textarea: {
     width: "100%"
@@ -100,6 +101,7 @@ const defaultProductModelState = {
   price: 0,
   cost: 0,
   categoryId: "",
+  pictures: [],
   stock: {
     enabled: false,
     allowNegative: false,
@@ -452,6 +454,25 @@ const EditProduct = ({ match, history }) => {
       });
   };
 
+  const uploadPicture = picture => {
+    let file = picture;
+    if (Array.isArray(file)) {
+      file = file[0];
+    }
+    ApiProductService.uploadPicture(file, model._id).then(({ data }) => {
+      if (data.code === "success") {
+        const newModel = { ...model };
+        newModel.pictures.push(data.data);
+        setModel(newModel);
+      } else {
+        setAlert({
+          message: t("Upload failed"),
+          severity: "error"
+        });
+      }
+    });
+  };
+
   const saveModel = () => {
     removeAlert();
     setProcessing(true);
@@ -715,7 +736,8 @@ const EditProduct = ({ match, history }) => {
                                   value: model.stock.warningThreshold || 0,
                                   onChange: e => {
                                     const newModel = { ...model };
-                                    newModel.stock.warningThreshold = e.target.value;
+                                    newModel.stock.warningThreshold =
+                                      e.target.value;
                                     setModel(newModel);
                                   }
                                 }}
@@ -762,6 +784,44 @@ const EditProduct = ({ match, history }) => {
                           </GridItem>
                         </>
                       )}
+                      <GridItem xs={12}>
+                        <h5 className={classes.heading}>
+                          {t("Product Image")}
+                        </h5>
+                      </GridItem>
+                      <GridItem xs={12} lg={6}>
+                        <ImageUploader
+                          withIcon={true}
+                          buttonText="Upload image"
+                          onChange={picture => uploadPicture(picture)}
+                          imgExtension={[".jpg", ".gif", ".png"]}
+                          maxFileSize={5242880}
+                        />
+                      </GridItem>
+                      <GridItem xs={12} lg={6}>
+                        <GridContainer>
+                          {model.pictures &&
+                            model.pictures.map((picture, index) => (
+                              <GridItem key={index} xs={12} lg={6}>
+                                <ProductImage
+                                  src={picture.url}
+                                  onRemove={() => {
+                                    const confirm = window.confirm(
+                                      t(
+                                        "Do you really want to remove this image?"
+                                      )
+                                    );
+                                    if (confirm) {
+                                      const newModel = { ...model };
+                                      newModel.pictures.splice(index, 1);
+                                      setModel(newModel);
+                                    }
+                                  }}
+                                ></ProductImage>
+                              </GridItem>
+                            ))}
+                        </GridContainer>
+                      </GridItem>
                     </GridContainer>
                   </GridItem>
                 </React.Fragment>

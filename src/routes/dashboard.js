@@ -25,7 +25,7 @@ import CategoryIcon from "@material-ui/icons/Category";
 import StoreIcon from "@material-ui/icons/Store";
 import TransactionIcon from "@material-ui/icons/AttachMoney";
 import SalaryIcon from "@material-ui/icons/PeopleAlt";
-
+import ListAltIcon from "@material-ui/icons/ListAlt";
 // core components/views for Admin layout
 import CategoriesPage from "views/Categories/Categories.js";
 import FinanceRoute from "views/Finance/FinanceRoute.js";
@@ -34,7 +34,7 @@ import StockPage from "views/Stock/ListProductStock.js";
 import AttributePage from "views/Attributes/Attributes.js";
 import OrderPage from "views/Orders/OrderPage.js";
 import TableList from "views/TableList/TableList.js";
-
+import StaticPage from "views/Pages/Pages.js";
 import Assignment from "views/Assignment/AssignmentRoute";
 import DashboardRoute from "views/Dashboard/DashboardRoute.js";
 
@@ -121,6 +121,13 @@ const dashboardRoutes = [
     layout: "/"
   },
   {
+    path: "/pages",
+    name: "Static Page",
+    icon: ListAltIcon,
+    component: StaticPage,
+    layout: "/"
+  },
+  {
     path: "/assignment",
     name: "Assignment",
     icon: LocationOn,
@@ -133,7 +140,7 @@ const dashboardRoutes = [
     icon: "content_paste",
     component: TableList,
     layout: "/"
-  },
+  }
   // {
   //   path: "/typography",
   //   name: "Typography",

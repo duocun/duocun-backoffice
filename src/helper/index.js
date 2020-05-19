@@ -49,10 +49,9 @@ export const buildPaginationQuery = (
 };
 
 // build query without pagination
-export const buildQuery = (params) => {
+export const buildQuery = params => {
   return buildPaginationQuery(null, null, params, [], []);
-}
-
+};
 
 export const groupAttributeData = flatData => {
   const groupData = [];
@@ -119,11 +118,7 @@ export const getDateRangeStrings = (days, startDate = undefined) => {
 
 export const getDateStrArrayBetween = (startDate, endDate) => {
   for (
-    var arr = [],
-      dt = new Date(
-        moment(startDate)
-          
-      );
+    var arr = [], dt = new Date(moment(startDate));
     dt <= endDate;
     dt.setDate(dt.getDate() + 1)
   ) {
@@ -166,6 +161,10 @@ export const countProductFromDate = (
         ),
     productId
   );
+};
+
+export const getPictureUrl = src => {
+  return process.env.REACT_APP_MEIDA_URL + `/${src}`;
 };
 
 //dateString parser

@@ -49,5 +49,14 @@ export default {
 
   updateProduct: (productId, data) => {
     return ApiService.v2().put("products/" + productId, { data });
+  },
+
+  uploadPicture: (file, productId) => {
+    const formData = new FormData();
+    formData.append("upload", file);
+    return ApiService.v2().post(
+      `products/imageUpload?productId=${productId}`,
+      formData
+    );
   }
 };

@@ -32,7 +32,7 @@
     "Product Name (English)": "商品名称（英文）",
     "Product Name (Chinese)": "商品名称（中文）",
     "Description (English)": "说明（英文）",
-    "Dsecription (Chinese)": "说明（中文）",
+    "Description (Chinese)": "说明（中文）",
     "Basic Information": "基本设置",
     "Stock": "库存",
     "Enabled": "启用",
@@ -81,5 +81,13 @@
     "Product Quantity Schedule": "产品数量表",
     "Stock Enabled": "库存功能已启用",
     "Warning Threshold": "库存预警值",
-    "Add Quantity": "添加数量"
+    "Add Quantity": "添加数量",
+    "Static Page": "静态页面",
+    "Add New Page": "新增页面",
+    "Edit Page": "编辑页面",
+    "New Product": "添加产品",
+    "Error: title is duplicated": " Error：标题重复",
+    "Error: slug is duplicated": "Error：slug重复",
+    "Do you really want to remove this image?": "您真的要删除该图像吗？",
+    "Product Image": "产品图片"
 }
