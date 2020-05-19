@@ -137,7 +137,7 @@ export default function OrderTablePage({ location }) {
 
   return (
     <GridContainer>
-      <GridItem xs={12} sm={12} md={12}>
+      <GridItem xs={12} sm={12} md={8}>
         <Card>
           <CardHeader color="primary">
             <GridContainer>
@@ -198,6 +198,8 @@ export default function OrderTablePage({ location }) {
               removeData={handleDeleteOrder} />
           </CardBody>
         </Card>
+      </GridItem>
+      <GridItem xs={12} sm={12} md={4}>
       </GridItem>
     </GridContainer>
   );

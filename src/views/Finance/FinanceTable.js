@@ -119,6 +119,7 @@ export const FinanceTable = ({
             <TableCell>{toDateString(row.created)}</TableCell>
             <TableCell>{row.fromName}</TableCell>
             <TableCell>{row.toName}</TableCell>
+            <TableCell>{row.clientName? row.clientName : ''}</TableCell>
             <TableCell>{row.actionCode}</TableCell>
             <TableCell>{row.amount}</TableCell>
             <TableCell>{getBalance(account, row)}</TableCell>
@@ -200,6 +201,17 @@ export const FinanceTable = ({
               {t("toName")}
               {renderSort("toName")}
             </TableCell>
+
+            <TableCell
+              onClick={() => {
+                toggleSort("clientName");
+              }}
+              style={{ cursor: "pointer" }}
+              >
+              {t("clientName")}
+              {renderSort("clientName")}
+            </TableCell>
+
             <TableCell
               onClick={() => {
                 toggleSort("action");

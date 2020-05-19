@@ -154,7 +154,7 @@ export const TransactionForm = ({ account, transaction, update }) => {
 
   const handleClientChange = (client) => {
     setClientQuery(client ? client.username : '');
-    setModel({ ...model, clientId: client._id, toName: client.username });
+    setModel({ ...model, clientId: client._id, clientName: client.username });
   }
 
   const handleStaffChange = (staffId) => {
