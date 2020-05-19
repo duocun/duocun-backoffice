@@ -1,10 +1,18 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
+import { connect } from "react-redux";
 
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 // core components
+import { IconButton, InputAdornment } from "@material-ui/core";
+
+import {
+  Clear as ClearIcon,
+  InsertInvitation as CalendarIcon
+} from "@material-ui/icons";
+
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
 
@@ -22,8 +30,10 @@ import Alert from "@material-ui/lab/Alert";
 import ApiOrderService from "services/api/ApiOrderService";
 import { OrderTable } from './OrderTable';
 
-import TimePicker from "components/TimePicker/TimePicker";
 import * as moment from "moment";
+// import { deliverDate } from "redux/reducers/order";
+import { setDeliverDate } from 'redux/actions/order';
+import { KeyboardDatePicker } from "@material-ui/pickers";
 
 const styles = {
   cardCategoryWhite: {
@@ -57,9 +67,9 @@ const styles = {
 
 const useStyles = makeStyles(styles);
 
-export default function OrderTablePage({ location }) {
+const OrderTablePage = ({ deliverDate, setDeliverDate, location }) => {
   const { t } = useTranslation();
-
+  
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(
@@ -78,7 +88,9 @@ export default function OrderTablePage({ location }) {
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const updateData = () => {
-    ApiOrderService.getOrdersByKeyword(page, rowsPerPage, query, [sort]).then(
+    const qDeliverDate = deliverDate ? {deliverDate} : {};
+    const condition = {...query, ...qDeliverDate}
+    ApiOrderService.getOrdersByKeyword(page, rowsPerPage, condition, [sort]).then(
       ({ data }) => {
         setOrders(data.data);
         setTotalRows(data.count);
@@ -94,6 +106,18 @@ export default function OrderTablePage({ location }) {
   };
 
   const [processing, setProcessing] = useState(false);
+
+  const handleDeliverDateClear = (e) => {
+    // const date = m ? m.format('YYYY-MM-DD') : '';
+    // setDeliverDate(date);
+    e.stopPropagation();
+    setDeliverDate(null);
+  }
+
+  const handleDeliverDateChange = (m) => {
+    const date = m ? m.format('YYYY-MM-DD') : null;
+    setDeliverDate(date);
+  }
 
   const handleDeleteOrder = (_id) => {
     if (window.confirm('Are you sure to delete ?')) {
@@ -133,7 +157,7 @@ export default function OrderTablePage({ location }) {
 
   useEffect(() => {
     updateData();
-  }, [page, rowsPerPage, sort, query]);
+  }, [page, rowsPerPage, sort, query, deliverDate]);
 
   return (
     <GridContainer>
@@ -156,11 +180,38 @@ export default function OrderTablePage({ location }) {
                     </Button> */}
                 </Box>
 
-                {/* <TimePicker
-                    label="Start Date"
-                    date={deliverDate}
-                    getDate={setDeliverDate}
-                  /> */}
+              </GridItem>
+              <GridItem xs={12} sm={12} lg={6} align="left">
+                <KeyboardDatePicker
+                  variant="inline"
+                  label="Deliver Date"
+                  format="YYYY-MM-DD"
+                  value={deliverDate ? moment.utc(deliverDate) : null}
+                  onChange={handleDeliverDateChange}
+
+                  KeyboardButtonProps={{
+                    'aria-label': 'change date',
+                  }}
+                  // keyboardIcon={<Icon>add_circle</Icon>}
+
+                  keyboardIcon={
+                    deliverDate ? (
+                      // <InputAdornment position="end">
+                        <IconButton onClick={handleDeliverDateClear}>
+                          <ClearIcon />
+                        </IconButton>
+                      // </InputAdornment>
+                    ) : (
+                      // <InputAdornment position="end">
+                        <IconButton>
+                          <CalendarIcon />
+                        </IconButton>
+                      // </InputAdornment>
+                    )
+                  }
+                />
+              </GridItem>
+              <GridItem xs={12} sm={12} lg={6} align="left">
                 <Searchbar
                   onChange={e => {
                     const { target } = e;
@@ -208,3 +259,15 @@ export default function OrderTablePage({ location }) {
 OrderTablePage.propTypes = {
   location: PropTypes.object
 };
+
+
+const mapStateToProps = (state) => ({ deliverDate: state.deliverDate });
+// const mapDispatchToProps = (dispatch) => ({
+//   loadAccounts: (payload, searchOption) => {
+//     dispatch(loadAccountsAsync(payload, searchOption));
+//   },
+// });
+export default connect(
+  mapStateToProps,
+  {setDeliverDate}
+)(OrderTablePage);
