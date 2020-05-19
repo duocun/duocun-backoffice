@@ -1,6 +1,6 @@
 import React from "react";
 import { Switch, Route } from "react-router-dom";
-import {TransactionPage} from "./TransactionPage";
+import TransactionPage from "./TransactionPage";
 import {FinanceForm} from "./FinanceForm";
 
 // import {FinanceException} from "./FinanceException";

@@ -32,7 +32,7 @@ const AccountSearch = ({label, placeholder, handleSelectAccount, val, id=""}) =>
   const classes = useStyles();
   const { t } = useTranslation();
   const [page, setPage] = useState(0);
-  const [keyword, setKeyword] = useState("");// getQueryParam(location, "search") || "");
+  const [keyword, setKeyword] = useState(val);// getQueryParam(location, "search") || "");
 
   const [accountId, setAccountId] = useState(id);
   // const [sort, setSort] = useState(["_id", 1]);

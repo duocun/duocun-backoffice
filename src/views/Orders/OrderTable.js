@@ -61,7 +61,7 @@ const useStyles = makeStyles(styles);
 //   }
 // }));
 
-export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, setRowsPerPage, setSort, setPage, editData, removeData }) => {
+export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, setRowsPerPage, setSort, setPage, selectData, removeData }) => {
   const { t } = useTranslation();
   const classes = useStyles();
   // const [page, setPage] = useState(
@@ -229,7 +229,7 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
                 // <OrderTable rows={orders} page={page} rowsPerPage={rowsPerPage} processing={processing}/>
                 <React.Fragment>
                   {rows.map((row, idx) => (
-                    <TableRow key={idx}>
+                    <TableRow key={idx} onClick={() => selectData(row)}>
                       {/* <TableCell>{page * rowsPerPage + idx + 1}</TableCell> */}
                       <TableCell>{row.code}</TableCell>
                       <TableCell>{toDateString(row.delivered)}</TableCell>
@@ -260,7 +260,7 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
                         </IconButton>
                       </TableCell> */}
                       <TableCell>
-                        <IconButton aria-label="edit" onClick={() => editData(row)}>
+                        <IconButton aria-label="edit" onClick={() => selectData(row)}>
                           <EditIcon />
                         </IconButton>
                         <IconButton aria-label="delete" disabled={processing} onClick={() => removeData(row._id)}>

@@ -91,6 +91,7 @@ export const FinanceTable = ({
   const renderRows = (account, rows) => {
 
     const getBalance = (account, row) => {
+      return row.toBalance;
       if(account.type === 'driver'){
         return row.toId === account._id ? row.toBalance : row.fromBalance;
       }else if(account.type === 'client'){
