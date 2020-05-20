@@ -168,7 +168,7 @@ const TransactionPage = ({ account, setAccount, location, history }) => {
     });
   }
 
-  const handelEditTransaction = (tr) => {
+  const handelSelectTransaction = (tr) => {
     if (tr.note) {
       setModel({ ...tr, modifyBy: account ? account._id : '' });
     } else {
@@ -372,7 +372,7 @@ const TransactionPage = ({ account, setAccount, location, history }) => {
                     setRowsPerPage={setRowsPerPage}
                     setSort={setSort}
                     setPage={setPage}
-                    editRow={handelEditTransaction}
+                    selectRow={handelSelectTransaction}
                     deleteRow={handleDeleteTransaction}
                   />
                 </GridItem>

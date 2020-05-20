@@ -71,7 +71,7 @@ export const FinanceTable = ({
   setSort,
   setPage,
   setAlert,
-  editRow,
+  selectRow,
   deleteRow
 }) => {
   const { t } = useTranslation();
@@ -91,7 +91,6 @@ export const FinanceTable = ({
   const renderRows = (account, rows) => {
 
     const getBalance = (account, row) => {
-      return row.toBalance;
       if(account.type === 'driver'){
         return row.toId === account._id ? row.toBalance : row.fromBalance;
       }else if(account.type === 'client'){
@@ -115,7 +114,7 @@ export const FinanceTable = ({
     return (
       <React.Fragment>
         {rows.map((row, idx) => (
-          <TableRow key={idx}>
+          <TableRow key={idx} onClick={() => selectRow(row)}>
             <TableCell>{page * rowsPerPage + idx + 1}</TableCell>
             <TableCell>{toDateString(row.created)}</TableCell>
             <TableCell>{row.fromName}</TableCell>
@@ -127,7 +126,7 @@ export const FinanceTable = ({
             <TableCell>{row.note}</TableCell>
             <TableCell>
               <IconButton aria-label="edit" 
-                onClick={() => editRow(row)}
+                onClick={() => selectRow(row)}
                 // href={`finance/${row._id}`}
                 >
                 <EditIcon />

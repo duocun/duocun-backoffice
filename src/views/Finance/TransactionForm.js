@@ -107,7 +107,6 @@ export const TransactionForm = ({ account, transaction, update }) => {
   // const getMomentFromLocal = (localTime, zone='America/Toronto') => {
   //   return moment.tz(localTime, zone);
   // }
-
   const { t } = useTranslation();
   const classes = useStyles();
   const [drivers, setDrivers] = useState([{_id:'', username:''}]);
@@ -260,16 +259,55 @@ export const TransactionForm = ({ account, transaction, update }) => {
     const token = AuthService.getAuthToken();
     ApiAuthService.getCurrentUser(token).then(({ data }) => {
       const account = { ...data };
-      ApiAccountService.getAccountList(null, null, { type: { $in: ['driver'] } }).then(({ data }) => {
-        setDrivers(data.data);
 
-        setModifyByAccount(account);
-        if (transaction) {
-          // setFromQuery(transaction.fromName);
-          // setToQuery(transaction.toName);
-          setModel({ ...transaction, modifyBy: modifyByAccount._id });
+      if(transaction && transaction.fromId && transaction.toId){
+        let ids = [transaction.fromId, transaction.toId];
+        if(transaction.actionCode === 'PS'){
+          ids = [transaction.fromId, transaction.toId, transaction.staffId];
         }
-      });
+        if(transaction.actionCode === 'RC'){
+          ids = [transaction.fromId, transaction.toId, transaction.clientId];
+        }
+        ApiAccountService.getAccounts({_id:{$in: ids}}).then(({data}) => {
+          const fromAccount = data.data.find(d => d._id === transaction.fromId);
+          const toAccount = data.data.find(d => d._id === transaction.toId);
+          let staff;
+          let client;
+          if(transaction.actionCode === 'PS'){
+            // staff = data.data.find(d => d._id === transaction.staffId);
+            // setFromQuery(staff.username);
+          }
+          if(transaction.actionCode === 'RC'){
+            client = data.data.find(d => d._id === transaction.clientId);
+            if(client){
+              setClientQuery(client.username);
+            }
+          }
+          ApiAccountService.getAccountList(null, null, { type: { $in: ['driver'] } }).then(({ data }) => {
+            setDrivers(data.data);
+            setModifyByAccount(account);
+            if (transaction) {
+              if(fromAccount){
+                setFromQuery(fromAccount.username);
+              }
+              if(toAccount){
+                setToQuery(toAccount.username);
+              }
+              setModel({ ...transaction, modifyBy: modifyByAccount._id });
+            }
+          });
+        });
+      }else{
+        ApiAccountService.getAccountList(null, null, { type: { $in: ['driver'] } }).then(({ data }) => {
+          setDrivers(data.data);
+          setModifyByAccount(account);
+          if (transaction) {
+            setModel({ ...transaction, modifyBy: modifyByAccount._id });
+          }
+        });
+      }
+
+
     });
   }, [transaction]);
 
@@ -293,7 +331,7 @@ export const TransactionForm = ({ account, transaction, update }) => {
                   </Alert>
                 </GridItem>
               )}
-              <GridItem xs={12} lg={6}>
+              <GridItem xs={12} lg={12}>
                 <Box pb={2}>
                   <AccountSearch
                     label="From Account"
@@ -305,7 +343,7 @@ export const TransactionForm = ({ account, transaction, update }) => {
                 </Box>
               </GridItem>
 
-              <GridItem xs={12} lg={6}>
+              <GridItem xs={12} lg={12}>
                 <Box pb={2}>
                   <AccountSearch
                     label="To Account"
@@ -319,7 +357,7 @@ export const TransactionForm = ({ account, transaction, update }) => {
 
               {
                 model.actionCode === 'RC' &&
-                <GridItem xs={12} lg={6}>
+                <GridItem xs={12} lg={12}>
                   <Box pb={2}>
                     <AccountSearch
                       label="Client"

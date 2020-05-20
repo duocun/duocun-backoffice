@@ -1,5 +1,6 @@
 import ApiService from "services/api/ApiService";
-import { buildPaginationQuery } from "helper/index";
+import { buildQuery, buildPaginationQuery } from "helper/index";
+
 export default {
   getAccountList: (page, pageSize, {username, type}, sort = []) => {
     let query = {};
@@ -11,6 +12,11 @@ export default {
       conditions.type = type; 
     }
     query.query = buildPaginationQuery(page, pageSize, conditions, [], sort);
+    return ApiService.v2().get("accounts", query);
+  },
+  getAccounts: (conditions) => {
+    let query = {};
+    query.query = buildQuery(conditions);
     return ApiService.v2().get("accounts", query);
   },
   getAccount: (accountId) => {

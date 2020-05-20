@@ -176,7 +176,7 @@ const SalaryPage = ({ history, location }) => {
 
   
 
-  const handelEditTransaction = (tr) => {
+  const handelSelectTransaction = (tr) => {
     if(tr.note){
       setModel(tr);
     }else{
@@ -315,7 +315,7 @@ const SalaryPage = ({ history, location }) => {
                     setRowsPerPage={setRowsPerPage}
                     setSort={setSort}
                     setPage={setPage}
-                    editRow={handelEditTransaction}
+                    selectRow={handelSelectTransaction}
                     deleteRow={handleDeleteTransaction}
                   />
                 </GridItem>

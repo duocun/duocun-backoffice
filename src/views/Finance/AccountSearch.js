@@ -9,6 +9,10 @@ import { makeStyles } from "@material-ui/core/styles";
 // import styles from "assets/jss/material-dashboard-react/components/searchBarStyle.js";
 
 import CustomInput from "components/CustomInput/CustomInput.js";
+// import Box from "@material-ui/core/Box";
+// import TextField from "@material-ui/core/TextField";
+
+
 // import Button from "components/CustomButtons/Button.js";
 import SearchDropDown from "components/SearchDropDown/SearchDropDown.js";
 // import { Throttle } from "react-throttle";
@@ -64,7 +68,7 @@ const AccountSearch = ({label, placeholder, handleSelectAccount, val, id=""}) =>
     }else{
       handleSearch(keyword);
     }
-  }, [keyword]);
+  }, [keyword, val]);
 
   const handleSelectData = (account) => {
     handleSelectAccount(account);
@@ -106,7 +110,7 @@ const AccountSearch = ({label, placeholder, handleSelectAccount, val, id=""}) =>
   }
 
   const handleBlur = () => {
-
+    // setSearching(false);
   }
 
   const divStyle = {
@@ -120,8 +124,10 @@ const AccountSearch = ({label, placeholder, handleSelectAccount, val, id=""}) =>
         className={classes.inputBox}
         labelText={t(label)}
         formControlProps={{
+          fullWidth: true,
           className: classes.margin + " " + classes.search,
         }}
+        labelProps={{ shrink: (keyword ? true : false) }}
         inputProps={{
           value: keyword,
           placeholder: t(placeholder),
@@ -140,6 +146,23 @@ const AccountSearch = ({label, placeholder, handleSelectAccount, val, id=""}) =>
           onBlur: handleBlur,
         }}
       />
+                {/* <Box pb={2}>
+                  <TextField id="search-input-box"
+                    fullWidth
+                    label={`${t(label)}`}
+                    value={keyword}
+                    InputLabelProps={{ shrink: keyword ? true : false }}
+                    onChange={handleKeywordChange}
+                    onKeyDown={(event) => {
+                      const { key } = event;
+                      if (key === "Enter") {
+                        return handleSearch(keyword);
+                      }
+                    }}
+                    onFocus={handleFocus}
+                    onBlur={handleBlur}
+                  />
+                </Box> */}
       {/* <Button
         color="white"
         aria-label="edit"

@@ -27,14 +27,18 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   list: {
-    // width: "100%",
-    // marginTop: 27,
-    // display: "block",
+    position: "absolute",
     backgroundColor: "white",
     color: "black",
     borderRadius: "3px",
-    width: "320px"
+    width: "320px",
+    zIndex: "500",
+    // border: "1px solid #eee",
+    boxShadow: "0px 5px 5px -3px rgba(0,0,0,0.2), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12)"
   },
+  listItem: {
+    backgroundColor: "white"
+  }
 }));
 
 const SearchDropDown = ({ data, hasMore, fetchData, selectData,
@@ -43,7 +47,9 @@ const SearchDropDown = ({ data, hasMore, fetchData, selectData,
   const classes = useStyles();
 
   const getVisibility = (show) => (show ? "visible" : "hidden");
-
+  const handleSelectData = (d) => {
+    selectData(d);
+  }
   return (
 
     <FormControl 
@@ -74,7 +80,7 @@ const SearchDropDown = ({ data, hasMore, fetchData, selectData,
         {
           data && data.length > 0 &&
           data.map(d => 
-            <MenuItem key={d._id} value={d._id} onClick={() => selectData(d)}>
+            <MenuItem className={classes.listItem} key={d._id} value={d._id} onClick={() => handleSelectData(d)}>
               {d.username+' ' + (d.phone? d.phone:'')}
             </MenuItem>
           )
