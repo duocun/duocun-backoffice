@@ -18,7 +18,7 @@
 // @material-ui/icons
 import Dashboard from "@material-ui/icons/Dashboard";
 import Person from "@material-ui/icons/Person";
-import LocationOn from "@material-ui/icons/LocationOn";
+import LocationIcon from "@material-ui/icons/LocationOn";
 import LocalMallIcon from "@material-ui/icons/LocalMall";
 import EditAttributesIcon from "@material-ui/icons/EditAttributes";
 import CategoryIcon from "@material-ui/icons/Category";
@@ -32,7 +32,8 @@ import FinanceRoute from "views/Finance/FinanceRoute.js";
 import ProductPage from "views/Products/Products.js";
 import StockPage from "views/Stock/ListProductStock.js";
 import AttributePage from "views/Attributes/Attributes.js";
-import OrderPage from "views/Orders/OrderPage.js";
+import OrderRoute from "views/Orders/OrderRoute.js";
+import MapRoute from "views/Maps/MapRoute.js";
 import TableList from "views/TableList/TableList.js";
 import StaticPage from "views/Pages/Pages.js";
 import Assignment from "views/Assignment/AssignmentRoute";
@@ -117,20 +118,27 @@ const dashboardRoutes = [
     path: "/orders",
     name: "Order",
     icon: "content_paste",
-    component: OrderPage,
+    component: OrderRoute,
+    layout: "/"
+  },
+  {
+    path: "/maps",
+    name: "Map",
+    icon: LocationIcon,
+    component: MapRoute,
     layout: "/"
   },
   {
     path: "/pages",
     name: "Static Page",
-    icon: ListAltIcon,
+    icon: LocationIcon,
     component: StaticPage,
     layout: "/"
   },
   {
     path: "/assignment",
     name: "Assignment",
-    icon: LocationOn,
+    icon: LocationIcon,
     component: Assignment,
     layout: "/"
   },

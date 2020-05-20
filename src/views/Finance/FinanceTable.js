@@ -131,12 +131,12 @@ export const FinanceTable = ({
                 >
                 <EditIcon />
               </IconButton>
-              <IconButton aria-label="delete"
+              {/* <IconButton aria-label="delete"
                 disabled={processing}
                 onClick={() => deleteRow(row._id)}
                 >
                 <DeleteIcon />
-              </IconButton>
+              </IconButton> */}
             </TableCell>
           </TableRow>
         ))}
