@@ -32,13 +32,13 @@ const useStyles = makeStyles((styles) => ({
 }));
 const rowsPerPage = 10;
 
-const AccountSearch = ({label, placeholder, handleSelectAccount, val, id=""}) => {
+const AccountSearch = ({label, placeholder, handleSelectAccount, val, id}) => {
   const classes = useStyles();
   const { t } = useTranslation();
   const [page, setPage] = useState(0);
   const [keyword, setKeyword] = useState(val);// getQueryParam(location, "search") || "");
 
-  const [accountId, setAccountId] = useState(id);
+  const [account, setAccount] = useState({_id: id, username: val});
   // const [sort, setSort] = useState(["_id", 1]);
   const [searching, setSearching] = useState(false);
   const [accounts, setAccounts] = useState([]);
@@ -63,16 +63,19 @@ const AccountSearch = ({label, placeholder, handleSelectAccount, val, id=""}) =>
   }
 
   useEffect(() => {
-    if(accountId){
-
-    }else{
-      handleSearch(keyword);
-    }
-  }, [keyword, val]);
+  //   // handleSelectAccount({_id: id, username: val});
+    setKeyword(val); // fix me
+    setAccount({_id: id, username: val});
+  //   // if(accountId){
+      
+  //   // }else{
+  //     handleSearch(keyword);
+  //   // }
+  }, [id, val]);
 
   const handleSelectData = (account) => {
     handleSelectAccount(account);
-    setAccountId(account._id);
+    setAccount(account);
     // setShowList(false);
     const str = account.username + ' ' + (account.phone ? account.phone:'');
     setKeyword(str);
@@ -100,7 +103,7 @@ const AccountSearch = ({label, placeholder, handleSelectAccount, val, id=""}) =>
   const handleKeywordChange = ({target}) => {
     const str = target.value;
     setKeyword(str);
-    setAccountId("");
+    setAccount({_id:'', username:''});
     setSearching(true);
     handleSearch(str);
   }
