@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+// import useMediaQuery from "@material-ui/core/useMediaQuery";
+import ApiOrderService from "services/api/ApiOrderService";
+
 import {
   withScriptjs,
   withGoogleMap,
@@ -10,13 +13,16 @@ import {
 // zoom --- 9
 // center --- { lat: 43.856098, lng: -79.337021 }
 const OrderMap = withScriptjs(
-  withGoogleMap(({data, zoom, center}) => (
+  withGoogleMap(({data, zoom, center, googleMapURL, loadingElement, containerElement, mapElement}) => (
     <GoogleMap
       defaultZoom={zoom}
       defaultCenter={center}
       defaultOptions={{
         scrollwheel: true,
         zoomControl: true,
+        fullscreenControl: false,
+        mapTypeControl: false,
+        streetViewControl:false,
         styles: [
           {
             featureType: "water",
@@ -111,10 +117,37 @@ const OrderMap = withScriptjs(
 );
 
 const OrderMapPage = () => {
+  // const matches = useMediaQuery('max-width:767px');
+
   const [orders, setOrders] = useState([]);
+
+  useEffect(() => {
+    ApiOrderService.getMapMarkers().then(({data}) => {
+
+    })
+  },[]);
+
+
+  const KEY = "AIzaSyCEd6D6vc9K-YzMH-QtQWRSs5HZkLKSWyk";
   return (
-    <div style={{width:'100%' ,display:'flex', justifyContent:'center'}}>
-      <OrderMap orders={orders}/>
+    <div>
+    <div className="driverList" style={{width:'100%', height:'100px'}}>
+      <div className="leftCol">Driver 1</div>
+      <div className="rightCol">Driver 2</div>
+    </div>
+    <div style={{width:'100%', height:'500px', display:'flex', justifyContent:'center'}}>
+    <OrderMap
+      googleMapURL={`https://maps.googleapis.com/maps/api/js?key=${KEY}&v=3.exp&libraries=geometry,drawing,places`}
+      loadingElement={<div style={{ height: `100%` }} />}
+      containerElement={
+        <div style={{ height: "100%", width: `100%` }} />
+      }
+      mapElement={<div style={{ height: `100%` }} />}
+      data={orders}
+      zoom={9}
+      center={{lat: 43.856098, lng: -79.337021}}
+    />
+    </div>
     </div>
   )
 }

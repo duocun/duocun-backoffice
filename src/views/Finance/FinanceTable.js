@@ -117,9 +117,16 @@ export const FinanceTable = ({
           <TableRow key={idx} onClick={() => selectRow(row)}>
             <TableCell>{page * rowsPerPage + idx + 1}</TableCell>
             <TableCell>{toDateString(row.created)}</TableCell>
+            {/* <TableCell>{toDateString(row.delivered)}</TableCell> */}
             <TableCell>{row.fromName}</TableCell>
             <TableCell>{row.toName}</TableCell>
-            <TableCell>{row.clientName? row.clientName : ''}</TableCell>
+            <TableCell>
+            {
+              row.items && row.items.length > 0 &&
+              row.items.map(it => <div key={it.productId}>{it.productName} x{it.quantity}</div>)
+            }
+            </TableCell>
+            {/* <TableCell>{row.clientName? row.clientName : ''}</TableCell> */}
             <TableCell>{row.actionCode}</TableCell>
             <TableCell>{row.amount}</TableCell>
             <TableCell>{getBalance(account, row)}</TableCell>
@@ -171,17 +178,17 @@ export const FinanceTable = ({
               }}
               style={{ cursor: "pointer" }}
             >
-              {t("Created")}
+              {t("Created Date")}
               {renderSort("created")}
             </TableCell>
             {/* <TableCell
               onClick={() => {
-                toggleSort("modified");
+                toggleSort("delivered");
               }}
               style={{ cursor: "pointer" }}
             >
-              {t("Modified")}
-              {renderSort("modified")}
+              {t("Deliver Date")}
+              {renderSort("delivered")}
             </TableCell> */}
             <TableCell
               onClick={() => {
@@ -189,7 +196,7 @@ export const FinanceTable = ({
               }}
               style={{ cursor: "pointer" }}
             >
-              {t("fromName")}
+              {t("From Name")}
               {renderSort("fromName")}
             </TableCell>
             <TableCell
@@ -198,18 +205,28 @@ export const FinanceTable = ({
               }}
               style={{ cursor: "pointer" }}
             >
-              {t("toName")}
+              {t("To Name")}
               {renderSort("toName")}
             </TableCell>
 
-            <TableCell
+            {/* <TableCell
               onClick={() => {
                 toggleSort("clientName");
               }}
               style={{ cursor: "pointer" }}
               >
-              {t("clientName")}
+              {t("Client")}
               {renderSort("clientName")}
+            </TableCell> */}
+
+            <TableCell
+              onClick={() => {
+                toggleSort("items");
+              }}
+              style={{ cursor: "pointer" }}
+              >
+              {t("Product")}
+              {renderSort("items")}
             </TableCell>
 
             <TableCell
@@ -218,7 +235,7 @@ export const FinanceTable = ({
               }}
               style={{ cursor: "pointer" }}
             >
-              {t("action")}
+              {t("Actions")}
               {renderSort("action")}
             </TableCell>
             <TableCell
@@ -227,7 +244,7 @@ export const FinanceTable = ({
               }}
               style={{ cursor: "pointer" }}
             >
-              {t("amount")}
+              {t("Amount")}
               {renderSort("amount")}
             </TableCell>
             <TableCell
@@ -236,7 +253,7 @@ export const FinanceTable = ({
               }}
               style={{ cursor: "pointer" }}
             >
-              {t("balance")}
+              {t("Balance")}
               {renderSort("toBalance")}
             </TableCell>
             <TableCell
@@ -245,7 +262,7 @@ export const FinanceTable = ({
               }}
               style={{ cursor: "pointer" }}
             >
-              {t("note")}
+              {t("Note")}
               {renderSort("note")}
             </TableCell>
             <TableCell>{t("Actions")}</TableCell>

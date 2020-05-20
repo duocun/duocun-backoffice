@@ -458,7 +458,7 @@ export const TransactionForm = ({ account, transaction, items, update }) => {
               <GridItem>
                 <KeyboardDatePicker
                   variant="inline"
-                  label="Date"
+                  label={t("Created Date")}
                   format="YYYY-MM-DD"
                   // format={format}
                   value={moment.utc(model.created)}

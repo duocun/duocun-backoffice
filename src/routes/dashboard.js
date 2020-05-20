@@ -66,6 +66,13 @@ const dashboardRoutes = [
   //   layout: "/"
   // },
   {
+    path: "/orders",
+    name: "Order",
+    icon: "content_paste",
+    component: OrderRoute,
+    layout: "/"
+  },
+  {
     path: "/finance/transaction",
     name: "Transaction",
     icon: TransactionIcon,
@@ -112,13 +119,6 @@ const dashboardRoutes = [
     name: "Merchants",
     icon: StoreIcon,
     component: MerchantsPage,
-    layout: "/"
-  },
-  {
-    path: "/orders",
-    name: "Order",
-    icon: "content_paste",
-    component: OrderRoute,
     layout: "/"
   },
   {
