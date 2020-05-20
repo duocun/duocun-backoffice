@@ -28,6 +28,7 @@ import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 
 import Alert from "@material-ui/lab/Alert";
 import ApiTransactionService from "services/api/ApiTransactionService";
+import ApiOrderService from "services/api/ApiOrderService";
 import { getQueryParam } from "helper/index";
 import FlashStorage from "services/FlashStorage";
 
@@ -84,7 +85,7 @@ const TransactionPage = ({ account, setAccount, location, history }) => {
   // states related to list and pagniation
   // const searchParams = useQuery();
 
-
+  const [items, setItems] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(
@@ -169,10 +170,24 @@ const TransactionPage = ({ account, setAccount, location, history }) => {
   }
 
   const handelSelectTransaction = (tr) => {
-    if (tr.note) {
-      setModel({ ...tr, modifyBy: account ? account._id : '' });
-    } else {
-      setModel({ ...tr, note: '', modifyBy: account ? account._id : '' });
+    if(tr && tr.actionCode === 'OFD'){
+      const orderId = tr.orderId;
+      ApiOrderService.getOrder(orderId).then(({data}) => {
+        const order = data.data;
+        setItems(order.items);
+        if (tr.note) {
+          setModel({ ...tr, modifyBy: account ? account._id : '' });
+        } else {
+          setModel({ ...tr, note: '', modifyBy: account ? account._id : '' });
+        }
+      });
+    }else{
+      setItems([]);
+      if (tr.note) {
+        setModel({ ...tr, modifyBy: account ? account._id : '' });
+      } else {
+        setModel({ ...tr, note: '', modifyBy: account ? account._id : '' });
+      }
     }
   }
 
@@ -421,8 +436,10 @@ const TransactionPage = ({ account, setAccount, location, history }) => {
           </Card>
         </GridItem>
         <GridItem xs={12} sm={12} md={4}>
-          <TransactionForm account={account}
+          <TransactionForm 
+            account={account}
             transaction={model}
+            items={items}
             update={handleUpdateData} />
         </GridItem>
       </GridContainer>
