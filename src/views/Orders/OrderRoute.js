@@ -3,7 +3,7 @@ import { Switch, Route } from "react-router-dom";
 import OrderTablePage from "views/Orders/OrderTablePage";
 // import OrderFormPage from "views/Orders/OrderFormPage";
 
-const OrderPage = () => {
+const OrderRoute = () => {
   return (
     <Switch>
       {/* <Route exact path="/orders/:id" component={OrderFormPage} /> */}
@@ -12,4 +12,4 @@ const OrderPage = () => {
   );
 };
 
-export default OrderPage;
+export default OrderRoute;
