@@ -153,15 +153,6 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
                 {t("Client")}
                 {renderSort("clientName")}
               </TableCell>
-              {/* <TableCell
-                onClick={() => {
-                  toggleSort("client");
-                }}
-                style={{ cursor: "pointer" }}
-              >
-                {t("Client Phone")}
-                {renderSort("client")}
-              </TableCell> */}
               <TableCell
                 onClick={() => {
                   toggleSort("merchantName");
@@ -171,51 +162,7 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
                 {t("Merchant")}
                 {renderSort("merchantName")}
               </TableCell>
-              {/* <TableCell
-                onClick={() => {
-                  toggleSort("price");
-                }}
-                style={{ cursor: "pointer" }}
-              >
-                {t("Price")}
-                {renderSort("price")}
-              </TableCell> */}
-              {/* <TableCell
-                onClick={() => {
-                  toggleSort("cost");
-                }}
-                style={{ cursor: "pointer" }}
-              >
-                {t("Cost")}
-                {renderSort("cost")}
-              </TableCell> */}
-              {/* <TableCell
-                onClick={() => {
-                  toggleSort("driver");
-                }}
-                style={{ cursor: "pointer" }}
-              >
-                {t("Driver Name")}
-                {renderSort("driver")}
-              </TableCell> */}
-              {/* <TableCell
-                onClick={() => {
-                  toggleSort("driver phone");
-                }}
-                style={{ cursor: "pointer" }}
-              >
-                {t("Driver Phone")}
-                {renderSort("driver phone")}
-              </TableCell> */}
-              {/* <TableCell
-                            onClick={() => {
-                              toggleSort("featured");
-                            }}
-                            style={{ cursor: "pointer" }}
-                          >
-                            {t("Featured")}
-                            {renderSort("featured")}
-                          </TableCell> */}
+              
               <TableCell>{t("Actions")}</TableCell>
             </TableRow>
           </TableHead>
@@ -238,27 +185,8 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
                         <div>{row.clientName ? row.clientName : ''}</div>
                         <div>{row.clientPhone ? row.clientPhone : 'N/A'}</div>
                       </TableCell>
-
-                      {/* <TableCell>{row.clientPhone ? row.clientPhone : 'N/A'}</TableCell> */}
                       <TableCell>{row.merchantName ? row.merchantName: 'N/A'}</TableCell>
-                      {/* <TableCell>{row.price}</TableCell> */}
-                      {/* <TableCell>{row.cost}</TableCell> */}
-                      {/* <TableCell>{row.driver ? row.driver.username : 'N/A'}</TableCell> */}
-                      {/* <TableCell>{row.driver ? row.driver.phone: 'N/A'}</TableCell> */}
-                      {/* <TableCell>
-                        <IconButton
-                          disabled={processing}
-                        onClick={() => {
-                          toggleFeature(row._id);
-                        }}
-                        >
-                          {row.featured ? (
-                            <CheckIcon color="primary"></CheckIcon>
-                          ) : (
-                              <CloseIcon color="error"></CloseIcon>
-                            )}
-                        </IconButton>
-                      </TableCell> */}
+ 
                       <TableCell>
                         <IconButton aria-label="edit" onClick={() => selectData(row)}>
                           <EditIcon />

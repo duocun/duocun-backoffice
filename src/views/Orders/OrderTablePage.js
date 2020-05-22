@@ -19,14 +19,16 @@ import GridContainer from "components/Grid/GridContainer.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-// import CardFooter from "components/Card/CardFooter.js";
+import CardFooter from "components/Card/CardFooter.js";
 
-import Searchbar from "components/Searchbar/Searchbar";
+import { Button } from "@material-ui/core";
+import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 import { getQueryParam } from "helper/index";
-import FlashStorage from "services/FlashStorage";
 import { Box } from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
 
+import FlashStorage from "services/FlashStorage";
+import Searchbar from "components/Searchbar/Searchbar";
 import ApiOrderService, {OrderStatus} from "services/api/ApiOrderService";
 import { OrderTable } from './OrderTable';
 
@@ -70,6 +72,27 @@ const styles = {
 
 const useStyles = makeStyles(styles);
 
+const defaultOrder = {
+  code:'',
+  clientId: '',
+  clientName: '',
+  merchantId: '',
+  merchantName: '',
+  items: [],
+  location: null,
+  price:0,
+  cost:0,
+  total: 0,
+  type:"G",
+  status:"N",
+  paymentStatus: "U",
+  paymentMethod: 'PC',
+  paymentId: "",
+  deliverDate: moment().format('YYYY-MM-DD'),
+  delivered: moment().toISOString(),
+  note: ''
+}
+
 const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDate, setAccount, setLoggedInAccount, location, history }) => {
   const { t } = useTranslation();
   
@@ -112,7 +135,6 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
         setLoading(false);
         if(data.data && data.data.length>0){
           const d = data.data[0];
-          setModel(d);
           const _id = d.clientId ? d.clientId : '';
           const username = d.clientName ? d.clientName: '';
           setAccount({_id, username, type: 'client'});
@@ -140,11 +162,21 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
     const date = m ? m.format('YYYY-MM-DD') : null;
     setDeliverDate(date);
   }
+  
   const handleToTransactionHistory = () => {
     history.push('/finance/transaction');
   }
+
   const handleDeliverDateClick = () => {
 
+  }
+
+  const handleNewOrder = () => {
+    setModel({
+      ...defaultOrder,
+      modifyBy: account ? account._id : '',
+      created: moment.utc().toISOString()
+    });
   }
 
   const handleUpdateData = () => {
@@ -291,6 +323,21 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
               selectData={handleSelectOrder}
               removeData={handleDeleteOrder} />
           </CardBody>
+          <CardFooter>
+            <GridItem xs={12} container direction="row-reverse">
+              <Box mt={2}>
+                <Button
+                  color="primary"
+                  variant="contained"
+                  disabled={processing}
+                  onClick={handleNewOrder}
+                >
+                  <AddCircleOutlineIcon />
+                  {t("New Order")}
+                </Button>
+              </Box>
+            </GridItem>
+          </CardFooter>
         </Card>
       </GridItem>
       <GridItem xs={12} sm={12} md={4}>

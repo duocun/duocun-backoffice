@@ -152,7 +152,7 @@ const OrderForm = ({ account, order, data, update, toTransactionHistory }) => {
 
 
   const handleCreate = () => {
-    if (model.fromId && model.staffId) {
+    if (model.clientId && model.items && model.items.length>0) {
       removeAlert();
       setProcessing(true);
       ApiOrderService.createOrder(model).then(({ data }) => {
@@ -162,7 +162,7 @@ const OrderForm = ({ account, order, data, update, toTransactionHistory }) => {
             severity: "success"
           };
           if (model._id === "new") {
-            FlashStorage.set("SALARY_ALERT", newAlert);
+            FlashStorage.set("ORDER_ALERT", newAlert);
             return;
           } else {
             setAlert(newAlert);
@@ -176,14 +176,14 @@ const OrderForm = ({ account, order, data, update, toTransactionHistory }) => {
         }
         setProcessing(false);
       })
-        .catch(e => {
-          console.error(e);
-          setAlert({
-            message: t("Save failed"),
-            severity: "error"
-          });
-          setProcessing(false);
+      .catch(e => {
+        console.error(e);
+        setAlert({
+          message: t("Save failed"),
+          severity: "error"
         });
+        setProcessing(false);
+      });
     }
   };
 
@@ -232,7 +232,7 @@ const OrderForm = ({ account, order, data, update, toTransactionHistory }) => {
     if (model._id) {
       handleUpdate();
     } else {
-      handleCreate();
+      // handleCreate();
     }
   }
 
@@ -303,7 +303,7 @@ const OrderForm = ({ account, order, data, update, toTransactionHistory }) => {
                 <Box pb={2}>
                   <TextField id="order-client"
                     label={`${t("Client")}`}
-                    value={model.clientName ? model.clientName : 'N/A'}
+                    value={model.clientName ? model.clientName : ''}
                     InputLabelProps={{ shrink: model.clientId ? true : false }}
                     InputProps={{
                       readOnly: true,
@@ -315,7 +315,7 @@ const OrderForm = ({ account, order, data, update, toTransactionHistory }) => {
                 <Box pb={2}>
                   <TextField id="order-client-phone"
                     label={`${t("Client Phone")}`}
-                    value={model.clientPhone? model.clientPhone : 'N/A'}
+                    value={model.clientPhone? model.clientPhone : ''}
                     InputLabelProps={{ shrink: model.clientPhone ? true : false }}
                     InputProps={{
                       readOnly: true,
@@ -362,45 +362,6 @@ const OrderForm = ({ account, order, data, update, toTransactionHistory }) => {
                   />
                 </Box>
               </GridItem>
-              <GridItem xs={12} lg={6}>
-                {/* <Box pb={2}>
-                  <FormControl className={classes.select}>
-                    <InputLabel id="action-label">Action</InputLabel>
-                    <Select required
-                      labelId="action-select-label"
-                      id="action-select"
-                      value={model.actionCode}
-                      onChange={e => handleActionChange(e.target.value)}
-                    >
-                      {
-                        actions.map(action => <MenuItem key={action.code} value={action.code}>{action.text}</MenuItem>)
-                      }
-                    </Select>
-                  </FormControl>
-                </Box> */}
-              </GridItem>
-
-              {/* {
-                model.actionCode === 'PS' &&
-                <GridItem xs={12} lg={6}>
-                  <Box pb={2}>
-                    <FormControl className={classes.select}>
-                      <InputLabel id="staff-select-label">Pay Salary To</InputLabel>
-                      <Select required
-                        labelId="staff-select-label"
-                        id="staff-select"
-                        value={model.staffId}
-                        onChange={e => handleStaffChange(e.target.value)}
-                      >
-                        {
-                          accounts && accounts.length > 0 &&
-                          accounts.map(d => <MenuItem key={d._id} value={d._id}>{d.username}</MenuItem>)
-                        }
-                      </Select>
-                    </FormControl>
-                  </Box>
-                </GridItem>
-              } */}
 
               <GridItem xs={12} lg={6}>
                 <Box pb={2}>
@@ -434,30 +395,12 @@ const OrderForm = ({ account, order, data, update, toTransactionHistory }) => {
                     fullWidth
                     value={model.note ? model.note : ''}
                     InputLabelProps={{ shrink: model.note ? true : false }}
-                    InputProps={{
-                      // readOnly: true,
-                    }}
+                    // InputProps={{}}
                     onChange={e => {
                       setModel({ ...model, note: e.target.value });
                     }}
                   />
                 </Box>
-                {/* <Box pb={2}>
-                  <CustomInput
-                    labelText={t("Note")}
-                    id="note"
-                    formControlProps={{
-                      fullWidth: true
-                    }}
-                    InputLabelProps={{ shrink: model.note ? true : false }}
-                    inputProps={{
-                      value: model.note,
-                      onChange: e => {
-                        setModel({ ...model, note: e.target.value });
-                      }
-                    }}
-                  />
-                </Box> */}
               </GridItem>
               <GridItem>
                 <KeyboardDatePicker
