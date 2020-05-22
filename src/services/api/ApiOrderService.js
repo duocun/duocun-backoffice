@@ -69,7 +69,12 @@ export default {
     model._id = model._id || "new";
     return ApiService.v2().post(`orders/${model._id}`, model);
   },
-    removeOrder: id => {
-      return ApiService.v2().delete(`orders/${id}`);
-    },
+  updateOrder: model => {
+    const data = {...model};
+    delete data._id;
+    return ApiService.v2().put(`orders/${model._id}`, {data});
+  },
+  removeOrder: id => {
+    return ApiService.v2().delete(`orders/${id}`);
+  },
 };

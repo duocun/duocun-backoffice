@@ -32,10 +32,10 @@ import { OrderTable } from './OrderTable';
 
 import * as moment from "moment";
 // import { deliverDate } from "redux/reducers/order";
-import { setDeliverDate } from 'redux/actions/order';
+import { selectOrder, setDeliverDate } from 'redux/actions/order';
 import {setAccount, setLoggedInAccount} from 'redux/actions/account';
 
-import {OrderForm} from './OrderForm';
+import OrderForm from './OrderForm';
 import ApiAuthService from 'services/api/ApiAuthService';
 
 const styles = {
@@ -70,7 +70,7 @@ const styles = {
 
 const useStyles = makeStyles(styles);
 
-const OrderTablePage = ({ account, deliverDate, setDeliverDate, setAccount, setLoggedInAccount, location, history }) => {
+const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDate, setAccount, setLoggedInAccount, location, history }) => {
   const { t } = useTranslation();
   
   const [model, setModel] = useState({});
@@ -111,10 +111,10 @@ const OrderTablePage = ({ account, deliverDate, setDeliverDate, setAccount, setL
         setTotalRows(data.count);
         setLoading(false);
         if(data.data && data.data.length>0){
-          const order = data.data[0];
-          setModel(order);
-          const _id = order.clientId ? order.clientId : '';
-          const username = order.clientName ? order.clientName: '';
+          const d = data.data[0];
+          setModel(d);
+          const _id = d.clientId ? d.clientId : '';
+          const username = d.clientName ? d.clientName: '';
           setAccount({_id, username, type: 'client'});
         }
       }
@@ -148,11 +148,12 @@ const OrderTablePage = ({ account, deliverDate, setDeliverDate, setAccount, setL
   }
 
   const handleUpdateData = () => {
-
+    updateData();
   }
 
   const handleSelectOrder = (data) => {
     setModel(data);
+    selectOrder(data);
     const _id = data.client ? data.client._id : '';
     const username = data.client ? data.client.username : '';
     setAccount({_id, username, type:'client'});
@@ -295,7 +296,7 @@ const OrderTablePage = ({ account, deliverDate, setDeliverDate, setAccount, setL
       <GridItem xs={12} sm={12} md={4}>
           <OrderForm
             account={account}
-            order={model}
+            data={model}
             update={handleUpdateData}
             toTransactionHistory={handleToTransactionHistory}
              />
@@ -310,7 +311,8 @@ OrderTablePage.propTypes = {
 };
 
 
-const mapStateToProps = (state) => ({ 
+const mapStateToProps = (state) => ({
+  order: state.order, 
   deliverDate: state.deliverDate,
   account: state.loggedInAccount
 });
@@ -321,5 +323,5 @@ const mapStateToProps = (state) => ({
 // });
 export default connect(
   mapStateToProps,
-  {setDeliverDate, setAccount, setLoggedInAccount}
+  {selectOrder, setDeliverDate, setAccount, setLoggedInAccount}
 )(OrderTablePage);
