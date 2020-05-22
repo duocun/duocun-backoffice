@@ -209,9 +209,9 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
                       <TableCell>{page * rowsPerPage + idx + 1}</TableCell>
                       <TableCell>{row.code}</TableCell>
                       <TableCell>{toDateString(row.delivered)}</TableCell>
-                      <TableCell>{row.client ? row.client.username : 'N/A'}</TableCell>
-                      <TableCell>{row.client ? row.client.phone : 'N/A'}</TableCell>
-                      <TableCell>{row.merchant ? row.merchant.name: 'N/A'}</TableCell>
+                      <TableCell>{row.clientName}</TableCell>
+                      <TableCell>{row.clientPhone ? row.clientPhone : 'N/A'}</TableCell>
+                      <TableCell>{row.merchantName ? row.merchantName: 'N/A'}</TableCell>
                       <TableCell>{row.price}</TableCell>
                       <TableCell>{row.cost}</TableCell>
                       <TableCell>

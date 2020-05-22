@@ -303,8 +303,8 @@ const OrderForm = ({ account, order, data, update, toTransactionHistory }) => {
                 <Box pb={2}>
                   <TextField id="order-client"
                     label={`${t("Client")}`}
-                    value={model.client ? model.client.username : 'N/A'}
-                    InputLabelProps={{ shrink: model.client ? true : false }}
+                    value={model.clientName ? model.clientName : 'N/A'}
+                    InputLabelProps={{ shrink: model.clientId ? true : false }}
                     InputProps={{
                       readOnly: true,
                     }}
@@ -315,8 +315,8 @@ const OrderForm = ({ account, order, data, update, toTransactionHistory }) => {
                 <Box pb={2}>
                   <TextField id="order-client-phone"
                     label={`${t("Client Phone")}`}
-                    value={model.client ? model.client.phone : 'N/A'}
-                    InputLabelProps={{ shrink: model.client ? true : false }}
+                    value={model.clientPhone? model.clientPhone : 'N/A'}
+                    InputLabelProps={{ shrink: model.clientPhone ? true : false }}
                     InputProps={{
                       readOnly: true,
                     }}

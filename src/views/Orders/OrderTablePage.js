@@ -96,9 +96,9 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
     const keyword = query;
     const condition = {
       $or: [
-        {clientName: { $regex: keyword }},
-        {code: { $regex: keyword }}, 
-        {'client.phone': { $regex: keyword }}
+        { clientName: { $regex: keyword }},
+        { clientPhone: { $regex: keyword }},
+        { code: { $regex: keyword }}
       ],
       status: {
         $nin: [OrderStatus.BAD, OrderStatus.DELETED, OrderStatus.TEMP],
@@ -154,8 +154,8 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
   const handleSelectOrder = (data) => {
     setModel(data);
     selectOrder(data);
-    const _id = data.client ? data.client._id : '';
-    const username = data.client ? data.client.username : '';
+    const _id = data.clientId;
+    const username = data.clienName;
     setAccount({_id, username, type:'client'});
   }
 

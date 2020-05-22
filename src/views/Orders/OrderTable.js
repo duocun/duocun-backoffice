@@ -235,12 +235,12 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
                       <TableCell>{toDateString(row.delivered)}</TableCell>
                       
                       <TableCell>
-                        <div>{row.client ? row.client.username : ''}</div>
-                        <div>{row.client ? row.client.phone : 'N/A'}</div>
+                        <div>{row.clientName ? row.clientName : ''}</div>
+                        <div>{row.clientPhone ? row.clientPhone : 'N/A'}</div>
                       </TableCell>
 
-                      {/* <TableCell>{row.client ? row.client.phone : 'N/A'}</TableCell> */}
-                      <TableCell>{row.merchant ? row.merchant.name: 'N/A'}</TableCell>
+                      {/* <TableCell>{row.clientPhone ? row.clientPhone : 'N/A'}</TableCell> */}
+                      <TableCell>{row.merchantName ? row.merchantName: 'N/A'}</TableCell>
                       {/* <TableCell>{row.price}</TableCell> */}
                       {/* <TableCell>{row.cost}</TableCell> */}
                       {/* <TableCell>{row.driver ? row.driver.username : 'N/A'}</TableCell> */}
