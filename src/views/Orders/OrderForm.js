@@ -244,6 +244,10 @@ const OrderForm = ({ account, order, data, update, toTransactionHistory }) => {
     setModel({ ...model, location });
   }
 
+  const handleDeliverDateChange = (m) => {
+    const deliverDate = m.toISOString().split('T')[0];
+    setModel({ ...model, deliverDate, delivered: `${deliverDate}T15:00:00.000Z` });
+  }
 
   useEffect(() => {
     if (data.actionCode === 'PS') {
@@ -408,7 +412,7 @@ const OrderForm = ({ account, order, data, update, toTransactionHistory }) => {
                   label={t("Deliver Date")}
                   format="YYYY-MM-DD"
                   value={moment.utc(model.delivered)}
-                  onChange={(m) => setModel({ ...model, delivered: `${m.toISOString().split('T')[0]}T15:00:00.000Z` })}
+                  onChange={(m) => handleDeliverDateChange(m)}
                 />
               </GridItem>
               <GridItem xs={12} container direction="row-reverse">
