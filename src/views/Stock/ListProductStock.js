@@ -550,6 +550,11 @@ export default function ListProductStock({ location }) {
                         defaultStartDate={moment()}
                         defaultEndDate={moment().add("+13", "days")}
                         onChange={(start, end) => {
+                          const newParams = { ...filterParams };
+                          newParams.startDate = moment(start).format(
+                            "YYYY-MM-DD"
+                          );
+                          setFilterParams(newParams);
                           setStartDate(start);
                           setEndDate(end);
                         }}

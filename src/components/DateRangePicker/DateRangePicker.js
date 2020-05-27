@@ -31,7 +31,7 @@ const useStyle = makeStyles(theme => {
 export default function DateRangePicker({
   defaultStartDate = new Date(),
   defaultEndDate = new Date(),
-  minDate = new Date(),
+  minDate = undefined,
   maxDate = undefined,
   onChange
 }) {

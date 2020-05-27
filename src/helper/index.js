@@ -151,16 +151,29 @@ export const countProductFromDate = (
   productId,
   dir = "after"
 ) => {
-  return countProductQuantityFromOrders(
-    dir === "after"
-      ? orders.filter(
-          order => moment(order.delivered).format("YYYY-MM-DD") >= date
-        )
-      : orders.filter(
-          order => moment(order.delivered).format("YYYY-MM-DD") <= date
-        ),
-    productId
-  );
+  let todayString = moment()
+    .local()
+    .format("YYYY-MM-DD");
+  let afterToday = todayString <= date;
+  let ordersToCount = afterToday
+    ? orders.filter(
+        order => order.deliverDate <= date && order.deliverDate >= todayString
+      )
+    : orders.filter(
+        order => order.deliverDate >= date && order.deliverDate <= todayString
+      );
+  let count = countProductQuantityFromOrders(ordersToCount, productId);
+  if (productId === "5e82ad721a577a3df456edf5") {
+    console.log("todayString", todayString);
+    console.log("date", date);
+    console.log("ordersToCount", ordersToCount);
+    console.log("count ", count);
+  }
+  if (afterToday) {
+    return count;
+  } else {
+    return -1 * count;
+  }
 };
 
 export const getPictureUrl = src => {
