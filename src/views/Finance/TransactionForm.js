@@ -259,7 +259,7 @@ export const TransactionForm = ({ account, transaction, items, update }) => {
   useEffect(() => {
     const token = AuthService.getAuthToken();
     ApiAuthService.getCurrentUser(token).then(({ data }) => {
-      const account = { ...data };
+      const account = { ...data.data };
 
       if(transaction && transaction.fromId && transaction.toId){
         let ids = [transaction.fromId, transaction.toId];

@@ -188,9 +188,10 @@ const OrderForm = ({ account, order, data, update, toTransactionHistory }) => {
   };
 
   const handleUpdate = () => {
-    if (model._id) {
+    if (model._id && modifyByAccount._id) {
       removeAlert();
       setProcessing(true);
+      setModel({...model, modifyBy: modifyByAccount._id})
       ApiOrderService.updateOrder(model).then(({ data }) => {
         if (data.code === 'success') {
           setAlert({
@@ -244,6 +245,10 @@ const OrderForm = ({ account, order, data, update, toTransactionHistory }) => {
     setModel({ ...model, location });
   }
 
+  const handleDeliverDateChange = (m) => {
+    const deliverDate = m.toISOString().split('T')[0];
+    setModel({ ...model, deliverDate, delivered: `${deliverDate}T15:00:00.000Z` });
+  }
 
   useEffect(() => {
     if (data.actionCode === 'PS') {
@@ -259,7 +264,7 @@ const OrderForm = ({ account, order, data, update, toTransactionHistory }) => {
   useEffect(() => {
     const token = AuthService.getAuthToken();
     ApiAuthService.getCurrentUser(token).then(({ data }) => {
-      const account = { ...data };
+      const account = { ...data.data };
       setModifyByAccount(account);
       ApiAccountService.getAccountList(null, null, { type: { $in: ['driver', 'system'] } }).then(({ data }) => {
         setAccounts(data.data);
@@ -408,7 +413,7 @@ const OrderForm = ({ account, order, data, update, toTransactionHistory }) => {
                   label={t("Deliver Date")}
                   format="YYYY-MM-DD"
                   value={moment.utc(model.delivered)}
-                  onChange={(m) => setModel({ ...model, delivered: `${m.toISOString().split('T')[0]}T15:00:00.000Z` })}
+                  onChange={(m) => handleDeliverDateChange(m)}
                 />
               </GridItem>
               <GridItem xs={12} container direction="row-reverse">
