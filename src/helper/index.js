@@ -163,12 +163,12 @@ export const countProductFromDate = (
         order => order.deliverDate >= date && order.deliverDate <= todayString
       );
   let count = countProductQuantityFromOrders(ordersToCount, productId);
-  if (productId === "5e82ad721a577a3df456edf5") {
-    console.log("todayString", todayString);
-    console.log("date", date);
-    console.log("ordersToCount", ordersToCount);
-    console.log("count ", count);
-  }
+  // if (productId === "5e82ad721a577a3df456edf5") {
+  //   console.log("todayString", todayString);
+  //   console.log("date", date);
+  //   console.log("ordersToCount", ordersToCount);
+  //   console.log("count ", count);
+  // }
   if (afterToday) {
     return count;
   } else {

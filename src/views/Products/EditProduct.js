@@ -794,7 +794,7 @@ const EditProduct = ({ match, history }) => {
                           withIcon={true}
                           buttonText="Upload image"
                           onChange={picture => uploadPicture(picture)}
-                          imgExtension={[".jpg", ".gif", ".png"]}
+                          imgExtension={[".jpg", ".gif", ".png", ".jpeg"]}
                           maxFileSize={5242880}
                         />
                       </GridItem>
