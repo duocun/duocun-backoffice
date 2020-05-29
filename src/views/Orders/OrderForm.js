@@ -322,8 +322,11 @@ const OrderForm = ({ account, order, data, update, toTransactionHistory }) => {
                     label={`${t("Client Phone")}`}
                     value={model.clientPhone? model.clientPhone : ''}
                     InputLabelProps={{ shrink: model.clientPhone ? true : false }}
-                    InputProps={{
-                      readOnly: true,
+                    // InputProps={{
+                    //   readOnly: true,
+                    // }}
+                    onChange={e => {
+                      setModel({ ...model, clientPhone: e.target.value });
                     }}
                   />
                 </Box>
