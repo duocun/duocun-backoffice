@@ -156,7 +156,7 @@ const Dashboard = ({summary, loadStatisticsSummary, history}) => {
       <GridContainer>
         <GridItem xs={12} sm={12} md={4}>
           <Card chart>
-            <CardHeader color="success">
+            <CardHeader color="success" onClick={()=>{history.push("/dashboard/order-analytics")}}>
               <ChartistGraph
                 className="ct-chart"
                 data={dailySalesChart.data}
@@ -166,7 +166,7 @@ const Dashboard = ({summary, loadStatisticsSummary, history}) => {
               />
             </CardHeader>
             <CardBody>
-              <h4 className={classes.cardTitle}>Daily Sales</h4>
+              <h4 className={classes.cardTitle}>订单总数监测</h4>
               <p className={classes.cardCategory}>
                 <span className={classes.successText}>
                   <ArrowUpward className={classes.upArrowCardCategory} /> 55%
@@ -183,7 +183,7 @@ const Dashboard = ({summary, loadStatisticsSummary, history}) => {
         </GridItem>
         <GridItem xs={12} sm={12} md={4}>
           <Card chart>
-            <CardHeader color="warning">
+            <CardHeader color="warning" onClick={()=>{history.push("/dashboard/product-analytics")}}>
               <ChartistGraph
                 className="ct-chart"
                 data={emailsSubscriptionChart.data}
@@ -194,7 +194,7 @@ const Dashboard = ({summary, loadStatisticsSummary, history}) => {
               />
             </CardHeader>
             <CardBody>
-              <h4 className={classes.cardTitle}>Email Subscriptions</h4>
+              <h4 className={classes.cardTitle}>商品销售总数监测</h4>
               <p className={classes.cardCategory}>Last Campaign Performance</p>
             </CardBody>
             <CardFooter chart>

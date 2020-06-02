@@ -20,5 +20,13 @@ export default {
   saveProductStatistic: (startDate, endDate) => {
     let query = {startDate, endDate};
     return ApiService.v2().get("statistics/product", query);
-  }
+  },
+  getOrderAnalytics: (startDate, endDate = null ) => {
+    let query = {startDate, endDate};
+    return ApiService.v2().get("statistics/order-analytics", query);
+  },
+  getProductAnalytics: (startDate, endDate = null ) => {
+    let query = {startDate, endDate};
+    return ApiService.v2().get("statistics/product-analytics", query);
+  },
 };
