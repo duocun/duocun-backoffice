@@ -296,7 +296,7 @@ export default function ListProductStock({ location }) {
   });
   // states related to stock dates
   const [startDate, setStartDate] = useState(moment());
-  const [endDate, setEndDate] = useState(moment().add("+14", "days"));
+  const [endDate, setEndDate] = useState(moment().add("+7", "days"));
   // states related to processing
   const [alert, setAlert] = useState(
     FlashStorage.get("PRODUCT_ALERT") || { message: "", severity: "info" }
@@ -548,7 +548,7 @@ export default function ListProductStock({ location }) {
                     <Box className={classes.headerBox}>
                       <DateRangePicker
                         defaultStartDate={moment()}
-                        defaultEndDate={moment().add("+13", "days")}
+                        defaultEndDate={moment().add("+6", "days")}
                         onChange={(start, end) => {
                           const newParams = { ...filterParams };
                           newParams.startDate = moment(start).format(
