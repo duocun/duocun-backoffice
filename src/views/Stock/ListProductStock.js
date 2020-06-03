@@ -405,6 +405,7 @@ export default function ListProductStock({ location }) {
   };
 
   useEffect(() => {
+    setLoading(true);
     ApiCategoryService.getCategories({ type: "G" }).then(({ data }) => {
       if (data.code === "success") {
         setCategories(data.data);
@@ -413,11 +414,13 @@ export default function ListProductStock({ location }) {
   }, []);
 
   useEffect(() => {
+    setLoading(true);
     updateData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, rowsPerPage, sort, categories]);
 
   useEffect(() => {
+    setLoading(true);
     if (page === 0) {
       updateData();
     } else {
