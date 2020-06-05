@@ -160,10 +160,10 @@ export const countProductFromDate = (
   let afterToday = todayString <= date;
   let ordersToCount = afterToday
     ? orders.filter(
-        order => order.deliverDate <= date && order.deliverDate >= todayString
+        order => order.deliverDate < date && order.deliverDate >= todayString
       )
     : orders.filter(
-        order => order.deliverDate >= date && order.deliverDate <= todayString
+        order => order.deliverDate > date && order.deliverDate <= todayString
       );
   let count = countProductQuantityFromOrders(ordersToCount, productId);
   // if (productId === "5e82ad721a577a3df456edf5") {
