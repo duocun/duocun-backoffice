@@ -102,6 +102,8 @@ const defaultProductModelState = {
   cost: 0,
   categoryId: "",
   pictures: [],
+  rank: 0,
+  merchantId: "",
   stock: {
     enabled: false,
     allowNegative: false,
@@ -412,6 +414,7 @@ const EditProduct = ({ match, history }) => {
   const [loading, setLoading] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [model, setModel] = useState(defaultProductModelState);
+  const [merchants, setMerchants] = useState([]);
   const [categoryTreeData, setCategoryTreeData] = useState([]);
   const [attributes, setAttributes] = useState(defaultAttributesState);
   const [alert, setAlert] = useState(
@@ -435,6 +438,7 @@ const EditProduct = ({ match, history }) => {
             setCategoryTreeData(categoryResp.data.data);
           }
           setAttributes(data.meta?.attributes || []);
+          setMerchants(data.meta?.merchants || []);
         } else {
           setAlert({
             message: t("Data not found"),
@@ -648,6 +652,54 @@ const EditProduct = ({ match, history }) => {
                               value: model.cost,
                               onChange: e => {
                                 setModel({ ...model, cost: e.target.value });
+                              }
+                            }}
+                          />
+                        </Box>
+                      </GridItem>
+                      <GridItem xs={12} lg={6}>
+                        <Box pb={2}>
+                          <FormControl className={classes.select}>
+                            <InputLabel id="product-merchant-label">
+                              {t("Merchant")}
+                            </InputLabel>
+                            <Select
+                              id="product-merchant"
+                              labelId="product-merchant-label"
+                              value={model.merchantId}
+                              onChange={e => {
+                                setModel({
+                                  ...model,
+                                  merchantId: e.target.value
+                                });
+                              }}
+                            >
+                              {merchants.map(merchant => {
+                                return (
+                                  <MenuItem
+                                    key={merchant._id}
+                                    value={merchant._id}
+                                  >
+                                    {merchant.name}
+                                  </MenuItem>
+                                );
+                              })}
+                            </Select>
+                          </FormControl>
+                        </Box>
+                      </GridItem>
+                      <GridItem xs={12} lg={6}>
+                        <Box pb={2}>
+                          <CustomInput
+                            labelText={t("Rank")}
+                            id="product-rank"
+                            formControlProps={{
+                              fullWidth: true
+                            }}
+                            inputProps={{
+                              value: model.rank,
+                              onChange: e => {
+                                setModel({ ...model, rank: e.target.value });
                               }
                             }}
                           />
