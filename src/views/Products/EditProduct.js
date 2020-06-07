@@ -103,6 +103,7 @@ const defaultProductModelState = {
   categoryId: "",
   pictures: [],
   rank: 0,
+  taxRate: 0,
   merchantId: "",
   stock: {
     enabled: false,
@@ -706,6 +707,23 @@ const EditProduct = ({ match, history }) => {
                         </Box>
                       </GridItem>
                       <GridItem xs={12} lg={6}>
+                        <Box pb={2}>
+                          <CustomInput
+                            labelText={t("Tax Rate")}
+                            id="product-tax-rate"
+                            formControlProps={{
+                              fullWidth: true
+                            }}
+                            inputProps={{
+                              value: model.taxRate,
+                              onChange: e => {
+                                setModel({ ...model, taxRate: e.target.value });
+                              }
+                            }}
+                          />
+                        </Box>
+                      </GridItem>
+                      <GridItem xs={12} lg={6}>
                         <h5 className={classes.heading}>{t("Stock")}</h5>
                       </GridItem>
                       <GridItem xs={12} lg={6}>
@@ -755,7 +773,7 @@ const EditProduct = ({ match, history }) => {
                               </FormControl>
                             </Box>
                           </GridItem>
-                          {/* <GridItem xs={12} lg={6}>
+                          <GridItem xs={12} lg={6}>
                             <Box pb={2}>
                               <CustomInput
                                 labelText={t("Quantity")}
@@ -774,7 +792,7 @@ const EditProduct = ({ match, history }) => {
                                 }}
                               />
                             </Box>
-                          </GridItem> */}
+                          </GridItem>
                           <GridItem xs={12} lg={6}>
                             <Box pb={2}>
                               <CustomInput
