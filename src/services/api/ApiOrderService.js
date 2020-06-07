@@ -77,4 +77,9 @@ export default {
   removeOrder: id => {
     return ApiService.v2().delete(`orders/${id}`);
   },
+
+  getDuplicates: (delivered) => {
+    let query = {delivered};
+    return ApiService.v2().get(`orders/duplicates`, query);
+  }
 };

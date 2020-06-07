@@ -25,6 +25,7 @@ import TableCell from "@material-ui/core/TableCell";
 
 
 import ApiStatisticsService from 'services/api/ApiStatisticsService';
+import ApiOrderService from "services/api/ApiOrderService";
 
 const useStyles = makeStyles((theme) => ({
   cardCategoryWhite: {
@@ -62,6 +63,7 @@ const DriverSummaryPage = ({}) => {
   const [drivers, setDriverList] = useState([]);
   const [driver, setDriver] = useState({_id: '', name: ''});
 
+  const [dupClients, setDupClientList] = useState([]);
   // const [anchorEl, setAnchorEl] = React.useState(null);
   // const [selectedDriver, setSelectedDriver] = React.useState(null);
   // const [selectedIndex, setSelectedIndex] = React.useState(1);
@@ -83,6 +85,14 @@ const DriverSummaryPage = ({}) => {
   // const handleClose = () => {
   //   setAnchorEl(null);
   // };
+
+  useEffect(() => {
+    const now = moment().toISOString();
+    ApiOrderService.getDuplicates(now).then(
+      ({data}) => {
+        setDupClientList(data);
+      });
+  }, []);
 
   useEffect(() => {
     const startDate = moment().format('YYYY-MM-DD');
@@ -190,6 +200,31 @@ const DriverSummaryPage = ({}) => {
               </GridContainer>
             </CardBody>
           </Card>
+        </GridItem>
+        <GridItem xs={12} sm={12} md={8}>
+
+          {
+            dupClients && dupClients.length > 0 &&
+        <Card>
+          <CardHeader color="primary">
+            有重复订单的客户
+          </CardHeader>
+          <Table>
+            <TableBody>
+                {dupClients.map((prop) => 
+                    <TableRow key={prop.clientPhone} >
+                      <TableCell>
+                        {prop.clientName}
+                      </TableCell>
+                      <TableCell>
+                        {prop.clientPhone}
+                      </TableCell>
+                    </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </Card>
+          }
         </GridItem>
       </GridContainer>
     </div>
