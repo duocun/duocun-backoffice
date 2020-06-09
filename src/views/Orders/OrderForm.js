@@ -491,7 +491,8 @@ const OrderForm = ({ account, data, update, history }) => {
                 <Box mt={2}>
                   <Button
                     variant="contained"
-                    onClick={handleToTransactionHistory}
+                    // onClick={handleToTransactionHistory}
+                    href={`finance/transaction`}
                   >
                     <FormatListBulletedIcon />
                     {t("Transaction History")}
