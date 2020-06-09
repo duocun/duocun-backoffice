@@ -89,4 +89,7 @@ export default {
     query.query = buildQuery(conditions);
     return ApiService.v2().get("orders/map-markers", query);
   },
+  cancelItems: (id, items) => {
+    return ApiService.v2().put(`orders/cancelItems/${id}`, {items});
+  }
 };

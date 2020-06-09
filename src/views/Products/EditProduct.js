@@ -433,7 +433,9 @@ const EditProduct = ({ match, history }) => {
     ApiProductService.getProduct(match.params.id)
       .then(async ({ data }) => {
         if (data.code === "success") {
-          setModel({ ...model, ...data.data });
+          if (match.params.id !== "new") {
+            setModel({ ...model, ...data.data });
+          }
           const categoryResp = await ApiCategoryService.getCategoryTree();
           if (categoryResp.data && categoryResp.data.code === "success") {
             setCategoryTreeData(categoryResp.data.data);
