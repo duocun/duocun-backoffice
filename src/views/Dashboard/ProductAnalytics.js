@@ -124,7 +124,7 @@ const getChart = (series, categories, height) => {
       },
       yaxis: {
         title: {
-          text: '订单数'
+          text: '送货单数'
         }
       },
       fill: {
