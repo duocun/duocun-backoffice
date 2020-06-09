@@ -50,7 +50,7 @@ const urls = {
 // data --- [{ _id, lat, lng, icon }]
 // zoom --- 9
 // center --- { lat: 43.856098, lng: -79.337021 }
-const OrderMap = withScriptjs(
+const AssignmentMapPage = withScriptjs(
   withGoogleMap(({ data, zoom, center, googleMapURL, loadingElement, containerElement, mapElement }) => (
     <GoogleMap
       defaultZoom={zoom}
@@ -229,4 +229,4 @@ const OrderMapPage = () => {
       )
     }
     
-export default OrderMapPage;
+export default AssignmentMapPage;
