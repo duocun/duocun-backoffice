@@ -188,7 +188,8 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
                       <TableCell>{row.merchantName ? row.merchantName: 'N/A'}</TableCell>
  
                       <TableCell>
-                        <IconButton aria-label="edit" onClick={() => selectData(row)}>
+                        <IconButton aria-label="edit" href={`orders/${row._id}`}> 
+                        {/* // onClick={() => selectData(row)}> */}
                           <EditIcon />
                         </IconButton>
                         <IconButton aria-label="delete" disabled={processing} onClick={() => removeData(row._id)}>

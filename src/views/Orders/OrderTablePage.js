@@ -37,7 +37,6 @@ import * as moment from "moment";
 import { selectOrder, setDeliverDate } from 'redux/actions/order';
 import {setAccount, setLoggedInAccount} from 'redux/actions/account';
 
-import OrderForm from './OrderForm';
 import ApiAuthService from 'services/api/ApiAuthService';
 
 const styles = {
@@ -179,10 +178,6 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
     });
   }
 
-  const handleUpdateData = () => {
-    updateData();
-  }
-
   const handleSelectOrder = (data) => {
     setModel(data);
     selectOrder(data);
@@ -241,7 +236,7 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
 
   return (
     <GridContainer>
-      <GridItem xs={12} sm={12} md={8}>
+      <GridItem xs={12} sm={12} md={12}>
         <Card>
           <CardHeader color="primary">
             <GridContainer>
@@ -340,14 +335,7 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
           </CardFooter>
         </Card>
       </GridItem>
-      <GridItem xs={12} sm={12} md={4}>
-          <OrderForm
-            account={account}
-            data={model}
-            update={handleUpdateData}
-            toTransactionHistory={handleToTransactionHistory}
-             />
-        </GridItem>
+
     </GridContainer>
   );
 }

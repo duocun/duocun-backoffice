@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { connect } from "react-redux";
+import PropTypes from "prop-types";
 
 import { Save as SaveIcon, FormatListBulleted as FormatListBulletedIcon } from "@material-ui/icons";
 import { TextField, Button, Checkbox,
@@ -16,10 +18,16 @@ import CardFooter from "components/Card/CardFooter.js";
 import EditSkeleton from "../Common/EditSkeleton";
 import ApiOrderService from "services/api/ApiOrderService";
 
+import OrderForm from './OrderForm';
+
+import { selectOrder, setDeliverDate } from 'redux/actions/order';
+import {setAccount, setLoggedInAccount} from 'redux/actions/account';
+
+
 const defaultOrdersModelState = {
-  _id: 'new',
-  client: {},
-  merchant: {},
+  _id: '',
+  clientId: {},
+  merchantId: {},
   items: [],
   price: 0,
   cost: 0,
@@ -31,7 +39,7 @@ const defaultOrdersModelState = {
   code:""
 }
 
-const OrdersForm = ({}) => {
+const OrderFormPage = ({match, history, order, selectOrder, account, deliverDate, setDeliverDate, setAccount}) => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -45,112 +53,58 @@ const OrdersForm = ({}) => {
 
   }
 
-  /////////////////// For render and events 
-
-  const _renderOrder = ()=> {
-    return <React.Fragment>
-      <GridItem xs={12}>
-        <h5>{t("Basic Information")}</h5>
-      </GridItem>
-      <GridItem xs={12} lg={12} >
-        {/* <FormControl className="dc-full-select">
-          <InputLabel id="merchant-type-label">Type</InputLabel>
-          <Select required labelId="merchant-type-label" id="order-type"
-            value={model.type} onChange={ e => setModel({...model, type: e.target.value})} >
-            <MenuItem value={'merchant'}>Merchant</MenuItem>
-            <MenuItem value={'driver'}>Driver</MenuItem>
-            <MenuItem value={'client'}>Client</MenuItem>
-            <MenuItem value={'system'}>System</MenuItem>
-            <MenuItem value={'freight'}>Freight</MenuItem>
-          </Select>
-        </FormControl> */}
-      </GridItem>
-      <GridItem xs={12} md={6} lg={6}>
-        <TextField id="order-code" label={`${t("Code")}`}
-          required className="dc-full" value={model.code}
-          onChange={e => { setModel({  ...model, code: e.target.value }); }}
-        />
-      </GridItem>
-      {/* <GridItem xs={12} md={6} lg={6}>
-        <TextField id="order-imageurl" label={`${t("ImageUrl")}`}
-          disabled className="dc-full" value={model.imageurl}
-          onChange={e => { setModel({  ...model, imageurl: e.target.value }); }}
-        />
-      </GridItem>
-      <GridItem xs={12} md={6} lg={6}>
-        <TextField id="order-realm" label={`${t("Realm")}`}
-          disabled className="dc-full" value={model.realm}
-          onChange={e => { setModel({  ...model, realm: e.target.value }); }}
-        />
-      </GridItem>
-      <GridItem xs={12} md={6} lg={6}>
-        <TextField id="order-sex" label={`${t("Sex")}`}
-          disabled className="dc-full" value={model.sex}
-          onChange={e => { setModel({  ...model, sex: e.target.value }); }}
-        />
-      </GridItem>
-      <GridItem xs={12} md={6} lg={6}>
-        <TextField id="order-phone" label={`${t("Phone")}`}
-          disabled className="dc-full" value={model.phone}
-          onChange={e => { setModel({  ...model, phone: e.target.value }); }}
-        />
-      </GridItem> */}
-    </React.Fragment>
-  }
-  const _attributeClick = (e, _key) => {
-    const attr = model.attributes || [];
-    if (e.target.checked) {
-      if (attr.indexOf(_key) < 0 ) {
-        attr.push(_key);
-      }
-    } else {
-      const index = attr.indexOf(_key);
-      if (index >= 0 ) {
-        attr.splice(index, 1);
-      }
-    }
-    setModel({...model, attributes: attr});
-  }
-  // const _renderAttributes = () => {
-  //   return <React.Fragment>
-  //     <GridItem xs={12}>
-  //       <h5>{t("Attributes")}</h5>
-  //     </GridItem>
-  //     <GridItem xs={12} lg={12} >
-  //       <GridContainer>
-  //         {
-  //           Object.keys(_ATTRIBUTES).map( _key => {
-  //             return <GridItem xs={6} lg={6} >
-  //                 <FormControlLabel
-  //                   control={<Checkbox checked={model.attributes.indexOf(_key)>=0}
-  //                     onChange={(e) => _attributeClick(e, _key)} color="primary" />}
-  //                   label={_ATTRIBUTES[_key]||_key}
-  //                   labelPlacement="end"
-  //                 />
-  //               </GridItem>
-  //           })
-  //         }
-  //       </GridContainer>
-  //     </GridItem>
-  //   </React.Fragment>
-  // }
-
-  const renderRight = () => {
-    return <GridContainer>
-      {/* {_renderAttributes()} */}
-    </GridContainer>
-  }
-  const renderLeft = () => {
-    return <GridContainer>
-        {_renderOrder()}
-      </GridContainer>
-  }
-  const removeAlert = () => {
-    setAlert({
-      message: "",
-      severity: "info"
-    });
+  const updateData = () => {
+    // const qDeliverDate = deliverDate ? {deliverDate} : {};
+    // const keyword = query;
+    // const condition = {
+    //   $or: [
+    //     { clientName: { $regex: keyword }},
+    //     { clientPhone: { $regex: keyword }},
+    //     { code: { $regex: keyword }}
+    //   ],
+    //   status: {
+    //     $nin: [OrderStatus.BAD, OrderStatus.DELETED, OrderStatus.TEMP],
+    //   },
+    //   ...qDeliverDate
+    // };
+    // ApiOrderService.getOrders(page, rowsPerPage, condition, [sort]).then(
+    //   ({ data }) => {
+    //     setOrders(data.data);
+    //     setTotalRows(data.count);
+    //     setLoading(false);
+    //     if(data.data && data.data.length>0){
+    //       const d = data.data[0];
+    //       const _id = d.clientId ? d.clientId : '';
+    //       const username = d.clientName ? d.clientName: '';
+    //       setAccount({_id, username, type: 'client'});
+    //     }
+    //   }
+    // );
   };
+
+  const updateFormData = (id) => {
+    if(id){
+      ApiOrderService.getOrder(id).then(({data}) => {
+        const order = data.data;
+        setModel(order);
+      });
+    }
+  }
+
+  const handleUpdateData = () => {
+    updateFormData(model._id);
+    updateData();
+  }
+
+  useEffect(() => {
+    if(!model._id){
+      ApiOrderService.getOrder(match.params.id).then(({data}) => {
+        const order = data.data;
+        setModel(order);
+      });
+    }
+  }, [model]);
+  /////////////////// For render and events 
 
 
   ////////////////////////////////////
@@ -177,54 +131,48 @@ const OrdersForm = ({}) => {
     // );
   }
 
-  updateModel = () => {
+  const updateModel = () => {
 
   }
+
   return (
     <GridContainer>
-      <GridItem xs={12} lg={12}>
-        <Card>
-          <CardHeader color="primary">
-            {loading && <h4>{t("Merchants")}</h4>}
-            {!loading && (
-              <h4>
-                {model._id && model._id !== "new"
-                  ? t("Edit Order") + ": " + model.name
-                  : t("Add Order")}
-              </h4>
-            )}
-          </CardHeader>
-          <CardBody>
-            {loading && <EditSkeleton />}
-            {!!alert.message && (
-              <Alert severity={alert.severity} onClose={removeAlert}>
-                {alert.message}
-              </Alert>
-            )}
-            {!loading && <GridContainer>
-              <GridItem xs={12} md={6} lg={6}>{renderLeft()}</GridItem>
-              <GridItem xs={12} md={6} lg={6}>{renderRight()} </GridItem>
-            </GridContainer>}
-          </CardBody>
-          <CardFooter direction="row-reverse">
-            <GridContainer>
-              <GridItem xs={12} >
-                <Button color="primary" variant="contained"
-                  disabled={loading || processing || !model.username || !model.type  } 
-                  onClick={saveModel} >
-                  <SaveIcon /> {t("Save")}
-                </Button>
-                &nbsp;&nbsp;&nbsp;&nbsp;
-                <Button variant="contained" href="../Orders">
-                  <FormatListBulletedIcon /> {t("Back")}
-                </Button>
-              </GridItem>
-            </GridContainer>
-          </CardFooter>
-        </Card>
+      <GridItem xs={12} sm={12} md={12}>
+        <OrderForm
+            account={account}
+            data={model}
+            update={handleUpdateData}
+            // toTransactionHistory={handleToTransactionHistory}
+             />
       </GridItem>
+
     </GridContainer>
   );
 };
 
-export default OrdersForm;
+
+OrderFormPage.propTypes = {
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.string
+    })
+  }),
+  history: PropTypes.object
+};
+
+const mapStateToProps = (state) => ({
+  order: state.order, 
+  deliverDate: state.deliverDate,
+  // account: state.loggedInAccount
+});
+// const mapDispatchToProps = (dispatch) => ({
+//   loadAccounts: (payload, searchOption) => {
+//     dispatch(loadAccountsAsync(payload, searchOption));
+//   },
+// });
+export default connect(
+  mapStateToProps,
+  {selectOrder, setDeliverDate, 
+    // setAccount, setLoggedInAccount
+  }
+)(OrderFormPage);
