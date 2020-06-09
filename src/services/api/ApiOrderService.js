@@ -81,5 +81,9 @@ export default {
   getDuplicates: (delivered) => {
     let query = {delivered};
     return ApiService.v2().get(`orders/duplicates`, query);
+  },
+
+  cancelItems: (id, items) => {
+    return ApiService.v2().put(`orders/cancelItems/${id}`, {items});
   }
 };
