@@ -68,8 +68,6 @@ const defaultTransaction = {
 const SalaryPage = ({ history, location }) => {
   const classes = useStyles();
   const { t } = useTranslation();
-
-
   // form related
   const [fromId, setFromId] = useState('');
   const [drivers, setDriverList] = useState([]);

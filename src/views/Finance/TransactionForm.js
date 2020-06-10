@@ -178,7 +178,7 @@ export const TransactionForm = ({ account, transaction, items, onAfterUpdate }) 
             return;
           } else {
             setAlert(newAlert);
-            onAfterUpdate(account._id);
+            onAfterUpdate(model.fromId);
           }
         } else {
           setAlert({
@@ -301,7 +301,7 @@ export const TransactionForm = ({ account, transaction, items, onAfterUpdate }) 
         ApiAccountService.getAccountList(null, null, { type: { $in: ['driver'] } }).then(({ data }) => {
           setDrivers(data.data);
           setModifyByAccount(account);
-          if (transaction) {
+          if (transaction && transaction.fromId && transaction.toId) {
             setModel({ ...transaction, modifyBy: modifyByAccount._id });
           }
         });

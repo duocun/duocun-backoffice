@@ -118,21 +118,25 @@ const TransactionFormPage = ({ match, history, account, transaction, update }) =
   );
 
   useEffect(() => {
-    if(!model._id){
-      ApiTransactionService.getTransaction(match.params.id).then(({data}) => {
-        const tr = data.data;
-        if (tr.actionCode === 'PS') {
-          setModel({
-            ...tr,
-            staffId: account._id,
-            staffName: account.username,
-            note: `Pay salary to ${account.username}`,
-            modifyBy: modifyByAccount._id
-          });
-        } else {
-          setModel({...tr, modifyBy: modifyByAccount._id});
-        }
-      });
+    if (!model._id) {
+      if (match.params.id === 'new') {
+        const s = 'new';
+      } else {
+        ApiTransactionService.getTransaction(match.params.id).then(({ data }) => {
+          const tr = data.data;
+          if (tr.actionCode === 'PS') {
+            setModel({
+              ...tr,
+              staffId: account._id,
+              staffName: account.username,
+              note: `Pay salary to ${account.username}`,
+              modifyBy: modifyByAccount._id
+            });
+          } else {
+            setModel({ ...tr, modifyBy: modifyByAccount._id });
+          }
+        });
+      }
     }
   }, [model]);
 
@@ -156,14 +160,14 @@ const TransactionFormPage = ({ match, history, account, transaction, update }) =
 
 
   const handleActionChange = (actionCode) => {
-    if(model._id){
-      if(actionCode === transaction.actionCode){
-        setModel({ ...model, actionCode, note: transaction.note? transaction.note : '' });
+    if (model._id) {
+      if (actionCode === transaction.actionCode) {
+        setModel({ ...model, actionCode, note: transaction.note ? transaction.note : '' });
       } else {
         setModel({ ...model, actionCode, note: '' });
       }
-    }else{
-      if(actionCode === 'PS'){
+    } else {
+      if (actionCode === 'PS') {
         setModel({ ...model, actionCode });
       } else {
         setModel({ ...model, actionCode, note: '' });
@@ -268,7 +272,7 @@ const TransactionFormPage = ({ match, history, account, transaction, update }) =
   const handleBack = () => {
 
   }
-  
+
 
   return (
     <GridContainer>
@@ -443,11 +447,11 @@ const TransactionFormPage = ({ match, history, account, transaction, update }) =
       </GridItem> */}
 
       <GridItem xs={12} sm={12} md={12}>
-        <TransactionForm 
+        <TransactionForm
           account={account}
           transaction={model}
           items={items}
-          afterUpdate={handleUpdateData} />
+          onAfterUpdate={handleUpdateData} />
       </GridItem>
     </GridContainer>
   )
@@ -465,7 +469,7 @@ TransactionFormPage.propTypes = {
 
 
 const mapStateToProps = (state) => ({
-  transaction: state.transaction, 
+  transaction: state.transaction,
   // deliverDate: state.deliverDate,
   account: state.account
 });

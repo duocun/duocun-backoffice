@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {connect} from "react-redux";
-import { useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
+// import { useLocation } from "react-router-dom";
 
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
@@ -394,16 +395,19 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
               <GridContainer>
                 <GridItem xs={12} container direction="row-reverse">
                   <Box mt={2}>
+                    <Link to={`transactions/new`}>
                     <Button
                       color="primary"
                       variant="contained"
                       disabled={processing}
-                      onClick={handleNewTransaction}
                     >
                       <AddCircleOutlineIcon />
                       {t("New Transaction")}
                     </Button>
+                    </Link>
                   </Box>
+              
+
                   <Box mt={2} mr={2}>
                     <Button
                       color="primary"
