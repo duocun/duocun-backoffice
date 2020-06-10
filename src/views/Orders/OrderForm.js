@@ -233,9 +233,9 @@ const OrderForm = ({ account, data, onAfterUpdate, history }) => {
     const checked = vs.filter(v => v.status);
     // const unchecked = vs.filter(v => !v.status);
     if(canSplit()){
-      const r = window.confirm('拆分并保存已选中的商品到另一个送货单。');
+      const r = window.confirm('拆分送货单, 为选中的商品新建一个送货单。');
       if(r){
-        ApiOrderService.cancelItems(model._id, checked).then(({data}) => {
+        ApiOrderService.splitOrder(model._id, checked).then(({data}) => {
           const r = data;
           updateFormData(model._id);
         });
@@ -407,7 +407,7 @@ const OrderForm = ({ account, data, onAfterUpdate, history }) => {
                     onClick={handleSplitOrder}
                     >
                     <SaveIcon />
-                    {t("Delete Items")}
+                    {t("Split Order")}
                   </Button>
                 </Box>
               </GridItem>
