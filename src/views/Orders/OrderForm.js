@@ -21,9 +21,9 @@ import CardBody from "components/Card/CardBody.js";
 // import FormLabel from "@material-ui/core/FormLabel";
 // import FormControl from "@material-ui/core/FormControl";
 // import FormGroup from "@material-ui/core/FormGroup";
-// import FormControlLabel from "@material-ui/core/FormControlLabel";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Checkbox from "@material-ui/core/Checkbox";
 // import Select from "@material-ui/core/Select";
-// import Checkbox from "@material-ui/core/Checkbox";
 
 // import Skeleton from "@material-ui/lab/Skeleton";
 import Alert from "@material-ui/lab/Alert";
@@ -121,7 +121,8 @@ const useStyles = makeStyles(theme => ({
 // }));
 
 
-const OrderForm = ({ account, order, data, update, toTransactionHistory }) => {
+// const OrderForm = ({ account, order, data, update, toTransactionHistory }) => {
+const OrderForm = ({ account, data, update, history }) => {
   // const { register, handleSubmit, watch, errors } = useForm();
   // moment.tz.add("America/Toronto|EST EDT EWT EPT|50 40 40 40|01010101010101010101010101010101010101010101012301010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010|-25TR0 1in0 11Wu 1nzu 1fD0 WJ0 1wr0 Nb0 1Ap0 On0 1zd0 On0 1wp0 TX0 1tB0 TX0 1tB0 TX0 1tB0 WL0 1qN0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 WL0 1qN0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 WL0 1qN0 4kM0 8x40 iv0 1o10 11z0 1nX0 11z0 1o10 11z0 1o10 1qL0 11D0 1nX0 11B0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 11z0 1o10 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0|65e5");
 
@@ -138,6 +139,9 @@ const OrderForm = ({ account, order, data, update, toTransactionHistory }) => {
   const [modifyByAccount, setModifyByAccount] = useState({ _id: '', username: '' });
   const [accounts, setAccounts] = useState([]);
   const [model, setModel] = useState(data);
+
+  const [productMap, setCheckMap] = useState({});
+
   const [processing, setProcessing] = useState(false);
   const removeAlert = () => {
     setAlert({
@@ -217,6 +221,28 @@ const OrderForm = ({ account, order, data, update, toTransactionHistory }) => {
     }
   }
 
+  const canSplit = () => {
+    const vs = Object.keys(productMap).map(pId => productMap[pId]);
+    const checked = vs.filter(v => v.status);
+    const unchecked = vs.filter(v => !v.status);
+    return (checked.length > 0 && unchecked.length>0);
+  }
+
+  const handleSplitOrder = () => {
+    const vs = Object.keys(productMap).map(pId => productMap[pId]);
+    const checked = vs.filter(v => v.status);
+    // const unchecked = vs.filter(v => !v.status);
+    if(canSplit()){
+      const r = window.confirm('拆分并保存已选中的商品到另一个送货单。');
+      if(r){
+        ApiOrderService.cancelItems(model._id, checked).then(({data}) => {
+          const r = data;
+          updateFormData(model._id);
+        });
+      }
+    }
+  }
+
   // location --- ILocation
   const getAddrString = (location) => {
     if (location) {
@@ -236,6 +262,20 @@ const OrderForm = ({ account, order, data, update, toTransactionHistory }) => {
       // handleCreate();
     }
   }
+  const handleToggleProduct = (e, it) => {
+    const c = {...productMap};
+    c[it.productId].status = e.target.checked;
+    setCheckMap(c);
+  }
+
+  const updateFormData = (id) => {
+    if(id){
+      ApiOrderService.getOrder(id).then(({data}) => {
+        const order = data.data;
+        setModel(order);
+      });
+    }
+  }
 
   const handleBack = () => {
 
@@ -250,7 +290,17 @@ const OrderForm = ({ account, order, data, update, toTransactionHistory }) => {
     setModel({ ...model, deliverDate, delivered: `${deliverDate}T15:00:00.000Z` });
   }
 
+  const handleToTransactionHistory = () => {
+    history.push('/finance/transaction');
+  }
+
   useEffect(() => {
+    const checkMap = {};
+    data.items.forEach(it => {
+      checkMap[it.productId] = {...it, status: false};
+    });
+    setCheckMap(checkMap);
+
     if (data.actionCode === 'PS') {
       setModel({
         ...data,
@@ -354,8 +404,26 @@ const OrderForm = ({ account, order, data, update, toTransactionHistory }) => {
                 <Box pb={2}>
                   {
                     model.items && model.items.length > 0 &&
-                    model.items.map(it => <div key={it.productId}>{it.productName} x {it.quantity}</div>)
+                    model.items.map(it => <div key={it.productId}>
+                      <FormControlLabel
+                        control={<Checkbox checked={productMap[it.productId].status} 
+                          onChange={(e) => handleToggleProduct(e, it)}
+                          name={`${it.productId}`} />}
+                          label={`${it.productName} x ${it.quantity}`}
+                          color="primary"
+                      />
+
+                    </div>)
                   }
+                  <Button
+                    color="primary"
+                    variant="contained"
+                    disabled={processing}
+                    onClick={handleSplitOrder}
+                    >
+                    <SaveIcon />
+                    {t("Split Order")}
+                  </Button>
                 </Box>
               </GridItem>
               <GridItem xs={12} lg={6}>
@@ -423,7 +491,8 @@ const OrderForm = ({ account, order, data, update, toTransactionHistory }) => {
                 <Box mt={2}>
                   <Button
                     variant="contained"
-                    onClick={toTransactionHistory}
+                    // onClick={handleToTransactionHistory}
+                    href={`finance/transaction`}
                   >
                     <FormatListBulletedIcon />
                     {t("Transaction History")}
@@ -460,16 +529,17 @@ OrderForm.propTypes = {
   history: PropTypes.object
 };
 
-
-const mapStateToProps = (state) => ({
-  order: state.order
-});
-// const mapDispatchToProps = (dispatch) => ({
-//   loadAccounts: (payload, searchOption) => {
-//     dispatch(loadAccountsAsync(payload, searchOption));
-//   },
+// const mapStateToProps = (state) => ({
+//   order: state.order
 // });
-export default connect(
-  mapStateToProps,
-  null
-)(OrderForm);
+// // const mapDispatchToProps = (dispatch) => ({
+// //   loadAccounts: (payload, searchOption) => {
+// //     dispatch(loadAccountsAsync(payload, searchOption));
+// //   },
+// // });
+// export default connect(
+//   mapStateToProps,
+//   null
+// )(OrderForm);
+
+export default OrderForm;

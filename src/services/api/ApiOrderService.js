@@ -1,5 +1,5 @@
 import ApiService from "services/api/ApiService";
-import { buildPaginationQuery } from "helper/index";
+import { buildQuery, buildPaginationQuery } from "helper/index";
 export const OrderStatus = {
   BAD: 'B',          // client return, compansate
   DELETED: 'D',          // cancellation
@@ -81,5 +81,18 @@ export default {
   getDuplicates: (delivered) => {
     let query = {delivered};
     return ApiService.v2().get(`orders/duplicates`, query);
+  },
+  // return {markers: [{orderId, lat, lng, type, status, icon}], driverMap:{driverId:{driverId, driverName}} }
+  getMapMarkers: (deliverDate) => {
+    let query = {};
+    const conditions = {deliverDate};
+    query.query = buildQuery(conditions);
+    return ApiService.v2().get("orders/map-markers", query);
+  },
+  cancelItems: (id, items) => {
+    return ApiService.v2().put(`orders/cancelItems/${id}`, {items});
+  },
+  assign: (driverId, driverName, orderIds) => {
+    return ApiService.v2().put(`orders/assign`, {driverId, driverName, orderIds});
   }
 };

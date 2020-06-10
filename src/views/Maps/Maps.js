@@ -7,7 +7,7 @@ import {
 } from "react-google-maps";
 
 const CustomSkinMap = withScriptjs(
-  withGoogleMap(() => (
+  withGoogleMap(({makers, center, zoom}) => (
     <GoogleMap
       defaultZoom={13}
       defaultCenter={{ lat: 40.748817, lng: -73.985428 }}
@@ -76,7 +76,7 @@ const CustomSkinMap = withScriptjs(
         ]
       }}
     >
-      <Marker position={{ lat: 40.748817, lng: -73.985428 }} />
+      <Marker position={{ lat: 40.748817, lng: -73.985428 }} icon={}/>
     </GoogleMap>
   ))
 );

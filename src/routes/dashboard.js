@@ -123,7 +123,7 @@ const dashboardRoutes = [
   },
   {
     path: "/maps",
-    name: "Map",
+    name: "Assignment",
     icon: LocationIcon,
     component: MapRoute,
     layout: "/"
@@ -135,13 +135,13 @@ const dashboardRoutes = [
     component: StaticPage,
     layout: "/"
   },
-  {
-    path: "/assignment",
-    name: "Assignment",
-    icon: LocationIcon,
-    component: Assignment,
-    layout: "/"
-  },
+  // {
+  //   path: "/assignment",
+  //   name: "Assignment",
+  //   icon: LocationIcon,
+  //   component: Assignment,
+  //   layout: "/"
+  // },
   {
     path: "/table",
     name: "Table List",

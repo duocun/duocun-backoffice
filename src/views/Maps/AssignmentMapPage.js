@@ -1,15 +1,9 @@
 import React, { useState, useEffect } from "react";
 import moment from "moment";
 
-import { useTranslation } from "react-i18next";
-
 import { KeyboardDatePicker } from "@material-ui/pickers";
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import { DrawingManager } from "react-google-maps/lib/components/drawing/DrawingManager";
-
-import ApiOrderService, {OrderStatus} from "services/api/ApiOrderService";
-
 
 import gBlack from 'assets/img/maps/g-black.png';
 import gBlue from 'assets/img/maps/g-blue.png';
@@ -23,10 +17,11 @@ import gRed from 'assets/img/maps/g-red.png';
 import gLightBlue from 'assets/img/maps/g-lightblue.png';
 import gDarkYellow from 'assets/img/maps/g-darkyellow.png';
 
-import gLightGreen from 'assets/img/maps/g-lightgreen.png';
+import gWhite from 'assets/img/maps/g-white.png';
 import gGreen from 'assets/img/maps/g-green.png';
 
 // import useMediaQuery from "@material-ui/core/useMediaQuery";
+import ApiOrderService from "services/api/ApiOrderService";
 import {
   withScriptjs,
   withGoogleMap,
@@ -35,12 +30,11 @@ import {
 } from "react-google-maps";
 import ApiAccountService from "services/api/ApiAccountService";
 
-const N_COLORS = 11;
 const urls = {
   'gBlack': gBlack,
   'gBlue': gBlue,
   'gBrown': gBrown,
-  'gLightGreen': gLightGreen,
+  'gGray': gGray,
   'gOrange': gOrange,
   'gPurple': gPurple,
   'gYellow': gYellow,
@@ -49,17 +43,15 @@ const urls = {
   'gLightBlue': gLightBlue,
   'gDarkYellow': gDarkYellow,
   // special
-  'gGray': gGray,
+  'gWhite': gWhite,
   'gGreen': gGreen
 }
-
 
 // data --- [{ _id, lat, lng, icon }]
 // zoom --- 9
 // center --- { lat: 43.856098, lng: -79.337021 }
-const OrderMap = withScriptjs(
-  withGoogleMap(({ data, zoom, center, onPolygonComplete, onOverlayComplete, onReloadMarkers,
-      googleMapURL, loadingElement, containerElement, mapElement }) => (
+const AssignmentMapPage = withScriptjs(
+  withGoogleMap(({ data, zoom, center, googleMapURL, loadingElement, containerElement, mapElement }) => (
     <GoogleMap
       defaultZoom={zoom}
       defaultCenter={center}
@@ -131,7 +123,7 @@ const OrderMap = withScriptjs(
         ],
       }}
     >
-      <DrawingManager
+      {/* <DrawingManager
         // defaultDrawingMode={window.google.maps.drawing.OverlayType.POLYGON}
         defaultOptions={{
           drawingControl: true,
@@ -148,9 +140,8 @@ const OrderMap = withScriptjs(
             zIndex: 1,
           },
         }}
-        onOverlayComplete = {onOverlayComplete}
-        onPolygonComplete ={onPolygonComplete}
-      />
+        onPolygonComplete ={value => console.log(getPaths(value))}
+      /> */}
 
       {data && data.length > 0 &&
         data.map((d) =>
@@ -166,48 +157,23 @@ const OrderMap = withScriptjs(
 
 const OrderMapPage = () => {
   // const matches = useMediaQuery('max-width:767px');
-  const { t } = useTranslation();
 
   const [markers, setMarkers] = useState([]);
   const [drivers, setDrivers] = useState([]);
   const [deliverDate, setDeliverDate] = useState(moment().toISOString());
-  const [overlays, setOverlays] = useState([]);
-  const [bounds, setBounds] = useState([]);
-
   useEffect(() => {
     ApiAccountService.getAccounts({type:'driver', status:'A'}).then(({data}) => {
-      let i = 0;
-      let colors = Object.keys(urls);
-      data.data.forEach(d => {
-        const index = i % N_COLORS;
-        const color = colors[index]
-        const url = urls[color];
-        d.color = color;
-        d.url = url;
-        i++;
-      });
-      const drivers = data.data;
-      setDrivers(drivers);
-
+      setDrivers(data.data);
       const deliverDate = moment().format('YYYY-MM-DD');
-      updateMarkers(deliverDate, drivers);
+      ApiOrderService.getMapMarkers(deliverDate).then(({ data }) => {
+  
+      });
     });
   }, []);
 
-  const updateMarkers = (deliverDate, drivers) => {
+  const updateMarkers = (deliverDate) => {
     // {markers: [{orderId, lat, lng, type, status, icon}], driverMap:{driverId:{driverId, driverName}} }
     ApiOrderService.getMapMarkers(deliverDate).then(({ data }) => {
-      let colorMap = {};
-      drivers.forEach(d => {
-        colorMap[d._id] = d.color;
-      });
-      data.data.markers.forEach(marker => {
-        if(marker.driverId === 'unassigned'){
-          marker.icon = 'gGray';
-        }else{
-          marker.icon = marker.status === OrderStatus.DONE ? 'gGreen' : colorMap[marker.driverId];
-        }
-      });
       setMarkers(data.data.markers);
     });
   }
@@ -215,84 +181,8 @@ const OrderMapPage = () => {
   const handleDateChange = (m) => {
     const date = m.format('YYYY-MM-DD');
     setDeliverDate(date);
-    updateMarkers(date, drivers);
+    updateMarkers(date);
   }
-
-
-  function getBounds(polygon) {
-    const polygonBounds = polygon.getPath();
-    const bounds = [];
-    for (let i = 0; i < polygonBounds.length; i++) {
-      const point = {
-        lat: polygonBounds.getAt(i).lat(),
-        lng: polygonBounds.getAt(i).lng()
-      };
-      bounds.push(point);
-    }
-    return bounds;
-  }
-
-  function inPolygon(point, vs) {
-    // ray-casting algorithm based on
-    // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
-
-    const x = point.lat, y = point.lng;
-
-    let inside = false;
-    for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
-      let xi = vs[i].lat, yi = vs[i].lng;
-      let xj = vs[j].lat, yj = vs[j].lng;
-
-      let intersect = ((yi > y) != (yj > y))
-        && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
-      if (intersect) inside = !inside;
-    }
-
-    return inside;
-  };
-
-  const handlePolygonComplete = (polygon) => {
-    const points = getBounds(polygon);
-    setBounds(points);
-    setOverlays([...overlays, polygon]);
-  }
-
-  const handleOverlayComplete = (e) => {
-    const overlay = e.overlay;
-    // setOverlays([...overlays, overlay]);
-  }
-
-  const reloadMarkers = () => {
-    updateMarkers(deliverDate, drivers);
-  }
-
-  const handleAssignment = (driver) => {
-    if(!bounds){
-      return;
-    }
-    const r = window.confirm(`确认把已选区域分给司机${driver.username}?`);
-    if(r){
-      const orderIds = [];
-      markers.forEach(m => {
-        if(inPolygon({lat: m.lat, lng: m.lng}, bounds)){
-          orderIds.push(m.orderId);
-        }
-      });
-      overlays.forEach(overlay => {
-        overlay.setMap(null);
-      });
-
-      setBounds(null);
-      const driverId = driver._id;
-      const driverName = driver.username;
-
-      ApiOrderService.assign(driverId, driverName, orderIds).then(({data}) => {
-        const r = data.data;
-        reloadMarkers();
-      });
-    }
-  }
-
 
   const KEY = "AIzaSyCEd6D6vc9K-YzMH-QtQWRSs5HZkLKSWyk";
   return (
@@ -301,7 +191,7 @@ const OrderMapPage = () => {
       {/* <GridItem xs={12} lg={12}> */}
       <KeyboardDatePicker
         variant="inline"
-        label={`${t("Deliver Date")}`}
+        label="Date"
         format="YYYY-MM-DD"
         value={moment.utc(deliverDate)}
         onChange={handleDateChange}
@@ -311,20 +201,9 @@ const OrderMapPage = () => {
       <GridContainer>
         <GridItem xs={12} sm={12} md={2}>
           <div className="driverList" style={{ width: '100%', height: '100px' }}>
-            <div className="leftCol" >
-              <div style={{width: "80%", float:"left"}} >未分配</div>
-              <div style={{width: "20%", float:"left"}} ><img src={gGray} /></div>
-            </div>
-            <div className="leftCol" style={{borderBottom: "1px solid #aaaaaa"}}>
-              <div style={{width: "80%", float:"left"}} >已完成</div>
-              <div style={{width: "20%", float:"left"}} ><img src={gGreen} /></div>
-            </div>
           {
             drivers.map(d => 
-              <div className="leftCol" key={d._id}>
-                <div style={{width: "80%", float:"left"}} onClick={() => handleAssignment(d)}>{d.username}</div>
-                <div style={{width: "20%", float:"left"}} ><img src={d.url} /></div>
-              </div>
+              <div className="leftCol">{d.username}</div>
               // <div className="rightCol">Driver 2</div>
             )
           }
@@ -342,9 +221,6 @@ const OrderMapPage = () => {
               data={markers}
               zoom={9}
               center={{ lat: 43.856098, lng: -79.337021 }}
-              onPolygonComplete={handlePolygonComplete}
-              onOverlayComplete={handleOverlayComplete}
-              // onReloadMarkers={reloadMarkers}
               />
           </div>
         </GridItem>
@@ -353,4 +229,4 @@ const OrderMapPage = () => {
       )
     }
     
-export default OrderMapPage;
+export default AssignmentMapPage;

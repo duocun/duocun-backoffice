@@ -163,6 +163,16 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
                 {renderSort("merchantName")}
               </TableCell>
               
+              <TableCell
+                onClick={() => {
+                  toggleSort("items");
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                {t("Product")}
+                {renderSort("items")}
+              </TableCell>
+
               <TableCell>{t("Actions")}</TableCell>
             </TableRow>
           </TableHead>
@@ -186,9 +196,16 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
                         <div>{row.clientPhone ? row.clientPhone : 'N/A'}</div>
                       </TableCell>
                       <TableCell>{row.merchantName ? row.merchantName: 'N/A'}</TableCell>
- 
                       <TableCell>
-                        <IconButton aria-label="edit" onClick={() => selectData(row)}>
+                      {
+                        row.items && row.items.length > 0 &&
+                        row.items.map(it => <div key={it.productId}>{it.productName} x{it.quantity}</div>)
+                      }
+                      </TableCell>
+
+                      <TableCell>
+                        <IconButton aria-label="edit" href={`orders/${row._id}`}> 
+                        {/* // onClick={() => selectData(row)}> */}
                           <EditIcon />
                         </IconButton>
                         <IconButton aria-label="delete" disabled={processing} onClick={() => removeData(row._id)}>
