@@ -91,5 +91,8 @@ export default {
   },
   cancelItems: (id, items) => {
     return ApiService.v2().put(`orders/cancelItems/${id}`, {items});
+  },
+  assign: (driverId, driverName, orderIds) => {
+    return ApiService.v2().put(`orders/assign`, {driverId, driverName, orderIds});
   }
 };

@@ -10,6 +10,7 @@ import Navbar from "components/Navbars/Navbar.js";
 import Footer from "components/Footer/Footer.js";
 import Sidebar from "components/Sidebar/Sidebar.js";
 
+// dashboard routes
 import routes from "routes/dashboard.js";
 
 import styles from "assets/jss/material-dashboard-react/layouts/adminStyle.js";
