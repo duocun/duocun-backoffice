@@ -42,6 +42,7 @@ export const setAccounts = (payload) => {
   };
 };
 
+// The account to be operate
 export const setAccount = (payload) => {
   return {
     type: "SET_ACCOUNT",
@@ -49,6 +50,7 @@ export const setAccount = (payload) => {
   };
 };
 
+// The account logged in currently
 export const setLoggedInAccount = (payload) => {
   return {
     type: "SET_LOGGED_IN_ACCOUNT",

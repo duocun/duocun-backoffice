@@ -3,25 +3,26 @@ import { useTranslation } from "react-i18next";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
-import { Save as SaveIcon, FormatListBulleted as FormatListBulletedIcon } from "@material-ui/icons";
+// import { Save as SaveIcon, FormatListBulleted as FormatListBulletedIcon } from "@material-ui/icons";
 import { TextField, Button, Checkbox,
     Select, MenuItem, InputLabel, FormControl, FormControlLabel } from "@material-ui/core";
-import { Alert } from "@material-ui/lab"
+// import { Alert } from "@material-ui/lab"
 
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
-import Card from "components/Card/Card.js";
-import CardHeader from "components/Card/CardHeader.js";
-import CardBody from "components/Card/CardBody.js";
-import CardFooter from "components/Card/CardFooter.js";
+// import Card from "components/Card/Card.js";
+// import CardHeader from "components/Card/CardHeader.js";
+// import CardBody from "components/Card/CardBody.js";
+// import CardFooter from "components/Card/CardFooter.js";
 
-import EditSkeleton from "../Common/EditSkeleton";
+// import EditSkeleton from "../Common/EditSkeleton";
 import ApiOrderService from "services/api/ApiOrderService";
 
 import OrderForm from './OrderForm';
 
 import { selectOrder, setDeliverDate } from 'redux/actions/order';
-import {setAccount, setLoggedInAccount} from 'redux/actions/account';
+import { setAccount } from 'redux/actions/account';
+import ApiAccountService from "services/api/ApiAccountService";
 
 
 const defaultOrdersModelState = {
@@ -100,7 +101,12 @@ const OrderFormPage = ({match, history, order, selectOrder, account, deliverDate
     if(!model._id){
       ApiOrderService.getOrder(match.params.id).then(({data}) => {
         const order = data.data;
-        setModel(order);
+        const clientId = order.clientId;
+        ApiAccountService.getAccount(clientId).then(({data}) => {
+          const account = data.data;
+          setAccount(account);
+          setModel(order);
+        });
       });
     }
   }, [model]);
@@ -163,7 +169,7 @@ OrderFormPage.propTypes = {
 const mapStateToProps = (state) => ({
   order: state.order, 
   deliverDate: state.deliverDate,
-  // account: state.loggedInAccount
+  account: state.account
 });
 // const mapDispatchToProps = (dispatch) => ({
 //   loadAccounts: (payload, searchOption) => {
@@ -172,7 +178,7 @@ const mapStateToProps = (state) => ({
 // });
 export default connect(
   mapStateToProps,
-  {selectOrder, setDeliverDate, 
-    // setAccount, setLoggedInAccount
+  {
+    selectOrder, setDeliverDate, setAccount
   }
 )(OrderFormPage);

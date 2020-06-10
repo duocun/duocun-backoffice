@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { connect } from "react-redux";
+// import { connect } from "react-redux";
+import { Link } from "react-router-dom";
 
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
@@ -422,7 +423,7 @@ const OrderForm = ({ account, data, update, history }) => {
                     onClick={handleSplitOrder}
                     >
                     <SaveIcon />
-                    {t("Split Order")}
+                    {t("Delete Items")}
                   </Button>
                 </Box>
               </GridItem>
@@ -492,10 +493,11 @@ const OrderForm = ({ account, data, update, history }) => {
                   <Button
                     variant="contained"
                     // onClick={handleToTransactionHistory}
-                    href={`finance/transaction`}
+                    // href={`finance/transaction`}
                   >
                     <FormatListBulletedIcon />
-                    {t("Transaction History")}
+                    <Link to={`../finance/transaction`}>{t("Transaction History")}</Link>
+                    
                   </Button>
                 </Box>
                 <Box mt={2} mr={2}>
