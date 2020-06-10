@@ -19,11 +19,11 @@ import gOrange from 'assets/img/maps/g-orange.png';
 import gPurple from 'assets/img/maps/g-purple.png';
 import gYellow from 'assets/img/maps/g-yellow.png';
 import gPink from 'assets/img/maps/g-pink.png';
-import gRed from 'assets/img/maps/g-red.png';
 import gLightBlue from 'assets/img/maps/g-lightblue.png';
 import gDarkYellow from 'assets/img/maps/g-darkyellow.png';
-
 import gLightGreen from 'assets/img/maps/g-lightgreen.png';
+
+import gRed from 'assets/img/maps/g-red.png';
 import gGreen from 'assets/img/maps/g-green.png';
 
 // import useMediaQuery from "@material-ui/core/useMediaQuery";
@@ -32,6 +32,7 @@ import {
   withGoogleMap,
   GoogleMap,
   Marker,
+  // MarkerWithLabel
 } from "react-google-maps";
 import ApiAccountService from "services/api/ApiAccountService";
 
@@ -45,11 +46,11 @@ const urls = {
   'gPurple': gPurple,
   'gYellow': gYellow,
   'gPink': gPink,
-  'gRed': gRed,
   'gLightBlue': gLightBlue,
   'gDarkYellow': gDarkYellow,
-  // special
   'gGray': gGray,
+  // special
+  'gRed': gRed,
   'gGreen': gGreen
 }
 
@@ -158,6 +159,13 @@ const OrderMap = withScriptjs(
             key={d.orderId}
             position={{ lat: d.lat, lng: d.lng }}
             icon={{url: urls[d.icon]}}
+            // title={'haoll'}
+            label={{text:d.clientName, fontSize:"11px"}}
+            // labelAnchor={{ x: 30 , y: 80 }}
+            // labelStyle={{
+            //   marginLeft: '30px',
+            //   paddingLeft: '50px'
+            // }}
           />
         )}
     </GoogleMap>
@@ -203,7 +211,7 @@ const OrderMapPage = () => {
       });
       data.data.markers.forEach(marker => {
         if(marker.driverId === 'unassigned'){
-          marker.icon = 'gGray';
+          marker.icon = 'gRed';
         }else{
           marker.icon = marker.status === OrderStatus.DONE ? 'gGreen' : colorMap[marker.driverId];
         }
@@ -313,7 +321,7 @@ const OrderMapPage = () => {
           <div className="driverList" style={{ width: '100%', height: '100px' }}>
             <div className="leftCol" >
               <div style={{width: "80%", float:"left"}} >未分配</div>
-              <div style={{width: "20%", float:"left"}} ><img src={gGray} /></div>
+              <div style={{width: "20%", float:"left"}} ><img src={gRed} /></div>
             </div>
             <div className="leftCol" style={{borderBottom: "1px solid #aaaaaa"}}>
               <div style={{width: "80%", float:"left"}} >已完成</div>
