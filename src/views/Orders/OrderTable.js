@@ -16,13 +16,13 @@ import TableBodySkeleton from "components/Table/TableBodySkeleton";
 import IconButton from "@material-ui/core/IconButton";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
-import CheckIcon from "@material-ui/icons/Check";
-import CloseIcon from "@material-ui/icons/Close";
+// import CheckIcon from "@material-ui/icons/Check";
+// import CloseIcon from "@material-ui/icons/Close";
 
-import FlashStorage from "services/FlashStorage";
+// import FlashStorage from "services/FlashStorage";
 
-import ApiOrderService from "services/api/ApiOrderService";
-import { AirlineSeatLegroomReducedOutlined } from "../../../node_modules/@material-ui/icons";
+// import ApiOrderService from "services/api/ApiOrderService";
+// import { AirlineSeatLegroomReducedOutlined } from "../../../node_modules/@material-ui/icons";
 
 const styles = {
   cardCategoryWhite: {

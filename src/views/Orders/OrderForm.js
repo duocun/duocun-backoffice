@@ -34,11 +34,10 @@ import Alert from "@material-ui/lab/Alert";
 import Button from "@material-ui/core/Button";
 // import IconButton from "@material-ui/core/IconButton";
 
+// icons
 import FormatListBulletedIcon from "@material-ui/icons/FormatListBulleted";
 import SaveIcon from "@material-ui/icons/Save";
-// import EditIcon from "@material-ui/icons/Edit";
-// import DeleteIcon from "@material-ui/icons/Delete";
-// import CancelIcon from "@material-ui/icons/Cancel";
+import HistoryIcon from '@material-ui/icons/History';
 
 
 
@@ -123,7 +122,7 @@ const useStyles = makeStyles(theme => ({
 
 
 // const OrderForm = ({ account, order, data, update, toTransactionHistory }) => {
-const OrderForm = ({ account, data, update, history }) => {
+const OrderForm = ({ account, data, onAfterUpdate, history }) => {
   // const { register, handleSubmit, watch, errors } = useForm();
   // moment.tz.add("America/Toronto|EST EDT EWT EPT|50 40 40 40|01010101010101010101010101010101010101010101012301010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010|-25TR0 1in0 11Wu 1nzu 1fD0 WJ0 1wr0 Nb0 1Ap0 On0 1zd0 On0 1wp0 TX0 1tB0 TX0 1tB0 TX0 1tB0 WL0 1qN0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 WL0 1qN0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 WL0 1qN0 4kM0 8x40 iv0 1o10 11z0 1nX0 11z0 1o10 11z0 1o10 1qL0 11D0 1nX0 11B0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 11z0 1o10 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0|65e5");
 
@@ -171,7 +170,7 @@ const OrderForm = ({ account, data, update, history }) => {
             return;
           } else {
             setAlert(newAlert);
-            update(account._id);
+            onAfterUpdate(account._id);
           }
         } else {
           setAlert({
@@ -203,7 +202,7 @@ const OrderForm = ({ account, data, update, history }) => {
             message: t("Update successfully"),
             severity: "success"
           });
-          update();
+          onAfterUpdate();
         } else {
           setAlert({
             message: t("Update failed"),
@@ -296,12 +295,14 @@ const OrderForm = ({ account, data, update, history }) => {
   }
 
   useEffect(() => {
+    // set products for remove products function
     const checkMap = {};
     data.items.forEach(it => {
       checkMap[it.productId] = {...it, status: false};
     });
     setCheckMap(checkMap);
 
+    // set model for save function
     if (data.actionCode === 'PS') {
       setModel({
         ...data,
@@ -343,7 +344,7 @@ const OrderForm = ({ account, data, update, history }) => {
                   </Alert>
                 </GridItem>
               )}
-              <GridItem xs={12} lg={6}>
+              <GridItem xs={12} lg={12}>
                 <Box pb={2}>
                   <TextField id="order-code"
                     label={`${t("Code")}`}
@@ -373,9 +374,6 @@ const OrderForm = ({ account, data, update, history }) => {
                     label={`${t("Client Phone")}`}
                     value={model.clientPhone? model.clientPhone : ''}
                     InputLabelProps={{ shrink: model.clientPhone ? true : false }}
-                    // InputProps={{
-                    //   readOnly: true,
-                    // }}
                     onChange={e => {
                       setModel({ ...model, clientPhone: e.target.value });
                     }}
@@ -384,15 +382,6 @@ const OrderForm = ({ account, data, update, history }) => {
               </GridItem>
               <GridItem xs={12} lg={12}>
                 <Box pb={2}>
-                  {/* <TextField id="order-client-addr"
-                    fullWidth
-                    label={`${t("Address")}`}
-                    value={getAddrString(model.location)}
-                    InputLabelProps={{ shrink: model.location ? true : false }}
-                    InputProps={{
-                      readOnly: true,
-                    }}
-                  /> */}
                   <AddressSearch
                     label={'Deliver Address'}
                     placeholder={'Search Address'}
@@ -413,7 +402,6 @@ const OrderForm = ({ account, data, update, history }) => {
                           label={`${it.productName} x ${it.quantity}`}
                           color="primary"
                       />
-
                     </div>)
                   }
                   <Button
@@ -486,19 +474,20 @@ const OrderForm = ({ account, data, update, history }) => {
                   format="YYYY-MM-DD"
                   value={moment.utc(model.delivered)}
                   onChange={(m) => handleDeliverDateChange(m)}
+                  InputLabelProps={{
+                    shrink: model.delivered,
+                  }}
                 />
               </GridItem>
               <GridItem xs={12} container direction="row-reverse">
-                <Box mt={2}>
-                  <Button
-                    variant="contained"
-                    // onClick={handleToTransactionHistory}
-                    // href={`finance/transaction`}
-                  >
-                    <FormatListBulletedIcon />
-                    <Link to={`../finance/transaction`}>{t("Transaction History")}</Link>
-                    
-                  </Button>
+
+                <Box mt={2} mr={2}>
+                  <Link to={`../orders`}>
+                    <Button variant="contained">
+                      <FormatListBulletedIcon />
+                      {t("Back")}
+                    </Button>
+                  </Link>
                 </Box>
                 <Box mt={2} mr={2}>
                   <Button
@@ -510,6 +499,14 @@ const OrderForm = ({ account, data, update, history }) => {
                     <SaveIcon />
                     {t("Save")}
                   </Button>
+                </Box>
+                <Box mt={2} mr={2}>
+                  <Link to={`../finance/transaction`}>
+                    <Button color="primary" variant="contained">
+                      <HistoryIcon />
+                      {t("Transaction History")}
+                    </Button>
+                  </Link>
                 </Box>
               </GridItem>
 

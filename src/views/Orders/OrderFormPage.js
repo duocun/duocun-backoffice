@@ -92,7 +92,7 @@ const OrderFormPage = ({match, history, order, selectOrder, account, deliverDate
     }
   }
 
-  const handleUpdateData = () => {
+  const handleAfterUpdate = () => {
     updateFormData(model._id);
     updateData();
   }
@@ -147,7 +147,7 @@ const OrderFormPage = ({match, history, order, selectOrder, account, deliverDate
         <OrderForm
             account={account}
             data={model}
-            update={handleUpdateData}
+            onAfterUpdate={handleAfterUpdate}
             // toTransactionHistory={handleToTransactionHistory}
              />
       </GridItem>
