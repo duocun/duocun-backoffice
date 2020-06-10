@@ -983,7 +983,7 @@ const EditProduct = ({ match, history }) => {
               </GridItem>
               <GridItem xs={12} container direction="row-reverse">
                 <Box mt={2}>
-                  <Button variant="contained" href="../products">
+                  <Button variant="contained" href="products">
                     <FormatListBulletedIcon />
                     {t("Back")}
                   </Button>
