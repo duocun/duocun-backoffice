@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-
+import { Link } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 
 import Table from "@material-ui/core/Table";
@@ -204,10 +204,11 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
                       </TableCell>
 
                       <TableCell>
-                        <IconButton aria-label="edit" href={`orders/${row._id}`}> 
-                        {/* // onClick={() => selectData(row)}> */}
-                          <EditIcon />
-                        </IconButton>
+                        <Link to={`orders/${row._id}`}>
+                          <IconButton aria-label="edit"> 
+                            <EditIcon />
+                          </IconButton>
+                        </Link>
                         <IconButton aria-label="delete" disabled={processing} onClick={() => removeData(row._id)}>
                           <DeleteIcon />
                         </IconButton>
