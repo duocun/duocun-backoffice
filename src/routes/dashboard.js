@@ -73,7 +73,7 @@ const dashboardRoutes = [
     layout: "/"
   },
   {
-    path: "/finance/transaction",
+    path: "/finance/transactions",
     name: "Transaction",
     icon: TransactionIcon,
     component: FinanceRoute,

@@ -34,8 +34,8 @@ import ApiAccountService from 'services/api/ApiAccountService';
 import Auth from "services/AuthService";
 import ApiTransactionService from "services/api/ApiTransactionService";
 
-import { FinanceTable } from "./FinanceTable";
-import { FinanceForm } from "./FinanceForm";
+import { TransactionTable } from "./TransactionTable";
+import TransactionFormPage from "./TransactionFormPage";
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -304,7 +304,7 @@ const SalaryPage = ({ history, location }) => {
                   </GridItem>
                 )}
                 <GridItem xs={12}>
-                  <FinanceTable
+                  <TransactionTable
                     account={driver}
                     rows={transactions}
                     page={page}
@@ -352,7 +352,7 @@ const SalaryPage = ({ history, location }) => {
           </Card>
         </GridItem>
         <GridItem xs={12} sm={12} md={4}>
-          <FinanceForm account={driver} transaction={model} update={updateData} />
+          <TransactionFormPage account={driver} transaction={model} update={updateData} />
         </GridItem>
       </GridContainer>
     </div>

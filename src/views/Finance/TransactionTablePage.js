@@ -8,7 +8,7 @@ import { makeStyles } from "@material-ui/core/styles";
 // import { connect } from "react-redux";
 
 import * as moment from 'moment';
-import { KeyboardDatePicker } from "@material-ui/pickers";
+// import { KeyboardDatePicker } from "@material-ui/pickers";
 
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
@@ -34,8 +34,7 @@ import FlashStorage from "services/FlashStorage";
 
 import AccountSearch from "./AccountSearch";
 
-import { FinanceTable } from "./FinanceTable";
-import { TransactionForm } from "./TransactionForm";
+import { TransactionTable } from "./TransactionTable";
 
 import { setAccount } from "redux/actions/account";
 
@@ -79,7 +78,7 @@ const defaultActions = [
   { code: 'BA', text: 'Buy Advertisement' }
 ];
 
-const TransactionPage = ({ account, setAccount, location, history }) => {
+const TransactionTablePage = ({ account, setAccount, location, history }) => {
   const { t } = useTranslation();
   const classes = useStyles();
   // states related to list and pagniation
@@ -202,9 +201,7 @@ const TransactionPage = ({ account, setAccount, location, history }) => {
     updateData(account._id, actionCode, startDate, endDate);
   }
 
-  const handleUpdateData = (accountId) => {
-    updateData(accountId, actionCode, startDate, endDate);
-  }
+
 
   const handleStartDateChange = (s) => {
     setStartDate(s);
@@ -312,7 +309,7 @@ const TransactionPage = ({ account, setAccount, location, history }) => {
   return (
     <div>
       <GridContainer>
-        <GridItem xs={12} lg={8}>
+        <GridItem xs={12} lg={12}>
           <Card>
             <CardHeader color="primary">
               <GridContainer>
@@ -376,7 +373,7 @@ const TransactionPage = ({ account, setAccount, location, history }) => {
                   </GridItem>
                 )}
                 <GridItem xs={12}>
-                  <FinanceTable
+                  <TransactionTable
                     account={account}
                     rows={transactions}
                     page={page}
@@ -435,19 +432,13 @@ const TransactionPage = ({ account, setAccount, location, history }) => {
             </CardFooter>
           </Card>
         </GridItem>
-        <GridItem xs={12} sm={12} md={4}>
-          <TransactionForm 
-            account={account}
-            transaction={model}
-            items={items}
-            update={handleUpdateData} />
-        </GridItem>
+
       </GridContainer>
     </div>
   );
 }
 
-TransactionPage.propTypes = {
+TransactionTablePage.propTypes = {
   location: PropTypes.object,
   loadAccounts: PropTypes.func,
   accounts: PropTypes.array,
@@ -467,4 +458,4 @@ const mapStateToProps = (state) => ({
 export default connect(
   mapStateToProps, 
   {setAccount}
-)(TransactionPage);
+)(TransactionTablePage);

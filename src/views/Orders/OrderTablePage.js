@@ -161,10 +161,6 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
     const date = m ? m.format('YYYY-MM-DD') : null;
     setDeliverDate(date);
   }
-  
-  const handleToTransactionHistory = () => {
-    history.push('/finance/transaction');
-  }
 
   const handleDeliverDateClick = () => {
 

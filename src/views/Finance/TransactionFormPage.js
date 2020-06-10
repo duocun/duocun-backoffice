@@ -1,37 +1,38 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import { connect } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
-import * as moment from 'moment';
-import { KeyboardDatePicker } from "@material-ui/pickers";
+// import * as moment from 'moment';
+// import { KeyboardDatePicker } from "@material-ui/pickers";
 // import TimePicker from "components/TimePicker/TimePicker";
 
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
-import Box from "@material-ui/core/Box";
+// import Box from "@material-ui/core/Box";
 
-import Card from "components/Card/Card.js";
-import CardHeader from "components/Card/CardHeader.js";
-import CardBody from "components/Card/CardBody.js";
+// import Card from "components/Card/Card.js";
+// import CardHeader from "components/Card/CardHeader.js";
+// import CardBody from "components/Card/CardBody.js";
 
-// import FormLabel from "@material-ui/core/FormLabel";
-import FormControl from "@material-ui/core/FormControl";
-// import FormGroup from "@material-ui/core/FormGroup";
-// import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Select from "@material-ui/core/Select";
-// import Checkbox from "@material-ui/core/Checkbox";
+// // import FormLabel from "@material-ui/core/FormLabel";
+// import FormControl from "@material-ui/core/FormControl";
+// // import FormGroup from "@material-ui/core/FormGroup";
+// // import FormControlLabel from "@material-ui/core/FormControlLabel";
+// import Select from "@material-ui/core/Select";
+// // import Checkbox from "@material-ui/core/Checkbox";
 
-// import Skeleton from "@material-ui/lab/Skeleton";
-import Alert from "@material-ui/lab/Alert";
-import CustomInput from "components/CustomInput/CustomInput";
-// import TextField from "@material-ui/core/TextField";
-import InputLabel from "@material-ui/core/InputLabel";
-import MenuItem from "@material-ui/core/MenuItem";
-import Button from "@material-ui/core/Button";
-import IconButton from "@material-ui/core/IconButton";
+// // import Skeleton from "@material-ui/lab/Skeleton";
+// import Alert from "@material-ui/lab/Alert";
+// import CustomInput from "components/CustomInput/CustomInput";
+// // import TextField from "@material-ui/core/TextField";
+// import InputLabel from "@material-ui/core/InputLabel";
+// import MenuItem from "@material-ui/core/MenuItem";
+// import Button from "@material-ui/core/Button";
+// import IconButton from "@material-ui/core/IconButton";
 
-import FormatListBulletedIcon from "@material-ui/icons/FormatListBulleted";
-import SaveIcon from "@material-ui/icons/Save";
+// import FormatListBulletedIcon from "@material-ui/icons/FormatListBulleted";
+// import SaveIcon from "@material-ui/icons/Save";
 // import EditIcon from "@material-ui/icons/Edit";
 // import DeleteIcon from "@material-ui/icons/Delete";
 // import CancelIcon from "@material-ui/icons/Cancel";
@@ -44,7 +45,10 @@ import ApiAccountService from 'services/api/ApiAccountService';
 import ApiTransactionService from 'services/api/ApiTransactionService';
 
 // import moment from 'moment-timezone/moment-timezone';
+import { TransactionForm } from "./TransactionForm";
 
+import { selectTransaction } from 'redux/actions/transaction';
+import { setAccount } from 'redux/actions/account';
 
 const useStyles = makeStyles(() => ({
   textarea: {
@@ -86,9 +90,7 @@ const defaultActions = [
   { code: 'T', text: 'Transfer' }
 ];
 
-
-
-export const FinanceForm = ({ account, transaction, match, update }) => {
+const TransactionFormPage = ({ match, history, account, transaction, update }) => {
 
   // moment.tz.add("America/Toronto|EST EDT EWT EPT|50 40 40 40|01010101010101010101010101010101010101010101012301010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010|-25TR0 1in0 11Wu 1nzu 1fD0 WJ0 1wr0 Nb0 1Ap0 On0 1zd0 On0 1wp0 TX0 1tB0 TX0 1tB0 TX0 1tB0 WL0 1qN0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 WL0 1qN0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 WL0 1qN0 4kM0 8x40 iv0 1o10 11z0 1nX0 11z0 1o10 11z0 1o10 1qL0 11D0 1nX0 11B0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 11z0 1o10 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0|65e5");
 
@@ -99,6 +101,7 @@ export const FinanceForm = ({ account, transaction, match, update }) => {
 
   const { t } = useTranslation();
   const classes = useStyles();
+  const [items, setItems] = useState([]);
   const [actions, setActions] = useState(defaultActions);
   const [modifyByAccount, setModifyByAccount] = useState({ _id: '', username: '' });
   const [accounts, setAccounts] = useState([]);
@@ -113,6 +116,44 @@ export const FinanceForm = ({ account, transaction, match, update }) => {
   const [alert, setAlert] = useState(
     FlashStorage.get("FINANCE_ALERT") || { message: "", severity: "info" }
   );
+
+  useEffect(() => {
+    if(!model._id){
+      ApiTransactionService.getTransaction(match.params.id).then(({data}) => {
+        const tr = data.data;
+        if (tr.actionCode === 'PS') {
+          setModel({
+            ...tr,
+            staffId: account._id,
+            staffName: account.username,
+            note: `Pay salary to ${account.username}`,
+            modifyBy: modifyByAccount._id
+          });
+        } else {
+          setModel({...tr, modifyBy: modifyByAccount._id});
+        }
+      });
+    }
+  }, [model]);
+
+  useEffect(() => {
+    const token = AuthService.getAuthToken();
+    ApiAuthService.getCurrentUser(token).then(({ data }) => {
+      const account = { ...data };
+      setModifyByAccount(account);
+      // ApiTransactionService.getTransaction(match.params.id).then(({ data }) => {
+      //   if (data.code === 'success') {
+      //     const tr = data.data;
+      //     setModel({ ...tr, modifyBy: account._id });
+      //   }
+      // setModel({ ...model, modifyBy: account._id });
+      ApiAccountService.getAccountList(null, null, { type: { $in: ['driver', 'system'] } }).then(({ data }) => {
+        setAccounts(data.data);
+      });
+      // });
+    });
+  }, []);
+
 
   const handleActionChange = (actionCode) => {
     if(model._id){
@@ -146,6 +187,9 @@ export const FinanceForm = ({ account, transaction, match, update }) => {
     setModel({ ...model, staffId, staffName, note: `Pay salary to ${staffName}` });
   }
 
+  const handleUpdateData = (accountId) => {
+    // updateData(accountId, actionCode, startDate, endDate);
+  }
 
   const handleCreate = () => {
     if (model.fromId && model.staffId) {
@@ -224,42 +268,11 @@ export const FinanceForm = ({ account, transaction, match, update }) => {
   const handleBack = () => {
 
   }
-
-  useEffect(() => {
-    if (transaction.actionCode === 'PS') {
-      setModel({
-        ...transaction,
-        staffId: account._id,
-        staffName: account.username,
-        note: `Pay salary to ${account.username}`,
-        modifyBy: modifyByAccount._id
-      });
-    } else {
-      setModel({...transaction, modifyBy: modifyByAccount._id});
-    }
-  }, [transaction]);
-
-  useEffect(() => {
-    const token = AuthService.getAuthToken();
-    ApiAuthService.getCurrentUser(token).then(({ data }) => {
-      const account = { ...data };
-      setModifyByAccount(account);
-      // ApiTransactionService.getTransaction(match.params.id).then(({ data }) => {
-      //   if (data.code === 'success') {
-      //     const tr = data.data;
-      //     setModel({ ...tr, modifyBy: account._id });
-      //   }
-      // setModel({ ...model, modifyBy: account._id });
-      ApiAccountService.getAccountList(null, null, { type: { $in: ['driver', 'system'] } }).then(({ data }) => {
-        setAccounts(data.data);
-      });
-      // });
-    });
-  }, []);
+  
 
   return (
     <GridContainer>
-      <GridItem xs={12} sm={12} lg={12}>
+      {/* <GridItem xs={12} sm={12} lg={12}>
         <Card>
           <CardHeader color="primary">
             <GridContainer>
@@ -427,13 +440,21 @@ export const FinanceForm = ({ account, transaction, match, update }) => {
             </GridContainer>
           </CardBody>
         </Card>
+      </GridItem> */}
+
+      <GridItem xs={12} sm={12} md={12}>
+        <TransactionForm 
+          account={account}
+          transaction={model}
+          items={items}
+          afterUpdate={handleUpdateData} />
       </GridItem>
     </GridContainer>
   )
 }
 
 
-FinanceForm.propTypes = {
+TransactionFormPage.propTypes = {
   match: PropTypes.shape({
     params: PropTypes.shape({
       id: PropTypes.string
@@ -441,3 +462,23 @@ FinanceForm.propTypes = {
   }),
   history: PropTypes.object
 };
+
+
+const mapStateToProps = (state) => ({
+  transaction: state.transaction, 
+  // deliverDate: state.deliverDate,
+  account: state.account
+});
+// const mapDispatchToProps = (dispatch) => ({
+//   loadAccounts: (payload, searchOption) => {
+//     dispatch(loadAccountsAsync(payload, searchOption));
+//   },
+// });
+export default connect(
+  mapStateToProps,
+  {
+    selectTransaction,
+    // setDeliverDate,
+    setAccount
+  }
+)(TransactionFormPage);

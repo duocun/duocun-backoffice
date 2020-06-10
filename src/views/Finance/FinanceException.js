@@ -21,7 +21,7 @@ import ApiTransactionService from "services/api/ApiTransactionService";
 import { getQueryParam } from "helper/index";
 import FlashStorage from "services/FlashStorage";
 
-import { FinanceTable } from "./FinanceTable";
+import { TransactionTable } from "./TransactionTable";
 import SecondaryNav from "components/SecondaryNav/SecondaryNav";
 
 //redux actions
@@ -192,7 +192,7 @@ export const FinanceException = ({ location, history }) => {
                   </GridItem>
                 )}
                 <GridItem xs={12}>
-                  <FinanceTable
+                  <TransactionTable
                     rows={transactions}
                     page={page}
                     rowsPerPage={rowsPerPage}

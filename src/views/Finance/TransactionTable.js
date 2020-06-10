@@ -1,6 +1,6 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-
 import { makeStyles } from "@material-ui/core/styles";
 
 import Table from "@material-ui/core/Table";
@@ -59,7 +59,7 @@ const useStyles = makeStyles(styles);
 //   }
 // }));
 
-export const FinanceTable = ({
+export const TransactionTable = ({
   account,
   rows,
   page,
@@ -132,12 +132,11 @@ export const FinanceTable = ({
             <TableCell>{getBalance(account, row)}</TableCell>
             <TableCell>{row.note}</TableCell>
             <TableCell>
-              <IconButton aria-label="edit" 
-                onClick={() => selectRow(row)}
-                // href={`finance/${row._id}`}
-                >
-                <EditIcon />
-              </IconButton>
+              <Link to={`transactions/${row._id}`}>
+                <IconButton aria-label="edit"> 
+                  <EditIcon />
+                </IconButton>
+              </Link>
               {/* <IconButton aria-label="delete"
                 disabled={processing}
                 onClick={() => deleteRow(row._id)}

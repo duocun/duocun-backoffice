@@ -290,10 +290,6 @@ const OrderForm = ({ account, data, onAfterUpdate, history }) => {
     setModel({ ...model, deliverDate, delivered: `${deliverDate}T15:00:00.000Z` });
   }
 
-  const handleToTransactionHistory = () => {
-    history.push('/finance/transaction');
-  }
-
   useEffect(() => {
     // set products for remove products function
     const checkMap = {};
@@ -501,7 +497,7 @@ const OrderForm = ({ account, data, onAfterUpdate, history }) => {
                   </Button>
                 </Box>
                 <Box mt={2} mr={2}>
-                  <Link to={`../finance/transaction`}>
+                  <Link to={`../finance/transactions`}>
                     <Button color="primary" variant="contained">
                       <HistoryIcon />
                       {t("Transaction History")}

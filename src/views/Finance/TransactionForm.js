@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
@@ -98,7 +99,7 @@ const defaultActions = [
   { code: 'OFD', text: 'Order From Duocun'}
 ];
 
-export const TransactionForm = ({ account, transaction, items, update }) => {
+export const TransactionForm = ({ account, transaction, items, onAfterUpdate }) => {
 
   // moment.tz.add("America/Toronto|EST EDT EWT EPT|50 40 40 40|01010101010101010101010101010101010101010101012301010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010|-25TR0 1in0 11Wu 1nzu 1fD0 WJ0 1wr0 Nb0 1Ap0 On0 1zd0 On0 1wp0 TX0 1tB0 TX0 1tB0 TX0 1tB0 WL0 1qN0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 WL0 1qN0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 WL0 1qN0 4kM0 8x40 iv0 1o10 11z0 1nX0 11z0 1o10 11z0 1o10 1qL0 11D0 1nX0 11B0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 11z0 1o10 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0|65e5");
 
@@ -177,7 +178,7 @@ export const TransactionForm = ({ account, transaction, items, update }) => {
             return;
           } else {
             setAlert(newAlert);
-            update(account._id);
+            onAfterUpdate(account._id);
           }
         } else {
           setAlert({
@@ -208,7 +209,7 @@ export const TransactionForm = ({ account, transaction, items, update }) => {
             message: t("Update successfully"),
             severity: "success"
           });
-          update(account._id);
+          onAfterUpdate(account._id);
         } else {
           setAlert({
             message: t("Update failed"),
@@ -317,7 +318,7 @@ export const TransactionForm = ({ account, transaction, items, update }) => {
           <CardHeader color="primary">
             <GridContainer>
               <GridItem xs={12} lg={6}>
-                <h4>{t(transaction._id ? "Edit Transaction" : "New Transaction")}</h4>
+                <h4>{t(transaction && transaction._id ? "Edit Transaction" : "New Transaction")}</h4>
               </GridItem>
             </GridContainer>
           </CardHeader>
@@ -330,7 +331,7 @@ export const TransactionForm = ({ account, transaction, items, update }) => {
                   </Alert>
                 </GridItem>
               )}
-              <GridItem xs={12} lg={12}>
+              <GridItem xs={12} md={6} lg={6}>
                 <Box pb={2}>
                   <AccountSearch
                     label="From Account"
@@ -342,7 +343,7 @@ export const TransactionForm = ({ account, transaction, items, update }) => {
                 </Box>
               </GridItem>
 
-              <GridItem xs={12} lg={12}>
+              <GridItem xs={12} md={6} lg={6}>
                 <Box pb={2}>
                   <AccountSearch
                     label="To Account"
@@ -356,7 +357,7 @@ export const TransactionForm = ({ account, transaction, items, update }) => {
 
               {
                 model.actionCode === 'RC' &&
-                <GridItem xs={12} lg={12}>
+                <GridItem xs={12} md={6} lg={6}>
                   <Box pb={2}>
                     <AccountSearch
                       label="Client"
@@ -369,7 +370,7 @@ export const TransactionForm = ({ account, transaction, items, update }) => {
                 </GridItem>
               }
 
-              <GridItem xs={12} lg={6}>
+              <GridItem xs={12} md={6} lg={6}>
                 <Box pb={2}>
                   <FormControl className={classes.select}>
                     <InputLabel id="action-label">Action</InputLabel>
@@ -389,7 +390,7 @@ export const TransactionForm = ({ account, transaction, items, update }) => {
 
               {
                 model.actionCode === 'PS' &&
-                <GridItem xs={12} lg={6}>
+                <GridItem xs={12} md={6}lg={6}>
                   <Box pb={2}>
                     <FormControl className={classes.select}>
                       <InputLabel id="staff-select-label">Pay Salary To</InputLabel>
@@ -432,11 +433,12 @@ export const TransactionForm = ({ account, transaction, items, update }) => {
                         setModel({ ...model, amount: e.target.value });
                       }
                     }}
+                    InputLabelProps={{ shrink: model.amount !== null ? true : false }}
                   />
                 </Box>
               </GridItem>
 
-              <GridItem xs={12} lg={6}>
+              <GridItem xs={12} md={12} lg={12}>
                 <Box pb={2}>
                   <CustomInput
                     labelText={t("Note")}
@@ -453,7 +455,7 @@ export const TransactionForm = ({ account, transaction, items, update }) => {
                   />
                 </Box>
               </GridItem>
-              <GridItem>
+              <GridItem xs={12} md={6} lg={6}>
                 <KeyboardDatePicker
                   variant="inline"
                   label={t("Created Date")}
@@ -464,17 +466,15 @@ export const TransactionForm = ({ account, transaction, items, update }) => {
                 />
               </GridItem>
               <GridItem xs={12} container direction="row-reverse">
-                <Box mt={2}>
-                  <Button
-                    variant="contained"
-                    // href={"finance?accountId=" + model.fromId}
-                    href="finance/salary"
-                    onClick={handleBack}
-                  >
-                    <FormatListBulletedIcon />
-                    {t("Back")}
-                  </Button>
+                <Box mt={2} mr={2}>
+                  <Link to={`../transactions`}>
+                    <Button variant="contained">
+                      <FormatListBulletedIcon />
+                      {t("Back")}
+                    </Button>
+                  </Link>
                 </Box>
+
                 <Box mt={2} mr={2}>
                   <Button
                     color="primary"
