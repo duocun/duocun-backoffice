@@ -1,32 +1,33 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { connect } from "react-redux";
-
-import * as moment from 'moment';
-// @material-ui/core components
-import { makeStyles } from "@material-ui/core/styles";
 import { useTranslation } from "react-i18next";
 import PropTypes from "prop-types";
+import * as moment from 'moment';
+
+// @material-ui/core components
+import { makeStyles } from "@material-ui/core/styles";
 
 // core components
-import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import Button from "components/CustomButtons/Button.js";
+import GridItem from "components/Grid/GridItem.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 
-import Box from "@material-ui/core/Box";
-import SaveIcon from "@material-ui/icons/Save";
+import { Button, Box } from "@material-ui/core";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
+import Alert from "@material-ui/lab/Alert";
+
+// icons
+import SaveIcon from "@material-ui/icons/Save";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 
 import FlashStorage from "services/FlashStorage";
-import Alert from "@material-ui/lab/Alert";
 import { getQueryParam } from "helper/index";
 
 import ApiAuthService from 'services/api/ApiAuthService';
@@ -34,19 +35,30 @@ import ApiAccountService from 'services/api/ApiAccountService';
 import Auth from "services/AuthService";
 import ApiTransactionService from "services/api/ApiTransactionService";
 
+import {selectTransaction} from "redux/actions/transaction";
 import { TransactionTable } from "./TransactionTable";
-import TransactionFormPage from "./TransactionFormPage";
 
-const useStyles = makeStyles((theme) => ({
+// import TransactionFormPage from "./TransactionFormPage";
+
+// const useStyles = makeStyles((theme) => ({
+//   table: {
+//     minWidth: 750
+//   },
+//   formControl: {
+//     margin: theme.spacing(1),
+//     minWidth: 120,
+//   },
+//   selectEmpty: {
+//     marginTop: theme.spacing(2),
+//   },
+// }));
+const useStyles = makeStyles(() => ({
+  gridContainer: {
+    padding: "0px",
+    margin: "0px"
+  },
   table: {
-    minWidth: 750
-  },
-  formControl: {
-    margin: theme.spacing(1),
-    minWidth: 120,
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
+    minWidth: 750,
   },
 }));
 
@@ -65,7 +77,7 @@ const defaultTransaction = {
   modifyBy: '',
 }
 
-const SalaryPage = ({ history, location }) => {
+const SalaryTablePage = ({ history, location, selectTransaction }) => {
   const classes = useStyles();
   const { t } = useTranslation();
   // form related
@@ -102,44 +114,64 @@ const SalaryPage = ({ history, location }) => {
     FlashStorage.get("SALARY_ALERT") || { message: "", severity: "info" }
   );
 
+
+  useEffect(() => {
+    const token = Auth.getAuthToken();
+    ApiAuthService.getCurrentUser(token).then(({ data }) => {
+      const account = { ...data };
+      setAccount(account);
+      // try to load default form
+      ApiAccountService.getAccountList(null, null, { type: 'driver' }).then(({ data }) => {
+        const staffs = data.data;
+        setDriverList(staffs);
+        if (staffs && staffs.length > 0) {
+          const staff = staffs[0];
+          setDriver(staff);
+          updateData(staff._id);
+
+          saveSalaryToRedux(staff, account);
+          // setModel({...model, staffId: staff._id, staffName: staff.username, modifyBy: account._id});
+        } else {
+          // setModel({...model, modifyBy: account._id});
+        }
+      });
+    });
+  }, []);
+
+  useEffect(() => {
+    updateData(driver._id);
+  }, [page, rowsPerPage, sort, driver]);
+
+
+  const saveSalaryToRedux = (driver, account) => {
+    ApiAccountService.getAccountList(null, null, { username: 'Expense', type: 'system' }).then(({ data }) => {
+      const expense = data.data[0];
+      const staffName = driver ? driver.username : '';
+      const tr = {
+        ...defaultTransaction,
+        actionCode: 'PS',
+        toId: expense._id,
+        toName: expense.username,
+        staffId: driver ? driver._id : '',
+        staffName,
+        note: `Pay salary to ${staffName}`,
+        modifyBy: account ? account._id : '',
+        created: moment.utc().toISOString()
+      }
+
+      selectTransaction(tr);
+    });
+  }
+
+
   const handleDriverChange = (staffId) => {
     const d = drivers.find(d => d._id === staffId);
     const staffName = d ? d.username : '';
-    setDriver({ _id: staffId, username: staffName });
-  }
+    const staff = { _id: staffId, username: staffName };
+    setDriver(staff);
 
-  // const handleFromChange = (fromId)=> {
-  //   setFromId(fromId);
-  //   setModel({...model, fromId});
-  // }
-  const handleNewSalary = () => {
-    const staffName = driver ? driver.username : '';
-    ApiAccountService.getAccountList(null, null, { username: 'Expense', type: 'system' }).then(({ data }) => {
-      if (data.data && data.data.length > 0) {
-        const expense = data.data[0];
-        setModel({
-          ...defaultTransaction,
-          actionCode: 'PS',
-          toId: expense._id,
-          toName: expense.username,
-          staffId: driver ? driver._id : '',
-          staffName,
-          note: `Pay salary to ${staffName}`,
-          modifyBy: account ? account._id : '',
-          created: moment.utc().toISOString()
-        });
-      } else {
-        setModel({
-          ...defaultTransaction,
-          actionCode: 'PS',
-          staffId: driver ? driver._id : '',
-          staffName,
-          note: `Pay salary to ${staffName}`,
-          modifyBy: account ? account._id : '',
-          created: moment.utc().toISOString()
-        });
-      }
-    });
+    // create an empty transaction for create new salary
+    saveSalaryToRedux(staff, account);
   }
 
   const handleUpdate = () => {
@@ -171,8 +203,6 @@ const SalaryPage = ({ history, location }) => {
         });
     }
   };
-
-  
 
   const handelSelectTransaction = (tr) => {
     if(tr.note){
@@ -214,31 +244,6 @@ const SalaryPage = ({ history, location }) => {
     }
   };
 
-  useEffect(() => {
-    const token = Auth.getAuthToken();
-    ApiAuthService.getCurrentUser(token).then(({ data }) => {
-      const account = { ...data };
-      setAccount(account);
-      // try to load default form
-      ApiAccountService.getAccountList(null, null, { type: 'driver' }).then(({ data }) => {
-        const staffs = data.data;
-        setDriverList(staffs);
-        if (staffs && staffs.length > 0) {
-          const staff = staffs[0];
-          setDriver(staff);
-          updateData(staff._id);
-          // setModel({...model, staffId: staff._id, staffName: staff.username, modifyBy: account._id});
-        } else {
-          // setModel({...model, modifyBy: account._id});
-        }
-      });
-    });
-  }, []);
-
-  useEffect(() => {
-    updateData(driver._id);
-  }, [page, rowsPerPage, sort, driver]);
-
 
   const updateData = (accountId) => {
     const condition = {
@@ -268,30 +273,46 @@ const SalaryPage = ({ history, location }) => {
     });
   };
 
-
-
   return (
-
-    <div>
-      <GridContainer>
-        <GridItem xs={12} sm={12} md={8}>
+      <GridContainer className={classes.gridContainer}>
           <Card>
             <CardHeader color="primary">
-              <GridItem xs={12} lg={6} align="left">
-                <Box mr={2} style={{ display: "inline-block" }}>
-                  <FormControl className={classes.formControl}>
-                    <InputLabel id="driver-select-label">Driver</InputLabel>
-                    <Select required labelId="driver-select-label" id="driver-select"
-                      value={driver ? driver._id : ''} onChange={e => handleDriverChange(e.target.value)} >
-                      {
-                        drivers && drivers.length > 0 &&
-                        drivers.map(d => <MenuItem key={d._id} value={d._id}>{d.username}</MenuItem>)
-                      }
-                    </Select>
-                  </FormControl>
-                </Box>
-              </GridItem>
+              <GridContainer>
+                <GridItem xs={12} md={12} lg={12}>
+                  <h4>{t("Salary")}</h4>
+                </GridItem>
+                <GridItem xs={6} md={3} lg={3}>
+                  <Box pb={2} mr={2}>
+                    <FormControl className={classes.formControl}>
+                      <InputLabel id="driver-select-label">{t("Driver")}</InputLabel>
+                      <Select required labelId="driver-select-label" id="driver-select"
+                        value={driver ? driver._id : ''} onChange={e => handleDriverChange(e.target.value)} >
+                        {
+                          drivers && drivers.length > 0 &&
+                          drivers.map(d => <MenuItem key={d._id} value={d._id}>{d.username}</MenuItem>)
+                        }
+                      </Select>
+                    </FormControl>
+                  </Box>
+                </GridItem>
+
+                <GridItem xs={6} md={3} lg={3}>
+                  <Box mr={2}>
+                    <Link to={`salary/new`}>
+                      <Button
+                        color="default"
+                        variant="contained"
+                      >
+                        <AddCircleOutlineIcon />
+                        {t("New Salary")}
+                      </Button>
+                    </Link>
+                  </Box>
+                </GridItem>
+
+              </GridContainer>
             </CardHeader>
+
             <CardBody>
               <GridContainer>
                 {!!alert.message && (
@@ -322,17 +343,6 @@ const SalaryPage = ({ history, location }) => {
             <CardFooter>
               <GridContainer>
                 <GridItem xs={12} container direction="row-reverse">
-                  <Box mt={2}>
-                    <Button
-                      color="primary"
-                      variant="contained"
-                      disabled={processing}
-                      onClick={handleNewSalary}
-                    >
-                      <AddCircleOutlineIcon />
-                      {t("New Salary")}
-                    </Button>
-                  </Box>
                   <Box mt={2} mr={2}>
                     <Button
                       color="primary"
@@ -348,12 +358,7 @@ const SalaryPage = ({ history, location }) => {
               </GridContainer>
             </CardFooter>
           </Card>
-        </GridItem>
-        <GridItem xs={12} sm={12} md={4}>
-          <TransactionFormPage account={driver} transaction={model} update={updateData} />
-        </GridItem>
       </GridContainer>
-    </div>
   );
 }
 
@@ -366,18 +371,18 @@ const SalaryPage = ({ history, location }) => {
 // export default connect(
 //   mapStateToProps,
 //   // mapDispatchToProps
-// )(SalaryPage);
+// )(SalaryTablePage);
 
-SalaryPage.propTypes = {
+SalaryTablePage.propTypes = {
   location: PropTypes.object,
   history: PropTypes.object
 };
-export default SalaryPage;
 
 // const mapStateToProps = state => ({
 //   account: state.account
 // });
 
-// export default connect(
-//   mapStateToProps
-// )(SalaryPage);
+export default connect(
+  null,
+  {selectTransaction}
+)(SalaryTablePage);

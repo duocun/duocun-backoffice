@@ -308,33 +308,14 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
   
 
   return (
-    <div>
       <GridContainer>
-        <GridItem xs={12} lg={12}>
           <Card>
             <CardHeader color="primary">
               <GridContainer>
                 <GridItem xs={12} sm={12} lg={12}>
                   <h4>{t("Transaction")}</h4>
                 </GridItem>
-                <GridItem xs={12} sm={12} lg={6} align="left">
-                <GridItem xs={12} sm={12} lg={12} align="left">
-                  <Box pb={2}>
-                    <FormControl className={classes.select}>
-                      <InputLabel id="action-label">Action</InputLabel>
-                      <Select required
-                        labelId="action-label"
-                        id="action-select"
-                        value={actionCode}
-                        onChange={e => handleActionChange(e.target.value)}
-                      >
-                        {
-                          defaultActions.map(d => <MenuItem key={d.code} value={d.code}>{d.text}</MenuItem>)
-                        }
-                      </Select>
-                    </FormControl>
-                  </Box>
-                  </GridItem>
+
                   {/* <GridItem xs={12} sm={12} lg={12} align="left">
                   <KeyboardDatePicker
                   variant="inline"
@@ -353,15 +334,51 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
                   onChange={(m) => handleEndDateChange(m.toISOString()) }
                 />
                   </GridItem> */}
+                <GridItem xs={12} sm={6} lg={4}>
+                  <Box pb={2}>
+                    <AccountSearch
+                      label="Account"
+                      placeholder="Search name or phone"
+                      val={query}
+                      handleSelectAccount={handleSelectAccount}
+                    />
+                  </Box>
                 </GridItem>
-                <GridItem xs={12} sm={12} lg={6} align="left">
-                  <AccountSearch
-                    label="Account"
-                    placeholder="Search name or phone"
-                    val={query}
-                    handleSelectAccount={handleSelectAccount}
-                  />
+
+                <GridItem xs={6} sm={6} lg={3}>
+                  <Box >
+                    <FormControl className={classes.select}>
+                      <InputLabel id="action-label">{t("Action")}</InputLabel>
+                      <Select required
+                        labelId="action-label"
+                        id="action-select"
+                        value={actionCode}
+                        onChange={e => handleActionChange(e.target.value)}
+                      >
+                        {
+                          defaultActions.map(d => <MenuItem key={d.code} value={d.code}>{d.text}</MenuItem>)
+                        }
+                      </Select>
+                    </FormControl>
+                  </Box>
                 </GridItem>
+                
+
+                <GridItem xs={6} sm={6} lg={3}>
+                  <Box  mt={2}>
+                    <Link to={`transactions/new`}>
+                    <Button
+                      color="default"
+                      variant="contained"
+                      disabled={processing}
+                    >
+                      <AddCircleOutlineIcon />
+                      {t("New Transaction")}
+                    </Button>
+                    </Link>
+                  </Box>
+                </GridItem>
+
               </GridContainer>
             </CardHeader>
             <CardBody>
@@ -394,19 +411,6 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
             <CardFooter>
               <GridContainer>
                 <GridItem xs={12} container direction="row-reverse">
-                  <Box mt={2}>
-                    <Link to={`transactions/new`}>
-                    <Button
-                      color="primary"
-                      variant="contained"
-                      disabled={processing}
-                    >
-                      <AddCircleOutlineIcon />
-                      {t("New Transaction")}
-                    </Button>
-                    </Link>
-                  </Box>
-              
 
                   <Box mt={2} mr={2}>
                     <Button
@@ -435,10 +439,7 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
               </GridContainer>
             </CardFooter>
           </Card>
-        </GridItem>
-
       </GridContainer>
-    </div>
   );
 }
 

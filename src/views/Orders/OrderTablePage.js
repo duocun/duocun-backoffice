@@ -232,7 +232,6 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
 
   return (
     <GridContainer>
-      <GridItem xs={12} sm={12} md={12}>
         <Card>
           <CardHeader color="primary">
             <GridContainer>
@@ -330,8 +329,6 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
             </GridItem>
           </CardFooter>
         </Card>
-      </GridItem>
-
     </GridContainer>
   );
 }
