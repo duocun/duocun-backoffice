@@ -175,8 +175,14 @@ const DriverSummaryPage = ({}) => {
                 {
                   driverSummary && Object.keys(driverSummary).length > 0 && driver && driverSummary[driver._id] &&
                   driverSummary[driver._id].merchants.map(m =>
-                    <div key={m.merchantName}>
-                    <div>{m.merchantName}</div>
+                    <GridItem xs={12} sm={12} md={12}>
+                    <Card>
+                    <CardHeader color="primary">
+                        <div key={m.merchantName}>
+                          <div>{m.merchantName}</div>
+                        </div>
+                    </CardHeader>
+                    <CardBody>
                     <Table>
                       <TableBody>
                           {m.items.map((prop, key) => 
@@ -194,7 +200,9 @@ const DriverSummaryPage = ({}) => {
                           )}
                         </TableBody>
                       </Table>
-                    </div>
+                      </CardBody>
+                      </Card>
+                    </GridItem>
                   )
                 }
               </GridContainer>
