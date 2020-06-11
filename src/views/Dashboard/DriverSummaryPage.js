@@ -71,29 +71,7 @@ const DriverSummaryPage = ({match, history, deliverDate, setDeliverDate}) => {
   const [driverSummary, setDriverSummary] = useState({});
   const [drivers, setDriverList] = useState([]);
   const [driver, setDriver] = useState({_id: '', name: ''});
-
   const [dupClients, setDupClientList] = useState([]);
-  // const [anchorEl, setAnchorEl] = React.useState(null);
-  // const [selectedDriver, setSelectedDriver] = React.useState(null);
-  // const [selectedIndex, setSelectedIndex] = React.useState(1);
-  // const handleClickListItem = (event) => {
-  //   setAnchorEl(event.currentTarget);
-  // };
-
-  // const handleMenuItemClick = (event, driver, index) => {
-  //   setSelectedIndex(index)
-  //   setSelectedDriver(driver);
-  //   setAnchorEl(null);
-  // };
-
-  const handleDriverChange = (driverId) => {
-    const d = drivers.find(d => d._id === driverId);
-    setDriver({_id: driverId, name: d? d._id: ''});
-  }
-
-  // const handleClose = () => {
-  //   setAnchorEl(null);
-  // };
 
   useEffect(() => {
     const now = moment().toISOString();
@@ -125,7 +103,7 @@ const DriverSummaryPage = ({match, history, deliverDate, setDeliverDate}) => {
         );
 
         if(match.params && match.params.id){
-          const driverId = Object.keys(summary).find(id => id === driverId); 
+          const driverId = Object.keys(summary).find(id => id === match.params.id); 
           if(driverId){
             const defaultDriver = summary[driverId];
             if(defaultDriver){
@@ -146,6 +124,10 @@ const DriverSummaryPage = ({match, history, deliverDate, setDeliverDate}) => {
       });
   }
 
+  const handleDriverChange = (driverId) => {
+    const d = drivers.find(d => d._id === driverId);
+    setDriver({_id: driverId, name: d? d._id: ''});
+  }
 
   const handleDateChange = (m) => {
     const date = m.format('YYYY-MM-DD');
