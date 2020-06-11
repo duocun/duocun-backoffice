@@ -44,6 +44,7 @@ import HistoryIcon from '@material-ui/icons/History';
 import FlashStorage from "services/FlashStorage";
 
 import AddressSearch from "components/AddressSearch/AddressSearch";
+import ProductSearch from "components/ProductSearch/ProductSearch";
 
 import AuthService from "services/AuthService";
 import ApiAuthService from 'services/api/ApiAuthService';
@@ -53,76 +54,12 @@ import ApiOrderService from 'services/api/ApiOrderService';
 
 // import moment from 'moment-timezone/moment-timezone';
 const useStyles = makeStyles(theme => ({
-  // textarea: {
-  //   width: "100%"
-  // },
-  // select: {
-  //   width: "100%",
-  //   marginTop: 27
-  // },
-  // heading: {
-  //   marginBottom: "0.5rem",
-  //   size: "1.5rem",
-  //   fontWeight: 600
-  // },
-  // table: {
-  //   minWidth: 750
-  // },
-  // editingCell: {
-  //   padding: "0 5px"
-  // },
-  // formControl: {
-  //   display: "block"
-  // },
-  // formControlLabel: {
-  //   marginTop: "1rem",
-  //   marginBottom: "1rem",
-  //   fontWeight: 600
-  // },
-  // formGroup: {
-  //   border: "1px solid #eee",
-  //   borderRadius: 5,
-  //   padding: 5
-  // }
+  
 }));
-
-// const useStyles = makeStyles(() => ({
-//   textarea: {
-//     width: "100%"
-//   },
-//   select: {
-//     width: "100%",
-//     marginTop: 27
-//   },
-//   heading: {
-//     marginBottom: "0.5rem",
-//     size: "1.5rem",
-//     fontWeight: 600
-//   },
-//   table: {
-//     minWidth: 750
-//   },
-//   editingCell: {
-//     padding: "0 5px"
-//   },
-//   formControl: {
-//     display: "block"
-//   },
-//   formControlLabel: {
-//     marginTop: "1rem",
-//     marginBottom: "1rem",
-//     fontWeight: 600
-//   },
-//   formGroup: {
-//     border: "1px solid #eee",
-//     borderRadius: 5,
-//     padding: 5
-//   }
-// }));
 
 
 // const OrderForm = ({ account, order, data, update, toTransactionHistory }) => {
-const OrderForm = ({ account, data, onAfterUpdate, history }) => {
+const OrderForm = ({ mode, account, data, onAfterUpdate, history }) => {
   // const { register, handleSubmit, watch, errors } = useForm();
   // moment.tz.add("America/Toronto|EST EDT EWT EPT|50 40 40 40|01010101010101010101010101010101010101010101012301010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010|-25TR0 1in0 11Wu 1nzu 1fD0 WJ0 1wr0 Nb0 1Ap0 On0 1zd0 On0 1wp0 TX0 1tB0 TX0 1tB0 TX0 1tB0 WL0 1qN0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 WL0 1qN0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 WL0 1qN0 4kM0 8x40 iv0 1o10 11z0 1nX0 11z0 1o10 11z0 1o10 1qL0 11D0 1nX0 11B0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 11z0 1o10 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0|65e5");
 
@@ -153,6 +90,39 @@ const OrderForm = ({ account, data, onAfterUpdate, history }) => {
   const [alert, setAlert] = useState(
     FlashStorage.get("FINANCE_ALERT") || { message: "", severity: "info" }
   );
+
+
+  useEffect(() => {
+    // set products for remove products function
+    if(data.items && data.items.length > 0){
+      const checkMap = {};
+      data.items.forEach(it => {
+        checkMap[it.productId] = {...it, status: false};
+      });
+      setCheckMap(checkMap);
+    }
+
+    // set model for save function
+    if (data.actionCode === 'PS') {
+      setModel({
+        ...data,
+        modifyBy: modifyByAccount._id
+      });
+    } else {
+      setModel({ ...data, modifyBy: modifyByAccount._id });
+    }
+  }, [data]);
+
+  useEffect(() => {
+    const token = AuthService.getAuthToken();
+    ApiAuthService.getCurrentUser(token).then(({ data }) => {
+      const account = { ...data.data };
+      setModifyByAccount(account);
+      ApiAccountService.getAccountList(null, null, { type: { $in: ['driver', 'system'] } }).then(({ data }) => {
+        setAccounts(data.data);
+      });
+    });
+  }, []);
 
 
   const handleCreate = () => {
@@ -290,35 +260,17 @@ const OrderForm = ({ account, data, onAfterUpdate, history }) => {
     setModel({ ...model, deliverDate, delivered: `${deliverDate}T15:00:00.000Z` });
   }
 
-  useEffect(() => {
-    // set products for remove products function
-    const checkMap = {};
-    data.items.forEach(it => {
-      checkMap[it.productId] = {...it, status: false};
-    });
-    setCheckMap(checkMap);
+  const handleSelectProduct = (item) => {
+    setModel({ ...model, items:[item] });
+  }
 
-    // set model for save function
-    if (data.actionCode === 'PS') {
-      setModel({
-        ...data,
-        modifyBy: modifyByAccount._id
-      });
-    } else {
-      setModel({ ...data, modifyBy: modifyByAccount._id });
+  const getTitle = () => {
+    if(mode === 'new' || mode === 'clone'){
+      return 'New Order';
+    }else{
+      return 'Edit Order';
     }
-  }, [data]);
-
-  useEffect(() => {
-    const token = AuthService.getAuthToken();
-    ApiAuthService.getCurrentUser(token).then(({ data }) => {
-      const account = { ...data.data };
-      setModifyByAccount(account);
-      ApiAccountService.getAccountList(null, null, { type: { $in: ['driver', 'system'] } }).then(({ data }) => {
-        setAccounts(data.data);
-      });
-    });
-  }, []);
+  }
 
   return (
     <GridContainer>
@@ -327,7 +279,7 @@ const OrderForm = ({ account, data, onAfterUpdate, history }) => {
           <CardHeader color="primary">
             <GridContainer>
               <GridItem xs={12} lg={6}>
-                <h4>{t(data._id ? "Edit Order" : "New Order")}</h4>
+                <h4>{t(getTitle())}</h4>
               </GridItem>
             </GridContainer>
           </CardHeader>
@@ -340,18 +292,21 @@ const OrderForm = ({ account, data, onAfterUpdate, history }) => {
                   </Alert>
                 </GridItem>
               )}
-              <GridItem xs={12} lg={12}>
-                <Box pb={2}>
-                  <TextField id="order-code"
-                    label={`${t("Code")}`}
-                    value={model.code}
-                    InputLabelProps={{ shrink: model.code ? true : false }}
-                    InputProps={{
-                      readOnly: true,
-                    }}
-                  />
-                </Box>
-              </GridItem>
+              {
+                !(mode === 'new' || mode === 'clone') &&
+                <GridItem xs={12} lg={12}>
+                  <Box pb={2}>
+                    <TextField id="order-code"
+                      label={`${t("Code")}`}
+                      value={model.code}
+                      InputLabelProps={{ shrink: model.code ? true : false }}
+                      InputProps={{
+                        readOnly: true,
+                      }}
+                      />
+                  </Box>
+                </GridItem>
+              }
               <GridItem xs={12} lg={6}>
                 <Box pb={2}>
                   <TextField id="order-client"
@@ -386,31 +341,48 @@ const OrderForm = ({ account, data, onAfterUpdate, history }) => {
                   />
                 </Box>
               </GridItem>
-              <GridItem xs={12} lg={12}>
-                <Box pb={2}>
-                  {
-                    model.items && model.items.length > 0 &&
-                    model.items.map(it => <div key={it.productId}>
-                      <FormControlLabel
-                        control={<Checkbox checked={productMap[it.productId].status} 
-                          onChange={(e) => handleToggleProduct(e, it)}
-                          name={`${it.productId}`} />}
-                          label={`${it.productName} x ${it.quantity}`}
-                          color="primary"
-                      />
-                    </div>)
-                  }
-                  <Button
-                    color="primary"
-                    variant="contained"
-                    disabled={processing}
-                    onClick={handleSplitOrder}
-                    >
-                    <SaveIcon />
-                    {t("Split Order")}
-                  </Button>
-                </Box>
-              </GridItem>
+{
+  (mode==="new" || mode ==="clone") &&
+  <GridItem xs={12} lg={12}>
+  <Box pb={2}>
+    <ProductSearch
+      label={'Product'}
+      placeholder={'Search Product'}
+      onSelectProduct={handleSelectProduct}
+      item={model.items[0]}
+    />
+  </Box>
+</GridItem>
+}
+
+              {
+                !(mode === 'new' || mode === 'clone') &&
+                  <GridItem xs={12} lg={12}>
+                    <Box pb={2}>
+                      {
+                        model.items && model.items.length > 0 &&
+                        model.items.map(it => <div key={it.productId}>
+                          <FormControlLabel
+                            control={<Checkbox checked={productMap[it.productId].status} 
+                            onChange={(e) => handleToggleProduct(e, it)}
+                            name={`${it.productId}`} />}
+                            label={`${it.productName} x ${it.quantity}`}
+                            color="primary"
+                            />
+                        </div>)
+                      }
+                      <Button
+                        color="primary"
+                        variant="contained"
+                        disabled={processing}
+                        onClick={handleSplitOrder}
+                        >
+                        <SaveIcon />
+                        {t("Split Order")}
+                      </Button>
+                    </Box>
+                  </GridItem>
+              }
               <GridItem xs={12} lg={6}>
                 <Box pb={2}>
                   <TextField id="order-total"
