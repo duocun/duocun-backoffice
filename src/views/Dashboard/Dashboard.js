@@ -115,7 +115,9 @@ const Dashboard = ({summary, loadStatisticsSummary, history}) => {
         </GridItem>
         <GridItem xs={12} sm={6} md={3}>
           <Card>
-            <CardHeader href="/products" color="danger" stats icon onClick={()=>{history.push("/dashboard/pickup")}}>
+          {/* onClick={()=>{history.push("/dashboard/pickup/all")} */}
+            <CardHeader href="/products" color="danger" stats icon >
+              <Link to="/dashboard/pickup/all">
               <CardIcon color="danger">
                 <Icon>info_outline</Icon>
               </CardIcon>
@@ -125,7 +127,7 @@ const Dashboard = ({summary, loadStatisticsSummary, history}) => {
 
               <p className={classes.cardCategory}>Products</p>
               <h3 className={classes.cardTitle}>{summary.nProducts}</h3>
-
+            </Link>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>

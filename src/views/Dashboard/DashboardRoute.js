@@ -11,7 +11,7 @@ const DashboardRoute = () => {
   return (
     <Switch>
       <Route exact path="/dashboard" component={Dashboard} />
-      <Route exact path="/dashboard/pickup" component={DriverSummaryPage} />
+      <Route exact path="/dashboard/pickup/:id" component={DriverSummaryPage} />
       <Route exact path="/dashboard/sales" component={SalesPage} />
       <Route exact path="/dashboard/products" component={ProductsPage} />
       <Route exact path="/dashboard/order-analytics" component={OrderAnalytics} />

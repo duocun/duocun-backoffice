@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
+import {connect} from "react-redux";
 import moment from "moment";
-
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { KeyboardDatePicker } from "@material-ui/pickers";
@@ -26,6 +27,7 @@ import gLightGreen from 'assets/img/maps/g-lightgreen.png';
 import gRed from 'assets/img/maps/g-red.png';
 import gGreen from 'assets/img/maps/g-green.png';
 
+
 // import useMediaQuery from "@material-ui/core/useMediaQuery";
 import {
   withScriptjs,
@@ -34,7 +36,9 @@ import {
   Marker,
   // MarkerWithLabel
 } from "react-google-maps";
+
 import ApiAccountService from "services/api/ApiAccountService";
+import { setDeliverDate } from 'redux/actions/order';
 
 const N_COLORS = 11;
 const urls = {
@@ -172,13 +176,10 @@ const OrderMap = withScriptjs(
   ))
 );
 
-const OrderMapPage = () => {
-  // const matches = useMediaQuery('max-width:767px');
+const OrderMapPage = ({deliverDate, setDeliverDate}) => {
   const { t } = useTranslation();
-
   const [markers, setMarkers] = useState([]);
   const [drivers, setDrivers] = useState([]);
-  const [deliverDate, setDeliverDate] = useState(moment().toISOString());
   const [overlays, setOverlays] = useState([]);
   const [bounds, setBounds] = useState([]);
 
@@ -197,8 +198,14 @@ const OrderMapPage = () => {
       const drivers = data.data;
       setDrivers(drivers);
 
-      const deliverDate = moment().format('YYYY-MM-DD');
-      updateMarkers(deliverDate, drivers);
+      if(!deliverDate){
+        const date = moment().format('YYYY-MM-DD');
+        setDeliverDate(date);
+        updateMarkers(date, drivers);
+      }else{
+        updateMarkers(deliverDate, drivers);
+      }
+      
     });
   }, []);
 
@@ -206,9 +213,14 @@ const OrderMapPage = () => {
     // {markers: [{orderId, lat, lng, type, status, icon}], driverMap:{driverId:{driverId, driverName}} }
     ApiOrderService.getMapMarkers(deliverDate).then(({ data }) => {
       let colorMap = {};
+      const onDutyDriverIds = Object.keys(data.data.driverMap);
+
       drivers.forEach(d => {
+        const onDuty = onDutyDriverIds.find(id => id === d._id);
+        d.onDuty = onDuty ? true : false;
         colorMap[d._id] = d.color;
       });
+
       data.data.markers.forEach(marker => {
         if(marker.driverId === 'unassigned'){
           marker.icon = 'gRed';
@@ -216,6 +228,7 @@ const OrderMapPage = () => {
           marker.icon = marker.status === OrderStatus.DONE ? 'gGreen' : colorMap[marker.driverId];
         }
       });
+      
       setMarkers(data.data.markers);
     });
   }
@@ -270,6 +283,7 @@ const OrderMapPage = () => {
     // setOverlays([...overlays, overlay]);
   }
 
+
   const reloadMarkers = () => {
     updateMarkers(deliverDate, drivers);
   }
@@ -312,12 +326,15 @@ const OrderMapPage = () => {
         label={`${t("Deliver Date")}`}
         format="YYYY-MM-DD"
         value={moment.utc(deliverDate)}
+        InputLabelProps={{
+          shrink: deliverDate,
+        }}
         onChange={handleDateChange}
       />
       {/* </GridItem> */}
 
       <GridContainer>
-        <GridItem xs={12} sm={12} md={2}>
+        <GridItem xs={12} sm={12} md={3}>
           <div className="driverList" style={{ width: '100%', height: '100px' }}>
             <div className="leftCol" >
               <div style={{width: "80%", float:"left"}} >未分配</div>
@@ -330,15 +347,19 @@ const OrderMapPage = () => {
           {
             drivers.map(d => 
               <div className="leftCol" key={d._id}>
-                <div style={{width: "80%", float:"left"}} onClick={() => handleAssignment(d)}>{d.username}</div>
-                <div style={{width: "20%", float:"left"}} ><img src={d.url} /></div>
+                <div style={{width: "50%", float:"left"}} onClick={() => handleAssignment(d)}>{d.username}</div>
+                <div style={{width: "15%", float:"left"}} ><img src={d.url} /></div>
+                {
+                  d.onDuty &&
+                  <Link to={`../dashboard/pickup/${d._id}`} style={{width: "25%", float:"left", fontSize:"12px"}} >查看提货</Link>
+                }
               </div>
               // <div className="rightCol">Driver 2</div>
             )
           }
           </div>
         </GridItem>
-        <GridItem xs={12} sm={12} md={10}>
+        <GridItem xs={12} sm={12} md={9}>
           <div style={{ width: '100%', height: '500px', display: 'flex', justifyContent: 'center' }}>
             <OrderMap
               googleMapURL={`https://maps.googleapis.com/maps/api/js?key=${KEY}&v=3.exp&libraries=geometry,drawing,places`}
@@ -361,4 +382,13 @@ const OrderMapPage = () => {
       )
     }
     
-export default OrderMapPage;
+
+    const mapStateToProps = (state) => ({
+      deliverDate: state.deliverDate
+    });
+    export default connect(
+      mapStateToProps,
+      {
+        setDeliverDate
+      }
+    )(OrderMapPage);

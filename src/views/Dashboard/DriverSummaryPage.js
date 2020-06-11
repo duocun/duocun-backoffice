@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
+import {connect} from "react-redux";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
-
+import { useTranslation } from "react-i18next";
 // core components
 import * as moment from 'moment';
 
@@ -17,6 +19,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 // import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
+import { KeyboardDatePicker } from "@material-ui/pickers";
 
 import Table from "@material-ui/core/Table";
 import TableRow from "@material-ui/core/TableRow";
@@ -26,6 +29,8 @@ import TableCell from "@material-ui/core/TableCell";
 
 import ApiStatisticsService from 'services/api/ApiStatisticsService';
 import ApiOrderService from "services/api/ApiOrderService";
+
+import { setDeliverDate } from 'redux/actions/order';
 
 const useStyles = makeStyles((theme) => ({
   cardCategoryWhite: {
@@ -54,11 +59,15 @@ const useStyles = makeStyles((theme) => ({
   selectEmpty: {
     marginTop: theme.spacing(2),
   },
+  itemRow: {
+    fontSize: "12px"
+  }
 }));
 
 
-const DriverSummaryPage = ({}) => {
+const DriverSummaryPage = ({match, history, deliverDate, setDeliverDate}) => {
   const classes = useStyles();
+  const { t } = useTranslation();
   const [driverSummary, setDriverSummary] = useState({});
   const [drivers, setDriverList] = useState([]);
   const [driver, setDriver] = useState({_id: '', name: ''});
@@ -95,11 +104,17 @@ const DriverSummaryPage = ({}) => {
   }, []);
 
   useEffect(() => {
-    const startDate = moment().format('YYYY-MM-DD');
-    // const startDate = '2020-04-03';  // hard coded date because 05-01 has no data
-    // loadDriverSummary(startDate);
-    ApiStatisticsService.saveDriverStatistic(startDate).then(
-      ({data}) => {
+    if(!deliverDate){
+      const date = moment().format('YYYY-MM-DD');
+      setDeliverDate(date);
+      loadData(deliverDate);
+    }else{
+      loadData(deliverDate);
+    }
+  }, []);
+
+  const loadData = (deliverDate) => {
+    ApiStatisticsService.saveDriverStatistic(deliverDate).then(({data}) => {
         const summary = data.data;
         setDriverSummary(summary);
         
@@ -109,23 +124,44 @@ const DriverSummaryPage = ({}) => {
           ))
         );
 
-        const defaultDriver = Object.values(summary)[0];
-        if(defaultDriver){
-          setDriver({_id: defaultDriver.driverId, name: defaultDriver.driverName});
+        if(match.params && match.params.id){
+          const driverId = Object.keys(summary).find(id => id === driverId); 
+          if(driverId){
+            const defaultDriver = summary[driverId];
+            if(defaultDriver){
+              setDriver({_id: defaultDriver.driverId, name: defaultDriver.driverName});
+            }
+          }else{
+            const defaultDriver = Object.values(summary)[0];
+            if(defaultDriver){
+              setDriver({_id: defaultDriver.driverId, name: defaultDriver.driverName});
+            }
+          }
+        }else{
+          const defaultDriver = Object.values(summary)[0];
+          if(defaultDriver){
+            setDriver({_id: defaultDriver.driverId, name: defaultDriver.driverName});
+          }
         }
-        // dispatch(setDriverSummary(data.data));
       });
-  }, []);
+  }
+
+
+  const handleDateChange = (m) => {
+    const date = m.format('YYYY-MM-DD');
+    setDeliverDate(date);
+    loadData(date);
+  }
+
   return (
 
-    <div>
       <GridContainer>
-        <GridItem xs={12} sm={12} md={8}>
-          <Card>
-            <CardHeader color="primary">
+          {/* <Card>
+            <CardHeader color="primary"> */}
+            <GridItem xs={12} sm={6} md={6}>
             {
             <FormControl className={classes.formControl}>
-              <InputLabel id="driver-select-label">Driver</InputLabel>
+              <InputLabel id="driver-select-label">{t('Driver')}</InputLabel>
               <Select required labelId="driver-select-label" id="driver-select"
                 value={driver ? driver._id : ''} onChange={e => handleDriverChange(e.target.value)} >
                 {
@@ -135,6 +171,19 @@ const DriverSummaryPage = ({}) => {
               </Select>
             </FormControl>
             }
+            </GridItem>
+            <GridItem xs={12} sm={6} md={6}>
+              <KeyboardDatePicker
+                variant="inline"
+                label={`${t("Deliver Date")}`}
+                format="YYYY-MM-DD"
+                value={moment.utc(deliverDate)}
+                InputLabelProps={{
+                  shrink: deliverDate,
+                }}
+                onChange={handleDateChange}
+              />
+            </GridItem>
               {/* <div>
               <List component="nav" aria-label="Device settings">
                 <ListItem
@@ -169,13 +218,13 @@ const DriverSummaryPage = ({}) => {
             ))}
             </Menu>
              </div> */}
-            </CardHeader>
+            {/* </CardHeader>
             <CardBody>
-              <GridContainer>
+              <GridContainer> */}
                 {
                   driverSummary && Object.keys(driverSummary).length > 0 && driver && driverSummary[driver._id] &&
                   driverSummary[driver._id].merchants.map(m =>
-                    <GridItem xs={12} sm={12} md={12}>
+                    // <GridItem xs={12} sm={12} md={12}>
                     <Card>
                     <CardHeader color="primary">
                         <div key={m.merchantName}>
@@ -183,17 +232,17 @@ const DriverSummaryPage = ({}) => {
                         </div>
                     </CardHeader>
                     <CardBody>
-                    <Table>
+                    <Table >
                       <TableBody>
                           {m.items.map((prop, key) => 
                               <TableRow key={key} >
-                                <TableCell>
+                                <TableCell className={classes.itemRow}>
                                   {prop.productName}
                                 </TableCell>
-                                <TableCell>
+                                <TableCell className={classes.itemRow}>
                                   x{prop.quantity}
                                 </TableCell>
-                                <TableCell>
+                                <TableCell className={classes.itemRow}>
                                   {prop.status==='P' ? '已提' : '未提'}
                                 </TableCell>
                               </TableRow>
@@ -202,14 +251,12 @@ const DriverSummaryPage = ({}) => {
                       </Table>
                       </CardBody>
                       </Card>
-                    </GridItem>
+                    // </GridItem>
                   )
                 }
-              </GridContainer>
+              {/* </GridContainer>
             </CardBody>
-          </Card>
-        </GridItem>
-        <GridItem xs={12} sm={12} md={8}>
+          </Card> */}
 
           {
             dupClients && dupClients.length > 0 &&
@@ -233,21 +280,26 @@ const DriverSummaryPage = ({}) => {
             </Table>
           </Card>
           }
-        </GridItem>
       </GridContainer>
-    </div>
   );
 }
 
-// const mapStateToProps = (state) => ({ driverSummary: state.driverSummary });
-// // const mapDispatchToProps = (dispatch) => ({
-// //   loadDriverSummary: (startDate) => {
-// //     dispatch(loadDriverSummaryAsync(startDate));
-// //   },
-// // });
-// export default connect(
-//   mapStateToProps,
-//   // mapDispatchToProps
-// )(DriverSummaryPage);
 
-export default DriverSummaryPage;
+DriverSummaryPage.propTypes = {
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.string
+    })
+  }),
+  history: PropTypes.object
+};
+
+const mapStateToProps = (state) => ({
+  deliverDate: state.deliverDate,
+});
+export default connect(
+  mapStateToProps,
+  {
+    setDeliverDate
+  }
+)(DriverSummaryPage);
