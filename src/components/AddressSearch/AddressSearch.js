@@ -66,7 +66,9 @@ const AddressSearch = ({label, placeholder, handleSelectLocation, location}) => 
     // const addr = `${address.mainText}, ${address.secondaryText}`;
     const placeId = address.placeId;
     ApiLocationService.getLocationByGeocode({placeId}).then(({data}) => {
-      const location = (!data.data.addressNumber) ? {...data.data, streetNumber} : data.data;
+
+      const location = (!data.data.streetNumber) ? {...data.data, streetNumber} : data.data;
+
       handleSelectLocation(location);
       const addr = getAddrString(location);
       setAddress(address);
