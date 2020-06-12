@@ -31,6 +31,11 @@ export default {
       productId
     });
   },
+  getProducts: (conditions) => {
+    let query = {};
+    query.query = buildQuery(conditions);
+    return ApiService.v2().get("products", query);
+  },
   getProduct: id => {
     return ApiService.v2().get(`products/${id}`);
   },

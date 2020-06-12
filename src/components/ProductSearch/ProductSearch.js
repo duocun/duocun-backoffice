@@ -27,12 +27,12 @@ const useStyles = makeStyles((styles) => ({
 const rowsPerPage = 10;
 
 
-const ProductSearch = ({label, placeholder, onSelectProduct, product}) => {
+const ProductSearch = ({label, placeholder, onSelect, name, id}) => {
   const classes = useStyles();
   const { t } = useTranslation();
   const [page, setPage] = useState(0);
-  const [keyword, setKeyword] = useState(product.name);// getQueryParam(product, "search") || "");
-  const [model, setProduct] = useState(product);
+  const [keyword, setKeyword] = useState(name); // getQueryParam(product, "search") || "");
+  const [model, setProduct] = useState({_id:'', name:''});
   // const [sort, setSort] = useState(["_id", 1]);
   const [searching, setSearching] = useState(false);
   const [products, setProducts] = useState([]); // [{placeId, mainText, secondaryText}]
@@ -40,7 +40,7 @@ const ProductSearch = ({label, placeholder, onSelectProduct, product}) => {
 
   const handleSearch = (keyword) => {
     if (keyword) {
-      if (keyword.length > 2) {
+      if (keyword.length >= 1) {
         ApiProductService.getProductsByKeyword(keyword).then(({data}) => {
           setProducts(data.data);
           setCount(data.count);
@@ -53,21 +53,15 @@ const ProductSearch = ({label, placeholder, onSelectProduct, product}) => {
     }
   }
 
-  useEffect(() => {
-    setKeyword(product.name);
-  }, [product]);
+  // useEffect(() => {
+  //   setKeyword(name);
+  // }, [name]);
 
-  const handleSelectData = (product) => {
-    const placeId = model.placeId;
-    ApiProductService.getLocationByGeocode({placeId}).then(({data}) => {
-      const product = data.data;
-      // handleSelectProduct(product);
-      setProduct(product);
-      setKeyword(product.name);
-      setSearching(false);
-    });
+  const handleSelectData = (item) => {
+    setKeyword(item.name);
+    setSearching(false);
+    onSelect(item);
   }
-
 
   const handleKeywordChange = ({target}) => {
     const str = target.value;
@@ -76,20 +70,6 @@ const ProductSearch = ({label, placeholder, onSelectProduct, product}) => {
     setSearching(true);
     handleSearch(str);
   }
-
-  // onAddressInputChange(keyword) {
-  //   if (keyword) {
-  //     if (keyword.length > 3) {
-  //       this.locationSvc.getSuggestAddressList(keyword).then(products => {
-  //         this.setState({ products: products, product: null, keyword: keyword, bAddressList: true });
-  //       });
-  //     } else {
-  //       this.setState({ keyword: keyword });
-  //     }
-  //   } else {
-  //     this.setState({ products: this.historyLocations, product: null, keyword: keyword, bAddressList: true });
-  //   }
-  // }
 
   const handleFocus = () => {
 
@@ -132,33 +112,6 @@ const ProductSearch = ({label, placeholder, onSelectProduct, product}) => {
           onBlur: handleBlur,
         }}
       />
-                {/* <Box pb={2}>
-                  <TextField id="search-input-box"
-                    fullWidth
-                    label={`${t(label)}`}
-                    value={keyword}
-                    InputLabelProps={{ shrink: keyword ? true : false }}
-                    onChange={handleKeywordChange}
-                    onKeyDown={(event) => {
-                      const { key } = event;
-                      if (key === "Enter") {
-                        return handleSearch(keyword);
-                      }
-                    }}
-                    onFocus={handleFocus}
-                    onBlur={handleBlur}
-                  />
-                </Box> */}
-      {/* <Button
-        color="white"
-        aria-label="edit"
-        justIcon
-        round
-        // onClick={() => handleSearch(keyword)}
-        // style={{ visibility: ifSearch ? "visible" : "hidden" }}
-      >
-        <Search />
-      </Button> */}
 
     <div style={divStyle}>
     {/* <SearchDropDown

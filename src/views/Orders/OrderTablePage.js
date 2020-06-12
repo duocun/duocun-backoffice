@@ -263,7 +263,7 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
                   }
                 />
               </GridItem>
-              <GridItem xs={12} sm={12} lg={3}>
+              {/* <GridItem xs={12} sm={12} lg={3}>
                 <Box mt={2}>
                   <Link to="/orders/new">
                   <Button
@@ -276,7 +276,7 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
                   </Button>
                   </Link>
                 </Box>
-              </GridItem>
+              </GridItem> */}
               <GridItem xs={12} sm={12} lg={6}>
                 <Box pb={2} mt={2}>
                   <Searchbar

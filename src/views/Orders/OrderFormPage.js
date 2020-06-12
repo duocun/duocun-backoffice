@@ -98,14 +98,13 @@ const OrderFormPage = ({match, history, order, selectOrder, account, deliverDate
     updateData();
   }
 
+  // after render
   useEffect(() => {
-    if(!model._id){
+    if(model && !model._id){
       if(match.params && match.params.id === 'new'){
         setMode('new');
       }else if(match.params && match.params.id === 'clone') {
-        let cloned = {...order};
-        delete cloned._id;
-        delete cloned.code;
+        let cloned = {...order, price: 0, cost: 0, tax: 0, total: 0, _id: 'clone'};
         setMode('clone');
         setModel(cloned);
       } else {

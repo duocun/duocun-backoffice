@@ -65,9 +65,8 @@ export default {
   getOrder: id => {
     return ApiService.v2().get(`orders/${id}`);
   },
-  saveOrder: model => {
-    model._id = model._id || "new";
-    return ApiService.v2().post(`orders/${model._id}`, model);
+  createOrder: data => {
+    return ApiService.v2().post(`orders`, data);
   },
   updateOrder: model => {
     const data = {...model};
@@ -94,5 +93,35 @@ export default {
   },
   assign: (driverId, driverName, orderIds) => {
     return ApiService.v2().put(`orders/assign`, {driverId, driverName, orderIds});
+  },
+  getChargeFromOrderItems(
+    items, // IOrderItem[],
+    overRangeCharge = 0
+  ) {
+    let price = 0;
+    let cost = 0;
+    let tax = 0;
+  
+    items.forEach((x) => { // IOrderItem
+      price += x.price * x.quantity;
+      cost += x.cost * x.quantity;
+      tax += Math.ceil(x.price * x.quantity * x.taxRate) / 100;
+    });
+  
+    const tips = 0;
+    const groupDiscount = 0;
+    const overRangeTotal = Math.round(overRangeCharge * 100) / 100;
+  
+    return {
+      price: Math.round(price * 100) / 100,
+      cost: Math.round(cost * 100) / 100,
+      tips: Math.round(tips * 100) / 100,
+      tax: Math.round(tax * 100) / 100,
+      overRangeCharge: overRangeTotal,
+      deliveryCost: 0, // merchant.deliveryCost,
+      deliveryDiscount: 0, // merchant.deliveryCost,
+      groupDiscount, // groupDiscount,
+      total: Math.round((price + tax + tips - groupDiscount + overRangeTotal)*100)/100
+    };
   }
 };
