@@ -1,5 +1,5 @@
 import ApiService from "services/api/ApiService";
-import { buildPaginationQuery } from "helper/index";
+import { buildQuery, buildPaginationQuery } from "helper/index";
 export default {
   getProductList: (page, pageSize, search = "", params = null, sort = []) => {
     let query = {};
@@ -31,6 +31,11 @@ export default {
       productId
     });
   },
+  getProducts: (conditions) => {
+    let query = {};
+    query.query = buildQuery(conditions);
+    return ApiService.v2().get("products", query);
+  },
   getProduct: id => {
     return ApiService.v2().get(`products/${id}`);
   },
@@ -58,5 +63,20 @@ export default {
       `products/imageUpload?productId=${productId}`,
       formData
     );
-  }
+  },
+  getProductsByKeyword: (keyword = "") => {
+    let query = {};
+    const condition = {
+      $or: [
+        {
+          name: { $regex: keyword }
+        },
+        {
+          description: { $regex: keyword }
+        }
+      ]
+    };
+    query.query = buildQuery(condition);
+    return ApiService.v2().get("products", query);
+  },
 };

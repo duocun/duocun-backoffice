@@ -47,6 +47,7 @@ const OrderFormPage = ({match, history, order, selectOrder, account, deliverDate
 
   // for model
   const [model, setModel] = useState(defaultOrdersModelState);
+  const [mode, setMode] = useState('');
   const [alert, setAlert] = useState({ message: "", severity: "info" });
 
   //////////////////// For data fetch
@@ -97,17 +98,27 @@ const OrderFormPage = ({match, history, order, selectOrder, account, deliverDate
     updateData();
   }
 
+  // after render
   useEffect(() => {
-    if(!model._id){
-      ApiOrderService.getOrder(match.params.id).then(({data}) => {
-        const order = data.data;
-        const clientId = order.clientId;
-        ApiAccountService.getAccount(clientId).then(({data}) => {
-          const account = data.data;
-          setAccount(account);
-          setModel(order);
+    if(model && !model._id){
+      if(match.params && match.params.id === 'new'){
+        setMode('new');
+      }else if(match.params && match.params.id === 'clone') {
+        let cloned = {...order, price: 0, cost: 0, tax: 0, total: 0, _id: 'clone'};
+        setMode('clone');
+        setModel(cloned);
+      } else {
+        ApiOrderService.getOrder(match.params.id).then(({data}) => {
+          const order = data.data;
+          const clientId = order.clientId;
+          ApiAccountService.getAccount(clientId).then(({data}) => {
+            const account = data.data;
+            setAccount(account);
+            setModel(order);
+            setMode('edit');
+          });
         });
-      });
+      }
     }
   }, [model]);
   /////////////////// For render and events 
@@ -145,6 +156,7 @@ const OrderFormPage = ({match, history, order, selectOrder, account, deliverDate
     <GridContainer>
       <GridItem xs={12} sm={12} md={12}>
         <OrderForm
+            mode={mode}
             account={account}
             data={model}
             onAfterUpdate={handleAfterUpdate}

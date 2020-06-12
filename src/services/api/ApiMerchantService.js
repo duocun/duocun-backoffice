@@ -1,5 +1,5 @@
 import ApiService from "services/api/ApiService";
-import { buildPaginationQuery } from "helper/index";
+import { buildQuery, buildPaginationQuery } from "helper/index";
 export default {
   getMerchantList: (page, pageSize, search = "", sort = []) => {
     let query = {};
@@ -17,5 +17,10 @@ export default {
   },
   createMerchant: (merchantData = {}) => {
     return ApiService.v2().post("merchants", merchantData);
+  },
+  getMerchants: (conditions) => {
+    let query = {};
+    query.query = buildQuery(conditions);
+    return ApiService.v2().get("merchants", query);
   },
 };
