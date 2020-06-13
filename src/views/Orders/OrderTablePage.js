@@ -117,12 +117,17 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
   const updateData = () => {
     const qDeliverDate = deliverDate ? {deliverDate} : {};
     const keyword = query;
-    const condition = {
+    const condition = keyword ? {
       $or: [
         { clientName: { $regex: keyword }},
         { clientPhone: { $regex: keyword }},
         { code: { $regex: keyword }}
       ],
+      status: {
+        $nin: [OrderStatus.BAD, OrderStatus.DELETED, OrderStatus.TEMP],
+      },
+      ...qDeliverDate
+    } : {
       status: {
         $nin: [OrderStatus.BAD, OrderStatus.DELETED, OrderStatus.TEMP],
       },
