@@ -36,7 +36,7 @@ export default {
   getOrders: (page, pageSize, condition = {}, sort = []) => {
     let query = {};
 
-    query.keyword = query.query = buildPaginationQuery(
+    query.query = buildPaginationQuery(
       page,
       pageSize,
       condition,
