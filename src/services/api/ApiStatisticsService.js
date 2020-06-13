@@ -13,7 +13,7 @@ export default {
     let query = {startDate, endDate};
     return ApiService.v2().get("statistics/merchant", query);
   },
-  saveDriverStatistic: (deliverDate) => {
+  getDriverStatistic: (deliverDate) => {
     let query = {deliverDate};
     return ApiService.v2().get("statistics/driver", query);
   },

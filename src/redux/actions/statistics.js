@@ -29,7 +29,7 @@ export const loadStatisticsSummaryAsync = (startDate, endDate) => {
 
 export const loadDriverSummaryAsync = (startDate) => {
   return (dispatch) => {
-    return ApiStatisticsService.saveDriverStatistic(startDate).then(
+    return ApiStatisticsService.getDriverStatistic(startDate).then(
       ({data}) => {
         dispatch(setDriverSummary(data.data));
       }
