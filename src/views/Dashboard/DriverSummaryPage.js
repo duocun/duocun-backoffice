@@ -92,7 +92,7 @@ const DriverSummaryPage = ({match, history, deliverDate, setDeliverDate}) => {
   }, []);
 
   const loadData = (deliverDate) => {
-    ApiStatisticsService.saveDriverStatistic(deliverDate).then(({data}) => {
+    ApiStatisticsService.getDriverStatistic(deliverDate).then(({data}) => {
         const summary = data.data;
         setDriverSummary(summary);
         
