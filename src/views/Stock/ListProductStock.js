@@ -286,7 +286,7 @@ export default function ListProductStock({ location }) {
       ? parseInt(getQueryParam(location, "page"))
       : 0
   );
-  const [rowsPerPage, setRowsPerPage] = useState(50);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
   const [totalRows, setTotalRows] = useState(0);
   const [query, setQuery] = useState(getQueryParam(location, "search") || "");
   const [sort, setSort] = useState(["_id", 1]);
