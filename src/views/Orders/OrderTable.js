@@ -16,6 +16,8 @@ import TableBodySkeleton from "components/Table/TableBodySkeleton";
 import IconButton from "@material-ui/core/IconButton";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
+import FileCopyIcon from '@material-ui/icons/FileCopy';
+
 // import CheckIcon from "@material-ui/icons/Check";
 // import CloseIcon from "@material-ui/icons/Close";
 
@@ -25,33 +27,37 @@ import DeleteIcon from "@material-ui/icons/Delete";
 // import { AirlineSeatLegroomReducedOutlined } from "../../../node_modules/@material-ui/icons";
 
 const styles = {
-  cardCategoryWhite: {
-    "&,& a,& a:hover,& a:focus": {
-      color: "rgba(255,255,255,.62)",
-      margin: "0",
-      fontSize: "14px",
-      marginTop: "0",
-      marginBottom: "0"
-    },
-    "& a,& a:hover,& a:focus": {
-      color: "#FFFFFF"
-    }
-  },
-  cardTitleWhite: {
-    color: "#FFFFFF",
-    marginTop: "0px",
-    minHeight: "auto",
-    fontWeight: "300",
-    fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
-    marginBottom: "3px",
-    textDecoration: "none",
-    "& small": {
-      color: "#777",
-      fontSize: "65%",
-      fontWeight: "400",
-      lineHeight: "1"
-    }
+  operationRow: {
+    paddingLeft: "0px",
+    paddingRight: "0px"
   }
+  // cardCategoryWhite: {
+  //   "&,& a,& a:hover,& a:focus": {
+  //     color: "rgba(255,255,255,.62)",
+  //     margin: "0",
+  //     fontSize: "14px",
+  //     marginTop: "0",
+  //     marginBottom: "0"
+  //   },
+  //   "& a,& a:hover,& a:focus": {
+  //     color: "#FFFFFF"
+  //   }
+  // },
+  // cardTitleWhite: {
+  //   color: "#FFFFFF",
+  //   marginTop: "0px",
+  //   minHeight: "auto",
+  //   fontWeight: "300",
+  //   fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
+  //   marginBottom: "3px",
+  //   textDecoration: "none",
+  //   "& small": {
+  //     color: "#777",
+  //     fontSize: "65%",
+  //     fontWeight: "400",
+  //     lineHeight: "1"
+  //   }
+  // }
 };
 
 const useStyles = makeStyles(styles);
@@ -203,7 +209,12 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
                       }
                       </TableCell>
 
-                      <TableCell>
+                      <TableCell className={classes.operationRow}>
+                        <Link to={`orders/clone`}>
+                          <IconButton aria-label="clone"> 
+                            <FileCopyIcon />
+                          </IconButton>
+                        </Link>
                         <Link to={`orders/${row._id}`}>
                           <IconButton aria-label="edit"> 
                             <EditIcon />

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import {Link} from 'react-router-dom';
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { connect } from "react-redux";
@@ -116,12 +117,17 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
   const updateData = () => {
     const qDeliverDate = deliverDate ? {deliverDate} : {};
     const keyword = query;
-    const condition = {
+    const condition = keyword ? {
       $or: [
         { clientName: { $regex: keyword }},
         { clientPhone: { $regex: keyword }},
         { code: { $regex: keyword }}
       ],
+      status: {
+        $nin: [OrderStatus.BAD, OrderStatus.DELETED, OrderStatus.TEMP],
+      },
+      ...qDeliverDate
+    } : {
       status: {
         $nin: [OrderStatus.BAD, OrderStatus.DELETED, OrderStatus.TEMP],
       },
@@ -235,23 +241,10 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
         <Card>
           <CardHeader color="primary">
             <GridContainer>
-              <GridItem xs={12} lg={6}>
+              <GridItem xs={12} sm={12} lg={12}>
                 <h4>{t("Orders")}</h4>
               </GridItem>
-              <GridItem xs={12} lg={6} align="right">
-                <Box mr={2} style={{ display: "inline-block" }}>
-                  {/* <Button
-                      href="orders/new"
-                      variant="contained"
-                      color="default"
-                    >
-                      <AddCircleOutlineIcon />
-                      {t("New Order")}
-                    </Button> */}
-                </Box>
-
-              </GridItem>
-              <GridItem xs={12} sm={12} lg={6} align="left">
+              <GridItem xs={12} sm={12} lg={3}>
                 <KeyboardDatePicker
                   variant="inline"
                   label={t("Deliver Date")}
@@ -275,21 +268,37 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
                   }
                 />
               </GridItem>
-              <GridItem xs={12} sm={12} lg={6} align="left">
-                <Searchbar
-                  onChange={e => {
-                    const { target } = e;
-                    setQuery(target.value);
-                  }}
-                  onSearch={() => {
-                    setLoading(true);
-                    if (page === 0) {
-                      updateData();
-                    } else {
-                      setPage(0);
-                    }
-                  }}
-                />
+              {/* <GridItem xs={12} sm={12} lg={3}>
+                <Box mt={2}>
+                  <Link to="/orders/new">
+                  <Button
+                    color="default"
+                    variant="contained"
+                    disabled={processing}
+                  >
+                    <AddCircleOutlineIcon />
+                    {t("New Order")}
+                  </Button>
+                  </Link>
+                </Box>
+              </GridItem> */}
+              <GridItem xs={12} sm={12} lg={6}>
+                <Box pb={2} mt={2}>
+                  <Searchbar
+                    onChange={e => {
+                      const { target } = e;
+                      setQuery(target.value);
+                    }}
+                    onSearch={() => {
+                      setLoading(true);
+                      if (page === 0) {
+                        updateData();
+                      } else {
+                        setPage(0);
+                      }
+                    }}
+                  />
+                </Box>
               </GridItem>
             </GridContainer>
           </CardHeader>
@@ -314,19 +323,7 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
               removeData={handleDeleteOrder} />
           </CardBody>
           <CardFooter>
-            <GridItem xs={12} container direction="row-reverse">
-              <Box mt={2}>
-                <Button
-                  color="primary"
-                  variant="contained"
-                  disabled={processing}
-                  onClick={handleNewOrder}
-                >
-                  <AddCircleOutlineIcon />
-                  {t("New Order")}
-                </Button>
-              </Box>
-            </GridItem>
+
           </CardFooter>
         </Card>
     </GridContainer>

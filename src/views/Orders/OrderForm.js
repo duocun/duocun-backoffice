@@ -20,17 +20,17 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 
 // import FormLabel from "@material-ui/core/FormLabel";
-// import FormControl from "@material-ui/core/FormControl";
 // import FormGroup from "@material-ui/core/FormGroup";
+import FormControl from "@material-ui/core/FormControl";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Checkbox from "@material-ui/core/Checkbox";
-// import Select from "@material-ui/core/Select";
+import Select from "@material-ui/core/Select";
 
 // import Skeleton from "@material-ui/lab/Skeleton";
 import Alert from "@material-ui/lab/Alert";
 // import CustomInput from "components/CustomInput/CustomInput";
-// import InputLabel from "@material-ui/core/InputLabel";
-// import MenuItem from "@material-ui/core/MenuItem";
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
 import Button from "@material-ui/core/Button";
 // import IconButton from "@material-ui/core/IconButton";
 
@@ -44,85 +44,23 @@ import HistoryIcon from '@material-ui/icons/History';
 import FlashStorage from "services/FlashStorage";
 
 import AddressSearch from "components/AddressSearch/AddressSearch";
+import OrderItemEditor from "views/Orders/OrderItemEditor";
 
 import AuthService from "services/AuthService";
 import ApiAuthService from 'services/api/ApiAuthService';
 import ApiAccountService from 'services/api/ApiAccountService';
 import ApiOrderService from 'services/api/ApiOrderService';
+import ApiMerchantService from "services/api/ApiMerchantService";
 // import ApiLocationService from 'services/api/ApiLocationService';
 
 // import moment from 'moment-timezone/moment-timezone';
 const useStyles = makeStyles(theme => ({
-  // textarea: {
-  //   width: "100%"
-  // },
-  // select: {
-  //   width: "100%",
-  //   marginTop: 27
-  // },
-  // heading: {
-  //   marginBottom: "0.5rem",
-  //   size: "1.5rem",
-  //   fontWeight: 600
-  // },
-  // table: {
-  //   minWidth: 750
-  // },
-  // editingCell: {
-  //   padding: "0 5px"
-  // },
-  // formControl: {
-  //   display: "block"
-  // },
-  // formControlLabel: {
-  //   marginTop: "1rem",
-  //   marginBottom: "1rem",
-  //   fontWeight: 600
-  // },
-  // formGroup: {
-  //   border: "1px solid #eee",
-  //   borderRadius: 5,
-  //   padding: 5
-  // }
-}));
 
-// const useStyles = makeStyles(() => ({
-//   textarea: {
-//     width: "100%"
-//   },
-//   select: {
-//     width: "100%",
-//     marginTop: 27
-//   },
-//   heading: {
-//     marginBottom: "0.5rem",
-//     size: "1.5rem",
-//     fontWeight: 600
-//   },
-//   table: {
-//     minWidth: 750
-//   },
-//   editingCell: {
-//     padding: "0 5px"
-//   },
-//   formControl: {
-//     display: "block"
-//   },
-//   formControlLabel: {
-//     marginTop: "1rem",
-//     marginBottom: "1rem",
-//     fontWeight: 600
-//   },
-//   formGroup: {
-//     border: "1px solid #eee",
-//     borderRadius: 5,
-//     padding: 5
-//   }
-// }));
+}));
 
 
 // const OrderForm = ({ account, order, data, update, toTransactionHistory }) => {
-const OrderForm = ({ account, data, onAfterUpdate, history }) => {
+const OrderForm = ({ mode, account, data, onAfterUpdate, history }) => {
   // const { register, handleSubmit, watch, errors } = useForm();
   // moment.tz.add("America/Toronto|EST EDT EWT EPT|50 40 40 40|01010101010101010101010101010101010101010101012301010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010|-25TR0 1in0 11Wu 1nzu 1fD0 WJ0 1wr0 Nb0 1Ap0 On0 1zd0 On0 1wp0 TX0 1tB0 TX0 1tB0 TX0 1tB0 WL0 1qN0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 WL0 1qN0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 WL0 1qN0 4kM0 8x40 iv0 1o10 11z0 1nX0 11z0 1o10 11z0 1o10 1qL0 11D0 1nX0 11B0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 11z0 1o10 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0|65e5");
 
@@ -138,7 +76,9 @@ const OrderForm = ({ account, data, onAfterUpdate, history }) => {
   const classes = useStyles();
   const [modifyByAccount, setModifyByAccount] = useState({ _id: '', username: '' });
   const [accounts, setAccounts] = useState([]);
+  const [merchants, setMerchants] = useState([]);
   const [model, setModel] = useState(data);
+  const [itemMap, setItemMap] = useState({});
 
   const [productMap, setCheckMap] = useState({});
 
@@ -154,40 +94,88 @@ const OrderForm = ({ account, data, onAfterUpdate, history }) => {
     FlashStorage.get("FINANCE_ALERT") || { message: "", severity: "info" }
   );
 
+  useEffect(() => {
+    ApiMerchantService.getMerchants({type: 'G', status:'A'}).then(({data}) => {
+      setMerchants(data.data);
+    });
+  }, [])
+
+  useEffect(() => {
+    // set products for remove products function
+    if(data){
+      if (data.items && data.items.length > 0) {
+        const checkMap = {};
+        data.items.forEach(it => {
+          checkMap[it.productId] = { ...it, status: false };
+        });
+        setCheckMap(checkMap);
+      }
+
+      // set model for save function
+      if (data.actionCode === 'PS') {
+        setModel({
+          ...data,
+          modifyBy: modifyByAccount._id
+        });
+      } else {
+        setModel({ ...data, modifyBy: modifyByAccount._id });
+      }
+    }
+  }, [data]);
+
+  useEffect(() => {
+    const token = AuthService.getAuthToken();
+    ApiAuthService.getCurrentUser(token).then(({ data }) => {
+      const account = { ...data.data };
+      setModifyByAccount(account);
+      ApiAccountService.getAccountList(null, null, { type: { $in: ['driver', 'system'] } }).then(({ data }) => {
+        setAccounts(data.data);
+      });
+    });
+  }, []);
+
 
   const handleCreate = () => {
-    if (model.clientId && model.items && model.items.length>0) {
-      removeAlert();
-      setProcessing(true);
-      ApiOrderService.createOrder(model).then(({ data }) => {
-        if (data.code === 'success') {
-          const newAlert = {
-            message: t("Saved successfully"),
-            severity: "success"
-          };
-          if (model._id === "new") {
-            FlashStorage.set("ORDER_ALERT", newAlert);
-            return;
+    if (model._id === 'clone') {
+      const vs = Object.values(itemMap);
+      const items = vs.filter(v => v._id !== 'new');
+
+      if (model.clientId && items && items.length > 0) {
+        let d = {...model, items};
+        delete d._id;
+        delete d.code;
+
+        removeAlert();
+        setProcessing(true);
+        ApiOrderService.createOrder(d).then(({ data }) => {
+          if (data.code === 'success') {
+            const newAlert = {
+              message: t("Saved successfully"),
+              severity: "success"
+            };
+            if (model._id === "new") {
+              FlashStorage.set("ORDER_ALERT", newAlert);
+              return;
+            } else {
+              setAlert(newAlert);
+              onAfterUpdate(account._id);
+            }
           } else {
-            setAlert(newAlert);
-            onAfterUpdate(account._id);
+            setAlert({
+              message: t("Save failed"),
+              severity: "error"
+            });
           }
-        } else {
-          setAlert({
-            message: t("Save failed"),
-            severity: "error"
-          });
-        }
-        setProcessing(false);
-      })
-      .catch(e => {
-        console.error(e);
-        setAlert({
-          message: t("Save failed"),
-          severity: "error"
+          setProcessing(false);
+        }).catch(e => {
+            console.error(e);
+            setAlert({
+              message: t("Save failed"),
+              severity: "error"
+            });
+            setProcessing(false);
         });
-        setProcessing(false);
-      });
+      }
     }
   };
 
@@ -195,7 +183,7 @@ const OrderForm = ({ account, data, onAfterUpdate, history }) => {
     if (model._id && modifyByAccount._id) {
       removeAlert();
       setProcessing(true);
-      setModel({...model, modifyBy: modifyByAccount._id})
+      setModel({ ...model, modifyBy: modifyByAccount._id })
       ApiOrderService.updateOrder(model).then(({ data }) => {
         if (data.code === 'success') {
           setAlert({
@@ -225,17 +213,17 @@ const OrderForm = ({ account, data, onAfterUpdate, history }) => {
     const vs = Object.keys(productMap).map(pId => productMap[pId]);
     const checked = vs.filter(v => v.status);
     const unchecked = vs.filter(v => !v.status);
-    return (checked.length > 0 && unchecked.length>0);
+    return (checked.length > 0 && unchecked.length > 0);
   }
 
   const handleSplitOrder = () => {
     const vs = Object.keys(productMap).map(pId => productMap[pId]);
     const checked = vs.filter(v => v.status);
     // const unchecked = vs.filter(v => !v.status);
-    if(canSplit()){
+    if (canSplit()) {
       const r = window.confirm('拆分送货单, 为选中的商品新建一个送货单。');
-      if(r){
-        ApiOrderService.splitOrder(model._id, checked).then(({data}) => {
+      if (r) {
+        ApiOrderService.splitOrder(model._id, checked).then(({ data }) => {
           const r = data;
           updateFormData(model._id);
         });
@@ -256,21 +244,21 @@ const OrderForm = ({ account, data, onAfterUpdate, history }) => {
   }
 
   const handleSubmit = () => {
-    if (model._id) {
+    if (model._id && model._id !== 'new' && model._id !== 'clone') {
       handleUpdate();
     } else {
-      // handleCreate();
+      handleCreate();
     }
   }
   const handleToggleProduct = (e, it) => {
-    const c = {...productMap};
+    const c = { ...productMap };
     c[it.productId].status = e.target.checked;
     setCheckMap(c);
   }
 
   const updateFormData = (id) => {
-    if(id){
-      ApiOrderService.getOrder(id).then(({data}) => {
+    if (id) {
+      ApiOrderService.getOrder(id).then(({ data }) => {
         const order = data.data;
         setModel(order);
       });
@@ -279,6 +267,14 @@ const OrderForm = ({ account, data, onAfterUpdate, history }) => {
 
   const handleBack = () => {
 
+  }
+
+  const handleUpdateItemMap = (itemMap) => {
+    setItemMap(itemMap);
+    const vs = Object.values(itemMap);
+    const items = vs.filter(v => v._id !== 'new');
+    const charge = ApiOrderService.getChargeFromOrderItems(items, 0);
+    setModel({...model, ...charge, items});
   }
 
   const handleSelectDeliverLocation = (location) => {
@@ -290,35 +286,17 @@ const OrderForm = ({ account, data, onAfterUpdate, history }) => {
     setModel({ ...model, deliverDate, delivered: `${deliverDate}T15:00:00.000Z` });
   }
 
-  useEffect(() => {
-    // set products for remove products function
-    const checkMap = {};
-    data.items.forEach(it => {
-      checkMap[it.productId] = {...it, status: false};
-    });
-    setCheckMap(checkMap);
+  const handleSelectProduct = (item) => {
+    setModel({ ...model, items: [item] });
+  }
 
-    // set model for save function
-    if (data.actionCode === 'PS') {
-      setModel({
-        ...data,
-        modifyBy: modifyByAccount._id
-      });
+  const getTitle = () => {
+    if (mode === 'new' || mode === 'clone') {
+      return 'New Order';
     } else {
-      setModel({ ...data, modifyBy: modifyByAccount._id });
+      return 'Edit Order';
     }
-  }, [data]);
-
-  useEffect(() => {
-    const token = AuthService.getAuthToken();
-    ApiAuthService.getCurrentUser(token).then(({ data }) => {
-      const account = { ...data.data };
-      setModifyByAccount(account);
-      ApiAccountService.getAccountList(null, null, { type: { $in: ['driver', 'system'] } }).then(({ data }) => {
-        setAccounts(data.data);
-      });
-    });
-  }, []);
+  }
 
   return (
     <GridContainer>
@@ -327,7 +305,7 @@ const OrderForm = ({ account, data, onAfterUpdate, history }) => {
           <CardHeader color="primary">
             <GridContainer>
               <GridItem xs={12} lg={6}>
-                <h4>{t(data._id ? "Edit Order" : "New Order")}</h4>
+                <h4>{t(getTitle())}</h4>
               </GridItem>
             </GridContainer>
           </CardHeader>
@@ -340,18 +318,21 @@ const OrderForm = ({ account, data, onAfterUpdate, history }) => {
                   </Alert>
                 </GridItem>
               )}
-              <GridItem xs={12} lg={12}>
-                <Box pb={2}>
-                  <TextField id="order-code"
-                    label={`${t("Code")}`}
-                    value={model.code}
-                    InputLabelProps={{ shrink: model.code ? true : false }}
-                    InputProps={{
-                      readOnly: true,
-                    }}
-                  />
-                </Box>
-              </GridItem>
+              {
+                !(mode === 'new' || mode === 'clone') &&
+                <GridItem xs={12} lg={12}>
+                  <Box pb={2}>
+                    <TextField id="order-code"
+                      label={`${t("Code")}`}
+                      value={model.code}
+                      InputLabelProps={{ shrink: model.code ? true : false }}
+                      InputProps={{
+                        readOnly: true,
+                      }}
+                    />
+                  </Box>
+                </GridItem>
+              }
               <GridItem xs={12} lg={6}>
                 <Box pb={2}>
                   <TextField id="order-client"
@@ -368,7 +349,7 @@ const OrderForm = ({ account, data, onAfterUpdate, history }) => {
                 <Box pb={2}>
                   <TextField id="order-client-phone"
                     label={`${t("Client Phone")}`}
-                    value={model.clientPhone? model.clientPhone : ''}
+                    value={model.clientPhone ? model.clientPhone : ''}
                     InputLabelProps={{ shrink: model.clientPhone ? true : false }}
                     onChange={e => {
                       setModel({ ...model, clientPhone: e.target.value });
@@ -386,31 +367,79 @@ const OrderForm = ({ account, data, onAfterUpdate, history }) => {
                   />
                 </Box>
               </GridItem>
-              <GridItem xs={12} lg={12}>
-                <Box pb={2}>
-                  {
-                    model.items && model.items.length > 0 &&
-                    model.items.map(it => <div key={it.productId}>
-                      <FormControlLabel
-                        control={<Checkbox checked={productMap[it.productId].status} 
-                          onChange={(e) => handleToggleProduct(e, it)}
-                          name={`${it.productId}`} />}
+
+              {
+                (mode === "new" || mode === "clone") &&
+                <GridItem xs={12} lg={6}>
+                  <Box pb={2}>
+                    <FormControl className={classes.select}>
+                      <InputLabel id="merchant-label">
+                        {t("Merchant")}
+                      </InputLabel>
+                      <Select
+                        id="merchant"
+                        labelId="merchant-label"
+                        value={model.merchantId}
+                        onChange={e => {
+                          setModel({
+                            ...model,
+                            merchantId: e.target.value
+                          });
+                        }}
+                      >
+                        {merchants.map(merchant => {
+                          return (
+                            <MenuItem
+                              key={merchant._id}
+                              value={merchant._id}
+                            >
+                              {merchant.name}
+                            </MenuItem>
+                          );
+                        })}
+                      </Select>
+                    </FormControl>
+                  </Box>
+                </GridItem>
+              }
+
+              {
+                (mode === "new" || mode === "clone") &&
+                <GridItem xs={12} lg={12}>
+                  <Box pb={2}>
+                    <OrderItemEditor merchantId={model.merchantId} onUpdateItemMap={handleUpdateItemMap} />
+                  </Box>
+                </GridItem>
+              }
+
+              {
+                !(mode === 'new' || mode === 'clone') &&
+                <GridItem xs={12} lg={12}>
+                  <Box pb={2}>
+                    {
+                      model.items && model.items.length > 0 &&
+                      model.items.map(it => <div key={it.productId}>
+                        <FormControlLabel
+                          control={<Checkbox checked={productMap[it.productId].status}
+                            onChange={(e) => handleToggleProduct(e, it)}
+                            name={`${it.productId}`} />}
                           label={`${it.productName} x ${it.quantity}`}
                           color="primary"
-                      />
-                    </div>)
-                  }
-                  <Button
-                    color="primary"
-                    variant="contained"
-                    disabled={processing}
-                    onClick={handleSplitOrder}
+                        />
+                      </div>)
+                    }
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      disabled={processing}
+                      onClick={handleSplitOrder}
                     >
-                    <SaveIcon />
-                    {t("Split Order")}
-                  </Button>
-                </Box>
-              </GridItem>
+                      <SaveIcon />
+                      {t("Split Order")}
+                    </Button>
+                  </Box>
+                </GridItem>
+              }
               <GridItem xs={12} lg={6}>
                 <Box pb={2}>
                   <TextField id="order-total"
@@ -428,8 +457,8 @@ const OrderForm = ({ account, data, onAfterUpdate, history }) => {
                 <Box pb={2}>
                   <TextField id="order-driver"
                     label={`${t("Driver")}`}
-                    value={model.driver ? model.driver.username : ''}
-                    InputLabelProps={{ shrink: model.driver ? true : false }}
+                    value={model.driverName}
+                    InputLabelProps={{ shrink: model.driverId ? true : false }}
                     InputProps={{
                       readOnly: true,
                     }}
@@ -440,8 +469,8 @@ const OrderForm = ({ account, data, onAfterUpdate, history }) => {
                 <Box pb={2}>
                   <TextField id="order-driver-phone"
                     label={`${t("Driver Phone")}`}
-                    value={model.driver ? model.driver.phone : ''}
-                    InputLabelProps={{ shrink: model.driver ? true : false }}
+                    value={model.driverPhone ? model.driverPhone : ''}
+                    InputLabelProps={{ shrink: model.driverPhone ? true : false }}
                     InputProps={{
                       readOnly: true,
                     }}
