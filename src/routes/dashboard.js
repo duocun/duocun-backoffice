@@ -25,7 +25,7 @@ import CategoryIcon from "@material-ui/icons/Category";
 import StoreIcon from "@material-ui/icons/Store";
 import TransactionIcon from "@material-ui/icons/AttachMoney";
 import SalaryIcon from "@material-ui/icons/PeopleAlt";
-import ListAltIcon from "@material-ui/icons/ListAlt";
+// import ListAltIcon from "@material-ui/icons/ListAlt";
 // core components/views for Admin layout
 import CategoriesPage from "views/Categories/Categories.js";
 import FinanceRoute from "views/Finance/FinanceRoute.js";
@@ -36,7 +36,8 @@ import OrderRoute from "views/Orders/OrderRoute.js";
 import MapRoute from "views/Maps/MapRoute.js";
 import TableList from "views/TableList/TableList.js";
 import StaticPage from "views/Pages/Pages.js";
-import Assignment from "views/Assignment/AssignmentRoute";
+// import Assignment from "views/Assignment/AssignmentRoute";
+import SupportPage from 'views/Support/Support.js';
 import DashboardRoute from "views/Dashboard/DashboardRoute.js";
 
 import AccountsPage from "views/Accounts/AccountsPage";
@@ -142,13 +143,24 @@ const dashboardRoutes = [
   //   component: Assignment,
   //   layout: "/"
   // },
+  /** 
+   * Customer Service Menu
+   * @author  terminator
+  */
   {
-    path: "/table",
-    name: "Table List",
-    icon: "content_paste",
-    component: TableList,
-    layout: "/"
-  }
+    path: '/support',
+    name: 'Support',
+    icon: 'help',
+    component: SupportPage,
+    layout: '/'
+  },
+  // {
+  //   path: "/table",
+  //   name: "Table List",
+  //   icon: "content_paste",
+  //   component: TableList,
+  //   layout: "/"
+  // },
   // {
   //   path: "/typography",
   //   name: "Typography",
