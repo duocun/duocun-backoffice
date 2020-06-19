@@ -72,13 +72,13 @@ const dashboardRoutes = [
     component: OrderRoute,
     layout: "/"
   },
-  {
-    path: "/finance/transactions",
-    name: "Transaction",
-    icon: TransactionIcon,
-    component: FinanceRoute,
-    layout: "/"
-  },
+  // {
+  //   path: "/finance/transactions",
+  //   name: "Transaction",
+  //   icon: TransactionIcon,
+  //   component: FinanceRoute,
+  //   layout: "/"
+  // },
   // {
   //   path: "/finance/salary",
   //   name: "Salary",
@@ -100,13 +100,13 @@ const dashboardRoutes = [
   //   component: StockPage,
   //   layout: "/"
   // },
-  {
-    path: "/attributes",
-    name: "Attributes",
-    icon: EditAttributesIcon,
-    component: AttributePage,
-    layout: "/"
-  },
+  // {
+  //   path: "/attributes",
+  //   name: "Attributes",
+  //   icon: EditAttributesIcon,
+  //   component: AttributePage,
+  //   layout: "/"
+  // },
   // {
   //   path: "/accounts",
   //   name: "Accounts",
@@ -114,20 +114,20 @@ const dashboardRoutes = [
   //   component: AccountsPage,
   //   layout: "/"
   // },
-  {
-    path: "/merchants",
-    name: "Merchants",
-    icon: StoreIcon,
-    component: MerchantsPage,
-    layout: "/"
-  },
-  {
-    path: "/maps",
-    name: "Assignment",
-    icon: LocationIcon,
-    component: MapRoute,
-    layout: "/"
-  },
+  // {
+  //   path: "/merchants",
+  //   name: "Merchants",
+  //   icon: StoreIcon,
+  //   component: MerchantsPage,
+  //   layout: "/"
+  // },
+  // {
+  //   path: "/maps",
+  //   name: "Assignment",
+  //   icon: LocationIcon,
+  //   component: MapRoute,
+  //   layout: "/"
+  // },
   // {
   //   path: "/pages",
   //   name: "Static Page",

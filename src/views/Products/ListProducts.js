@@ -120,7 +120,7 @@ function Product({ loggedInAccount, location }) {
   };
 
   const getMerchantQuery = (query, account) => {
-    if(account & account?.merchants && account?.merchants.length > 0){
+    if(account && account.merchants && account.merchants.length > 0){
       const a = [];
       account.merchants.forEach(merchantId => {
         a.push({merchantId});
@@ -133,9 +133,14 @@ function Product({ loggedInAccount, location }) {
 
   const updateData = type => {
     const params = { type };
+    const q = query ? {
+      name: {
+        $regex: query
+      }
+    }: null;
 
     if(AuthService.isAdmin(loggedInAccount)){
-      ApiProductService.getProductList(page, rowsPerPage, query, params, [
+      ApiProductService.getProductList(page, rowsPerPage, q, params, [
         sort
       ]).then(({ data }) => {
         setProducts(data.data);
@@ -143,8 +148,8 @@ function Product({ loggedInAccount, location }) {
         setLoading(false);
       });
     }else if(AuthService.isMerchant(loggedInAccount)){
-      const q = getMerchantQuery(query);
-      ApiProductService.getProductList(page, rowsPerPage, q, params, [
+      const qMerchant = getMerchantQuery(q, loggedInAccount);
+      ApiProductService.getProductList(page, rowsPerPage, qMerchant, params, [
         sort
       ]).then(({ data }) => {
         setProducts(data.data);

@@ -29,7 +29,7 @@ const useStyles = makeStyles(styles);
 const AdminNavbarLinks = ({ signOut, setLoggedInAccount }) => {
   const { t } = useTranslation();
   const history = useHistory({
-    basename: "/" // backoffice
+    basename: "" // backoffice
   });
   const classes = useStyles();
   const [openNotification, setOpenNotification] = React.useState(null);

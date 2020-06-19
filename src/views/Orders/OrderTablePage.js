@@ -93,7 +93,7 @@ const defaultOrder = {
   note: ''
 }
 
-const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDate, setAccount, setLoggedInAccount, location, history }) => {
+const OrderTablePage = ({ order, selectOrder, loggedInAccount, deliverDate, setDeliverDate, setAccount, setLoggedInAccount, location, history }) => {
   const { t } = useTranslation();
   
   const [model, setModel] = useState({});
@@ -114,7 +114,7 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
   const [sort, setSort] = useState(["_id", -1]);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const updateData = () => {
+  const updateData = (deliverDate, merchants) => {
     const qDeliverDate = deliverDate ? {deliverDate} : {};
     const keyword = query;
     const condition = keyword ? {
@@ -123,11 +123,13 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
         { clientPhone: { $regex: keyword }},
         { code: { $regex: keyword }}
       ],
+      merchantId: {$in: merchants},
       status: {
         $nin: [OrderStatus.BAD, OrderStatus.DELETED, OrderStatus.TEMP],
       },
       ...qDeliverDate
     } : {
+      merchantId: {$in: merchants},
       status: {
         $nin: [OrderStatus.BAD, OrderStatus.DELETED, OrderStatus.TEMP],
       },
@@ -161,11 +163,13 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
     // setDeliverDate(date);
     e.stopPropagation();
     setDeliverDate(null);
+    updateData(null, loggedInAccount.merchants);
   }
 
   const handleDeliverDateChange = (m) => {
     const date = m ? m.format('YYYY-MM-DD') : null;
     setDeliverDate(date);
+    updateData(date, loggedInAccount.merchants);
   }
 
   const handleDeliverDateClick = () => {
@@ -175,7 +179,7 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
   const handleNewOrder = () => {
     setModel({
       ...defaultOrder,
-      modifyBy: account ? account._id : '',
+      modifyBy: loggedInAccount ? loggedInAccount._id : '',
       created: moment.utc().toISOString()
     });
   }
@@ -199,7 +203,7 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
               message: t("Delete successfully"),
               severity: "success"
             });
-            updateData();
+            updateData(deliverDate, loggedInAccount.merchants);
           } else {
             setAlert({
               message: t("Delete failed"),
@@ -225,13 +229,13 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
   // );
 
   useEffect(() => {
-    if(!account){
+    if(!loggedInAccount){
       ApiAuthService.getCurrentAccount().then(({ data }) => {
-        setLoggedInAccount(data);
-        updateData();
+        setLoggedInAccount(data.data);
+        updateData(deliverDate, data.data.merchants);
       });
     }else{
-      updateData();
+      updateData(deliverDate, loggedInAccount.merchants);
     }
   }, [page, rowsPerPage, sort, query, deliverDate]);
 
@@ -282,7 +286,7 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
                   </Link>
                 </Box>
               </GridItem> */}
-              <GridItem xs={12} sm={12} lg={6}>
+              {/* <GridItem xs={12} sm={12} lg={6}>
                 <Box pb={2} mt={2}>
                   <Searchbar
                     onChange={e => {
@@ -299,7 +303,7 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
                     }}
                   />
                 </Box>
-              </GridItem>
+              </GridItem> */}
             </GridContainer>
           </CardHeader>
           <CardBody>
@@ -339,7 +343,7 @@ OrderTablePage.propTypes = {
 const mapStateToProps = (state) => ({
   order: state.order, 
   deliverDate: state.deliverDate,
-  account: state.loggedInAccount
+  loggedInAccount: state.loggedInAccount
 });
 // const mapDispatchToProps = (dispatch) => ({
 //   loadAccounts: (payload, searchOption) => {

@@ -37,7 +37,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const Login = ({ signIn, setLoggedInAccount, history, isAuthorized }) => {
+const Login = ({ signIn, setLoggedInAccount, history, isSignedIn }) => {
   const classes = useStyles();
   const { t } = useTranslation();
   const [username, setUsername] = useState("");
@@ -55,9 +55,9 @@ const Login = ({ signIn, setLoggedInAccount, history, isAuthorized }) => {
               setLoggedInAccount(account);
               AuthService.login(tokenId);
               signIn();
-              history.push("/admin/dashboard");
+              history.push("/dashboard");
             } else {
-              if (isAuthorized) {
+              if (isSignedIn) {
                 signOut();
               }
               setFailed(true);
@@ -131,19 +131,20 @@ Login.propTypes = {
   signIn: PropTypes.func,
   signOut: PropTypes.func,
   history: PropTypes.object,
-  isAuthorized: PropTypes.bool
+  isSignedIn: PropTypes.bool
 };
 
 const mapStateToProps = state => ({
-  isAuthorized: state.isAuthorized
+  isSignedIn: state.isSignedIn
 });
 
-// const mapDispatchToProps = dispatch => ({
-//   signIn: () => dispatch(signIn()),
-//   signOut: () => dispatch(signOut()),
-// });
+const mapDispatchToProps = dispatch => ({
+  signIn: () => dispatch(signIn()),
+  signOut: () => dispatch(signOut()),
+  setLoggedInAccount: (e) => dispatch(setLoggedInAccount(e))
+});
 
 export default connect(
   mapStateToProps,
-  {signIn, signOut, setLoggedInAccount}
+  mapDispatchToProps
 )(Login);

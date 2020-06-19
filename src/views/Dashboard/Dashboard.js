@@ -63,7 +63,7 @@ const Dashboard = ({summary, loadStatisticsSummary, history}) => {
   return (
     <div>
       <GridContainer>
-        <GridItem xs={12} sm={6} md={3}>
+        {/* <GridItem xs={12} sm={6} md={3}>
           <Card>
             <CardHeader color="warning" stats icon onClick={()=>{history.push("/dashboard/products")}}>
               <CardIcon color="warning">
@@ -78,12 +78,6 @@ const Dashboard = ({summary, loadStatisticsSummary, history}) => {
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
-                {/* <Danger>
-                  <Warning />
-                </Danger>
-                <a href="#pablo" onClick={e => e.preventDefault()}>
-                  Get more space
-                </a> */}
                 <div className={classes.stats}>
                   <DateRange />
                   Last 24 Hours
@@ -115,16 +109,11 @@ const Dashboard = ({summary, loadStatisticsSummary, history}) => {
         </GridItem>
         <GridItem xs={12} sm={6} md={3}>
           <Card>
-          {/* onClick={()=>{history.push("/dashboard/pickup/all")} */}
             <CardHeader href="/products" color="danger" stats icon >
               <Link to="/dashboard/pickup/all">
               <CardIcon color="danger">
                 <Icon>info_outline</Icon>
               </CardIcon>
-              {/* <IconButton aria-label="driverSummary" href="dashboard/pickup">
-                <AccountBoxOutlinedIcon />
-              </IconButton> */}
-
               <p className={classes.cardCategory}>Products</p>
               <h3 className={classes.cardTitle}>{summary.nProducts}</h3>
             </Link>
@@ -227,7 +216,7 @@ const Dashboard = ({summary, loadStatisticsSummary, history}) => {
               </div>
             </CardFooter>
           </Card>
-        </GridItem>
+        </GridItem> */}
       </GridContainer>
       <GridContainer>
         <GridItem xs={12} sm={12} md={6}>

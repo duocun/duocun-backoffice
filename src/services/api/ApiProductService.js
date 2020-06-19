@@ -11,14 +11,10 @@ export default {
         params && typeof params === "object"
           ? {
               ...params,
-              name: {
-                $regex: search
-              }
+              ...search
             }
           : {
-              name: {
-                $regex: search
-              }
+              ...search
             };
 
       query.query = buildPaginationQuery(page, pageSize, condition, [], sort);
