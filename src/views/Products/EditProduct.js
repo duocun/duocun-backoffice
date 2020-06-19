@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import { connect } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -55,6 +56,9 @@ import {
   getDateRangeStrings
 } from "helper/index";
 import ImageUploader from "react-images-upload";
+
+import AuthService from "services/AuthService";
+import ApiMerchantService from "services/api/ApiMerchantService";
 const useStyles = makeStyles(() => ({
   textarea: {
     width: "100%"
@@ -409,7 +413,7 @@ const ProductQuantitySchedule = ({ productId, productQuantity, days = 7 }) => {
   );
 };
 
-const EditProduct = ({ match, history }) => {
+const EditProduct = ({ match, history, loggedInAccount }) => {
   const { t } = useTranslation();
   const classes = useStyles();
   const [loading, setLoading] = useState(false);
@@ -429,6 +433,8 @@ const EditProduct = ({ match, history }) => {
     });
   };
 
+
+
   const updatePage = () => {
     ApiProductService.getProduct(match.params.id)
       .then(async ({ data }) => {
@@ -441,7 +447,15 @@ const EditProduct = ({ match, history }) => {
             setCategoryTreeData(categoryResp.data.data);
           }
           setAttributes(data.meta?.attributes || []);
-          setMerchants(data.meta?.merchants || []);
+
+          if(AuthService.isAdmin(loggedInAccount)){
+            setMerchants(data.meta?.merchants || []);
+          }else if(AuthService.isMerchant(loggedInAccount)){
+            const q = {_id: {$in: loggedInAccount.merchants}};
+            ApiMerchantService.getMerchants(q).then((d) => {
+              setMerchants(d.data?.data || []);
+            });
+          }
         } else {
           setAlert({
             message: t("Data not found"),
@@ -1047,4 +1061,15 @@ EditProduct.propTypes = {
   history: PropTypes.object
 };
 
-export default EditProduct;
+const mapStateToProps = state => ({
+  loggedInAccount: state.loggedInAccount
+});
+
+// const mapDispatchToProps = dispatch => ({
+// });
+
+export default connect(
+  mapStateToProps,
+  null
+)(EditProduct);
+

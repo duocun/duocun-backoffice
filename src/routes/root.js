@@ -4,24 +4,36 @@ import { connect } from "react-redux";
 import { Router, Route, Switch, Redirect } from "react-router-dom";
 import { createBrowserHistory } from "history";
 import { signIn } from "redux/actions";
+import {setLoggedInAccount} from "redux/actions/account";
 import AuthService from "services/AuthService";
+import ApiAuthService from 'services/api/ApiAuthService';
 import Admin from "layouts/Admin.js";
 import Login from "views/Login/Login.js";
 const history = createBrowserHistory({
-  basename: "/admin2" // "/duocun-backoffice"
+  basename: "/" // "/duocun-backoffice"
 });
-const Root = props => {
+
+
+
+const Root = ({setLoggedInAccount}) => {
   const [isAuthorized, setIsAuthorized] = useState(AuthService.isLoggedIn());
 
   useEffect(() => {
-    setIsAuthorized(props.isAuthorized);
-  }, [props.isAuthorized]);
+    ApiAuthService.getCurrentAccount().then(({data}) => {
+      setLoggedInAccount(data.data);
+      if(AuthService.isAdmin(data.data) || AuthService.isMerchant(data.data)){
+        setIsAuthorized(isAuthorized);
+      }else{
+        setIsAuthorized(false);
+      }
+    });
+  }, []);
 
   useEffect(() => {
     if (AuthService.isLoggedIn()) {
-      props.signIn();
+      signIn();
     }
-  }, [props]);
+  }, []);
 
   return isAuthorized ? (
     <Router history={history}>
@@ -44,17 +56,18 @@ Root.propTypes = {
   signIn: PropTypes.func
 };
 
-const mapStateToProps = ({ authReducer }) => {
+const mapStateToProps = (state) => {
   return {
-    isAuthorized: authReducer.isAuthorized
+    // isAuthorized: state.isAuthorized,
+    loggedInAccount: state.loggedInAccount
   };
 };
 
-const mapDispatchToProps = dispatch => ({
-  signIn: () => dispatch(signIn())
-});
+// const mapDispatchToProps = dispatch => ({
+//   signIn: () => dispatch(signIn())
+// });
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
+  { signIn, setLoggedInAccount }
 )(Root);

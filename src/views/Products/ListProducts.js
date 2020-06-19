@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
@@ -45,6 +46,7 @@ import ApiCategoryService from "services/api/ApiCategoryService";
 import ApiProductService from "services/api/ApiProductService";
 import { getQueryParam } from "helper/index";
 import FlashStorage from "services/FlashStorage";
+import AuthService from "services/AuthService";
 
 const useStyles = makeStyles(theme => ({
   table: {
@@ -65,7 +67,7 @@ const defaultProduct = {
   category: { _id: "", name: "" }
 };
 
-export default function Product({ location }) {
+function Product({ loggedInAccount, location }) {
   const { t } = useTranslation();
   const classes = useStyles();
   // states related to list and pagniation
@@ -117,16 +119,45 @@ export default function Product({ location }) {
     );
   };
 
+  const getMerchantQuery = (query, account) => {
+    if(account & account?.merchants && account?.merchants.length > 0){
+      const a = [];
+      account.merchants.forEach(merchantId => {
+        a.push({merchantId});
+      });
+      return {...query, ...{$or: a}};
+    }else{
+      return null;
+    }
+  }
+
   const updateData = type => {
     const params = { type };
-    ApiProductService.getProductList(page, rowsPerPage, query, params, [
-      sort
-    ]).then(({ data }) => {
-      setProducts(data.data);
-      setTotalRows(data.count);
+
+    if(AuthService.isAdmin(loggedInAccount)){
+      ApiProductService.getProductList(page, rowsPerPage, query, params, [
+        sort
+      ]).then(({ data }) => {
+        setProducts(data.data);
+        setTotalRows(data.count);
+        setLoading(false);
+      });
+    }else if(AuthService.isMerchant(loggedInAccount)){
+      const q = getMerchantQuery(query);
+      ApiProductService.getProductList(page, rowsPerPage, q, params, [
+        sort
+      ]).then(({ data }) => {
+        setProducts(data.data);
+        setTotalRows(data.count);
+        setLoading(false);
+      });
+    }else{
+      setProducts([]);
+      setTotalRows(0);
       setLoading(false);
-    });
+    }
   };
+
   const toggleSort = fieldName => {
     // sort only one field
     if (sort && sort[0] === fieldName) {
@@ -488,3 +519,16 @@ export default function Product({ location }) {
 Product.propTypes = {
   location: PropTypes.object
 };
+
+const mapStateToProps = state => ({
+  loggedInAccount: state.loggedInAccount
+});
+
+// const mapDispatchToProps = dispatch => ({
+// });
+
+export default connect(
+  mapStateToProps,
+  null
+  // {signIn, signOut, setLoggedInAccount}
+)(Product);

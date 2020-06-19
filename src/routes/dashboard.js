@@ -51,13 +51,13 @@ const dashboardRoutes = [
     component: DashboardRoute,
     layout: "/"
   },
-  {
-    path: "/categories",
-    name: "Categories",
-    icon: CategoryIcon,
-    component: CategoriesPage,
-    layout: "/"
-  },
+  // {
+  //   path: "/categories",
+  //   name: "Categories",
+  //   icon: CategoryIcon,
+  //   component: CategoriesPage,
+  //   layout: "/"
+  // },
   // {
   //   path: "/finance",
   //   name: "Finance",
@@ -79,13 +79,13 @@ const dashboardRoutes = [
     component: FinanceRoute,
     layout: "/"
   },
-  {
-    path: "/finance/salary",
-    name: "Salary",
-    icon: SalaryIcon,
-    component: FinanceRoute,
-    layout: "/"
-  },
+  // {
+  //   path: "/finance/salary",
+  //   name: "Salary",
+  //   icon: SalaryIcon,
+  //   component: FinanceRoute,
+  //   layout: "/"
+  // },
   {
     path: "/products",
     name: "Products",
@@ -93,13 +93,13 @@ const dashboardRoutes = [
     component: ProductPage,
     layout: "/"
   },
-  {
-    path: "/stocks",
-    name: "Stock",
-    icon: WidgetsIcon,
-    component: StockPage,
-    layout: "/"
-  },
+  // {
+  //   path: "/stocks",
+  //   name: "Stock",
+  //   icon: WidgetsIcon,
+  //   component: StockPage,
+  //   layout: "/"
+  // },
   {
     path: "/attributes",
     name: "Attributes",
@@ -107,13 +107,13 @@ const dashboardRoutes = [
     component: AttributePage,
     layout: "/"
   },
-  {
-    path: "/accounts",
-    name: "Accounts",
-    icon: Person,
-    component: AccountsPage,
-    layout: "/"
-  },
+  // {
+  //   path: "/accounts",
+  //   name: "Accounts",
+  //   icon: Person,
+  //   component: AccountsPage,
+  //   layout: "/"
+  // },
   {
     path: "/merchants",
     name: "Merchants",
@@ -128,13 +128,13 @@ const dashboardRoutes = [
     component: MapRoute,
     layout: "/"
   },
-  {
-    path: "/pages",
-    name: "Static Page",
-    icon: LocationIcon,
-    component: StaticPage,
-    layout: "/"
-  },
+  // {
+  //   path: "/pages",
+  //   name: "Static Page",
+  //   icon: LocationIcon,
+  //   component: StaticPage,
+  //   layout: "/"
+  // },
   // {
   //   path: "/assignment",
   //   name: "Assignment",
@@ -142,13 +142,13 @@ const dashboardRoutes = [
   //   component: Assignment,
   //   layout: "/"
   // },
-  {
-    path: "/table",
-    name: "Table List",
-    icon: "content_paste",
-    component: TableList,
-    layout: "/"
-  }
+  // {
+  //   path: "/table",
+  //   name: "Table List",
+  //   icon: "content_paste",
+  //   component: TableList,
+  //   layout: "/"
+  // }
   // {
   //   path: "/typography",
   //   name: "Typography",

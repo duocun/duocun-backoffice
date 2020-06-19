@@ -51,37 +51,7 @@ import { selectTransaction } from 'redux/actions/transaction';
 import { setAccount } from 'redux/actions/account';
 
 const useStyles = makeStyles(() => ({
-  textarea: {
-    width: "100%"
-  },
-  select: {
-    width: "100%",
-    marginTop: 27
-  },
-  heading: {
-    marginBottom: "0.5rem",
-    size: "1.5rem",
-    fontWeight: 600
-  },
-  table: {
-    minWidth: 750
-  },
-  editingCell: {
-    padding: "0 5px"
-  },
-  formControl: {
-    display: "block"
-  },
-  formControlLabel: {
-    marginTop: "1rem",
-    marginBottom: "1rem",
-    fontWeight: 600
-  },
-  formGroup: {
-    border: "1px solid #eee",
-    borderRadius: 5,
-    padding: 5
-  }
+
 }));
 
 const defaultActions = [
@@ -102,7 +72,6 @@ const TransactionFormPage = ({ match, history, account, transaction, update }) =
   const { t } = useTranslation();
   const classes = useStyles();
   const [items, setItems] = useState([]);
-  const [actions, setActions] = useState(defaultActions);
   const [modifyByAccount, setModifyByAccount] = useState({ _id: '', username: '' });
   const [accounts, setAccounts] = useState([]);
   const [model, setModel] = useState(transaction);

@@ -40,7 +40,7 @@
     "redux-thunk": "^2.3.0",
     "uuid": "^8.0.0"
   },
-  "homepage": "https://duocun.ca/admin2/",
+  "homepage": "https://admin.duocun.ca",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

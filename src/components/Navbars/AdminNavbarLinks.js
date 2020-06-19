@@ -22,13 +22,14 @@ import { useTranslation } from "react-i18next";
 import styles from "assets/jss/material-dashboard-react/components/headerLinksStyle.js";
 import AuthService from "services/AuthService";
 import { signOut } from "redux/actions";
+import { setLoggedInAccount } from "redux/actions/account";
 
 const useStyles = makeStyles(styles);
 
-const AdminNavbarLinks = ({ signOut }) => {
+const AdminNavbarLinks = ({ signOut, setLoggedInAccount }) => {
   const { t } = useTranslation();
   const history = useHistory({
-    basename: "admin2" // backoffice
+    basename: "/" // backoffice
   });
   const classes = useStyles();
   const [openNotification, setOpenNotification] = React.useState(null);
@@ -55,6 +56,7 @@ const AdminNavbarLinks = ({ signOut }) => {
   };
   const handleLogout = () => {
     AuthService.logout();
+    setLoggedInAccount(null);
     signOut();
     history.push("/login");
   };
@@ -215,5 +217,6 @@ const mapDispatchToProps = dispatch => ({
 
 export default connect(
   null,
-  mapDispatchToProps
+  // mapDispatchToProps
+  {signOut, setLoggedInAccount}
 )(AdminNavbarLinks);

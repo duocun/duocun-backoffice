@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next";
 import AuthService from "services/AuthService";
 import ApiAuthService from "services/api/ApiAuthService";
 import { signIn, signOut } from "redux/actions";
+import { setLoggedInAccount } from "redux/actions";
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -36,7 +37,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const Login = ({ signIn, history, isAuthorized }) => {
+const Login = ({ signIn, setLoggedInAccount, history, isAuthorized }) => {
   const classes = useStyles();
   const { t } = useTranslation();
   const [username, setUsername] = useState("");
@@ -49,8 +50,9 @@ const Login = ({ signIn, history, isAuthorized }) => {
         if (data.code === 'success') {
           const tokenId = data.data;
           ApiAuthService.getCurrentUser(tokenId).then(({ data }) => {
-            const account = data;
+            const account = data?.data;
             if (AuthService.isAuthorized(account)) {
+              setLoggedInAccount(account);
               AuthService.login(tokenId);
               signIn();
               history.push("/admin/dashboard");
@@ -136,12 +138,12 @@ const mapStateToProps = state => ({
   isAuthorized: state.isAuthorized
 });
 
-const mapDispatchToProps = dispatch => ({
-  signIn: () => dispatch(signIn()),
-  signOut: () => dispatch(signOut()),
-});
+// const mapDispatchToProps = dispatch => ({
+//   signIn: () => dispatch(signIn()),
+//   signOut: () => dispatch(signOut()),
+// });
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
+  {signIn, signOut, setLoggedInAccount}
 )(Login);
