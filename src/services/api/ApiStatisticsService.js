@@ -17,8 +17,8 @@ export default {
     let query = {deliverDate};
     return ApiService.v2().get("statistics/driver", query);
   },
-  saveProductStatistic: (startDate, endDate) => {
-    let query = {startDate, endDate};
+  getProductStatistic: (deliverDate) => {
+    let query = {deliverDate};
     return ApiService.v2().get("statistics/product", query);
   },
   getOrderAnalytics: (startDate, endDate = null ) => {
