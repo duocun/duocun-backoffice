@@ -499,9 +499,7 @@ export default function EditPage({ match, history }) {
                               <SerpPreview
                                 title={model.title}
                                 metaDescription={model.description}
-                                url={
-                                  "https://duocun.ca/mall/page/" + model.slug
-                                }
+                                url={"https://duocun.ca/page/" + model.slug}
                               />
                             </Box>
                           </GridItem>
