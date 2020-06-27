@@ -74,7 +74,8 @@ export default {
         {
           description: { $regex: keyword }
         }
-      ]
+      ],
+      type:'G'
     };
     query.query = buildQuery(condition);
     return ApiService.v2().get("products", query);

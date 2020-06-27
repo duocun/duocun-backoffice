@@ -45,18 +45,22 @@ const urls = {
   'gBlack': gBlack,
   'gBlue': gBlue,
   'gBrown': gBrown,
-  'gLightGreen': gLightGreen,
+  // 'gLightGreen': gLightGreen,
   'gOrange': gOrange,
   'gPurple': gPurple,
   'gYellow': gYellow,
   'gPink': gPink,
   'gLightBlue': gLightBlue,
   'gDarkYellow': gDarkYellow,
-  'gGray': gGray,
+  // 'gGray': gGray,
   // special
-  'gRed': gRed,
-  'gGreen': gGreen
+  // 'gRed': gRed,
+  // 'gGreen': gGreen
 }
+
+
+
+
 
 
 // data --- [{ _id, lat, lng, icon }]
@@ -162,7 +166,7 @@ const OrderMap = withScriptjs(
           <Marker
             key={d.orderId}
             position={{ lat: d.lat, lng: d.lng }}
-            icon={{url: urls[d.icon]}}
+            icon={{url: d.icon === 'gRed' ? gRed :  (d.icon === 'gGreen' ? gGreen : urls[d.icon])  }}
             // title={'haoll'}
             label={{text:d.clientName, fontSize:"11px"}}
             // labelAnchor={{ x: 30 , y: 80 }}

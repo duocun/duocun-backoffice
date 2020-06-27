@@ -22,8 +22,8 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 
-import { Button } from "@material-ui/core";
-import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
+// import { Button } from "@material-ui/core";
+// import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 import { getQueryParam } from "helper/index";
 import { Box } from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
@@ -39,20 +39,8 @@ import { selectOrder, setDeliverDate } from 'redux/actions/order';
 import {setAccount, setLoggedInAccount} from 'redux/actions/account';
 
 import ApiAuthService from 'services/api/ApiAuthService';
-
+import ProductSearch from "components/ProductSearch/ProductSearch";
 const styles = {
-  cardCategoryWhite: {
-    "&,& a,& a:hover,& a:focus": {
-      color: "rgba(255,255,255,.62)",
-      margin: "0",
-      fontSize: "14px",
-      marginTop: "0",
-      marginBottom: "0"
-    },
-    "& a,& a:hover,& a:focus": {
-      color: "#FFFFFF"
-    }
-  },
   cardTitleWhite: {
     color: "#FFFFFF",
     marginTop: "0px",
@@ -95,9 +83,11 @@ const defaultOrder = {
 
 const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDate, setAccount, setLoggedInAccount, location, history }) => {
   const { t } = useTranslation();
-  
+  const classes = useStyles();
+
   const [model, setModel] = useState({});
   const [orders, setOrders] = useState([]);
+  const [product, setProduct] = useState({_id:'', name:''});
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(
     getQueryParam(location, "page")
@@ -113,8 +103,10 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
   const [totalRows, setTotalRows] = useState(0);
   const [sort, setSort] = useState(["_id", -1]);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [processing, setProcessing] = useState(false);
 
   const updateData = () => {
+    const qProduct = product && product._id ? {'items.productId': product._id} : {};
     const qDeliverDate = deliverDate ? {deliverDate} : {};
     const keyword = query;
     const condition = keyword ? {
@@ -126,12 +118,14 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
       status: {
         $nin: [OrderStatus.BAD, OrderStatus.DELETED, OrderStatus.TEMP],
       },
-      ...qDeliverDate
+      ...qDeliverDate,
+      ...qProduct
     } : {
       status: {
         $nin: [OrderStatus.BAD, OrderStatus.DELETED, OrderStatus.TEMP],
       },
-      ...qDeliverDate
+      ...qDeliverDate,
+      ...qProduct
     };
     ApiOrderService.getOrders(page, rowsPerPage, condition, [sort]).then(
       ({ data }) => {
@@ -154,7 +148,6 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
     });
   };
 
-  const [processing, setProcessing] = useState(false);
 
   const handleDeliverDateClear = (e) => {
     // const date = m ? m.format('YYYY-MM-DD') : '';
@@ -220,6 +213,23 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
     }
   };
 
+  const handleSearch = () => {
+    setLoading(true);
+    if (page === 0) {
+      updateData();
+    } else {
+      setPage(0);
+    }
+  }
+
+  const handleSelectProduct = (product) => {
+    setProduct(product);
+    updateData();
+  }
+  const handleClearProduct = (product) => {
+    setProduct({_id:'', name:''});
+    updateData();
+  }
   // const [deliverDate, setDeliverDate] = useState(
   //   moment.utc().toISOString()
   // );
@@ -237,36 +247,53 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
 
 
   return (
-    <GridContainer>
+    <div className={classes.orderPage}>
         <Card>
           <CardHeader color="primary">
             <GridContainer>
-              <GridItem xs={12} sm={12} lg={12}>
-                <h4>{t("Orders")}</h4>
+            <GridItem xs={12} sm={12} lg={6}>
+                <Box pb={2} mt={2}>
+                  <Searchbar
+                    onChange={e => {setQuery(e.target.value);}}
+                    onSearch={handleSearch}
+                  />
+                </Box>
               </GridItem>
-              <GridItem xs={12} sm={12} lg={3}>
-                <KeyboardDatePicker
-                  variant="inline"
-                  label={t("Deliver Date")}
-                  format="YYYY-MM-DD"
-                  value={deliverDate ? moment.utc(deliverDate) : null}
-                  onChange={handleDeliverDateChange}
-                  onClick={handleDeliverDateClick}
-                  KeyboardButtonProps={{
-                    'aria-label': 'change date',
-                  }}
-                  keyboardIcon={
-                    deliverDate ? (
-                        <IconButton onClick={handleDeliverDateClear}>
-                          <ClearIcon />
-                        </IconButton>
-                    ) : (
-                        <IconButton>
-                          <CalendarIcon />
-                        </IconButton>
-                    )
-                  }
-                />
+              <GridItem xs={12} sm={12} lg={6}>
+                <GridItem xs={12} sm={12} lg={12}>
+                  <KeyboardDatePicker
+                    variant="inline"
+                    label={t("Deliver Date")}
+                    format="YYYY-MM-DD"
+                    value={deliverDate ? moment.utc(deliverDate) : null}
+                    onChange={handleDeliverDateChange}
+                    onClick={handleDeliverDateClick}
+                    KeyboardButtonProps={{
+                      'aria-label': 'change date',
+                    }}
+                    keyboardIcon={
+                      deliverDate ? (
+                          <IconButton onClick={handleDeliverDateClear}>
+                            <ClearIcon />
+                          </IconButton>
+                      ) : (
+                          <IconButton>
+                            <CalendarIcon />
+                          </IconButton>
+                      )
+                    }
+                  />
+                </GridItem>
+                <GridItem xs={12} sm={12} lg={12}>
+                  <ProductSearch 
+                    label={t("Product")}
+                    placeholder={t("Search Product Name")}
+                    name={product ? product.name:''}
+                    id={product ? product._id:''}
+                    onSelect={handleSelectProduct}
+                    onClear={handleClearProduct}
+                  />
+                </GridItem>
               </GridItem>
               {/* <GridItem xs={12} sm={12} lg={3}>
                 <Box mt={2}>
@@ -282,24 +309,7 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
                   </Link>
                 </Box>
               </GridItem> */}
-              <GridItem xs={12} sm={12} lg={6}>
-                <Box pb={2} mt={2}>
-                  <Searchbar
-                    onChange={e => {
-                      const { target } = e;
-                      setQuery(target.value);
-                    }}
-                    onSearch={() => {
-                      setLoading(true);
-                      if (page === 0) {
-                        updateData();
-                      } else {
-                        setPage(0);
-                      }
-                    }}
-                  />
-                </Box>
-              </GridItem>
+
             </GridContainer>
           </CardHeader>
           <CardBody>
@@ -326,7 +336,7 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
 
           </CardFooter>
         </Card>
-    </GridContainer>
+    </div>
   );
 }
 

@@ -9,13 +9,23 @@ import Input from "@material-ui/core/Input";
 // @material-ui/icons
 import Clear from "@material-ui/icons/Clear";
 import Check from "@material-ui/icons/Check";
+import IconButton from "@material-ui/core/IconButton";
+
 // core components
 import styles from "assets/jss/material-dashboard-react/components/customInputStyle.js";
 
 const useStyles = makeStyles(styles);
+const useCustomStyle = makeStyles((theme)=>({
+  clearBtn:{
+    position: "absolute",
+    right: "0px",
+    top: "10px"
+  }
+}));
 
 export default function CustomInput(props) {
   const classes = useStyles();
+  const customClasses = useCustomStyle();
   const {
     formControlProps,
     labelText,
@@ -61,6 +71,13 @@ export default function CustomInput(props) {
         id={id}
         {...inputProps}
       />
+      {
+        inputProps && inputProps.value && inputProps.onClear &&
+        <IconButton className={customClasses.clearBtn} onClick={inputProps.onClear}>
+            <Clear />
+        </IconButton>
+      }
+
       {error ? (
         <Clear className={classes.feedback + " " + classes.labelRootError} />
       ) : success ? (

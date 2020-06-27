@@ -33,10 +33,18 @@ const switchRoutes = (
 );
 
 const useStyles = makeStyles(styles);
+const useCustomStyles = makeStyles(theme => ({
+  pageContent: {
+    padding: '0px',
+    marginTop: '80px'
+  }
+}));
+
 
 export default function Admin({ ...rest }) {
   // styles
   const classes = useStyles();
+  const customClasses = useCustomStyles();
   // ref to help us initialize PerfectScrollbar on windows devices
   const mainPanel = React.createRef();
   // states and functions
@@ -92,7 +100,7 @@ export default function Admin({ ...rest }) {
           {...rest}
         />
         {getRoute() ? (
-          <div className={classes.content}>
+          <div className={customClasses.pageContent}>
             <div className={classes.container}>{switchRoutes}</div>
           </div>
         ) : (
