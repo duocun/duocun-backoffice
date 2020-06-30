@@ -72,8 +72,19 @@ const formatAddress = location => {
   return (
     location.streetNumber +
     " " +
-    location.streetName +
-    " " +
+    location.streetName
+    // " " +
+    // location.city +
+    // " " +
+    // location.province
+    // ", " +
+    // location.postalCode
+  );
+};
+
+const formatAddressLine2 = location => {
+  if (!location) return "";
+  return (
     location.city +
     " " +
     location.province +
@@ -81,6 +92,7 @@ const formatAddress = location => {
     location.postalCode
   );
 };
+
 
 export const OrderTable = ({
   rows,
@@ -179,7 +191,7 @@ export const OrderTable = ({
                 {renderSort("clientName")}
               </TableCell>
               <TableCell>{t("Address")}</TableCell>
-              <TableCell
+              {/* <TableCell
                 onClick={() => {
                   toggleSort("merchantName");
                 }}
@@ -187,8 +199,7 @@ export const OrderTable = ({
               >
                 {t("Merchant")}
                 {renderSort("merchantName")}
-              </TableCell>
-
+              </TableCell> */}
               <TableCell
                 onClick={() => {
                   toggleSort("items");
@@ -220,10 +231,11 @@ export const OrderTable = ({
                     </TableCell>
                     <TableCell>
                       <div>{formatAddress(row.location)}</div>
+                      <div>{formatAddressLine2(row.location)}</div>
                     </TableCell>
-                    <TableCell>
+                    {/* <TableCell>
                       {row.merchantName ? row.merchantName : "N/A"}
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell>
                       {row.items &&
                         row.items.length > 0 &&

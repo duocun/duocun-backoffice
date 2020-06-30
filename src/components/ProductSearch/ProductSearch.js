@@ -16,9 +16,14 @@ const useStyles = makeStyles((styles) => ({
   inputBox: {
     width: "100%"
   },
-  // mainText: {
-  //   width: "100%"
-  // },
+  dropdownList: {
+    position: "absolute",
+    zIndex: "3000",
+    background: "gray",
+    width: "320px",
+    height: "200px",
+    overflowY: "scroll"
+  },
   // secondaryText: {
   //   width: "100%"
   // }
@@ -127,7 +132,7 @@ const ProductSearch = ({ label, placeholder, onSelect, onClear, name, id }) => {
 
     {
       products && products.length > 0 && searching &&
-      <div style={divStyle}>
+      <div className={classes.dropdownList}>
       {
         products.map(d =>
             <MenuItem className={classes.listItem} key={d._id} value={d._id} onClick={() => handleSelectData(d)}>

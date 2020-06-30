@@ -23,6 +23,7 @@ const Searchbar = ({
   getOption,
   //if Search is for finance page, since for transaction there is no direct search, actual search is searching the account list
   ifSearch = true,
+  placeholder = t("Search")
 }) => {
   const classes = useStyles();
   const { t } = useTranslation();
@@ -57,7 +58,7 @@ const Searchbar = ({
           className: classes.margin + " " + classes.search,
         }}
         inputProps={{
-          placeholder: t("Search"),
+          placeholder,
           inputProps: {
             "aria-label": t("Search"),
           },

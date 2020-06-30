@@ -105,7 +105,7 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [processing, setProcessing] = useState(false);
 
-  const updateData = () => {
+  const updateData = (product) => {
     const qProduct = product && product._id ? {'items.productId': product._id} : {};
     const qDeliverDate = deliverDate ? {deliverDate} : {};
     const keyword = query;
@@ -119,13 +119,15 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
         $nin: [OrderStatus.BAD, OrderStatus.DELETED, OrderStatus.TEMP],
       },
       ...qDeliverDate,
-      ...qProduct
+      ...qProduct,
+      type: 'G'
     } : {
       status: {
         $nin: [OrderStatus.BAD, OrderStatus.DELETED, OrderStatus.TEMP],
       },
       ...qDeliverDate,
-      ...qProduct
+      ...qProduct,
+      type: 'G'
     };
     ApiOrderService.getOrders(page, rowsPerPage, condition, [sort]).then(
       ({ data }) => {
@@ -192,7 +194,7 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
               message: t("Delete successfully"),
               severity: "success"
             });
-            updateData();
+            updateData(product);
           } else {
             setAlert({
               message: t("Delete failed"),
@@ -216,7 +218,7 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
   const handleSearch = () => {
     setLoading(true);
     if (page === 0) {
-      updateData();
+      updateData(product);
     } else {
       setPage(0);
     }
@@ -224,11 +226,13 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
 
   const handleSelectProduct = (product) => {
     setProduct(product);
-    updateData();
+    setLoading(true);
+    updateData(product);
   }
   const handleClearProduct = (product) => {
     setProduct({_id:'', name:''});
-    updateData();
+    setLoading(true);
+    updateData(null);
   }
   // const [deliverDate, setDeliverDate] = useState(
   //   moment.utc().toISOString()
@@ -238,10 +242,10 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
     if(!account){
       ApiAuthService.getCurrentAccount().then(({ data }) => {
         setLoggedInAccount(data);
-        updateData();
+        updateData(product);
       });
     }else{
-      updateData();
+      updateData(product);
     }
   }, [page, rowsPerPage, sort, query, deliverDate]);
 
@@ -256,6 +260,7 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
                   <Searchbar
                     onChange={e => {setQuery(e.target.value);}}
                     onSearch={handleSearch}
+                    placeholder={t("Search Code or Phone number")}
                   />
                 </Box>
               </GridItem>
