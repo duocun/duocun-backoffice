@@ -1,6 +1,8 @@
 import queryString from "query-string";
 import moment, * as moments from "moment";
 
+const MEDIA_PATH = 'https://s3.amazonaws.com/pictures.duocun.ca/media';
+
 export const getQueryParam = (location, key) => {
   if (location.search) {
     const parsed = queryString.parse(location.search);
@@ -180,7 +182,9 @@ export const countProductFromDate = (
 };
 
 export const getPictureUrl = src => {
-  return process.env.REACT_APP_MEIDA_URL + `/${src}`;
+  const [fname, ext] = src.split('.');
+  return `${MEDIA_PATH}/${fname}.${ext}`;
+  // return process.env.REACT_APP_MEIDA_URL + `/${src}`;
 };
 
 //dateString parser

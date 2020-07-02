@@ -292,7 +292,7 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
                 <GridItem xs={12} sm={12} lg={12}>
                   <ProductSearch 
                     label={t("Product")}
-                    placeholder={t("Search Product Name")}
+                    placeholder="Search Product Name"
                     name={product ? product.name:''}
                     id={product ? product._id:''}
                     onSelect={handleSelectProduct}
