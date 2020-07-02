@@ -24,11 +24,7 @@ const Searchbar = ({
   getOption,
   placeholder="Search",
   //if Search is for finance page, since for transaction there is no direct search, actual search is searching the account list
-  ifSearch = true,
-<<<<<<< HEAD
-=======
-  placeholder = "Search"
->>>>>>> 48339c330eb6026366389f647de624803a889ac0
+  ifSearch = true
 }) => {
   const classes = useStyles();
   const { t } = useTranslation();
