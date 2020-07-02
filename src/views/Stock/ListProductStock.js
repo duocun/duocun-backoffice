@@ -289,7 +289,7 @@ export default function ListProductStock({ location }) {
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [totalRows, setTotalRows] = useState(0);
   const [query, setQuery] = useState(getQueryParam(location, "search") || "");
-  const [sort, setSort] = useState(["_id", 1]);
+  const [sort, setSort] = useState(["_id", -1]);
   const [categories, setCategories] = useState([]);
   const [filterParams, setFilterParams] = useState({
     "stock.enabled": true
