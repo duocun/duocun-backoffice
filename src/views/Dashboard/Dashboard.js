@@ -117,17 +117,13 @@ const Dashboard = ({summary, loadStatisticsSummary, history}) => {
           <Card>
           {/* onClick={()=>{history.push("/dashboard/pickup/all")} */}
             <CardHeader color="danger" stats icon >
-              <Link to="/dashboard/pickup/all">
               <CardIcon color="danger">
                 <Icon>info_outline</Icon>
               </CardIcon>
-              {/* <IconButton aria-label="driverSummary" href="dashboard/pickup">
-                <AccountBoxOutlinedIcon />
-              </IconButton> */}
-
-              <p className={classes.cardCategory}>Products</p>
-              <h3 className={classes.cardTitle}>{summary.nProducts}</h3>
-            </Link>
+              <Link to="/dashboard/pickup/all">
+                <p className={classes.cardCategory}>Products</p>
+                <h3 className={classes.cardTitle}>{summary.nProducts}</h3>
+              </Link>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -143,10 +139,10 @@ const Dashboard = ({summary, loadStatisticsSummary, history}) => {
               <CardIcon color="info">
                 <Accessibility />
               </CardIcon>
-              <Link to="/dashboard/productSummary">
+              {/* <Link to="/dashboard/productSummary"> */}
               <p className={classes.cardCategory}>Total Products</p>
               <h3 className={classes.cardTitle}>+245</h3>
-              </Link>
+              {/* </Link> */}
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>

@@ -182,9 +182,8 @@ export const countProductFromDate = (
 };
 
 export const getPictureUrl = src => {
-  const [fname, ext] = src.split('.');
-  return `${MEDIA_PATH}/${fname}_960.${ext}`;
-  // return process.env.REACT_APP_MEIDA_URL + `/${src}`;
+  // const [fname, ext] = src.split('.');
+  return `${MEDIA_PATH}/${src}`;
 };
 
 //dateString parser
