@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {connect} from "react-redux";
+import { connect } from "react-redux";
 import moment from "moment";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -9,7 +9,7 @@ import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
 import { DrawingManager } from "react-google-maps/lib/components/drawing/DrawingManager";
 
-import ApiOrderService, {OrderStatus} from "services/api/ApiOrderService";
+import ApiOrderService, { OrderStatus } from "services/api/ApiOrderService";
 
 
 import gBlack from 'assets/img/maps/g-black.png';
@@ -34,6 +34,7 @@ import {
   withGoogleMap,
   GoogleMap,
   Marker,
+  Polyline
   // MarkerWithLabel
 } from "react-google-maps";
 
@@ -41,21 +42,21 @@ import ApiAccountService from "services/api/ApiAccountService";
 import { setDeliverDate } from 'redux/actions/order';
 
 const N_COLORS = 11;
-const urls = {
-  'gBlack': gBlack,
-  'gBlue': gBlue,
-  'gBrown': gBrown,
-  'gLightGreen': gLightGreen,
-  'gOrange': gOrange,
-  'gPurple': gPurple,
-  'gYellow': gYellow,
-  'gPink': gPink,
-  'gLightBlue': gLightBlue,
-  'gDarkYellow': gDarkYellow,
-  'gGray': gGray,
+const COLOR_MAP = {
+  'gBlack': {url:gBlack, val:'#000000'},
+  'gBlue': {url:gBlue, val:'#0000ff'},
+  'gBrown': {url:gBrown, val:'#a52a2a'},
+  'gLightGreen': {url:gLightGreen, val:'#7fffd4'},
+  'gOrange': {url:gOrange, val:'#ff4500'},
+  'gPurple': {url:gPurple, val:'#663399'},
+  'gYellow': {url:gYellow, val:'#ffff00'},
+  'gPink': {url:gPink, val:'#ff69b4'},
+  'gLightBlue': {url:gLightBlue, val:'#add8e6'},
+  'gDarkYellow': {url:gDarkYellow, val:'#daa520'},
+  'gGray': {url:gGray, val:'#a9a9a9'},
   // special
-  'gRed': gRed,
-  'gGreen': gGreen
+  'gRed': {url:gRed, val:'#ff0000'},
+  'gGreen': {url:gGreen, val:'#000'}
 }
 
 
@@ -63,173 +64,211 @@ const urls = {
 // zoom --- 9
 // center --- { lat: 43.856098, lng: -79.337021 }
 const OrderMap = withScriptjs(
-  withGoogleMap(({ data, zoom, center, onPolygonComplete, onOverlayComplete, onReloadMarkers,
-      googleMapURL, loadingElement, containerElement, mapElement }) => (
-    <GoogleMap
-      defaultZoom={zoom}
-      defaultCenter={center}
-      defaultOptions={{
-        scrollwheel: true,
-        zoomControl: true,
-        fullscreenControl: false,
-        mapTypeControl: false,
-        streetViewControl: false,
-        styles: [
-          {
-            featureType: "water",
-            stylers: [
-              { saturation: 43 },
-              { lightness: -11 },
-              { hue: "#0088ff" },
-            ],
-          },
-          {
-            featureType: "road",
-            elementType: "geometry.fill",
-            stylers: [
-              { hue: "#ff0000" },
-              { saturation: -100 },
-              { lightness: 99 },
-            ],
-          },
-          {
-            featureType: "road",
-            elementType: "geometry.stroke",
-            stylers: [{ color: "#808080" }, { lightness: 54 }],
-          },
-          {
-            featureType: "landscape.man_made",
-            elementType: "geometry.fill",
-            stylers: [{ color: "#ece2d9" }],
-          },
-          {
-            featureType: "poi.park",
-            elementType: "geometry.fill",
-            stylers: [{ color: "#ccdca1" }],
-          },
-          {
-            featureType: "road",
-            elementType: "labels.text.fill",
-            stylers: [{ color: "#767676" }],
-          },
-          {
-            featureType: "road",
-            elementType: "labels.text.stroke",
-            stylers: [{ color: "#ffffff" }],
-          },
-          { featureType: "poi", stylers: [{ visibility: "off" }] },
-          {
-            featureType: "landscape.natural",
-            elementType: "geometry.fill",
-            stylers: [{ visibility: "on" }, { color: "#b8cb93" }],
-          },
-          { featureType: "poi.park", stylers: [{ visibility: "on" }] },
-          {
-            featureType: "poi.sports_complex",
-            stylers: [{ visibility: "on" }],
-          },
-          { featureType: "poi.medical", stylers: [{ visibility: "on" }] },
-          {
-            featureType: "poi.business",
-            stylers: [{ visibility: "simplified" }],
-          },
-        ],
-      }}
-    >
-      <DrawingManager
-        // defaultDrawingMode={window.google.maps.drawing.OverlayType.POLYGON}
+  withGoogleMap(({ lines, data, zoom, center, onPolygonComplete, onOverlayComplete, onReloadMarkers,
+    googleMapURL, loadingElement, containerElement, mapElement }) => (
+      <GoogleMap
+        defaultZoom={zoom}
+        defaultCenter={center}
         defaultOptions={{
-          drawingControl: true,
-          drawingControlOptions: {
-            position: window.google.maps.ControlPosition.TOP_CENTER,
-            drawingModes: [window.google.maps.drawing.OverlayType.POLYGON],
-          },
-          circleOptions: {
-            fillColor: `#ffff00`,
-            fillOpacity: 1,
-            strokeWeight: 5,
-            clickable: false,
-            editable: true,
-            zIndex: 1,
-          },
+          scrollwheel: true,
+          zoomControl: true,
+          fullscreenControl: false,
+          mapTypeControl: false,
+          streetViewControl: false,
+          styles: [
+            {
+              featureType: "water",
+              stylers: [
+                { saturation: 43 },
+                { lightness: -11 },
+                { hue: "#0088ff" },
+              ],
+            },
+            {
+              featureType: "road",
+              elementType: "geometry.fill",
+              stylers: [
+                { hue: "#ff0000" },
+                { saturation: -100 },
+                { lightness: 99 },
+              ],
+            },
+            {
+              featureType: "road",
+              elementType: "geometry.stroke",
+              stylers: [{ color: "#808080" }, { lightness: 54 }],
+            },
+            {
+              featureType: "landscape.man_made",
+              elementType: "geometry.fill",
+              stylers: [{ color: "#ece2d9" }],
+            },
+            {
+              featureType: "poi.park",
+              elementType: "geometry.fill",
+              stylers: [{ color: "#ccdca1" }],
+            },
+            {
+              featureType: "road",
+              elementType: "labels.text.fill",
+              stylers: [{ color: "#767676" }],
+            },
+            {
+              featureType: "road",
+              elementType: "labels.text.stroke",
+              stylers: [{ color: "#ffffff" }],
+            },
+            { featureType: "poi", stylers: [{ visibility: "off" }] },
+            {
+              featureType: "landscape.natural",
+              elementType: "geometry.fill",
+              stylers: [{ visibility: "on" }, { color: "#b8cb93" }],
+            },
+            { featureType: "poi.park", stylers: [{ visibility: "on" }] },
+            {
+              featureType: "poi.sports_complex",
+              stylers: [{ visibility: "on" }],
+            },
+            { featureType: "poi.medical", stylers: [{ visibility: "on" }] },
+            {
+              featureType: "poi.business",
+              stylers: [{ visibility: "simplified" }],
+            },
+          ],
         }}
-        onOverlayComplete = {onOverlayComplete}
-        onPolygonComplete ={onPolygonComplete}
-      />
+      >
+        <DrawingManager
+          // defaultDrawingMode={window.google.maps.drawing.OverlayType.POLYGON}
+          defaultOptions={{
+            drawingControl: true,
+            drawingControlOptions: {
+              position: window.google.maps.ControlPosition.TOP_CENTER,
+              drawingModes: [window.google.maps.drawing.OverlayType.POLYGON],
+            },
+            circleOptions: {
+              fillColor: `#ffff00`,
+              fillOpacity: 1,
+              strokeWeight: 5,
+              clickable: false,
+              editable: true,
+              zIndex: 1,
+            },
+          }}
+          onOverlayComplete={onOverlayComplete}
+          onPolygonComplete={onPolygonComplete}
+        />
 
-      {data && data.length > 0 &&
-        data.map((d) =>
-          <Marker
-            key={d.orderId}
-            position={{ lat: d.lat, lng: d.lng }}
-            icon={{url: urls[d.icon]}}
-            // title={'haoll'}
-            label={{text:d.clientName, fontSize:"11px"}}
+        {data && data.length > 0 &&
+          data.map((d) =>
+            <Marker
+              key={d.orderId}
+              position={{ lat: d.lat, lng: d.lng }}
+              icon={{ url: COLOR_MAP[d.icon].url }}
+              // title={'haoll'}
+              label={{ text: d.clientName, fontSize: "11px" }}
             // labelAnchor={{ x: 30 , y: 80 }}
             // labelStyle={{
             //   marginLeft: '30px',
             //   paddingLeft: '50px'
             // }}
-          />
-        )}
-    </GoogleMap>
-  ))
+            />
+          )}
+        {
+          lines && lines.length > 0 &&
+          lines.map((line) =>
+
+            <Polyline
+              key={line.driverId}
+              path={line.route}
+              geodesic={true}
+              options={{
+                strokeColor: line.color,
+                strokeOpacity: 0.75,
+                strokeWeight: 2,
+                icons: [
+                  {
+                    // icon: lineSymbol,
+                    offset: "0",
+                    repeat: "20px"
+                  }
+                ]
+              }}
+            />
+          )
+        }
+      </GoogleMap>
+    ))
 );
 
-const OrderMapPage = ({deliverDate, setDeliverDate}) => {
+const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
   const { t } = useTranslation();
   const [markers, setMarkers] = useState([]);
   const [drivers, setDrivers] = useState([]);
   const [overlays, setOverlays] = useState([]);
   const [bounds, setBounds] = useState([]);
+  const [lines, setLines] = useState([]);
 
   useEffect(() => {
-    ApiAccountService.getAccounts({type:'driver', status:'A'}).then(({data}) => {
-      let i = 0;
-      let colors = Object.keys(urls);
-      data.data.forEach(d => {
-        const index = i % N_COLORS;
-        const color = colors[index]
-        const url = urls[color];
-        d.color = color;
-        d.url = url;
-        i++;
+    // ApiOrderService.getAutoRoutes(deliverDate).then(({data}) => {
+    //   const routes = data.data.routes;
+      ApiAccountService.getAccounts({ type: 'driver', status: 'A' }).then(({ data }) => {
+        let i = 0;
+        let colorIds = Object.keys(COLOR_MAP);
+        data.data.forEach(d => {
+          const index = i % N_COLORS;
+          const colorId = colorIds[index];
+          const url = COLOR_MAP[colorId].url;
+          d.colorId = colorId;
+          d.url = url;
+          i++;
+        });
+        const drivers = data.data;
+        setDrivers(drivers);
+        // setLines(routes);
+        if (!deliverDate) {
+          const date = moment().format('YYYY-MM-DD');
+          setDeliverDate(date);
+          updateMarkers(date, drivers);
+        } else {
+          updateMarkers(deliverDate, drivers);
+        }
       });
-      const drivers = data.data;
-      setDrivers(drivers);
-
-      if(!deliverDate){
-        const date = moment().format('YYYY-MM-DD');
-        setDeliverDate(date);
-        updateMarkers(date, drivers);
-      }else{
-        updateMarkers(deliverDate, drivers);
-      }
-      
-    });
+    // });
   }, []);
+
 
   const updateMarkers = (deliverDate, drivers) => {
     // {markers: [{orderId, lat, lng, type, status, icon}], driverMap:{driverId:{driverId, driverName}} }
-    ApiOrderService.getMapMarkers(deliverDate).then(({ data }) => {
-      let colorMap = {};
-      const onDutyDriverIds = Object.keys(data.data.driverMap);
+    ApiOrderService.getAutoRoutes(deliverDate).then(({data}) => {
+      const routes = data.data.routes;
+      ApiOrderService.getMapMarkers(deliverDate).then(({ data }) => {
+        let colorMap = {};
+        const onDutyDriverIds = Object.keys(data.data.driverMap);
 
-      drivers.forEach(d => {
-        const onDuty = onDutyDriverIds.find(id => id === d._id);
-        d.onDuty = onDuty ? true : false;
-        colorMap[d._id] = d.color;
-      });
+        drivers.forEach(d => {
+          const onDuty = onDutyDriverIds.find(id => id === d._id);
+          d.onDuty = onDuty ? true : false;
+          colorMap[d._id] = d.colorId;
+        });
 
-      data.data.markers.forEach(marker => {
-        if(marker.driverId === 'unassigned'){
-          marker.icon = 'gRed';
-        }else{
-          marker.icon = marker.status === OrderStatus.DONE ? 'gGreen' : colorMap[marker.driverId];
-        }
+        data.data.markers.forEach(marker => {
+          if (marker.driverId === 'unassigned') {
+            marker.icon = 'gRed';
+          } else {
+            marker.icon = marker.status === OrderStatus.DONE ? 'gGreen' : colorMap[marker.driverId];
+          }
+        });
+
+        setMarkers(data.data.markers);
+        routes.forEach(r => {
+          const driverId = r.driverId;
+          const driver = drivers.find(d => d._id === driverId);
+          const colorId = driver ? driver.colorId : 'gRed';
+          r.color = COLOR_MAP[colorId].val;
+        });
+        setLines(routes);
       });
       
-      setMarkers(data.data.markers);
     });
   }
 
@@ -289,14 +328,14 @@ const OrderMapPage = ({deliverDate, setDeliverDate}) => {
   }
 
   const handleAssignment = (driver) => {
-    if(!bounds){
+    if (!bounds) {
       return;
     }
     const r = window.confirm(`确认把已选区域分给司机${driver.username}?`);
-    if(r){
+    if (r) {
       const orderIds = [];
       markers.forEach(m => {
-        if(inPolygon({lat: m.lat, lng: m.lng}, bounds)){
+        if (inPolygon({ lat: m.lat, lng: m.lng }, bounds)) {
           orderIds.push(m.orderId);
         }
       });
@@ -308,7 +347,7 @@ const OrderMapPage = ({deliverDate, setDeliverDate}) => {
       const driverId = driver._id;
       const driverName = driver.username;
 
-      ApiOrderService.assign(driverId, driverName, orderIds).then(({data}) => {
+      ApiOrderService.assign(driverId, driverName, orderIds).then(({ data }) => {
         const r = data.data;
         reloadMarkers();
       });
@@ -337,26 +376,26 @@ const OrderMapPage = ({deliverDate, setDeliverDate}) => {
         <GridItem xs={12} sm={12} md={3}>
           <div className="driverList" style={{ width: '100%', height: '100px' }}>
             <div className="leftCol" >
-              <div style={{width: "80%", float:"left"}} >未分配</div>
-              <div style={{width: "20%", float:"left"}} ><img src={gRed} /></div>
+              <div style={{ width: "80%", float: "left" }} >未分配</div>
+              <div style={{ width: "20%", float: "left" }} ><img src={gRed} /></div>
             </div>
-            <div className="leftCol" style={{borderBottom: "1px solid #aaaaaa"}}>
-              <div style={{width: "80%", float:"left"}} >已完成</div>
-              <div style={{width: "20%", float:"left"}} ><img src={gGreen} /></div>
+            <div className="leftCol" style={{ borderBottom: "1px solid #aaaaaa" }}>
+              <div style={{ width: "80%", float: "left" }} >已完成</div>
+              <div style={{ width: "20%", float: "left" }} ><img src={gGreen} /></div>
             </div>
-          {
-            drivers.map(d => 
-              <div className="leftCol" key={d._id}>
-                <div style={{width: "50%", float:"left"}} onClick={() => handleAssignment(d)}>{d.username}</div>
-                <div style={{width: "15%", float:"left"}} ><img src={d.url} /></div>
-                {
-                  d.onDuty &&
-                  <Link to={`../dashboard/pickup/${d._id}`} style={{width: "25%", float:"left", fontSize:"12px"}} >查看提货</Link>
-                }
-              </div>
-              // <div className="rightCol">Driver 2</div>
-            )
-          }
+            {
+              drivers.map(d =>
+                <div className="leftCol" key={d._id}>
+                  <div style={{ width: "50%", float: "left" }} onClick={() => handleAssignment(d)}>{d.username}</div>
+                  <div style={{ width: "15%", float: "left" }} ><img src={d.url} /></div>
+                  {
+                    d.onDuty &&
+                    <Link to={`../dashboard/pickup/${d._id}`} style={{ width: "25%", float: "left", fontSize: "12px" }} >查看提货</Link>
+                  }
+                </div>
+                // <div className="rightCol">Driver 2</div>
+              )
+            }
           </div>
         </GridItem>
         <GridItem xs={12} sm={12} md={9}>
@@ -369,26 +408,27 @@ const OrderMapPage = ({deliverDate, setDeliverDate}) => {
               }
               mapElement={<div style={{ height: `100%` }} />}
               data={markers}
+              lines={lines}
               zoom={9}
               center={{ lat: 43.856098, lng: -79.337021 }}
               onPolygonComplete={handlePolygonComplete}
               onOverlayComplete={handleOverlayComplete}
-              // onReloadMarkers={reloadMarkers}
-              />
+            // onReloadMarkers={reloadMarkers}
+            />
           </div>
         </GridItem>
-        </GridContainer>
+      </GridContainer>
     </div>
-      )
-    }
-    
+  )
+}
 
-    const mapStateToProps = (state) => ({
-      deliverDate: state.deliverDate
-    });
-    export default connect(
-      mapStateToProps,
-      {
-        setDeliverDate
-      }
-    )(OrderMapPage);
+
+const mapStateToProps = (state) => ({
+  deliverDate: state.deliverDate
+});
+export default connect(
+  mapStateToProps,
+  {
+    setDeliverDate
+  }
+)(OrderMapPage);
