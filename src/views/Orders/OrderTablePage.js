@@ -300,20 +300,6 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
                   />
                 </GridItem>
               </GridItem>
-              {/* <GridItem xs={12} sm={12} lg={3}>
-                <Box mt={2}>
-                  <Link to="/orders/new">
-                  <Button
-                    color="default"
-                    variant="contained"
-                    disabled={processing}
-                  >
-                    <AddCircleOutlineIcon />
-                    {t("New Order")}
-                  </Button>
-                  </Link>
-                </Box>
-              </GridItem> */}
 
             </GridContainer>
           </CardHeader>

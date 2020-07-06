@@ -31,41 +31,9 @@ const styles = {
     paddingLeft: "0px",
     paddingRight: "0px"
   }
-  // cardCategoryWhite: {
-  //   "&,& a,& a:hover,& a:focus": {
-  //     color: "rgba(255,255,255,.62)",
-  //     margin: "0",
-  //     fontSize: "14px",
-  //     marginTop: "0",
-  //     marginBottom: "0"
-  //   },
-  //   "& a,& a:hover,& a:focus": {
-  //     color: "#FFFFFF"
-  //   }
-  // },
-  // cardTitleWhite: {
-  //   color: "#FFFFFF",
-  //   marginTop: "0px",
-  //   minHeight: "auto",
-  //   fontWeight: "300",
-  //   fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
-  //   marginBottom: "3px",
-  //   textDecoration: "none",
-  //   "& small": {
-  //     color: "#777",
-  //     fontSize: "65%",
-  //     fontWeight: "400",
-  //     lineHeight: "1"
-  //   }
-  // }
 };
 
 const useStyles = makeStyles(styles);
-// const useStyles = makeStyles(() => ({
-//   table: {
-//     minWidth: 750
-//   }
-// }));
 
 const formatAddress = location => {
   if (!location) return "";
@@ -109,14 +77,6 @@ export const OrderTable = ({
 }) => {
   const { t } = useTranslation();
   const classes = useStyles();
-  // const [page, setPage] = useState(
-  //   getQueryParam(location, "page")
-  //     ? parseInt(getQueryParam(location, "page"))
-  //     : 0
-  // );
-  // const [sort, setSort] = useState(["_id", 1]);
-  // const [rowsPerPage, setRowsPerPage] = useState(10);
-  // const [totalRows, setTotalRows] = useState(0);
 
   const renderSort = fieldName => {
     return (
@@ -150,11 +110,6 @@ export const OrderTable = ({
   if (!rows.length) {
     return (
       <div>{t("No data to display")}</div>
-      // <TableRow>
-      //   <TableCell align="center" colSpan={7} size="medium">
-      //     {t("No data to display")}
-      //   </TableCell>
-      // </TableRow>
     );
   } else {
     return (
@@ -191,7 +146,7 @@ export const OrderTable = ({
                 {renderSort("clientName")}
               </TableCell>
               <TableCell>{t("Address")}</TableCell>
-              {/* <TableCell
+              <TableCell
                 onClick={() => {
                   toggleSort("merchantName");
                 }}
@@ -199,7 +154,7 @@ export const OrderTable = ({
               >
                 {t("Merchant")}
                 {renderSort("merchantName")}
-              </TableCell> */}
+              </TableCell>
               <TableCell
                 onClick={() => {
                   toggleSort("items");
@@ -233,9 +188,9 @@ export const OrderTable = ({
                       <div>{formatAddress(row.location)}</div>
                       <div>{formatAddressLine2(row.location)}</div>
                     </TableCell>
-                    {/* <TableCell>
+                    <TableCell>
                       {row.merchantName ? row.merchantName : "N/A"}
-                    </TableCell> */}
+                    </TableCell>
                     <TableCell>
                       {row.items &&
                         row.items.length > 0 &&
