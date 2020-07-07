@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
+
 import { connect } from "react-redux";
 import moment from "moment";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-
+import { makeStyles } from "@material-ui/core/styles";
 import { KeyboardDatePicker } from "@material-ui/pickers";
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
 import { DrawingManager } from "react-google-maps/lib/components/drawing/DrawingManager";
 
 import ApiOrderService, { OrderStatus } from "services/api/ApiOrderService";
-
+import useViewportDimensions from "helper/useViewportDimensions";
 
 import gBlack from 'assets/img/maps/g-black.png';
 import gBlue from 'assets/img/maps/g-blue.png';
@@ -40,6 +41,12 @@ import {
 
 import ApiAccountService from "services/api/ApiAccountService";
 import { setDeliverDate } from 'redux/actions/order';
+
+const useStyles = makeStyles({
+  page: {
+    height: "100%"
+  } 
+});
 
 const N_COLORS = 11;
 const COLOR_MAP = {
@@ -206,6 +213,8 @@ const OrderMap = withScriptjs(
 
 const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
   const { t } = useTranslation();
+  const classes = useStyles();
+  const { height, width } = useViewportDimensions();
   const [markers, setMarkers] = useState([]);
   const [drivers, setDrivers] = useState([]);
   const [overlays, setOverlays] = useState([]);
@@ -363,7 +372,7 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
 
   const KEY = "AIzaSyCEd6D6vc9K-YzMH-QtQWRSs5HZkLKSWyk";
   return (
-    <div>
+    <div className={classes.page}>
 
       {/* <GridItem xs={12} lg={12}> */}
       <KeyboardDatePicker
@@ -405,7 +414,7 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
           </div>
         </GridItem>
         <GridItem xs={12} sm={12} md={9}>
-          <div style={{ width: '100%', height: '500px', display: 'flex', justifyContent: 'center' }}>
+          <div style={{ width: '100%', height: `${height - 128}px`, display: 'flex', justifyContent: 'center' }}>
             <OrderMap
               googleMapURL={`https://maps.googleapis.com/maps/api/js?key=${KEY}&v=3.exp&libraries=geometry,drawing,places`}
               loadingElement={<div style={{ height: `100%` }} />}
