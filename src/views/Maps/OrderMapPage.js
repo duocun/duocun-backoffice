@@ -240,7 +240,7 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
   const updateMarkers = (deliverDate, drivers) => {
     // {markers: [{orderId, lat, lng, type, status, icon}], driverMap:{driverId:{driverId, driverName}} }
     ApiOrderService.getAutoRoutes(deliverDate).then(({data}) => {
-      const routes = data.data.routes;
+      const routes = data ? data.data?.routes : [];
       ApiOrderService.getMapMarkers(deliverDate).then(({ data }) => {
         let colorMap = {};
         const onDutyDriverIds = Object.keys(data.data.driverMap);
@@ -260,12 +260,14 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
         });
 
         setMarkers(data.data.markers);
-        routes.forEach(r => {
-          const driverId = r.driverId;
-          const driver = drivers.find(d => d._id === driverId);
-          const colorId = driver ? driver.colorId : 'gRed';
-          r.color = COLOR_MAP[colorId].val;
-        });
+        if(routes && routes.length>0){
+          routes.forEach(r => {
+            const driverId = r.driverId;
+            const driver = drivers.find(d => d._id === driverId);
+            const colorId = driver ? driver.colorId : 'gRed';
+            r.color = COLOR_MAP[colorId].val;
+          });
+        }
         setLines(routes);
       });
       
