@@ -94,10 +94,16 @@ export default {
   assign: (driverId, driverName, orderIds) => {
     return ApiService.v2().put(`orders/assign`, {driverId, driverName, orderIds});
   },
-  getChargeFromOrderItems(
+  getAutoRoutes: (deliverDate) => {
+    // let query = {};
+    // const conditions = {deliverDate};
+    // query.query = buildQuery(conditions);
+    return ApiService.v2().get(`orders/routes?deliverDate=${deliverDate}`);
+  },
+  getChargeFromOrderItems: (
     items, // IOrderItem[],
     overRangeCharge = 0
-  ) {
+  ) => {
     let price = 0;
     let cost = 0;
     let tax = 0;
