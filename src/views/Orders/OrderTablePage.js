@@ -9,6 +9,7 @@ import { makeStyles } from "@material-ui/core/styles";
 // core components
 import { IconButton, InputAdornment } from "@material-ui/core";
 import { KeyboardDatePicker } from "@material-ui/pickers";
+import { DatePicker } from "components/DatePicker/DatePicker.js";
 import {
   Clear as ClearIcon,
   InsertInvitation as CalendarIcon
@@ -229,7 +230,7 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
     setLoading(true);
     updateData(product);
   }
-  const handleClearProduct = (product) => {
+  const handleClearProduct = () => {
     setProduct({_id:'', name:''});
     setLoading(true);
     updateData(null);
@@ -266,28 +267,12 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
               </GridItem>
               <GridItem xs={12} sm={12} lg={6}>
                 <GridItem xs={12} sm={12} lg={12}>
-                  <KeyboardDatePicker
-                    variant="inline"
-                    label={t("Deliver Date")}
-                    format="YYYY-MM-DD"
-                    value={deliverDate ? moment.utc(deliverDate) : null}
+                  <DatePicker label={"Deliver Date"}
+                    date={deliverDate}
                     onChange={handleDeliverDateChange}
                     onClick={handleDeliverDateClick}
-                    KeyboardButtonProps={{
-                      'aria-label': 'change date',
-                    }}
-                    keyboardIcon={
-                      deliverDate ? (
-                          <IconButton onClick={handleDeliverDateClear}>
-                            <ClearIcon />
-                          </IconButton>
-                      ) : (
-                          <IconButton>
-                            <CalendarIcon />
-                          </IconButton>
-                      )
-                    }
-                  />
+                    onClear={handleDeliverDateClear}
+                    />
                 </GridItem>
                 <GridItem xs={12} sm={12} lg={12}>
                   <ProductSearch 

@@ -32,6 +32,7 @@ export default function CustomInput(props) {
     id,
     labelProps,
     inputProps,
+    onClear,
     error,
     success
   } = props;
@@ -48,6 +49,11 @@ export default function CustomInput(props) {
   const marginTop = classNames({
     [classes.marginTop]: labelText === undefined
   });
+  const handleClear = () => {
+    if(onClear){
+      onClear();
+    }
+  }
   return (
     <FormControl
       {...formControlProps}
@@ -72,9 +78,9 @@ export default function CustomInput(props) {
         {...inputProps}
       />
       {
-        inputProps && inputProps.value && inputProps.onClear &&
-        <IconButton className={customClasses.clearBtn} onClick={inputProps.onClear}>
-            <Clear />
+        inputProps && inputProps.value && onClear &&
+        <IconButton className={customClasses.clearBtn} onClick={handleClear}>
+          <Clear />
         </IconButton>
       }
 

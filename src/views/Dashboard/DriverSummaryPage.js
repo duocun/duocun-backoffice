@@ -65,7 +65,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-const DriverSummaryPage = ({ match, history, deliverDate, setDeliverDate }) => {
+const DriverSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
   const classes = useStyles();
   const { t } = useTranslation();
   const [driverSummary, setDriverSummary] = useState({});

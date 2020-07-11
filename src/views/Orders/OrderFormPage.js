@@ -22,13 +22,19 @@ import OrderForm from './OrderForm';
 
 import { selectOrder, setDeliverDate } from 'redux/actions/order';
 import { setAccount } from 'redux/actions/account';
-import ApiAccountService from "services/api/ApiAccountService";
+// import ApiAccountService from "services/api/ApiAccountService";
 
+const FormMode = {
+  NEW: 'new',
+  EDIT: 'edit',
+  CLONE: 'clone'
+};
 
-const defaultOrdersModelState = {
-  _id: '',
-  clientId: {},
-  merchantId: {},
+const defaultOrdersModel = {
+  _id: FormMode.NEW,
+  code: "",
+  clientId: "",
+  merchantId: "",
   items: [],
   price: 0,
   cost: 0,
@@ -36,19 +42,21 @@ const defaultOrdersModelState = {
   delivered: "",
   created: "",
   type: "",
-  actionCode: "",
-  code:""
+  actionCode: ""
 }
 
-const OrderFormPage = ({match, history, order, selectOrder, account, deliverDate, setDeliverDate, setAccount}) => {
-  const { t } = useTranslation();
-  const [loading, setLoading] = useState(false);
-  const [processing, setProcessing] = useState(false);
+/**
+ * props --- None
+ * redux --- order, account, deliverDate
+ */
+const OrderFormPage = ({match, order}) => {
+  // const { t } = useTranslation();
+  // const [loading, setLoading] = useState(false);
+  // const [processing, setProcessing] = useState(false);
 
   // for model
-  const [model, setModel] = useState(defaultOrdersModelState);
-  const [mode, setMode] = useState('');
-  const [alert, setAlert] = useState({ message: "", severity: "info" });
+  const [model, setModel] = useState(defaultOrdersModel);
+  // const [alert, setAlert] = useState({ message: "", severity: "info" });
 
   //////////////////// For data fetch
   const getOrderData = () => {
@@ -98,29 +106,23 @@ const OrderFormPage = ({match, history, order, selectOrder, account, deliverDate
     updateData();
   }
 
-  // after render
+
   useEffect(() => {
-    if(model && !model._id){
-      if(match.params && match.params.id === 'new'){
-        setMode('new');
-      }else if(match.params && match.params.id === 'clone') {
-        let cloned = {...order, price: 0, cost: 0, tax: 0, total: 0, _id: 'clone'};
-        setMode('clone');
+    // if(model && !model._id){
+      if(match.params && match.params.id === FormMode.NEW){
+        // setModel(cloned);
+      }else if(match.params && match.params.id === FormMode.CLONE) {
+        let cloned = {...order, price: 0, cost: 0, tax: 0, total: 0, _id: FormMode.CLONE};
         setModel(cloned);
       } else {
-        ApiOrderService.getOrder(match.params.id).then(({data}) => {
+        const orderId = match.params.id;
+        ApiOrderService.getOrder(orderId).then(({data}) => {
           const order = data.data;
-          const clientId = order.clientId;
-          ApiAccountService.getAccount(clientId).then(({data}) => {
-            const account = data.data;
-            setAccount(account);
-            setModel(order);
-            setMode('edit');
-          });
+          setModel(order);
         });
       }
-    }
-  }, [model]);
+    // }
+  }, []);
   /////////////////// For render and events 
 
 
@@ -156,12 +158,9 @@ const OrderFormPage = ({match, history, order, selectOrder, account, deliverDate
     <GridContainer>
       <GridItem xs={12} sm={12} md={12}>
         <OrderForm
-            mode={mode}
-            account={account}
             data={model}
             onAfterUpdate={handleAfterUpdate}
-            // toTransactionHistory={handleToTransactionHistory}
-             />
+        />
       </GridItem>
 
     </GridContainer>
@@ -179,9 +178,7 @@ OrderFormPage.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  order: state.order, 
-  deliverDate: state.deliverDate,
-  account: state.account
+  order: state.order
 });
 // const mapDispatchToProps = (dispatch) => ({
 //   loadAccounts: (payload, searchOption) => {
