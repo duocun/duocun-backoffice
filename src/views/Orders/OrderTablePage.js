@@ -7,8 +7,6 @@ import { connect } from "react-redux";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 // core components
-import { IconButton, InputAdornment } from "@material-ui/core";
-import { KeyboardDatePicker } from "@material-ui/pickers";
 import { DatePicker } from "components/DatePicker/DatePicker.js";
 import {
   Clear as ClearIcon,

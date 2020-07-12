@@ -27,6 +27,12 @@ export const setDeliverDate = payload => ({
   payload
 })
 
+// payload --- order created date string
+export const setOrderDate = payload => ({
+  type: 'SET_ORDER_DATE',
+  payload
+})
+
 // payload --- order object
 export const selectOrder = payload => ({
   type: 'SELECT_ORDER',

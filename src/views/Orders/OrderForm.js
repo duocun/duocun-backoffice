@@ -498,7 +498,7 @@ const OrderForm = ({ data, onAfterUpdate, history }) => {
                             </MenuItem>
                           )
                         }
-                      </Select>
+                      </Select>n
                     </FormControl>
                     }
                 {/* </Box> */}

@@ -14,14 +14,19 @@ import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles({
   "clearBtn": {
-    paddingTop: "20px"
+    paddingTop: "20px",
+    paddingLeft: "0px",
+    paddingRight: "0px"
+  },
+  "wrapper": {
+    display: "flex"
   }
 });
 
 export const DatePicker = ({ date, label, onChange, onClick, onClear }) => {
   const { t } = useTranslation();
   const classes = useStyles();
-  return <div>
+  return <div className={classes.wrapper}>
     <KeyboardDatePicker
       variant="inline"
       label={t(label)}

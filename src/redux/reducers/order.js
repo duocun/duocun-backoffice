@@ -5,6 +5,13 @@ export const deliverDate = (state = null, action) => {
   return state;
 };
 
+export const orderDate = (state = null, action) => {
+  if (action && action.type === "SET_ORDER_DATE") {
+    return action.payload;
+  }
+  return state;
+};
+
 export const orders = (state = [], action) => {
   if (action && action.type === "SET_ORDERS") {
     return action.payload;

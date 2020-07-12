@@ -1,6 +1,6 @@
 import { combineReducers } from "redux";
 import authReducer from "./auth";
-import { orders, order, filterOrders, deliverDate } from "./order";
+import { orders, order, filterOrders, deliverDate, orderDate } from "./order";
 import { transactions, transaction } from "./transaction";
 import { account, loggedInAccount, accounts } from "./account";
 import { statisticsSummary } from "./statistics";
@@ -15,6 +15,7 @@ export default combineReducers({
   transaction,
   filterOrders,
   deliverDate,
+  orderDate,
   account,
   loggedInAccount,
   accounts,
