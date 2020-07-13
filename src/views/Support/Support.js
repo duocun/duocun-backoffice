@@ -21,6 +21,8 @@ import {
   Person,
   EmojiEmotions,
   Image,
+  Clear,
+  PhotoSizeSelectLargeOutlined,
 } from '@material-ui/icons';
 
 import { Picker } from 'emoji-mart'
@@ -32,6 +34,16 @@ import GridItem from 'components/Grid/GridItem.js';
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
+import Auth from "services/AuthService";
+import ApiService from 'services/api/ApiService';
+import ApiAuthService from 'services/api/ApiAuthService';
+import { buildQuery, buildPaginationQuery } from "helper/index";
+import FlashStorage from "services/FlashStorage";
+import { getSocket } from "services/SocketService";
+import TimeAgo from 'javascript-time-ago';
+import zh from 'javascript-time-ago/locale/zh';
+
+TimeAgo.addLocale(zh);
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -83,145 +95,308 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: '5px',
     textAlign: 'center',
   },
+  chatImage: {
+    maxWidth: "300px",
+    display: "block"
+  },
+  imageInput: {
+    display: "none"
+  },
+  imageContainer: {
+    display: "flex",
+    position: "relative",
+    justifyContent: "center",
+    maxHeight: "200px"
+  },
+  imageClearButton: {
+    position: "absolute",
+    left: "0",
+    height: "36px"    
+  },
+  sendImage:{
+    objectFit: "contain"
+  }
+
 }));
 
-export default function SupportPage() {
+let socket = null;
 
+export default function SupportPage() {
+  
   const { t } = useTranslation();
   const classes = useStyles();
-
   const chatBoxRef = React.useRef(null);
   const chatInputRef = React.useRef(null);
+  const timeAgo = new TimeAgo('zh-CN');
 
   const [message, setMessage] = React.useState('');
   const [emojiVisible, setEmojiVisible] = React.useState(false);
   const [users, setUsers] = React.useState([]);
   const [messages, setMessages] = React.useState([]);
+  const [messagesList, setMessagesList] = React.useState([]);
+  const [managerId, setManagerId] = React.useState("");
+  const [managerImg, setManagerImg] = React.useState("");
+  const [managerName, setManagerName] = React.useState("");
+  const [userId, setUserId] = React.useState("");
+  const [isUserMore, setIsUserMore] = React.useState(true);
+  const [userPage, setUserPage] = React.useState(0);
+  const [chatPage, setChatPage] = React.useState(0);
+  const [isMessageMore, setIsMessageMore] = React.useState(false);
 
-  const initUsers = [
-    {
-      name: 'test1',
-      avatar: '',
-      recent_message: 'hellohellohellohellohellohellohello',
-      recent_datetime: '12:30',
-      unread_count: Math.floor(Math.random() * 10)
-    },
-    {
-      name: 'test2',
-      avatar: '',
-      recent_message: 'hello',
-      recent_datetime: '12:30',
-      unread_count: Math.floor(Math.random() * 10),
-    },
-    {
-      name: 'test3',
-      avatar: '',
-      recent_message: 'hello',
-      recent_datetime: '12:30',
-      unread_count: Math.floor(Math.random() * 10),
-    },
-    {
-      name: 'test4',
-      avatar: '',
-      recent_message: 'hello',
-      recent_datetime: '12:30',
-      unread_count: Math.floor(Math.random() * 10),
-    },
-    {
-      name: 'test5',
-      avatar: '',
-      recent_message: 'hello',
-      recent_datetime: '12:30',
-      unread_count: Math.floor(Math.random() * 10),
-    },
-    {
-      name: 'test6',
-      avatar: '',
-      recent_message: 'hello',
-      recent_datetime: '12:30',
-      unread_count: Math.floor(Math.random() * 10),
-    },
-    {
-      name: 'test7',
-      avatar: '',
-      recent_message: 'hello',
-      recent_datetime: '12:30',
-      unread_count: Math.floor(Math.random() * 10),
-    },
-    {
-      name: 'test8',
-      avatar: '',
-      recent_message: 'hello',
-      recent_datetime: '12:30',
-      unread_count: Math.floor(Math.random() * 10),
-    },
-    {
-      name: 'test9',
-      avatar: '',
-      recent_message: 'hello',
-      recent_datetime: '12:30',
-      unread_count: Math.floor(Math.random() * 10),
-    },
-    {
-      name: 'test10',
-      avatar: '',
-      recent_message: 'hello',
-      recent_datetime: '12:30',
-      unread_count: Math.floor(Math.random() * 10),
-    },
-  ];
+  // for checking current message receiver is logged in or not
+  const [userLoggedIn, setUserLoggedIn] = React.useState(false);
 
-  const initMessages = [
-    {
-      content: 'Hi, everybody! 1',
-      role: 'customer',
-      datetime: '13:24'
-    },
-    {
-      content: 'Hi, everybody!',
-      role: 'supporter',
-      datetime: '13:24'
-    },
-    {
-      content: 'Hi, everybody!',
-      role: 'customer',
-      datetime: '13:24'
-    },
-    {
-      content: 'Hi, everybody!',
-      role: 'supporter',
-      datetime: '13:24'
-    },
-    {
-      content: 'Hi, everybody!',
-      role: 'customer',
-      datetime: '13:24'
-    },
-  ];
+  // for sending images
+  const [selectedFile, setSelectedFile] = React.useState(null);
+  const [selectedMedia, setMedia] = React.useState(null);
+
+  // for dynamic accumulation due to socket message
+  const [userOffset, setUserOffset] = React.useState(0);
+  const [chatOffset, setChatOffset] = React.useState(0);
+  
+  const [alert, setAlert] = React.useState(
+    FlashStorage.get("ATTRIBUTE_ALERT") || { message: "", severity: "info" }
+  );
+
 
   const queryUser = () => {
-    setUsers(users.concat(initUsers));
+    if(managerId && managerId !== ""){
+      let query = {};
+      let s_query = {
+        where: {},
+        options: {}
+      };
+      let pageSize = 20;
+      s_query.options.limit = pageSize;
+      s_query.options.skip = userOffset + pageSize * userPage;
+
+      query.query = JSON.stringify(s_query);
+      ApiService.v2().get("messages/chatusers", query).then( ({data}) => {
+        if(data.code === "success"){
+          if(data.data.length < pageSize){
+            setIsUserMore(false);
+          }
+          if(data.data.length > 0){        
+            setUsers(users.concat(data.data));
+            // if(userPage === 0){
+            //   setUserId(data.data[0]._id);
+            // }
+          }
+          setUserPage(userPage + 1);
+        }
+      }).catch(e => {
+        console.error(e);
+        setAlert({
+          message: t("Data not found"),
+          severity: "error"
+        });
+      });
+    }
   };
 
   const queryMessage = () => {
-    setMessages(messages.concat(initMessages));
+    if(userId && userId !== ""){
+      // get messages
+      let query = {};
+      let conditions = {};      
+      let pageSize = 30;
+
+      let s_query = {
+        where: {},
+        options: {}
+      };
+      s_query.options.limit = pageSize;
+      s_query.options.skip = chatOffset + pageSize * chatPage;
+
+      query.query = JSON.stringify(s_query);
+      ApiService.v2().get(`messages/chatmessages/${managerId}/${userId}`, query).then(({data}) => {
+        if(data.code === "success"){
+          if(chatPage === 0){
+            setTimeout(() => {
+              chatBoxRef.current.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
+            }, 200);
+          }
+          console.log(data.data);
+          if(data.data.length < pageSize){
+            setIsMessageMore(false);
+          }
+          if(data.data.length > 0){
+            setMessages(JSON.parse(
+              JSON.stringify(messagesList.concat(data.data))).reverse());
+            setMessagesList(messagesList.concat(data.data));
+            setChatPage(chatPage + 1);
+          }
+        }
+      }).catch(e => {
+        console.error(e);
+        setAlert({
+          message: t("Data not found"),
+          severity: "error"
+        });
+      });
+    }
+
   };
 
+  const getTimeStr = (startTime) => {
+    if(startTime){
+      return timeAgo.format(startTime);
+    }else{
+      return t("Undefined");
+    }
+  }
+
+  const handleUserItemClick = (selectedUserId, userIndex) => {
+    if(userId !== selectedUserId){
+      users[userIndex].unread = 0;
+      setUserLoggedIn(users[userIndex].userNo === 0);
+      setUserId(selectedUserId);
+      setMessagesList([]);
+      setMessages([]);
+      setIsMessageMore(true);
+      setChatPage(0);
+      setChatOffset(0);
+    }
+  }
+
   const handleSubmit = () => {
-    if (message.trim() === '') {
-      setMessage('');
-    } else {
-      setMessages([...messages, {
-        content: message,
-        role: 'supporter',
-        datetime: 'now',
-      }]);
-      setMessage('');
-      setTimeout(() => {
-        chatBoxRef.current.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
-      }, 200);
+    if(userId !== ""){
+      if (message.trim() === '' && selectedMedia === null) {
+        setMessage('');
+      } else {
+        let newMessage = {
+          message: message,
+          image: selectedFile,
+          sender: managerId,
+          senderImg: managerImg,
+          senderName: managerName,
+          createdAt: Date.now()
+        };
+        setMessages([...messages, newMessage]);
+        setMessagesList([newMessage, ...messagesList]);
+        setChatOffset(chatOffset + 1);
+        setMessage('');
+        setMedia(null);
+        setSelectedFile("");
+        setTimeout(() => {
+          chatBoxRef.current.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
+        }, 1000);
+
+        // send data via socket
+        newMessage.receiver = userId;
+        newMessage.userLoggedIn = userLoggedIn;
+        console.log("SENDING DATA");
+        console.log(newMessage);
+        socket.emit('admin_send', newMessage);
+      }
+    }else{
+      setAlert({
+        message: t("Please select customer"),
+        severity: "error"
+      });
     }
   };
+
+  const receiveSocket = (socket) => {
+    socket.off("connect").on("connect", (data) => {
+      console.log('auto connect');
+    });
+
+    socket.off('id').on('id', (data) => {
+      console.log(`my id is ${data}`);      
+    });
+
+    socket.off('to_manager').on('to_manager', (data) => {
+      console.log(data);
+      // check if this is from a new user or not and also if this is from a currently reading user
+      let usersLength = users.length;
+      let isNew = true;
+      for(let i = 0; i < usersLength; i++){
+        // if new message's sender is in list
+        console.log(users[i]._id, data.sender);
+        if(users[i]._id === data.sender){
+          isNew = false;
+          // if it is currently viewing user's
+          if(userId === data.sender){
+            // just add message
+            let messageData = {
+              _id: data.sender,
+              message: data.message,
+              image: data.image,
+              createdAt: data.createdAt,
+              senderImg: data.senderImg
+            }
+            setMessages(messages.concat(messageData));
+            setMessagesList([messageData].concat(messagesList));
+            setChatOffset(chatOffset + 1);
+            setTimeout(() => {
+              chatBoxRef.current.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
+            }, 200);
+          }else{
+            const userItem = users.splice(i, 1)[0];
+            userItem.unread = userItem.unread + 1;
+            userItem.message = data.message !== "" ? data.message: t('Image Arrived');
+            // users.unshift(userItem);
+            console.log(users);
+            setUsers([ userItem, ...users ]);            
+          }
+          break;
+        }
+      }
+      if(isNew){
+        setUsers([{
+          _id: data.sender,
+          senderName: data.senderName,
+          senderImg: data.senderImg,
+          createdAt: data.createdAt,
+          userNo: data.userNo,
+          message: data.message ? data.message: t('Image arrived'),
+          unread: 1
+        }, ...users]);
+        setUserOffset(userOffset + 1);
+      }
+    })
+  }
+
+  const handleUploadClick = (event) => {
+    if (event.target.files && event.target.files[0]) {
+      setMedia(event.target.files[0]);
+      const reader = new FileReader();
+      reader.readAsDataURL(event.target.files[0]);
+      reader.onload = (e) => {
+        setSelectedFile(reader.result);
+      };
+    }
+  };
+
+  const onClearImage = () => {
+    setSelectedFile("");
+    setMedia(null);
+  }
+
+  React.useEffect(() => {
+    const token = Auth.getAuthToken();
+    ApiAuthService.getCurrentUser(token).then(({data}) => {
+      if(data && data.code === "success"){
+        setManagerId(data.data._id);
+        setManagerName(data.data.username);
+        setManagerImg(data.data.profileImg);
+        console.log(data.data);
+        // socket initialization
+        socket = getSocket();
+        socket.emit('admin_init', {
+          'id': data.data._id
+        });
+        queryUser();
+      }
+    });
+  }, []);
+
+  React.useEffect(() => {
+    if(socket){
+      receiveSocket(socket);    
+    }   
+  }, [users, userId, messagesList]);
 
   return (
     <GridContainer>
@@ -240,7 +415,7 @@ export default function SupportPage() {
                 <InfiniteScroll
                   pageStart={0}
                   loadMore={queryUser}
-                  hasMore={true}
+                  hasMore={isUserMore}
                   loader={
                     <div
                       key="user-spinner"
@@ -263,27 +438,29 @@ export default function SupportPage() {
                           >
                             <ListItem
                               button
+                              onClick={() => handleUserItemClick(user._id, index)}
                             >
                               <ListItemAvatar>
                                 <Badge
                                   color="secondary"
-                                  badgeContent={user.unread_count}
+                                  badgeContent={ user.unread }
                                   overlap="circle"
                                 >
-                                  <Avatar>
-                                    <Person />
-                                  </Avatar>
+                                  { user.senderImg === "" 
+                                    ? <Avatar><Person /></Avatar>
+                                    : <Avatar alt = {user.senderName} src = {user.senderImg}/>
+                                  }                                  
                                 </Badge>
                               </ListItemAvatar>
                               <ListItemText
-                                primary={user.name}
+                                primary={user.senderName ? user.senderName : `${t("User")} ${user.userNo}`}
                                 secondary={
                                   <Typography
                                     noWrap={true}
                                     variant="body2"
                                     color="textSecondary"
                                   >
-                                    {user.recent_message}
+                                    { user.message }                                    
                                   </Typography>
                                 }
                               />
@@ -293,7 +470,7 @@ export default function SupportPage() {
                                   variant="caption"
                                   color="textPrimary"
                                 >
-                                  {user.recent_datetime}
+                                  { getTimeStr(user.createdAt) }
                                 </Typography>
                               </ListItemSecondaryAction>
                             </ListItem>
@@ -315,7 +492,7 @@ export default function SupportPage() {
                     <InfiniteScroll
                       pageStart={0}
                       loadMore={queryMessage}
-                      hasMore={true}
+                      hasMore={isMessageMore}
                       isReverse={true}
                       loader={
                         <div
@@ -333,17 +510,18 @@ export default function SupportPage() {
                       <List
                         ref={chatBoxRef}
                       >
-                        {messages.map((message, index) => {
-                          if (message.role === 'customer') {
+                        {messages.map((messageItem, index) => {
+                          if (messageItem.sender !== managerId) {
                             return (
                               <ListItem
                                 key={`message-${index}`}
                                 alignItems="flex-start"
                               >
                                 <ListItemAvatar>
-                                  <Avatar>
-                                    <Person />
-                                  </Avatar>
+                                  { messageItem.senderImg === "" 
+                                    ? <Avatar><Person /></Avatar>
+                                    : <Avatar alt = {messageItem.senderName} src = {messageItem.senderImg}/>
+                                  }
                                 </ListItemAvatar>
                                 <ListItemText
                                   primary=""
@@ -356,7 +534,10 @@ export default function SupportPage() {
                                         variant="body1"
                                         color="textPrimary"
                                       >
-                                        {message.content}
+                                        { messageItem.image && 
+                                          <img className={classes.chatImage} src={messageItem.image}/>
+                                        }
+                                        { messageItem.message}
                                       </Typography>
                                     </span>
                                   }
@@ -379,17 +560,19 @@ export default function SupportPage() {
                                         component="span"
                                         variant="body1"
                                       >
-                                        {message.content}
+                                        { messageItem.image && 
+                                          <img className={classes.chatImage} src={messageItem.image}/>
+                                        }
+                                        {messageItem.message}
                                       </Typography>
                                     </span>
                                   }
                                 />
                                 <ListItemAvatar>
                                   <Avatar
-                                    className={classes.chatBoxAvatarRight}
-                                  >
-                                    <Person />
-                                  </Avatar>
+                                    className = {classes.chatBoxAvatarRight}
+                                    src = {messageItem.senderImg}
+                                  />
                                 </ListItemAvatar>
                               </ListItem>
                             );
@@ -402,6 +585,21 @@ export default function SupportPage() {
               </GridContainer>
               <GridContainer>
                 <GridItem xs={12}>
+                  { selectedMedia && 
+                    <div className={classes.imageContainer}
+                    >
+                      <IconButton 
+                        color="primary"
+                        aria-label="close"
+                        component="span"
+                        className={classes.imageClearButton}
+                        onClick={() => onClearImage()}
+                      >
+                        <Clear />
+                      </IconButton>                  
+                      <img src={selectedFile} className={classes.sendImage} />
+                    </div>
+                  }
                   <div
                     style={{
                       position: 'relative',
@@ -415,13 +613,23 @@ export default function SupportPage() {
                     >
                       <EmojiEmotions />
                     </IconButton>
-                    <IconButton
-                      color="primary"
-                      aria-label="image"
-                      component="span"
-                    >
-                      <Image />
-                    </IconButton>
+                    <input
+                      accept="image/*"
+                      className={classes.imageInput}
+                      id="contained-button-file"
+                      multiple
+                      type="file"
+                      onChange={handleUploadClick}
+                    />
+                    <label htmlFor="contained-button-file">
+                      <IconButton
+                        color="primary"
+                        aria-label="image"
+                        component="span"
+                      >
+                        <Image />
+                      </IconButton>
+                    </label>
                     {emojiVisible && (
                       <Picker
                         style={{
