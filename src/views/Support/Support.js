@@ -195,6 +195,7 @@ export default function SupportPage() {
   };
 
   const queryMessage = () => {
+    console.log("IMHERE");
     if(userId && userId !== ""){
       // get messages
       let query = {};
@@ -209,7 +210,9 @@ export default function SupportPage() {
       s_query.options.skip = chatOffset + pageSize * chatPage;
 
       query.query = JSON.stringify(s_query);
+      console.log(query);
       ApiService.v2().get(`messages/chatmessages/${managerId}/${userId}`, query).then(({data}) => {
+
         if(data.code === "success"){
           if(chatPage === 0){
             setTimeout(() => {
@@ -318,6 +321,15 @@ export default function SupportPage() {
           isNew = false;
           // if it is currently viewing user's
           if(userId === data.sender){
+
+            // reset messages
+            ApiService.v2().get(`messages/reset/${data._id}`).then(({data}) => {
+              if(data.code === "success"){
+                // reset messages ok
+                console.log(data.data)
+              }
+            });
+
             // just add message
             let messageData = {
               _id: data.sender,
