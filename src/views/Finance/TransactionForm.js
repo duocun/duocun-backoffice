@@ -141,20 +141,44 @@ export const TransactionForm = ({ account, transaction, items, onAfterUpdate }) 
     }
   }
 
-  const handleFromAccountChange = (fromAccount) => {
+  const handleSelectFromAccount = (fromAccount) => {
     setFromQuery(fromAccount ? fromAccount.username : '');
     setModel({ ...model, fromId: fromAccount._id, fromName: fromAccount.username });
   }
 
-  const handleToAccountChange = (toAccount) => {
+  const handleClearFromAccount = () => {
+    setFromQuery("");
+  }
+
+  const handleSearchFromAccount = (page, rowsPerPage, keyword) => {
+    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword);
+  }
+  const handleSelectToAccount = (toAccount) => {
     setToQuery(toAccount ? toAccount.username : '');
     setModel({ ...model, toId: toAccount._id, toName: toAccount.username });
   }
 
-  const handleClientChange = (client) => {
+  const handleClearToAccount = () => {
+    setToQuery("");
+  }
+
+  const handleSearchToAccount = (page, rowsPerPage, keyword) => {
+    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword);
+  }
+
+  const handleSelectClient = (client) => {
     setClientQuery(client ? client.username : '');
     setModel({ ...model, clientId: client._id, clientName: client.username });
   }
+  
+  const handleClearClient = () => {
+    setClientQuery("");
+  }
+
+  const handleSearchClient = (page, rowsPerPage, keyword) => {
+    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword);
+  }
+
 
   const handleStaffChange = (staffId) => {
     const staff = drivers.find(a => a._id === staffId);
@@ -333,25 +357,41 @@ export const TransactionForm = ({ account, transaction, items, onAfterUpdate }) 
               )}
               <GridItem xs={12} md={6} lg={6}>
                 <Box pb={2}>
-                  <AccountSearch
+                  {/* <AccountSearch
                     label="From Account"
                     placeholder="Name or phone"
                     val={fromQuery}
                     id={model.fromId}
                     handleSelectAccount={handleFromAccountChange}
-                  />
+                  /> */}
+                  <AccountSearch
+                  label="From Account"
+                  placeholder="Search name or phone"
+                  val={fromQuery}
+                  onSelect={handleSelectFromAccount}
+                  onSearch={handleSearchFromAccount}
+                  onClear={handleClearFromAccount}
+                />
                 </Box>
               </GridItem>
 
               <GridItem xs={12} md={6} lg={6}>
                 <Box pb={2}>
-                  <AccountSearch
+                  {/* <AccountSearch
                     label="To Account"
                     placeholder="Name or phone"
                     val={toQuery}
                     id={model.toId}
                     handleSelectAccount={handleToAccountChange}
-                  />
+                  /> */}
+                <AccountSearch
+                  label="To Account"
+                  placeholder="Search name or phone"
+                  val={toQuery}
+                  onSelect={handleSelectToAccount}
+                  onSearch={handleSearchToAccount}
+                  onClear={handleClearToAccount}
+                />
                 </Box>
               </GridItem>
 
@@ -359,13 +399,22 @@ export const TransactionForm = ({ account, transaction, items, onAfterUpdate }) 
                 model.actionCode === 'RC' &&
                 <GridItem xs={12} md={6} lg={6}>
                   <Box pb={2}>
-                    <AccountSearch
+                    {/* <AccountSearch
                       label="Client"
                       placeholder="Name or phone"
                       val={clientQuery}
                       id={model.clientId}
                       handleSelectAccount={handleClientChange}
-                    />
+                    /> */}
+                <AccountSearch
+                  label="Client"
+                  placeholder="Search name or phone"
+                  val={clientQuery}
+                  id={model.clientId}
+                  onSelect={handleSelectClient}
+                  onSearch={handleSearchClient}
+                  onClear={handleClearClient}
+                />
                   </Box>
                 </GridItem>
               }

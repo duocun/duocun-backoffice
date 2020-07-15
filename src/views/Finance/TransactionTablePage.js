@@ -119,7 +119,7 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
     } else {
       updateData(null, actionCode, startDate, endDate);
     }
-  }, [page, rowsPerPage, sort, account, actionCode, startDate, endDate]);
+  }, [page, rowsPerPage, sort, account, actionCode, startDate, endDate, query]);
 
   const updateData = (accountId, actionCode, startDate, endDate) => {
     const createdQuery = {}; // (startDate && endDate) ? {created: {$gte: startDate, $lte: endDate}} : {};
@@ -197,6 +197,14 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
     const type = account ? account.type : 'client';
     setAccount({ _id: account ? account._id : '', type });
     setQuery(account ? account.username : '');
+  }
+
+  const handleClearAccount = () => {
+    setQuery("");
+  }
+
+  const handleSearchAccount = (page, rowsPerPage, keyword) => {
+    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword);
   }
 
   const handleActionChange = (actionCode) => {
@@ -340,13 +348,21 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
                   </GridItem> */}
                 <GridItem xs={12} sm={6} lg={4}>
                   <Box pb={2}>
-                    <AccountSearch
+                    {/* <AccountSearch
                       label="Account"
                       placeholder="Search name or phone"
                       val={query}
                       handleSelectAccount={handleSelectAccount}
                       onSearch={handleSearch}
-                    />
+                    /> */}
+                <AccountSearch
+                  label="Account"
+                  placeholder="Search name or phone"
+                  val={query}
+                  onSelect={handleSelectAccount}
+                  onSearch={handleSearchAccount}
+                  onClear={handleClearAccount}
+                />
                   </Box>
                 </GridItem>
 
