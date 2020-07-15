@@ -41,12 +41,10 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const SearchDropDown = ({ data, hasMore, fetchData, selectData,
-  show = false, 
-}) => {
+const SearchDropDown = ({ data, hasMore, fetchData, selectData, show = false }) => {
   const classes = useStyles();
 
-  const getVisibility = (show) => (show ? "visible" : "hidden");
+  // const getVisibility = (show) => (show ? "visible" : "hidden");
   const handleSelectData = (d) => {
     selectData(d);
   }
@@ -54,9 +52,10 @@ const SearchDropDown = ({ data, hasMore, fetchData, selectData,
 
     <FormControl 
       className={classes.list}
-      style={{ visibility: getVisibility(show) }}
+      // style={{ visibility: getVisibility(show) }}
     >
-    <InfiniteScroll className={classes.list}
+    <InfiniteScroll 
+        className={classes.list}
         dataLength={data.length} //This is important field to render the next data
         next={fetchData}
         hasMore={hasMore}

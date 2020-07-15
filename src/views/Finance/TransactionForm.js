@@ -44,7 +44,7 @@ import ApiAuthService from 'services/api/ApiAuthService';
 import ApiAccountService from 'services/api/ApiAccountService';
 import ApiTransactionService from 'services/api/ApiTransactionService';
 
-import AccountSearch from "./AccountSearch";
+import AccountSearch from "components/AccountSearch/AccountSearch.js";
 // import moment from 'moment-timezone/moment-timezone';
 
 

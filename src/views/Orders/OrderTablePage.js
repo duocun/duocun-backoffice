@@ -39,6 +39,9 @@ import {setAccount, setLoggedInAccount} from 'redux/actions/account';
 
 import ApiAuthService from 'services/api/ApiAuthService';
 import ProductSearch from "components/ProductSearch/ProductSearch";
+import AccountSearch from "components/AccountSearch/AccountSearch";
+import ApiAccountService from "services/api/ApiAccountService";
+
 const styles = {
   cardTitleWhite: {
     color: "#FFFFFF",
@@ -80,7 +83,7 @@ const defaultOrder = {
   note: ''
 }
 
-const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDate, setAccount, setLoggedInAccount, location, history }) => {
+const OrderTablePage = ({ selectOrder, account, deliverDate, setDeliverDate, setAccount, location, history }) => {
   const { t } = useTranslation();
   const classes = useStyles();
 
@@ -100,7 +103,7 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
   );
 
   const [totalRows, setTotalRows] = useState(0);
-  const [sort, setSort] = useState(["_id", -1]);
+  const [sort, setSort] = useState(["delivered", -1]);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [processing, setProcessing] = useState(false);
 
@@ -108,31 +111,29 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
     const qProduct = product && product._id ? {'items.productId': product._id} : {};
     const qDeliverDate = deliverDate ? {deliverDate} : {};
     const keyword = query;
-    const condition = keyword ? {
+    const qKeyword = keyword ? {
       $or: [
-        { clientName: { $regex: keyword }},
-        { clientPhone: { $regex: keyword }},
-        { code: { $regex: keyword }}
-      ],
+      { clientName: { $regex: keyword }},
+      { clientPhone: { $regex: keyword }},
+      { code: { $regex: keyword }}
+    ]} : {};
+
+    const condition = {
       status: {
         $nin: [OrderStatus.BAD, OrderStatus.DELETED, OrderStatus.TEMP],
       },
+      type: 'G',
+      ...qKeyword,
       ...qDeliverDate,
       ...qProduct,
-      type: 'G'
-    } : {
-      status: {
-        $nin: [OrderStatus.BAD, OrderStatus.DELETED, OrderStatus.TEMP],
-      },
-      ...qDeliverDate,
-      ...qProduct,
-      type: 'G'
     };
+
     ApiOrderService.getOrders(page, rowsPerPage, condition, [sort]).then(
       ({ data }) => {
         setOrders(data.data);
         setTotalRows(data.count);
         setLoading(false);
+        // ?
         if(data.data && data.data.length>0){
           const d = data.data[0];
           const _id = d.clientId ? d.clientId : '';
@@ -142,6 +143,7 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
       }
     );
   };
+
   const removeAlert = () => {
     setAlert({
       message: "",
@@ -237,15 +239,30 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
   //   moment.utc().toISOString()
   // );
 
+  const handleSelectClient = account => {
+    const type = account ? account.type : 'client';
+    setAccount({ _id: account ? account._id : '', type });
+    setQuery(account ? account.username : '');
+    // updateData(product);
+  }
+
+  const handleClearClient = () => {
+    setQuery("");
+  }
+
+  const handleSearchClient = (page, rowsPerPage, keyword) => {
+    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword);
+  }
+
   useEffect(() => {
-    if(!account){
-      ApiAuthService.getCurrentAccount().then(({ data }) => {
-        setLoggedInAccount(data);
-        updateData(product);
-      });
-    }else{
+    // if(!account){
+    //   ApiAuthService.getCurrentAccount().then(({ data }) => {
+    //     setLoggedInAccount(data);
+    //     updateData(product);
+    //   });
+    // }else{
       updateData(product);
-    }
+    // }
   }, [page, rowsPerPage, sort, query, deliverDate]);
 
 
@@ -256,11 +273,19 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
             <GridContainer>
             <GridItem xs={12} sm={12} lg={6}>
                 <Box pb={2} mt={2}>
-                  <Searchbar
+                  {/* <Searchbar
                     onChange={e => {setQuery(e.target.value);}}
                     onSearch={handleSearch}
                     placeholder={t("Search Code or Phone number")}
-                  />
+                  /> */}
+                    <AccountSearch
+                      label="Account"
+                      placeholder="Search name or phone"
+                      val={query}
+                      onSelect={handleSelectClient}
+                      onSearch={handleSearchClient}
+                      onClear={handleClearClient}
+                    />
                 </Box>
               </GridItem>
               <GridItem xs={12} sm={12} lg={6}>
@@ -321,7 +346,6 @@ OrderTablePage.propTypes = {
 
 
 const mapStateToProps = (state) => ({
-  order: state.order, 
   deliverDate: state.deliverDate,
   account: state.loggedInAccount
 });
@@ -332,5 +356,8 @@ const mapStateToProps = (state) => ({
 // });
 export default connect(
   mapStateToProps,
-  {selectOrder, setDeliverDate, setAccount, setLoggedInAccount}
+  {
+    selectOrder, setDeliverDate, setAccount, 
+    // setLoggedInAccount
+  }
 )(OrderTablePage);

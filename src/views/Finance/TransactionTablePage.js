@@ -33,11 +33,13 @@ import ApiOrderService from "services/api/ApiOrderService";
 import { getQueryParam } from "helper/index";
 import FlashStorage from "services/FlashStorage";
 
-import AccountSearch from "./AccountSearch";
+import AccountSearch from "components/AccountSearch/AccountSearch.js";
 
 import { TransactionTable } from "./TransactionTable";
 
 import { setAccount } from "redux/actions/account";
+
+import ApiAccountService from "services/api/ApiAccountService";
 
 const useStyles = makeStyles(() => ({
   table: {
@@ -202,8 +204,6 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
     updateData(account._id, actionCode, startDate, endDate);
   }
 
-
-
   const handleStartDateChange = (s) => {
     setStartDate(s);
     updateData(account._id, actionCode, startDate, endDate);
@@ -306,6 +306,10 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
     }
   };
   
+  const handleSearch = (i, rowsPerPage, keyword) => {
+    ApiAccountService.getAccountByKeyword(0, rowsPerPage, keyword); // .then(({data}) => {
+    // });
+  } 
 
   return (
       <GridContainer>
@@ -341,6 +345,7 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
                       placeholder="Search name or phone"
                       val={query}
                       handleSelectAccount={handleSelectAccount}
+                      onSearch={handleSearch}
                     />
                   </Box>
                 </GridItem>
