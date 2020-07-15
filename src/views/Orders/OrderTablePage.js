@@ -253,7 +253,7 @@ const OrderTablePage = ({ selectOrder, account, deliverDate, setDeliverDate, set
   }
 
   const handleSearchClient = (page, rowsPerPage, keyword) => {
-    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword, 'client');
+    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword);
   }
 
   const handleSelectDriver = account => {
@@ -268,7 +268,7 @@ const OrderTablePage = ({ selectOrder, account, deliverDate, setDeliverDate, set
   }
 
   const handleSearchDriver = (page, rowsPerPage, keyword) => {
-    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword, 'driver');
+    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword);
   }
 
   useEffect(() => {
