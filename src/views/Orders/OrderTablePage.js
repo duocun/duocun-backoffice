@@ -101,6 +101,8 @@ const OrderTablePage = ({ selectOrder, account, deliverDate, setDeliverDate, set
   const [alert, setAlert] = useState(
     FlashStorage.get("ORDER_ALERT") || { message: "", severity: "info" }
   );
+  const [driverKeyword, setDriverKeyword] = useState("");
+  const [driver, setDriver] = useState({_id:'', username:''});
 
   const [totalRows, setTotalRows] = useState(0);
   const [sort, setSort] = useState(["delivered", -1]);
@@ -251,7 +253,22 @@ const OrderTablePage = ({ selectOrder, account, deliverDate, setDeliverDate, set
   }
 
   const handleSearchClient = (page, rowsPerPage, keyword) => {
-    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword);
+    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword, 'client');
+  }
+
+  const handleSelectDriver = account => {
+    const type = account ? account.type : 'driver';
+    setDriver({ _id: account ? account._id : '', type });
+    setDriverKeyword(account ? account.username : '');
+    // updateData(product);
+  }
+
+  const handleClearDriver = () => {
+    setDriverKeyword("");
+  }
+
+  const handleSearchDriver = (page, rowsPerPage, keyword) => {
+    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword, 'driver');
   }
 
   useEffect(() => {
@@ -271,44 +288,45 @@ const OrderTablePage = ({ selectOrder, account, deliverDate, setDeliverDate, set
         <Card>
           <CardHeader color="primary">
             <GridContainer>
-            <GridItem xs={12} sm={12} lg={6}>
-                <Box pb={2} mt={2}>
-                  {/* <Searchbar
-                    onChange={e => {setQuery(e.target.value);}}
-                    onSearch={handleSearch}
-                    placeholder={t("Search Code or Phone number")}
-                  /> */}
-                    <AccountSearch
-                      label="Account"
-                      placeholder="Search name or phone"
-                      val={query}
-                      onSelect={handleSelectClient}
-                      onSearch={handleSearchClient}
-                      onClear={handleClearClient}
-                    />
-                </Box>
-              </GridItem>
-              <GridItem xs={12} sm={12} lg={6}>
-                <GridItem xs={12} sm={12} lg={12}>
-                  <DatePicker label={"Deliver Date"}
-                    date={deliverDate}
-                    onChange={handleDeliverDateChange}
-                    onClick={handleDeliverDateClick}
-                    onClear={handleDeliverDateClear}
-                    />
-                </GridItem>
-                <GridItem xs={12} sm={12} lg={12}>
-                  <ProductSearch 
-                    label={t("Product")}
-                    placeholder="Search Product Name"
-                    name={product ? product.name:''}
-                    id={product ? product._id:''}
-                    onSelect={handleSelectProduct}
-                    onClear={handleClearProduct}
-                  />
-                </GridItem>
+              <GridItem xs={12} sm={12} lg={3}>
+                <AccountSearch
+                  label="Client"
+                  placeholder="Search name or phone"
+                  val={query}
+                  onSelect={handleSelectClient}
+                  onSearch={handleSearchClient}
+                  onClear={handleClearClient}
+                />
               </GridItem>
 
+              <GridItem xs={12} sm={12} lg={3}>
+                <DatePicker label={"Deliver Date"}
+                  date={deliverDate}
+                  onChange={handleDeliverDateChange}
+                  onClick={handleDeliverDateClick}
+                  onClear={handleDeliverDateClear}
+                  />
+              </GridItem>
+              {/* <GridItem xs={12} sm={12} lg={3}>
+                <AccountSearch
+                  label="Driver"
+                  placeholder="Search name or phone"
+                  val={driverKeyword}
+                  onSelect={handleSelectDriver}
+                  onSearch={handleSearchDriver}
+                  onClear={handleClearDriver}
+                />
+              </GridItem> */}
+              <GridItem xs={12} sm={12} lg={3}>
+                <ProductSearch 
+                  label={t("Product")}
+                  placeholder="Search Product Name"
+                  name={product ? product.name:''}
+                  id={product ? product._id:''}
+                  onSelect={handleSelectProduct}
+                  onClear={handleClearProduct}
+                />
+              </GridItem>
             </GridContainer>
           </CardHeader>
           <CardBody>

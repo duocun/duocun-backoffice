@@ -11,10 +11,13 @@ import ApiProductService from "services/api/ApiProductService";
 
 const useStyles = makeStyles({
   searchWrapper: {
-    width: "320px"
+    width: "100%"
   },
   inputBox: {
     width: "100%"
+  },
+  margin: {
+    marginTop: "0px"
   },
   dropdownList: {
     position: "absolute",

@@ -85,7 +85,7 @@ const SearchDropDown = ({ data, hasMore, fetchData, selectData, show = false }) 
           )
         }
     </InfiniteScroll>
-        </FormControl>
+    </FormControl>
   );
 };
 

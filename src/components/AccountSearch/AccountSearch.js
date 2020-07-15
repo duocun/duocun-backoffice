@@ -1,35 +1,45 @@
 import React, {useState, useEffect} from 'react';
-import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
-
-// import InputLabel from "@material-ui/core/InputLabel";
-// import Search from "@material-ui/icons/Search";
-
-// import styles from "assets/jss/material-dashboard-react/components/searchBarStyle.js";
-
+import MenuItem from "@material-ui/core/MenuItem";
 import CustomInput from "components/CustomInput/CustomInput.js";
-// import Box from "@material-ui/core/Box";
-// import TextField from "@material-ui/core/TextField";
-
-
-// import Button from "components/CustomButtons/Button.js";
 import SearchDropDown from "components/SearchDropDown/SearchDropDown.js";
-// import { Throttle } from "react-throttle";
-// import FlashStorage from "services/FlashStorage";
-// import { getQueryParam } from "helper/index";
-// import Searchbar from "components/Searchbar/Searchbar";
 
-import ApiAccountService from "services/api/ApiAccountService";
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 const useStyles = makeStyles((styles) => ({
   searchWrapper: {
-    width: "320px"
+    width: "100%"
   },
   inputBox: {
     width: "100%"
-  }
+  },
+  margin: {
+    marginTop: "0px"
+  },
+  dropdownList: {
+    position: "absolute",
+    zIndex: "3000",
+    background: "gray",
+    width: "320px",
+    height: "200px",
+    overflowY: "scroll"
+  },
+  // list: {
+  //   position: "absolute",
+  //   backgroundColor: "white",
+  //   color: "black",
+  //   borderRadius: "3px",
+  //   width: "320px",
+  //   zIndex: "500",
+  //   // border: "1px solid #eee",
+  //   boxShadow: "0px 5px 5px -3px rgba(0,0,0,0.2), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12)"
+  // },
+  // listItem: {
+  //   backgroundColor: "white"
+  // }
 }));
+
 const rowsPerPage = 10;
 
 const AccountSearch = ({label, placeholder, val, id, onSearch, onSelect, onClear}) => {
@@ -39,7 +49,6 @@ const AccountSearch = ({label, placeholder, val, id, onSearch, onSelect, onClear
   const [keyword, setKeyword] = useState(val);// getQueryParam(location, "search") || "");
 
   const [account, setAccount] = useState({_id: id, username: val});
-  // const [sort, setSort] = useState(["_id", 1]);
   const [searching, setSearching] = useState(false);
   const [dropdown, setDropdown] = useState(false);
   const [accounts, setAccounts] = useState({});
@@ -67,16 +76,6 @@ const AccountSearch = ({label, placeholder, val, id, onSearch, onSelect, onClear
         }
         setSearching(false);
       });
-      // ApiAccountService.getAccountByKeyword(0, rowsPerPage, keyword).then(({data}) => {
-      //   setAccounts(data.data);
-      //   setCount(data.count);
-      //   setPage(1);
-      //   if(data.data.length<data.count){
-      //     setHasMoreAccounts(true);
-      //   }else{
-      //     setHasMoreAccounts(false);
-      //   }
-      // });
     } else {
       setPage(1);
       setHasMoreAccounts(true);
@@ -84,14 +83,8 @@ const AccountSearch = ({label, placeholder, val, id, onSearch, onSelect, onClear
   }
 
   useEffect(() => {
-  //   // handleSelectAccount({_id: id, username: val});
     setKeyword(val); // fix me
     setAccount({_id: id, username: val});
-  //   // if(accountId){
-      
-  //   // }else{
-  //     handleSearch(keyword);
-  //   // }
   }, [id, val]);
 
   const handleSelectData = (account) => {
@@ -104,20 +97,18 @@ const AccountSearch = ({label, placeholder, val, id, onSearch, onSelect, onClear
   }
 
 
-  const fetchAccounts = () => {
+  const fetchData = () => {
     if (accounts.length >= count) {
       setHasMoreAccounts(false);
       return;
     }
 
     onSearch(page, rowsPerPage, keyword).then(({data}) => {
-    // ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword).then(({data}) => {
       const dMap = {...accounts};
       data.data.forEach(d => {
         dMap[d._id] = d;
       });
       setAccounts(dMap);
-      // setAccounts([...accounts, ...data.data]);
       setCount(data.count);
       setPage(page + 1);
     });
@@ -178,47 +169,54 @@ const AccountSearch = ({label, placeholder, val, id, onSearch, onSelect, onClear
         }}
         onClear={onClear}
       />
-                {/* <Box pb={2}>
-                  <TextField id="search-input-box"
-                    fullWidth
-                    label={`${t(label)}`}
-                    value={keyword}
-                    InputLabelProps={{ shrink: keyword ? true : false }}
-                    onChange={handleKeywordChange}
-                    onKeyDown={(event) => {
-                      const { key } = event;
-                      if (key === "Enter") {
-                        return handleSearch(keyword);
-                      }
-                    }}
-                    onFocus={handleFocus}
-                    onBlur={handleBlur}
-                  />
-                </Box> */}
-      {/* <Button
-        color="white"
-        aria-label="edit"
-        justIcon
-        round
-        // onClick={() => handleSearch(keyword)}
-        // style={{ visibility: ifSearch ? "visible" : "hidden" }}
-      >
-        <Search />
-      </Button> */}
-
     <div style={divStyle}>
     {
       dropdown &&
       <SearchDropDown
         data={Object.keys(accounts).map(id => accounts[id])}
         hasMore={hasMoreAccounts}
-        fetchData={fetchAccounts}
+        fetchData={fetchData}
         selectData={handleSelectData}
         show={dropdown}
       />
     }
+      {/* {
+        dropdown &&
+        
+        <InfiniteScroll 
+        className={classes.list}
+        dataLength={Object.keys(accounts).length} //This is important field to render the next data
+        next={fetchData}
+        hasMore={hasMoreAccounts}
+        loader={<h4>Loading...</h4>}
+        height={200}
+        endMessage={
+          <p style={{textAlign: 'center'}}>
+          <b>Yay! You have seen it all</b>
+        </p>
+      }
+      // below props only if you need pull down functionality
+      // refreshFunction={this.refresh}
+      // pullDownToRefresh
+      // pullDownToRefreshContent={
+        //   <h3 style={{textAlign: 'center'}}>&#8595; Pull down to refresh</h3>
+        // }
+        // releaseToRefreshContent={
+          //   <h3 style={{textAlign: 'center'}}>&#8593; Release to refresh</h3>
+          // }
+          >
+      {
+        accounts && Object.keys(accounts).length > 0 && searching &&
+        Object.keys(accounts).map(id =>
+            <MenuItem className={classes.listItem} key={id} value={id} onClick={() => handleSelectData(accounts[id])}>
+          <div>{accounts[id].username + " " + accounts[id].phone} </div>
+        </MenuItem>
+        )
+      }
+      </InfiniteScroll>
+    } */}
     </div>
-</div>
+  </div>
 }
 
 // AccountSearch.propTypes = {
