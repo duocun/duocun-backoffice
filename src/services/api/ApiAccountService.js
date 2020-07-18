@@ -23,11 +23,11 @@ export default {
     return ApiService.v2().get("accounts/" + accountId);
   },
 
-  getAccountByKeyword: (page, pageSize, keyword = "", sort = []) => {
+  getAccountByKeyword: (page, pageSize, keyword = "", accountTypes=[], sort = []) => {
     let query = {};
-    // const type =  accountTypes ? {type: accountTypes} : {};
+    const type =  accountTypes && accountTypes.length > 0 ? {type: {$in: accountTypes}} : {};
     const condition = {
-      // ...type,
+      ...type,
       $or: [
         {
           username: { $regex: keyword }

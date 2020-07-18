@@ -55,7 +55,7 @@ const AccountSearch = ({label, placeholder, val, id, onSearch, onSelect, onClear
   const [count, setCount] = useState(10);
   const [hasMoreAccounts, setHasMoreAccounts] = useState(true);
 
-  const handleSearch = (keyword) => {
+  const handleSearch = (keyword, page) => {
     if(searching){
       return;
     }
@@ -98,7 +98,7 @@ const AccountSearch = ({label, placeholder, val, id, onSearch, onSelect, onClear
 
 
   const fetchData = () => {
-    if (accounts.length >= count) {
+    if (Object.keys(accounts).length >= count) {
       setHasMoreAccounts(false);
       return;
     }
@@ -114,17 +114,13 @@ const AccountSearch = ({label, placeholder, val, id, onSearch, onSelect, onClear
     });
   }
 
-  // const handleSearchChange = ({target}) => {
-  //   setKeyword(target.value);
-  // };
-
   const handleKeywordChange = ({target}) => {
     const str = target.value;
     setKeyword(str);
     setAccount({_id:'', username:''});
     setPage(0);
     setDropdown(true);
-    handleSearch(str);
+    handleSearch(str, 0);
   }
 
   const handleFocus = () => {
@@ -161,7 +157,7 @@ const AccountSearch = ({label, placeholder, val, id, onSearch, onSelect, onClear
           onKeyDown: (event) => {
             const { key } = event;
             if (key === "Enter") {
-              return handleSearch(keyword);
+              return handleSearch(keyword, page);
             }
           },
           onFocus: handleFocus,

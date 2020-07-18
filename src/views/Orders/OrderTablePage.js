@@ -268,7 +268,7 @@ const OrderTablePage = ({ selectOrder, account, deliverDate, setDeliverDate, set
   }
 
   const handleSearchDriver = (page, rowsPerPage, keyword) => {
-    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword);
+    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword, ['driver']);
   }
 
   useEffect(() => {
@@ -307,7 +307,7 @@ const OrderTablePage = ({ selectOrder, account, deliverDate, setDeliverDate, set
                   onClear={handleDeliverDateClear}
                   />
               </GridItem>
-              {/* <GridItem xs={12} sm={12} lg={3}>
+              <GridItem xs={12} sm={12} lg={3}>
                 <AccountSearch
                   label="Driver"
                   placeholder="Search name or phone"
@@ -316,7 +316,7 @@ const OrderTablePage = ({ selectOrder, account, deliverDate, setDeliverDate, set
                   onSearch={handleSearchDriver}
                   onClear={handleClearDriver}
                 />
-              </GridItem> */}
+              </GridItem>
               <GridItem xs={12} sm={12} lg={3}>
                 <ProductSearch 
                   label={t("Product")}
