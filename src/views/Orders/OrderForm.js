@@ -39,10 +39,10 @@ import FormatListBulletedIcon from "@material-ui/icons/FormatListBulleted";
 import SaveIcon from "@material-ui/icons/Save";
 import HistoryIcon from '@material-ui/icons/History';
 
-
-
 import FlashStorage from "services/FlashStorage";
 
+
+import AccountSearch from "components/AccountSearch/AccountSearch";
 import AddressSearch from "components/AddressSearch/AddressSearch";
 import OrderItemEditor from "views/Orders/OrderItemEditor";
 
@@ -83,7 +83,7 @@ const OrderForm = ({ data, onAfterUpdate, history }) => {
   const [itemMap, setItemMap] = useState({});
   const [drivers, setDriverList] = useState([]);
   const [productMap, setCheckMap] = useState({});
-
+  const [driverKeyword, setDriverKeyword] = useState("");
   const [processing, setProcessing] = useState(false);
   const removeAlert = () => {
     setAlert({
@@ -307,6 +307,24 @@ const OrderForm = ({ data, onAfterUpdate, history }) => {
     });
   }
 
+  const handleSelectDriver = account => {
+    // const type = account ? account.type : 'driver';
+    setDriverKeyword(account ? account.username : '');
+    setModel({
+      ...model,
+      driverId: account._id,
+      driverName: account ? account.username: ''
+    });
+  }
+
+  const handleClearDriver = () => {
+    setDriverKeyword("");
+  }
+
+  const handleSearchDriver = (page, rowsPerPage, keyword) => {
+    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword, ['driver']);
+  }
+
   const getTitle = () => {
     if (model._id === 'new' || model._id === 'clone') {
       return 'New Order';
@@ -480,26 +498,37 @@ const OrderForm = ({ data, onAfterUpdate, history }) => {
                       readOnly: true,
                     }}
                   /> */}
+              <GridItem xs={12} sm={12} lg={3}>
+                <AccountSearch
+                  label="Driver"
+                  placeholder="Search name or phone"
+                  val={driverKeyword}
+                  onSelect={handleSelectDriver}
+                  onSearch={handleSearchDriver}
+                  onClear={handleClearDriver}
+                />
+              </GridItem>
                   {
-                    model.driverId &&
-                  <FormControl className={classes.select}>
-                      <InputLabel id="driver-label">{t("Driver")}</InputLabel>
-                      <Select id="driver"
-                        labelId="driver-label"
-                        value={model.driverId}
-                        onChange={handleDriverChange}>
-                          <MenuItem key="unassigned" value="unassigned">
-                              {t("Unassigned")}
-                          </MenuItem>
-                        {
-                          drivers.map(driver => 
-                            <MenuItem key={driver._id} value={driver._id}>
-                              {driver.username}
-                            </MenuItem>
-                          )
-                        }
-                      </Select>n
-                    </FormControl>
+                    
+                    // model.driverId &&
+                  // <FormControl className={classes.select}>
+                  //     <InputLabel id="driver-label">{t("Driver")}</InputLabel>
+                  //     <Select id="driver"
+                  //       labelId="driver-label"
+                  //       value={model.driverId}
+                  //       onChange={handleDriverChange}>
+                  //         <MenuItem key="unassigned" value="unassigned">
+                  //             {t("Unassigned")}
+                  //         </MenuItem>
+                  //       {
+                  //         drivers.map(driver => 
+                  //           <MenuItem key={driver._id} value={driver._id}>
+                  //             {driver.username}
+                  //           </MenuItem>
+                  //         )
+                  //       }
+                  //     </Select>n
+                  //   </FormControl>
                     }
                 {/* </Box> */}
               </GridItem>

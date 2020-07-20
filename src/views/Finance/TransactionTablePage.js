@@ -80,7 +80,7 @@ const defaultActions = [
   { code: 'BE', text: 'Buy Equipment' },
   { code: 'BA', text: 'Buy Advertisement' }
 ];
-
+// account --- redux state
 const TransactionTablePage = ({ account, setAccount, location, history }) => {
   const { t } = useTranslation();
   const classes = useStyles();
@@ -98,11 +98,12 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalRows, setTotalRows] = useState(0);
   const [query, setQuery] = useState(account ? account.username : (getQueryParam(location, "search") || ""));
-  const [sort, setSort] = useState(["_id", 1]);
+  const [sort, setSort] = useState(["created", -1]);
 
   // filters
-  // const [account, setAccount] = useState({ _id: '', type: '' }); // selected account
   const [actionCode, setActionCode] = useState('A');
+
+  // startDate and endDate is deprecated now.
   const [startDate, setStartDate] = useState(moment.utc().toISOString());
   const [endDate, setEndDate] = useState(moment.utc().toISOString());
 
@@ -201,6 +202,7 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
 
   const handleClearAccount = () => {
     setQuery("");
+    setAccount({ _id: '', type: '' });
   }
 
   const handleSearchAccount = (page, rowsPerPage, keyword) => {
@@ -348,13 +350,6 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
                   </GridItem> */}
                 <GridItem xs={12} sm={6} lg={4}>
                   <Box pb={2}>
-                    {/* <AccountSearch
-                      label="Account"
-                      placeholder="Search name or phone"
-                      val={query}
-                      handleSelectAccount={handleSelectAccount}
-                      onSearch={handleSearch}
-                    /> */}
                 <AccountSearch
                   label="Account"
                   placeholder="Search name or phone"
