@@ -21,6 +21,10 @@ export default {
     let query = {deliverDate};
     return ApiService.v2().get("statistics/product", query);
   },
+  getSalaryStatistic: () => {
+    let query = {};
+    return ApiService.v2().get("statistics/salary", query);
+  },
   getOrderAnalytics: (startDate, endDate = null ) => {
     let query = {startDate, endDate};
     return ApiService.v2().get("statistics/order-analytics", query);

@@ -139,10 +139,10 @@ const Dashboard = ({summary, loadStatisticsSummary, history}) => {
               <CardIcon color="info">
                 <Accessibility />
               </CardIcon>
-              {/* <Link to="/dashboard/productSummary"> */}
-              <p className={classes.cardCategory}>Total Products</p>
+              <Link to="/dashboard/salary">
+              <p className={classes.cardCategory}>Salary</p>
               <h3 className={classes.cardTitle}>+245</h3>
-              {/* </Link> */}
+              </Link>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>

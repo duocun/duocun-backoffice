@@ -38,6 +38,7 @@ import ApiTransactionService from "services/api/ApiTransactionService";
 import {selectTransaction} from "redux/actions/transaction";
 import { TransactionTable } from "./TransactionTable";
 
+import AccountSearch from "components/AccountSearch/AccountSearch";
 // import TransactionFormPage from "./TransactionFormPage";
 
 // const useStyles = makeStyles((theme) => ({
@@ -87,6 +88,8 @@ const SalaryTablePage = ({ history, location, selectTransaction }) => {
   const [account, setAccount] = useState({ _id: '', username: '' });
   const [model, setModel] = useState(defaultTransaction);
 
+  const [driverKeyword, setDriverKeyword] = useState("");
+
   // table related
   const searchParams = useQuery();
 
@@ -100,7 +103,7 @@ const SalaryTablePage = ({ history, location, selectTransaction }) => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalRows, setTotalRows] = useState(0);
   const [query, setQuery] = useState(getQueryParam(location, "search") || "");
-  const [sort, setSort] = useState(["_id", 1]);
+  const [sort, setSort] = useState(["created", -1]);
 
 
   const [processing, setProcessing] = useState(false);
@@ -115,27 +118,31 @@ const SalaryTablePage = ({ history, location, selectTransaction }) => {
   );
 
 
-  useEffect(() => {
-    const token = Auth.getAuthToken();
-    ApiAuthService.getCurrentUser(token).then(({ data }) => {
-      const account = { ...data };
-      setAccount(account);
-      // try to load default form
-      ApiAccountService.getAccountList(null, null, { type: 'driver' }).then(({ data }) => {
-        const staffs = data.data;
-        setDriverList(staffs);
-        if (staffs && staffs.length > 0) {
-          const staff = staffs[0];
-          setDriver(staff);
-          updateData(staff._id);
+  // useEffect(() => {
+  //   const token = Auth.getAuthToken();
+  //   ApiAuthService.getCurrentUser(token).then(({ data }) => {
+  //     const account = { ...data };
+  //     setAccount(account);
+  //     // try to load default form
+  //     ApiAccountService.getAccountList(null, null, { type: 'driver' }).then(({ data }) => {
+  //       const staffs = data.data;
+  //       setDriverList(staffs);
+  //       if (staffs && staffs.length > 0) {
+  //         const staff = staffs[0];
+  //         setDriver(staff);
+  //         updateData(staff._id);
 
-          saveSalaryToRedux(staff, account);
-          // setModel({...model, staffId: staff._id, staffName: staff.username, modifyBy: account._id});
-        } else {
-          // setModel({...model, modifyBy: account._id});
-        }
-      });
-    });
+  //         saveSalaryToRedux(staff, account);
+  //         // setModel({...model, staffId: staff._id, staffName: staff.username, modifyBy: account._id});
+  //       } else {
+  //         // setModel({...model, modifyBy: account._id});
+  //       }
+  //     });
+  //   });
+  // }, []);
+
+  useEffect(() => {
+
   }, []);
 
   useEffect(() => {
@@ -161,17 +168,6 @@ const SalaryTablePage = ({ history, location, selectTransaction }) => {
 
       selectTransaction(tr);
     });
-  }
-
-
-  const handleDriverChange = (staffId) => {
-    const d = drivers.find(d => d._id === staffId);
-    const staffName = d ? d.username : '';
-    const staff = { _id: staffId, username: staffName };
-    setDriver(staff);
-
-    // create an empty transaction for create new salary
-    saveSalaryToRedux(staff, account);
   }
 
   const handleUpdate = () => {
@@ -246,21 +242,20 @@ const SalaryTablePage = ({ history, location, selectTransaction }) => {
 
 
   const updateData = (accountId) => {
-    const condition = {
+    const query = accountId ? {
       $or: [
-        {
-          fromId: accountId
-        },
-        {
-          toId: accountId
-        },
-        {
-          staffId: accountId
-        }
-      ],
-      actionCode: { $in: ['T', 'PS'] },
+        { fromId: accountId },
+        { toId: accountId },
+        { staffId: accountId }
+      ]
+    }: {};
+
+    const condition = {
+      ...query,
+      actionCode: { $in: ['PS'] },
       status: { $nin: ['bad', 'tmp'] }
     };
+
     ApiTransactionService.getTransactionList(
       page,
       rowsPerPage,
@@ -273,17 +268,49 @@ const SalaryTablePage = ({ history, location, selectTransaction }) => {
     });
   };
 
+  // const handleDriverChange = (staffId) => {
+  //   const d = drivers.find(d => d._id === staffId);
+  //   const staffName = d ? d.username : '';
+  //   const staff = { _id: staffId, username: staffName };
+  //   setDriver(staff);
+
+  //   // create an empty transaction for create new salary
+  //   saveSalaryToRedux(staff, account);
+  // }
+
+  const handleSelectDriver = account => {
+    const type = account ? account.type : 'driver';
+    setDriver({ _id: account ? account._id : '', type });
+    setDriverKeyword(account ? account.username : '');
+    // updateData(product);
+    // create an empty transaction for create new salary
+    saveSalaryToRedux(account, account);
+  }
+
+  const handleClearDriver = () => {
+    setDriverKeyword("");
+  }
+
+  const handleSearchDriver = (page, rowsPerPage, keyword) => {
+    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword, ['driver']);
+  }
+
   return (
       <GridContainer className={classes.gridContainer}>
           <Card>
             <CardHeader color="primary">
               <GridContainer>
-                <GridItem xs={12} md={12} lg={12}>
-                  <h4>{t("Salary")}</h4>
-                </GridItem>
                 <GridItem xs={6} md={3} lg={3}>
                   <Box pb={2} mr={2}>
-                    <FormControl className={classes.formControl}>
+                    <AccountSearch
+                      label="Driver"
+                      placeholder="Search name or phone"
+                      val={driverKeyword}
+                      onSelect={handleSelectDriver}
+                      onSearch={handleSearchDriver}
+                      onClear={handleClearDriver}
+                    />
+                    {/* <FormControl className={classes.formControl}>
                       <InputLabel id="driver-select-label">{t("Driver")}</InputLabel>
                       <Select required labelId="driver-select-label" id="driver-select"
                         value={driver ? driver._id : ''} onChange={e => handleDriverChange(e.target.value)} >
@@ -292,7 +319,7 @@ const SalaryTablePage = ({ history, location, selectTransaction }) => {
                           drivers.map(d => <MenuItem key={d._id} value={d._id}>{d.username}</MenuItem>)
                         }
                       </Select>
-                    </FormControl>
+                    </FormControl> */}
                   </Box>
                 </GridItem>
 
