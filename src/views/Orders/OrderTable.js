@@ -105,6 +105,15 @@ export const OrderTable = ({
 
   const handleOrderEdit = row => {};
 
+  // const handleDriverChange = (staffId) => {
+  //   const d = drivers.find(d => d._id === staffId);
+  //   const staffName = d ? d.username : '';
+  //   const staff = { _id: staffId, username: staffName };
+  //   setDriver(staff);
+
+  //   // create an empty transaction for create new salary
+  //   saveSalaryToRedux(staff, account);
+  // }
   const [processing, setProcessing] = useState(false);
 
   if (!rows.length) {
@@ -117,29 +126,24 @@ export const OrderTable = ({
         <Table className={classes.table} aria-label="Order Table" size="small">
           <TableHead>
             <TableRow>
-              {/* <TableCell>#</TableCell> */}
               <TableCell
-                onClick={() => {
-                  toggleSort("code");
-                }}
+                onClick={() => {toggleSort("code");}}
                 style={{ cursor: "pointer" }}
               >
                 {t("Code")}
                 {renderSort("code")}
               </TableCell>
+
               <TableCell
-                onClick={() => {
-                  toggleSort("delivered");
-                }}
+                onClick={() => {toggleSort("delivered");}}
                 style={{ cursor: "pointer" }}
               >
                 {t("Deliver Date")}
                 {renderSort("delivered")}
               </TableCell>
+
               <TableCell
-                onClick={() => {
-                  toggleSort("clientName");
-                }}
+                onClick={() => {toggleSort("clientName");}}
                 style={{ cursor: "pointer" }}
               >
                 {t("Client")}
@@ -147,24 +151,19 @@ export const OrderTable = ({
               </TableCell>
               <TableCell>{t("Address")}</TableCell>
               <TableCell
-                onClick={() => {
-                  toggleSort("merchantName");
-                }}
+                onClick={() => {toggleSort("merchantName");}}
                 style={{ cursor: "pointer" }}
               >
                 {t("Merchant")}
                 {renderSort("merchantName")}
               </TableCell>
               <TableCell
-                onClick={() => {
-                  toggleSort("items");
-                }}
+                onClick={() => {toggleSort("items");}}
                 style={{ cursor: "pointer" }}
               >
                 {t("Product")}
                 {renderSort("items")}
               </TableCell>
-
               <TableCell>{t("Actions")}</TableCell>
             </TableRow>
           </TableHead>
@@ -174,12 +173,12 @@ export const OrderTable = ({
             ) : (
               // <OrderTable rows={orders} page={page} rowsPerPage={rowsPerPage} processing={processing}/>
               <React.Fragment>
-                {rows.map((row, idx) => (
+                {
+                  rows && rows.length > 0 &&
+                  rows.map((row, idx) => 
                   <TableRow key={idx} onClick={() => selectData(row)}>
-                    {/* <TableCell>{page * rowsPerPage + idx + 1}</TableCell> */}
                     <TableCell>{row.code}</TableCell>
                     <TableCell>{toDateString(row.delivered)}</TableCell>
-
                     <TableCell>
                       <div>{row.clientName ? row.clientName : ""}</div>
                       <div>{row.clientPhone ? row.clientPhone : "N/A"}</div>
@@ -221,7 +220,8 @@ export const OrderTable = ({
                       </IconButton>
                     </TableCell>
                   </TableRow>
-                ))}
+                  )
+                }
               </React.Fragment>
             )}
           </TableBody>

@@ -65,7 +65,7 @@ const Dashboard = ({summary, loadStatisticsSummary, history}) => {
       <GridContainer>
         <GridItem xs={12} sm={6} md={3}>
           <Card>
-            <CardHeader color="warning" stats icon onClick={()=>{history.push("/dashboard/products")}}>
+            <CardHeader color="warning" stats icon onClick={()=>{history.push("/dashboard/order-summary")}}>
               <CardIcon color="warning">
                 <Icon>content_copy</Icon>
               </CardIcon>
@@ -139,10 +139,10 @@ const Dashboard = ({summary, loadStatisticsSummary, history}) => {
               <CardIcon color="info">
                 <Accessibility />
               </CardIcon>
-              {/* <Link to="/dashboard/productSummary"> */}
-              <p className={classes.cardCategory}>Total Products</p>
+              <Link to="/dashboard/salary">
+              <p className={classes.cardCategory}>Salary</p>
               <h3 className={classes.cardTitle}>+245</h3>
-              {/* </Link> */}
+              </Link>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>

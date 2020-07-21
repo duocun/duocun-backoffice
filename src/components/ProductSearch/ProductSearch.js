@@ -9,12 +9,15 @@ import CustomInput from "components/CustomInput/CustomInput.js";
 
 import ApiProductService from "services/api/ApiProductService";
 
-const useStyles = makeStyles((styles) => ({
+const useStyles = makeStyles({
   searchWrapper: {
-    width: "320px"
+    width: "100%"
   },
   inputBox: {
     width: "100%"
+  },
+  margin: {
+    marginTop: "0px"
   },
   dropdownList: {
     position: "absolute",
@@ -27,7 +30,7 @@ const useStyles = makeStyles((styles) => ({
   // secondaryText: {
   //   width: "100%"
   // }
-}));
+});
 
 const rowsPerPage = 10;
 
@@ -126,8 +129,8 @@ const ProductSearch = ({ label, placeholder, onSelect, onClear, name, id }) => {
         },
         onFocus: handleFocus,
         onBlur: handleBlur,
-        onClear: handleClear
       }}
+      onClear={handleClear}
     />
 
     {

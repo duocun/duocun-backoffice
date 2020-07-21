@@ -11,21 +11,15 @@ import ApiLocationService from "services/api/ApiLocationService";
 
 const useStyles = makeStyles((styles) => ({
   searchWrapper: {
-    width: "320px"
+    width: "100%"
   },
   inputBox: {
     width: "100%"
   },
-  // mainText: {
-  //   width: "100%"
-  // },
-  // secondaryText: {
-  //   width: "100%"
-  // }
+  margin: {
+    marginTop: "0px"
+  }
 }));
-
-const rowsPerPage = 10;
-
 
 const AddressSearch = ({label, placeholder, handleSelectLocation, location}) => {
   const classes = useStyles();
@@ -36,7 +30,6 @@ const AddressSearch = ({label, placeholder, handleSelectLocation, location}) => 
 
   const placeId = location ? location.placeId : '';
   const [address, setAddress] = useState({placeId, mainText: val, secondaryText:''});
-  // const [sort, setSort] = useState(["_id", 1]);
   const [searching, setSearching] = useState(false);
   const [addresses, setAddresses] = useState([]); // [{placeId, mainText, secondaryText}]
   const [count, setCount] = useState(10);

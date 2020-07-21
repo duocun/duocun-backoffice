@@ -7,8 +7,7 @@ import { connect } from "react-redux";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 // core components
-import { IconButton, InputAdornment } from "@material-ui/core";
-import { KeyboardDatePicker } from "@material-ui/pickers";
+import { DatePicker } from "components/DatePicker/DatePicker.js";
 import {
   Clear as ClearIcon,
   InsertInvitation as CalendarIcon
@@ -40,6 +39,9 @@ import {setAccount, setLoggedInAccount} from 'redux/actions/account';
 
 import ApiAuthService from 'services/api/ApiAuthService';
 import ProductSearch from "components/ProductSearch/ProductSearch";
+import AccountSearch from "components/AccountSearch/AccountSearch";
+import ApiAccountService from "services/api/ApiAccountService";
+
 const styles = {
   cardTitleWhite: {
     color: "#FFFFFF",
@@ -81,7 +83,7 @@ const defaultOrder = {
   note: ''
 }
 
-const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDate, setAccount, setLoggedInAccount, location, history }) => {
+const OrderTablePage = ({ selectOrder, account, deliverDate, setDeliverDate, setAccount, location, history }) => {
   const { t } = useTranslation();
   const classes = useStyles();
 
@@ -99,9 +101,11 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
   const [alert, setAlert] = useState(
     FlashStorage.get("ORDER_ALERT") || { message: "", severity: "info" }
   );
+  const [driverKeyword, setDriverKeyword] = useState("");
+  const [driver, setDriver] = useState({_id:'', username:''});
 
   const [totalRows, setTotalRows] = useState(0);
-  const [sort, setSort] = useState(["_id", -1]);
+  const [sort, setSort] = useState(["delivered", -1]);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [processing, setProcessing] = useState(false);
 
@@ -109,31 +113,29 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
     const qProduct = product && product._id ? {'items.productId': product._id} : {};
     const qDeliverDate = deliverDate ? {deliverDate} : {};
     const keyword = query;
-    const condition = keyword ? {
+    const qKeyword = keyword ? {
       $or: [
-        { clientName: { $regex: keyword }},
-        { clientPhone: { $regex: keyword }},
-        { code: { $regex: keyword }}
-      ],
+      { clientName: { $regex: keyword }},
+      { clientPhone: { $regex: keyword }},
+      { code: { $regex: keyword }}
+    ]} : {};
+
+    const condition = {
       status: {
         $nin: [OrderStatus.BAD, OrderStatus.DELETED, OrderStatus.TEMP],
       },
+      type: 'G',
+      ...qKeyword,
       ...qDeliverDate,
       ...qProduct,
-      type: 'G'
-    } : {
-      status: {
-        $nin: [OrderStatus.BAD, OrderStatus.DELETED, OrderStatus.TEMP],
-      },
-      ...qDeliverDate,
-      ...qProduct,
-      type: 'G'
     };
+
     ApiOrderService.getOrders(page, rowsPerPage, condition, [sort]).then(
       ({ data }) => {
         setOrders(data.data);
         setTotalRows(data.count);
         setLoading(false);
+        // ?
         if(data.data && data.data.length>0){
           const d = data.data[0];
           const _id = d.clientId ? d.clientId : '';
@@ -143,6 +145,7 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
       }
     );
   };
+
   const removeAlert = () => {
     setAlert({
       message: "",
@@ -229,7 +232,7 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
     setLoading(true);
     updateData(product);
   }
-  const handleClearProduct = (product) => {
+  const handleClearProduct = () => {
     setProduct({_id:'', name:''});
     setLoading(true);
     updateData(null);
@@ -238,15 +241,45 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
   //   moment.utc().toISOString()
   // );
 
+  const handleSelectClient = account => {
+    const type = account ? account.type : 'client';
+    setAccount({ _id: account ? account._id : '', type });
+    setQuery(account ? account.username : '');
+    // updateData(product);
+  }
+
+  const handleClearClient = () => {
+    setQuery("");
+  }
+
+  const handleSearchClient = (page, rowsPerPage, keyword) => {
+    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword);
+  }
+
+  const handleSelectDriver = account => {
+    const type = account ? account.type : 'driver';
+    setDriver({ _id: account ? account._id : '', type });
+    setDriverKeyword(account ? account.username : '');
+    // updateData(product);
+  }
+
+  const handleClearDriver = () => {
+    setDriverKeyword("");
+  }
+
+  const handleSearchDriver = (page, rowsPerPage, keyword) => {
+    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword, ['driver']);
+  }
+
   useEffect(() => {
-    if(!account){
-      ApiAuthService.getCurrentAccount().then(({ data }) => {
-        setLoggedInAccount(data);
-        updateData(product);
-      });
-    }else{
+    // if(!account){
+    //   ApiAuthService.getCurrentAccount().then(({ data }) => {
+    //     setLoggedInAccount(data);
+    //     updateData(product);
+    //   });
+    // }else{
       updateData(product);
-    }
+    // }
   }, [page, rowsPerPage, sort, query, deliverDate]);
 
 
@@ -255,52 +288,45 @@ const OrderTablePage = ({ order, selectOrder, account, deliverDate, setDeliverDa
         <Card>
           <CardHeader color="primary">
             <GridContainer>
-            <GridItem xs={12} sm={12} lg={6}>
-                <Box pb={2} mt={2}>
-                  <Searchbar
-                    onChange={e => {setQuery(e.target.value);}}
-                    onSearch={handleSearch}
-                    placeholder={t("Search Code or Phone number")}
-                  />
-                </Box>
-              </GridItem>
-              <GridItem xs={12} sm={12} lg={6}>
-                <GridItem xs={12} sm={12} lg={12}>
-                  <KeyboardDatePicker
-                    variant="inline"
-                    label={t("Deliver Date")}
-                    format="YYYY-MM-DD"
-                    value={deliverDate ? moment.utc(deliverDate) : null}
-                    onChange={handleDeliverDateChange}
-                    onClick={handleDeliverDateClick}
-                    KeyboardButtonProps={{
-                      'aria-label': 'change date',
-                    }}
-                    keyboardIcon={
-                      deliverDate ? (
-                          <IconButton onClick={handleDeliverDateClear}>
-                            <ClearIcon />
-                          </IconButton>
-                      ) : (
-                          <IconButton>
-                            <CalendarIcon />
-                          </IconButton>
-                      )
-                    }
-                  />
-                </GridItem>
-                <GridItem xs={12} sm={12} lg={12}>
-                  <ProductSearch 
-                    label={t("Product")}
-                    placeholder="Search Product Name"
-                    name={product ? product.name:''}
-                    id={product ? product._id:''}
-                    onSelect={handleSelectProduct}
-                    onClear={handleClearProduct}
-                  />
-                </GridItem>
+              <GridItem xs={12} sm={12} lg={3}>
+                <AccountSearch
+                  label="Client"
+                  placeholder="Search name or phone"
+                  val={query}
+                  onSelect={handleSelectClient}
+                  onSearch={handleSearchClient}
+                  onClear={handleClearClient}
+                />
               </GridItem>
 
+              <GridItem xs={12} sm={12} lg={3}>
+                <DatePicker label={"Deliver Date"}
+                  date={deliverDate}
+                  onChange={handleDeliverDateChange}
+                  onClick={handleDeliverDateClick}
+                  onClear={handleDeliverDateClear}
+                  />
+              </GridItem>
+              <GridItem xs={12} sm={12} lg={3}>
+                <AccountSearch
+                  label="Driver"
+                  placeholder="Search name or phone"
+                  val={driverKeyword}
+                  onSelect={handleSelectDriver}
+                  onSearch={handleSearchDriver}
+                  onClear={handleClearDriver}
+                />
+              </GridItem>
+              <GridItem xs={12} sm={12} lg={3}>
+                <ProductSearch 
+                  label={t("Product")}
+                  placeholder="Search Product Name"
+                  name={product ? product.name:''}
+                  id={product ? product._id:''}
+                  onSelect={handleSelectProduct}
+                  onClear={handleClearProduct}
+                />
+              </GridItem>
             </GridContainer>
           </CardHeader>
           <CardBody>
@@ -338,7 +364,6 @@ OrderTablePage.propTypes = {
 
 
 const mapStateToProps = (state) => ({
-  order: state.order, 
   deliverDate: state.deliverDate,
   account: state.loggedInAccount
 });
@@ -349,5 +374,8 @@ const mapStateToProps = (state) => ({
 // });
 export default connect(
   mapStateToProps,
-  {selectOrder, setDeliverDate, setAccount, setLoggedInAccount}
+  {
+    selectOrder, setDeliverDate, setAccount, 
+    // setLoggedInAccount
+  }
 )(OrderTablePage);
