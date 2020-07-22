@@ -440,7 +440,6 @@ const SalaryTablePage = ({ account, loggedInAccount, location, selectTransaction
                     <TableHeadCell sort={sort} field="created" label="Created Date" onSetSort={setSort} />
                     <TableHeadCell sort={sort} field="fromName" label="From Name" onSetSort={setSort} />
                     <TableHeadCell sort={sort} field="toName" label="To Name" onSetSort={setSort} />
-                    <TableHeadCell sort={sort} field="action" label="Actions" onSetSort={setSort} />
                     <TableHeadCell sort={sort} field="amount" label="Amount" onSetSort={setSort} />
                     {/* <TableHeadCell sort={sort} field="toBalance" label="Balance" onSetSort={setSort} /> */}
                     <TableHeadCell sort={sort} field="note" label="Note" onSetSort={setSort} />
@@ -464,13 +463,7 @@ const SalaryTablePage = ({ account, loggedInAccount, location, selectTransaction
                               <TableCell>{toDateString(row.created)}</TableCell>
                               <TableCell>{row.fromName}</TableCell>
                               <TableCell>{row.toName}</TableCell>
-                              <TableCell>
-                                {
-                                  row.items && row.items.length > 0 &&
-                                  row.items.map(it => <div key={it.productId}>{it.productName} x{it.quantity}</div>)
-                                }
-                              </TableCell>
-                              <TableCell>{row.actionCode}</TableCell>
+                              {/* <TableCell>{row.actionCode}</TableCell> */}
                               <TableCell>{row.amount}</TableCell>
                               {/* <TableCell>{getBalance(account, row)}</TableCell> */}
                               <TableCell>{row.note}</TableCell>
