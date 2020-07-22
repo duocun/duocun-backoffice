@@ -91,8 +91,14 @@ export default {
   splitOrder: (id, items) => {
     return ApiService.v2().put(`orders/splitOrder/${id}`, {items});
   },
-  assign: (driverId, driverName, orderIds) => {
-    return ApiService.v2().put(`orders/assign`, {driverId, driverName, orderIds});
+  getAssignments: (deliverDate) => {
+    let query = {};
+    const conditions = {deliverDate};
+    query.query = buildQuery(conditions);
+    return ApiService.v2().get(`orders/assignments`, query);
+  },
+  updateAssignments: (deliverDate, driverId, driverName, orderIdMap, assignments) => {
+    return ApiService.v2().put(`orders/assignments`, {deliverDate, driverId, driverName, orderIdMap, assignments});
   },
   getAutoRoutes: (deliverDate) => {
     // let query = {};

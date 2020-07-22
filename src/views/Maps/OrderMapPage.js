@@ -220,10 +220,10 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
   const [overlays, setOverlays] = useState([]);
   const [bounds, setBounds] = useState([]);
   const [lines, setLines] = useState([]);
-
+  const [assignments, setAssignments] = useState([]);
   useEffect(() => {
-    // ApiOrderService.getAutoRoutes(deliverDate).then(({data}) => {
-    //   const routes = data.data.routes;
+    ApiOrderService.getAssignments(deliverDate).then(({data}) => {
+      const assignments = data.data;
       ApiAccountService.getAccounts({ type: 'driver', status: 'A' }).then(({ data }) => {
         let i = 0;
         let colorIds = Object.keys(COLOR_MAP);
@@ -236,6 +236,7 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
           i++;
         });
         const drivers = data.data;
+        setAssignments(assignments);
         setDrivers(drivers);
         // setLines(routes);
         if (!deliverDate) {
@@ -343,26 +344,36 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
   }
 
   const handleAssignment = (driver) => {
+    const driverId = driver._id;
+    const driverName = driver.username;
+
     if (!bounds) {
       return;
     }
     const r = window.confirm(`确认把已选区域分给司机${driver.username}?`);
+    
     if (r) {
-      const orderIds = [];
+      const orderIdMap = {};
       markers.forEach(m => {
         if (inPolygon({ lat: m.lat, lng: m.lng }, bounds)) {
-          orderIds.push(m.orderId);
+          orderIdMap[m.orderId] = true;
         }
       });
       overlays.forEach(overlay => {
         overlay.setMap(null);
       });
-
       setBounds(null);
-      const driverId = driver._id;
-      const driverName = driver.username;
 
-      ApiOrderService.assign(driverId, driverName, orderIds).then(({ data }) => {
+      const cloned = [...assignments];
+      cloned.forEach(assignment => { // { orderId, lat, lng, type, status, driverId, driverName, clientName }
+        if(orderIdMap[assignment.orderId]) {
+          assignment.driverId = driverId;
+          assignment.driverName = driverName;
+        }
+      });
+      setAssignments(cloned);
+
+      ApiOrderService.assign(deliverDate, driverId, driverName, orderIdMap, cloned).then(({ data }) => {
         const r = data.data;
         reloadMarkers();
       });
@@ -370,7 +381,7 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
   }
 
 
-  const KEY = "AIzaSyCEd6D6vc9K-YzMH-QtQWRSs5HZkLKSWyk";
+  const KEY = "AIzaSyCpOl3ou-sgPg5vfHQO0jWXkS1gJ4SDg8M";
   return (
     <div className={classes.page}>
 
