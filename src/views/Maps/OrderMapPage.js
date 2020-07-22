@@ -247,14 +247,14 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
           updateMarkers(deliverDate, drivers);
         }
       });
-    // });
+    });
   }, []);
 
 
   const updateMarkers = (deliverDate, drivers) => {
     // {markers: [{orderId, lat, lng, type, status, icon}], driverMap:{driverId:{driverId, driverName}} }
     ApiOrderService.getAutoRoutes(deliverDate).then(({data}) => {
-      const routes = data ? data.data?.routes : [];
+      const routes = data ? data.data.routes : [];
       ApiOrderService.getMapMarkers(deliverDate).then(({ data }) => {
         let colorMap = {};
         const onDutyDriverIds = Object.keys(data.data.driverMap);
@@ -382,6 +382,7 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
 
 
   const KEY = "AIzaSyCpOl3ou-sgPg5vfHQO0jWXkS1gJ4SDg8M";
+
   return (
     <div className={classes.page}>
 
@@ -446,12 +447,13 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
       </GridContainer>
     </div>
   )
-}
+};
 
 
 const mapStateToProps = (state) => ({
   deliverDate: state.deliverDate
 });
+
 export default connect(
   mapStateToProps,
   {
