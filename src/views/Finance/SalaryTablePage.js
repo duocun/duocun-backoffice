@@ -16,11 +16,20 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+// import TableContainer from "@material-ui/core/TableContainer";
+import TableHead from "@material-ui/core/TableHead";
+import TablePagination from "components/Table/TablePagniation.js";
+import TableRow from "@material-ui/core/TableRow";
+import TableSortLabel from "@material-ui/core/TableSortLabel";
+import TableBodySkeleton from "components/Table/TableBodySkeleton";
+
+import IconButton from "@material-ui/core/IconButton";
+import EditIcon from "@material-ui/icons/Edit";
+
 import { Button, Box } from "@material-ui/core";
-import FormControl from "@material-ui/core/FormControl";
-import Select from "@material-ui/core/Select";
-import InputLabel from "@material-ui/core/InputLabel";
-import MenuItem from "@material-ui/core/MenuItem";
 import Alert from "@material-ui/lab/Alert";
 
 // icons
@@ -30,16 +39,17 @@ import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 import FlashStorage from "services/FlashStorage";
 import { getQueryParam } from "helper/index";
 
-import ApiAuthService from 'services/api/ApiAuthService';
-import ApiAccountService from 'services/api/ApiAccountService';
-import Auth from "services/AuthService";
 import ApiTransactionService from "services/api/ApiTransactionService";
+import ApiAccountService from 'services/api/ApiAccountService';
 
-import {selectTransaction} from "redux/actions/transaction";
-import { TransactionTable } from "./TransactionTable";
+import { selectTransaction } from "redux/actions/transaction";
+import { setAccount } from "redux/actions/account";
 
 import AccountSearch from "components/AccountSearch/AccountSearch";
 // import TransactionFormPage from "./TransactionFormPage";
+//helper function
+import { toDateString } from "../../helper";
+
 
 // const useStyles = makeStyles((theme) => ({
 //   table: {
@@ -61,37 +71,100 @@ const useStyles = makeStyles(() => ({
   table: {
     minWidth: 750,
   },
+  cardCategoryWhite: {
+    "&,& a,& a:hover,& a:focus": {
+      color: "rgba(255,255,255,.62)",
+      margin: "0",
+      fontSize: "14px",
+      marginTop: "0",
+      marginBottom: "0",
+    },
+    "& a,& a:hover,& a:focus": {
+      color: "#FFFFFF",
+    },
+  },
+  cardTitleWhite: {
+    color: "#FFFFFF",
+    marginTop: "0px",
+    minHeight: "auto",
+    fontWeight: "300",
+    fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
+    marginBottom: "3px",
+    textDecoration: "none",
+    "& small": {
+      color: "#777",
+      fontSize: "65%",
+      fontWeight: "400",
+      lineHeight: "1",
+    },
+  }
+
 }));
 
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
 }
 
-const defaultTransaction = {
-  actionCode: '',
+export const defaultSalary = {
+  actionCode: 'PS',
   amount: 0,
   fromId: '',
+  fromName: '',
   toId: '',
+  toName: '',
   note: '',
   staffId: '',
   staffName: '',
   modifyBy: '',
+  created: moment.utc().toISOString()
 }
 
-const SalaryTablePage = ({ history, location, selectTransaction }) => {
+
+
+const TableHeadCell = ({ sort, field, label, onSetSort }) => {
+  const { t } = useTranslation();
+
+  const toggleSort = (fieldName) => {// sort only one field
+    if (sort && sort[0] === fieldName) {
+      onSetSort([fieldName, sort[1] === 1 ? -1 : 1]);
+    } else {
+      onSetSort([fieldName, 1]);
+    }
+  }
+
+  const renderSortLabel = (fieldName) => {
+    return (
+      <TableSortLabel
+        active={sort && sort[0] === fieldName}
+        direction={sort && sort[1] === -1 ? "desc" : "asc"}
+        onClick={() => { toggleSort(fieldName); }}
+      >
+      </TableSortLabel>
+    )
+  }
+
+  return (
+    <TableCell
+      onClick={() => { toggleSort(field); }}
+      style={{ cursor: "pointer" }}
+    >
+      {t(label)}
+      {renderSortLabel(field)}
+    </TableCell>
+  )
+}
+
+// redux --- account, loggedInAccount, selectTransaction, setAccount
+const SalaryTablePage = ({ account, loggedInAccount, location, selectTransaction, setAccount }) => {
   const classes = useStyles();
   const { t } = useTranslation();
   // form related
-  const [fromId, setFromId] = useState('');
-  const [drivers, setDriverList] = useState([]);
   const [driver, setDriver] = useState({ _id: '', username: '', type: 'driver' });
-  const [account, setAccount] = useState({ _id: '', username: '' });
-  const [model, setModel] = useState(defaultTransaction);
+  const [model, setModel] = useState(defaultSalary);
 
   const [driverKeyword, setDriverKeyword] = useState("");
 
   // table related
-  const searchParams = useQuery();
 
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -102,11 +175,9 @@ const SalaryTablePage = ({ history, location, selectTransaction }) => {
   );
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalRows, setTotalRows] = useState(0);
-  const [query, setQuery] = useState(getQueryParam(location, "search") || "");
   const [sort, setSort] = useState(["created", -1]);
-
-
   const [processing, setProcessing] = useState(false);
+
   const removeAlert = () => {
     setAlert({
       message: "",
@@ -116,7 +187,6 @@ const SalaryTablePage = ({ history, location, selectTransaction }) => {
   const [alert, setAlert] = useState(
     FlashStorage.get("SALARY_ALERT") || { message: "", severity: "info" }
   );
-
 
   // useEffect(() => {
   //   const token = Auth.getAuthToken();
@@ -141,31 +211,37 @@ const SalaryTablePage = ({ history, location, selectTransaction }) => {
   //   });
   // }, []);
 
-  useEffect(() => {
+  // useEffect(() => {
 
-  }, []);
+  // }, []);
 
   useEffect(() => {
-    updateData(driver._id);
+    if(driver && driver._id){
+      updateData(driver._id);
+    }else if(account && account._id){
+      updateData(account._id);
+    } else {
+      updateData('');
+    }
   }, [page, rowsPerPage, sort, driver]);
 
 
-  const saveSalaryToRedux = (driver, account) => {
+  const saveSalaryToRedux = (driver, loggedInAccount) => {
     ApiAccountService.getAccountList(null, null, { username: 'Expense', type: 'system' }).then(({ data }) => {
       const expense = data.data[0];
       const staffName = driver ? driver.username : '';
       const tr = {
-        ...defaultTransaction,
+        ...defaultSalary,
         actionCode: 'PS',
         toId: expense._id,
         toName: expense.username,
         staffId: driver ? driver._id : '',
         staffName,
         note: `Pay salary to ${staffName}`,
-        modifyBy: account ? account._id : '',
+        modifyBy: loggedInAccount ? loggedInAccount._id : '',
         created: moment.utc().toISOString()
       }
-
+      setAccount(driver);
       selectTransaction(tr);
     });
   }
@@ -200,11 +276,11 @@ const SalaryTablePage = ({ history, location, selectTransaction }) => {
     }
   };
 
-  const handelSelectTransaction = (tr) => {
-    if(tr.note){
+  const handelSelectRow = (tr) => {
+    if (tr.note) {
       setModel(tr);
-    }else{
-      setModel({...tr, note: ''});
+    } else {
+      setModel({ ...tr, note: '' });
     }
   }
 
@@ -248,7 +324,7 @@ const SalaryTablePage = ({ history, location, selectTransaction }) => {
         { toId: accountId },
         { staffId: accountId }
       ]
-    }: {};
+    } : {};
 
     const condition = {
       ...query,
@@ -284,110 +360,168 @@ const SalaryTablePage = ({ history, location, selectTransaction }) => {
     setDriverKeyword(account ? account.username : '');
     // updateData(product);
     // create an empty transaction for create new salary
-    saveSalaryToRedux(account, account);
+    saveSalaryToRedux(account, loggedInAccount);
   }
 
   const handleClearDriver = () => {
     setDriverKeyword("");
+    setDriver({ _id: '', type: 'driver' });
+    selectTransaction(defaultSalary);
+    setAccount(null);
   }
 
   const handleSearchDriver = (page, rowsPerPage, keyword) => {
     return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword, ['driver']);
   }
 
+  const getBalance = (account, row) => {
+    if(account){
+      if (account.type === 'driver') {
+        return row.toId === account._id ? row.toBalance : row.fromBalance;
+      } else if (account.type === 'client') {
+        return row.toId === account._id ? row.toBalance : row.fromBalance;
+      } else if (account.type === 'merchant') {
+        return row.fromId === account._id ? row.fromBalance : row.toBalance;
+      } else {
+        return row.toBalance;
+      }
+    }else{
+      return 0;
+    }
+  }
+
   return (
-      <GridContainer className={classes.gridContainer}>
-          <Card>
-            <CardHeader color="primary">
-              <GridContainer>
-                <GridItem xs={6} md={3} lg={3}>
-                  <Box pb={2} mr={2}>
-                    <AccountSearch
-                      label="Driver"
-                      placeholder="Search name or phone"
-                      val={driverKeyword}
-                      onSelect={handleSelectDriver}
-                      onSearch={handleSearchDriver}
-                      onClear={handleClearDriver}
-                    />
-                    {/* <FormControl className={classes.formControl}>
-                      <InputLabel id="driver-select-label">{t("Driver")}</InputLabel>
-                      <Select required labelId="driver-select-label" id="driver-select"
-                        value={driver ? driver._id : ''} onChange={e => handleDriverChange(e.target.value)} >
-                        {
-                          drivers && drivers.length > 0 &&
-                          drivers.map(d => <MenuItem key={d._id} value={d._id}>{d.username}</MenuItem>)
-                        }
-                      </Select>
-                    </FormControl> */}
-                  </Box>
-                </GridItem>
+    <GridContainer className={classes.gridContainer}>
+      <Card>
+        <CardHeader color="primary">
+          <GridContainer>
+            <GridItem xs={6} md={3} lg={3}>
+              <Box pb={2} mr={2}>
+                <AccountSearch
+                  label="Driver"
+                  placeholder="Search name or phone"
+                  val={driverKeyword}
+                  onSelect={handleSelectDriver}
+                  onSearch={handleSearchDriver}
+                  onClear={handleClearDriver}
+                />
+              </Box>
+            </GridItem>
 
-                <GridItem xs={6} md={3} lg={3}>
-                  <Box mr={2}>
-                    <Link to={`salary/new`}>
-                      <Button
-                        color="default"
-                        variant="contained"
-                      >
-                        <AddCircleOutlineIcon />
-                        {t("New Salary")}
-                      </Button>
-                    </Link>
-                  </Box>
-                </GridItem>
+            <GridItem xs={6} md={3} lg={3}>
+              <Box mr={2}>
+                <Link to={`salary/new`}>
+                  <Button color="default" variant="contained">
+                    <AddCircleOutlineIcon /> {t("New Salary")}
+                  </Button>
+                </Link>
+              </Box>
+            </GridItem>
 
-              </GridContainer>
-            </CardHeader>
+          </GridContainer>
+        </CardHeader>
 
-            <CardBody>
-              <GridContainer>
-                {!!alert.message && (
-                  <GridItem xs={12}>
-                    <Alert severity={alert.severity} onClose={removeAlert}>
-                      {alert.message}
-                    </Alert>
-                  </GridItem>
-                )}
-                <GridItem xs={12}>
-                  <TransactionTable
-                    account={driver}
-                    rows={transactions}
-                    page={page}
-                    rowsPerPage={rowsPerPage}
-                    totalRows={totalRows}
-                    sort={sort}
-                    loading={loading}
-                    setRowsPerPage={setRowsPerPage}
-                    setSort={setSort}
-                    setPage={setPage}
-                    selectRow={handelSelectTransaction}
-                    deleteRow={handleDeleteTransaction}
-                  />
-                </GridItem>
-              </GridContainer>
-            </CardBody>
-            <CardFooter>
-              <GridContainer>
-                <GridItem xs={12} container direction="row-reverse">
-                  <Box mt={2} mr={2}>
-                    <Button
-                      color="primary"
-                      variant="contained"
-                      disabled={processing}
-                      onClick={handleUpdate}
-                    >
-                      <SaveIcon />
-                      {t("Update")}
-                    </Button>
-                  </Box>
-                </GridItem>
-              </GridContainer>
-            </CardFooter>
-          </Card>
-      </GridContainer>
+        <CardBody>
+          <GridContainer>
+            {!!alert.message && (
+              <GridItem xs={12}>
+                <Alert severity={alert.severity} onClose={removeAlert}>
+                  {alert.message}
+                </Alert>
+              </GridItem>
+            )}
+            <GridItem xs={12}>
+              <Table
+                className={classes.table}
+                aria-label="Transaction Table"
+                size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableHeadCell sort={sort} field="created" label="Created Date" onSetSort={setSort} />
+                    <TableHeadCell sort={sort} field="fromName" label="From Name" onSetSort={setSort} />
+                    <TableHeadCell sort={sort} field="toName" label="To Name" onSetSort={setSort} />
+                    <TableHeadCell sort={sort} field="action" label="Actions" onSetSort={setSort} />
+                    <TableHeadCell sort={sort} field="amount" label="Amount" onSetSort={setSort} />
+                    {/* <TableHeadCell sort={sort} field="toBalance" label="Balance" onSetSort={setSort} /> */}
+                    <TableHeadCell sort={sort} field="note" label="Note" onSetSort={setSort} />
+                    <TableCell>{t("Actions")}</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {loading ? (
+                    <TableBodySkeleton colCount={7} rowCount={rowsPerPage} />
+                  ) : (
+                      (!transactions.length) ? (
+                        <TableRow>
+                          <TableCell align="center" colSpan={7} size="medium">
+                            {t("No data to display")}
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                          transactions.map((row, idx) => (
+                            <TableRow key={idx} onClick={() => handelSelectRow(row)}>
+                              {/* <TableCell>{page * rowsPerPage + idx + 1}</TableCell> */}
+                              <TableCell>{toDateString(row.created)}</TableCell>
+                              <TableCell>{row.fromName}</TableCell>
+                              <TableCell>{row.toName}</TableCell>
+                              <TableCell>
+                                {
+                                  row.items && row.items.length > 0 &&
+                                  row.items.map(it => <div key={it.productId}>{it.productName} x{it.quantity}</div>)
+                                }
+                              </TableCell>
+                              <TableCell>{row.actionCode}</TableCell>
+                              <TableCell>{row.amount}</TableCell>
+                              {/* <TableCell>{getBalance(account, row)}</TableCell> */}
+                              <TableCell>{row.note}</TableCell>
+                              <TableCell>
+                                <Link to={`salary/${row._id}`}>
+                                  <IconButton aria-label="edit"> <EditIcon /></IconButton>
+                                </Link>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        )
+                    )}
+                </TableBody>
+              </Table>
+
+              {!loading && (
+                <TablePagination
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  onChangePage={(e, newPage) => setPage(newPage)}
+                  count={totalRows}
+                  onChangeRowsPerPage={({ target }) => {
+                    setPage(0);
+                    setRowsPerPage(target.value);
+                  }}
+                ></TablePagination>
+              )}
+            </GridItem>
+          </GridContainer>
+        </CardBody>
+        <CardFooter>
+          <GridContainer>
+            <GridItem xs={12} container direction="row-reverse">
+              <Box mt={2} mr={2}>
+                <Button
+                  color="primary"
+                  variant="contained"
+                  disabled={processing}
+                  onClick={handleUpdate}
+                >
+                  <SaveIcon />{t("Update")}
+                </Button>
+              </Box>
+            </GridItem>
+          </GridContainer>
+        </CardFooter>
+      </Card>
+    </GridContainer>
   );
 }
+
 
 // const mapStateToProps = (state) => ({ driverSummary: state.driverSummary });
 // // const mapDispatchToProps = (dispatch) => ({
@@ -405,11 +539,12 @@ SalaryTablePage.propTypes = {
   history: PropTypes.object
 };
 
-// const mapStateToProps = state => ({
-//   account: state.account
-// });
+const mapStateToProps = state => ({
+  account: state.account,
+  loggedInAccount: state.loggedInAccount
+});
 
 export default connect(
-  null,
-  {selectTransaction}
+  mapStateToProps,
+  { selectTransaction, setAccount }
 )(SalaryTablePage);

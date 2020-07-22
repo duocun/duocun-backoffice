@@ -91,14 +91,18 @@ export const TransactionTable = ({
   const renderRows = (account, rows) => {
 
     const getBalance = (account, row) => {
-      if(account.type === 'driver'){
-        return row.toId === account._id ? row.toBalance : row.fromBalance;
-      }else if(account.type === 'client'){
-        return row.toId === account._id ? row.toBalance : row.fromBalance;
-      }else if(account.type === 'merchant'){
-        return row.fromId === account._id ? row.fromBalance: row.toBalance;
-      } else{
-        return row.toBalance;
+      if(account){
+        if (account.type === 'driver') {
+          return row.toId === account._id ? row.toBalance : row.fromBalance;
+        } else if (account.type === 'client') {
+          return row.toId === account._id ? row.toBalance : row.fromBalance;
+        } else if (account.type === 'merchant') {
+          return row.fromId === account._id ? row.fromBalance : row.toBalance;
+        } else {
+          return row.toBalance;
+        }
+      }else{
+        return 0;
       }
     }
 
