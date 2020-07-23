@@ -73,7 +73,7 @@ export const TransactionTable = ({
       <React.Fragment>
         {rows.map((row, idx) => (
           <TableRow key={idx} onClick={() => selectRow(row)}>
-            <TableCell>{page * rowsPerPage + idx + 1}</TableCell>
+            {/* <TableCell>{page * rowsPerPage + idx + 1}</TableCell> */}
             <TableCell>{toDateString(row.created)}</TableCell>
             {/* <TableCell>{toDateString(row.delivered)}</TableCell> */}
             <TableCell>{row.fromName}</TableCell>

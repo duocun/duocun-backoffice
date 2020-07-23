@@ -395,17 +395,20 @@ export const TransactionForm = ({ account, transaction, items, onAfterUpdate }) 
                   </Box>
                 </GridItem>
               }
-
-              <GridItem xs={12} md={4} lg={4}>
-                <FormControl className={classes.formControl}>
-                  <TextField id="transaction-amount"
-                    label={t("Amount")}
-                    value={model.amount}
-                    InputLabelProps={{ shrink: true }}
-                    onChange={e => { setModel({ ...model, amount: e.target.value }); }}
-                  />
-                </FormControl>
-              </GridItem>
+              
+              {
+                model && model.amount!==undefined &&
+                <GridItem xs={12} md={4} lg={4}>
+                  <FormControl className={classes.formControl}>
+                    <TextField id="transaction-amount"
+                      label={t("Amount")}
+                      value={model.amount}
+                      InputLabelProps={{ shrink: true }}
+                      onChange={e => { setModel({ ...model, amount: e.target.value }); }}
+                    />
+                  </FormControl>
+                </GridItem>
+              }
 
               <GridItem xs={12} md={9} lg={9}>
                 <Box pb={2}>
