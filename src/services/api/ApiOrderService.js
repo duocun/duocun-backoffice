@@ -97,8 +97,8 @@ export default {
     query.query = buildQuery(conditions);
     return ApiService.v2().get(`orders/assignments`, query);
   },
-  updateAssignments: (deliverDate, driverId, driverName, orderIdMap, assignments) => {
-    return ApiService.v2().put(`orders/assignments`, {deliverDate, driverId, driverName, orderIdMap, assignments});
+  updateAssignments: (deliverDate, driverId, driverName, orderIds, orderIdMap, assignments) => {
+    return ApiService.v2().put(`orders/assignments`, {deliverDate, driverId, driverName, orderIds, orderIdMap, assignments});
   },
   getAutoRoutes: (deliverDate) => {
     // let query = {};

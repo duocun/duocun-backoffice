@@ -221,6 +221,7 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
   const [bounds, setBounds] = useState([]);
   const [lines, setLines] = useState([]);
   const [assignments, setAssignments] = useState([]);
+
   useEffect(() => {
     ApiOrderService.getAssignments(deliverDate).then(({data}) => {
       const assignments = data.data;
@@ -343,7 +344,7 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
     updateMarkers(deliverDate, drivers);
   }
 
-  const handleAssignment = (driver) => {
+  const handleAssign = (driver) => {
     const driverId = driver._id;
     const driverName = driver.username;
 
@@ -354,9 +355,11 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
     
     if (r) {
       const orderIdMap = {};
+      const orderIds = [];
       markers.forEach(m => {
         if (inPolygon({ lat: m.lat, lng: m.lng }, bounds)) {
           orderIdMap[m.orderId] = true;
+          orderIds.push(m.orderId);
         }
       });
       overlays.forEach(overlay => {
@@ -364,7 +367,7 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
       });
       setBounds(null);
 
-      const cloned = [...assignments];
+      const cloned = assignments && assignments.length>0 ? [...assignments] : [];
       cloned.forEach(assignment => { // { orderId, lat, lng, type, status, driverId, driverName, clientName }
         if(orderIdMap[assignment.orderId]) {
           assignment.driverId = driverId;
@@ -372,8 +375,7 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
         }
       });
       setAssignments(cloned);
-
-      ApiOrderService.assign(deliverDate, driverId, driverName, orderIdMap, cloned).then(({ data }) => {
+      ApiOrderService.updateAssignments(deliverDate, driverId, driverName, orderIds, orderIdMap, cloned).then(({ data }) => {
         const r = data.data;
         reloadMarkers();
       });
@@ -413,7 +415,7 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
             {
               drivers.map(d =>
                 <div className="leftCol" key={d._id}>
-                  <div style={{ width: "50%", float: "left" }} onClick={() => handleAssignment(d)}>{d.username}</div>
+                  <div style={{ width: "50%", float: "left" }} onClick={() => handleAssign(d)}>{d.username}</div>
                   <div style={{ width: "15%", float: "left" }} ><img src={d.url} /></div>
                   {
                     d.onDuty &&
