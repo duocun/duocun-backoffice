@@ -375,7 +375,7 @@ export const TransactionForm = ({ account, transaction, items, onAfterUpdate }) 
               }
 
               {
-                actions && actions.length > 0 && model && model.actionCode &&
+                actions && actions.length > 0 && model &&
                 <GridItem xs={12} md={4} lg={4}>
                   <FormControl className={classes.formControl} >
                     <DropdownSelect id="action-select"
@@ -395,7 +395,7 @@ export const TransactionForm = ({ account, transaction, items, onAfterUpdate }) 
                   </Box>
                 </GridItem>
               }
-              
+
               {
                 model && model.amount!==undefined &&
                 <GridItem xs={12} md={4} lg={4}>
@@ -440,6 +440,7 @@ export const TransactionForm = ({ account, transaction, items, onAfterUpdate }) 
                   onChange={(m) => setModel({ ...model, created: m.toISOString() })}
                 />
               </GridItem>
+
               <GridItem xs={12} container direction="row-reverse">
                 <Box mt={2} mr={2}>
                   <Link to={`../transactions`}>

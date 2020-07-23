@@ -2,12 +2,22 @@ import React from 'react';
 import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
+import { makeStyles } from "@material-ui/core/styles";
 
+const useStyles = makeStyles(() => ({
+  select: {
+    width: "100%",
+  },
+}));
 export const DropdownSelect = ({id, value, options, onChange}) => {
+
+  const classes = useStyles();
+
   return (
     <div className="dc-full-select">
       <InputLabel id={`${id}-label`}>Action</InputLabel>
-      <Select required
+      <Select className={classes.select}
+        required
         labelId={`${id}-label`}
         id={id}
         value={value}

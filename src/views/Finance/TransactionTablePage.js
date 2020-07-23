@@ -36,8 +36,8 @@ import FlashStorage from "services/FlashStorage";
 import AccountSearch from "components/AccountSearch/AccountSearch.js";
 
 import { TransactionTable } from "./TransactionTable";
-
 import { setAccount } from "redux/actions/account";
+import { defaultTransaction } from "views/Finance/FinanceModel";
 
 import ApiAccountService from "services/api/ApiAccountService";
 
@@ -51,19 +51,6 @@ const useStyles = makeStyles(() => ({
 //   return new URLSearchParams(useLocation().search);
 // }
 
-const defaultTransaction = {
-  actionCode: '',
-  amount: 0,
-  fromId: '',
-  fromName: '',
-  toId: '',
-  toName: '',
-  note: '',
-  staffId: '',
-  staffName: '',
-  modifyBy: '',
-  created: moment.utc().toISOString()
-}
 
 const defaultActions = [
   { code: 'A', text: 'All' },
