@@ -288,7 +288,7 @@ const OrderTablePage = ({ selectOrder, account, deliverDate, setDeliverDate, set
         <Card>
           <CardHeader color="primary">
             <GridContainer>
-              <GridItem xs={12} sm={12} lg={3}>
+              <GridItem xs={12} sm={4} lg={3}>
                 <AccountSearch
                   label="Client"
                   placeholder="Search name or phone"
@@ -299,7 +299,7 @@ const OrderTablePage = ({ selectOrder, account, deliverDate, setDeliverDate, set
                 />
               </GridItem>
 
-              <GridItem xs={12} sm={12} lg={3}>
+              <GridItem xs={12} sm={4} lg={3}>
                 <DatePicker label={"Deliver Date"}
                   date={deliverDate}
                   onChange={handleDeliverDateChange}
@@ -307,7 +307,7 @@ const OrderTablePage = ({ selectOrder, account, deliverDate, setDeliverDate, set
                   onClear={handleDeliverDateClear}
                   />
               </GridItem>
-              <GridItem xs={12} sm={12} lg={3}>
+              <GridItem xs={12} sm={4} lg={3}>
                 <AccountSearch
                   label="Driver"
                   placeholder="Search name or phone"
@@ -317,7 +317,7 @@ const OrderTablePage = ({ selectOrder, account, deliverDate, setDeliverDate, set
                   onClear={handleClearDriver}
                 />
               </GridItem>
-              <GridItem xs={12} sm={12} lg={3}>
+              <GridItem xs={12} sm={4} lg={3}>
                 <ProductSearch 
                   label={t("Product")}
                   placeholder="Search Product Name"

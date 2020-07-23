@@ -78,7 +78,7 @@ export default function CustomInput(props) {
         {...inputProps}
       />
       {
-        inputProps && inputProps.value && onClear &&
+        onClear &&
         <IconButton className={customClasses.clearBtn} onClick={handleClear}>
           <Clear />
         </IconButton>
