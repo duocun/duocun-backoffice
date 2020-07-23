@@ -157,7 +157,7 @@ const DriverSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
           format="YYYY-MM-DD"
           value={moment.utc(deliverDate)}
           InputLabelProps={{
-            shrink: deliverDate,
+            shrink: deliverDate ? true : false,
           }}
           onChange={handleDateChange}
         />

@@ -37,6 +37,9 @@ export const DatePicker = ({ date, label, onChange, onClick, onClear }) => {
       KeyboardButtonProps={{
         'aria-label': 'change date',
       }}
+      InputLabelProps={{
+        shrink: date ? true : false,
+      }}
     // keyboardIcon={
     //   date ? (
     //       <IconButton onClick={handledateClear}>

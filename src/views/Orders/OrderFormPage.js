@@ -647,7 +647,7 @@ const OrderFormPage = ({ match, order, onAfterUpdate, history }) => {
                   value={moment.utc(model.delivered)}
                   onChange={(m) => handleDeliverDateChange(m)}
                   InputLabelProps={{
-                    shrink: model.delivered,
+                    shrink: model.delivered? true : false,
                   }}
                 />
               </GridItem>
