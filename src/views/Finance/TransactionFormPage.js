@@ -120,25 +120,35 @@ const TransactionFormPage = ({ match, history, account, transaction, update }) =
   useEffect(() => {
     if (!model._id) {
       if (match.params.id === 'new') {
-        const s = 'new';
+        if (model.actionCode === 'PS') {
+          ApiAccountService.getAccountList(null, null, { username: 'Expense', type: 'system' }).then(({ data }) => {
+            const expense = data.data[0];
+            const toName = expense ? expense.username : '';
+            const staffName = account ? account.username : '';
+            setModel({
+              ...model,
+              toId: expense ? expense._id : '',
+              toName,
+              staffId: account ? account._id : '',
+              staffName,
+              note: account ? `Pay salary to ${account.username}` : '',
+              modifyBy: modifyByAccount._id
+            });
+          });
+        }else{
+          setModel({
+            ...model,
+            modifyBy: modifyByAccount._id
+          });
+        }
       } else {
         ApiTransactionService.getTransaction(match.params.id).then(({ data }) => {
           const tr = data.data;
-          if (tr.actionCode === 'PS') {
-            setModel({
-              ...tr,
-              staffId: account._id,
-              staffName: account.username,
-              note: `Pay salary to ${account.username}`,
-              modifyBy: modifyByAccount._id
-            });
-          } else {
-            setModel({ ...tr, modifyBy: modifyByAccount._id });
-          }
+          setModel({ ...tr, modifyBy: modifyByAccount._id });
         });
       }
     }
-  }, [model]);
+  }, [model, account]);
 
   useEffect(() => {
     const token = AuthService.getAuthToken();

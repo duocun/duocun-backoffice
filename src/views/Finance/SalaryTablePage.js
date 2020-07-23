@@ -19,11 +19,8 @@ import CardFooter from "components/Card/CardFooter.js";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
-// import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
 import TablePagination from "components/Table/TablePagniation.js";
 import TableRow from "@material-ui/core/TableRow";
-import TableSortLabel from "@material-ui/core/TableSortLabel";
 import TableBodySkeleton from "components/Table/TableBodySkeleton";
 
 import IconButton from "@material-ui/core/IconButton";
@@ -49,6 +46,7 @@ import AccountSearch from "components/AccountSearch/AccountSearch";
 // import TransactionFormPage from "./TransactionFormPage";
 //helper function
 import { toDateString } from "../../helper";
+import { TableHeader } from "components/Table/TableHeader";
 
 
 // const useStyles = makeStyles((theme) => ({
@@ -117,41 +115,6 @@ export const defaultSalary = {
   staffName: '',
   modifyBy: '',
   created: moment.utc().toISOString()
-}
-
-
-
-const TableHeadCell = ({ sort, field, label, onSetSort }) => {
-  const { t } = useTranslation();
-
-  const toggleSort = (fieldName) => {// sort only one field
-    if (sort && sort[0] === fieldName) {
-      onSetSort([fieldName, sort[1] === 1 ? -1 : 1]);
-    } else {
-      onSetSort([fieldName, 1]);
-    }
-  }
-
-  const renderSortLabel = (fieldName) => {
-    return (
-      <TableSortLabel
-        active={sort && sort[0] === fieldName}
-        direction={sort && sort[1] === -1 ? "desc" : "asc"}
-        onClick={() => { toggleSort(fieldName); }}
-      >
-      </TableSortLabel>
-    )
-  }
-
-  return (
-    <TableCell
-      onClick={() => { toggleSort(field); }}
-      style={{ cursor: "pointer" }}
-    >
-      {t(label)}
-      {renderSortLabel(field)}
-    </TableCell>
-  )
 }
 
 // redux --- account, loggedInAccount, selectTransaction, setAccount
@@ -435,17 +398,17 @@ const SalaryTablePage = ({ account, loggedInAccount, location, selectTransaction
                 className={classes.table}
                 aria-label="Transaction Table"
                 size="small">
-                <TableHead>
-                  <TableRow>
-                    <TableHeadCell sort={sort} field="created" label="Created Date" onSetSort={setSort} />
-                    <TableHeadCell sort={sort} field="fromName" label="From Name" onSetSort={setSort} />
-                    <TableHeadCell sort={sort} field="toName" label="To Name" onSetSort={setSort} />
-                    <TableHeadCell sort={sort} field="amount" label="Amount" onSetSort={setSort} />
-                    {/* <TableHeadCell sort={sort} field="toBalance" label="Balance" onSetSort={setSort} /> */}
-                    <TableHeadCell sort={sort} field="note" label="Note" onSetSort={setSort} />
-                    <TableCell>{t("Actions")}</TableCell>
-                  </TableRow>
-                </TableHead>
+                  <TableHeader data={[
+                      {field: 'created', label: 'Created Date'},
+                      {field: 'fromName', label: 'From Name'},
+                      {field: 'toName', label: 'To Name'},
+                      {field: 'amount', label: 'Amount'},
+                      {field: 'note', label: 'Note'},
+                      {field: 'actions', label: 'Actions'}
+                    ]}
+                    sort={sort}
+                    onSetSort={setSort} 
+                  />
                 <TableBody>
                   {loading ? (
                     <TableBodySkeleton colCount={7} rowCount={rowsPerPage} />
@@ -463,7 +426,6 @@ const SalaryTablePage = ({ account, loggedInAccount, location, selectTransaction
                               <TableCell>{toDateString(row.created)}</TableCell>
                               <TableCell>{row.fromName}</TableCell>
                               <TableCell>{row.toName}</TableCell>
-                              {/* <TableCell>{row.actionCode}</TableCell> */}
                               <TableCell>{row.amount}</TableCell>
                               {/* <TableCell>{getBalance(account, row)}</TableCell> */}
                               <TableCell>{row.note}</TableCell>

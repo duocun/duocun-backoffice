@@ -55,11 +55,14 @@ const defaultTransaction = {
   actionCode: '',
   amount: 0,
   fromId: '',
+  fromName: '',
   toId: '',
+  toName: '',
   note: '',
   staffId: '',
   staffName: '',
   modifyBy: '',
+  created: moment.utc().toISOString()
 }
 
 const defaultActions = [
@@ -326,10 +329,6 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
           <Card>
             <CardHeader color="primary">
               <GridContainer>
-                <GridItem xs={12} sm={12} lg={12}>
-                  <h4>{t("Transaction")}</h4>
-                </GridItem>
-
                   {/* <GridItem xs={12} sm={12} lg={12} align="left">
                   <KeyboardDatePicker
                   variant="inline"
@@ -349,20 +348,17 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
                 />
                   </GridItem> */}
                 <GridItem xs={12} sm={6} lg={4}>
-                  <Box pb={2}>
-                <AccountSearch
-                  label="Account"
-                  placeholder="Search name or phone"
-                  val={query}
-                  onSelect={handleSelectAccount}
-                  onSearch={handleSearchAccount}
-                  onClear={handleClearAccount}
-                />
-                  </Box>
+                  <AccountSearch
+                    label="Account"
+                    placeholder="Search name or phone"
+                    val={query}
+                    onSelect={handleSelectAccount}
+                    onSearch={handleSearchAccount}
+                    onClear={handleClearAccount}
+                  />
                 </GridItem>
 
                 <GridItem xs={6} sm={6} lg={3}>
-                  <Box >
                     <FormControl className={classes.select}>
                       <InputLabel id="action-label">{t("Action")}</InputLabel>
                       <Select required
@@ -376,21 +372,19 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
                         }
                       </Select>
                     </FormControl>
-                  </Box>
                 </GridItem>
                 
 
                 <GridItem xs={6} sm={6} lg={3}>
                   <Box  mt={2}>
                     <Link to={`transactions/new`}>
-                    <Button
-                      color="default"
-                      variant="contained"
-                      disabled={processing}
-                    >
-                      <AddCircleOutlineIcon />
-                      {t("New Transaction")}
-                    </Button>
+                      <Button
+                        color="default"
+                        variant="contained"
+                        disabled={processing}
+                      >
+                        <AddCircleOutlineIcon />{t("New Transaction")}
+                      </Button>
                     </Link>
                   </Box>
                 </GridItem>

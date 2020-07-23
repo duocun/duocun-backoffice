@@ -470,7 +470,7 @@ const OrderFormPage = ({ match, order, onAfterUpdate, history }) => {
               )}
               {
                 !(model._id === 'new' || model._id === 'clone') &&
-                <GridItem xs={12} lg={4}>
+                <GridItem xs={12} md={4} lg={4}>
                   <Box pb={2}>
                     <TextField id="order-code"
                       label={`${t("Code")}`}
@@ -482,7 +482,7 @@ const OrderFormPage = ({ match, order, onAfterUpdate, history }) => {
                   </Box>
                 </GridItem>
               }
-              <GridItem xs={12} lg={4}>
+              <GridItem xs={12} md={4} lg={4}>
                 <Box pb={2}>
                   <TextField id="order-client"
                     label={`${t("Client")}`}
@@ -494,7 +494,7 @@ const OrderFormPage = ({ match, order, onAfterUpdate, history }) => {
                   />
                 </Box>
               </GridItem>
-              <GridItem xs={12} lg={6}>
+              <GridItem xs={12} md={4} lg={4}>
                 <Box pb={2}>
                   <TextField id="order-client-phone"
                     label={`${t("Client Phone")}`}
@@ -506,7 +506,7 @@ const OrderFormPage = ({ match, order, onAfterUpdate, history }) => {
                   />
                 </Box>
               </GridItem>
-              <GridItem xs={12} lg={12}>
+              <GridItem xs={12}  md={8} lg={8}>
                 <Box pb={2}>
                   <AddressSearch
                     label={'Deliver Address'}
@@ -589,7 +589,7 @@ const OrderFormPage = ({ match, order, onAfterUpdate, history }) => {
                   </Box>
                 </GridItem>
               }
-              <GridItem xs={12} lg={6}>
+              <GridItem xs={12} md={4} lg={4}>
                 <Box pb={2}>
                   <TextField id="order-total"
                     label={`${t("Total")}`}
@@ -602,51 +602,17 @@ const OrderFormPage = ({ match, order, onAfterUpdate, history }) => {
                 </Box>
               </GridItem>
 
-              <GridItem xs={12} lg={6}>
-                {/* <Box pb={5}> */}
-                {/* <TextField id="order-driver"
-                    label={`${t("Driver")}`}
-                    value={model.driverName}
-                    InputLabelProps={{ shrink: model.driverId ? true : false }}
-                    InputProps={{
-                      readOnly: true,
-                    }}
-                  /> */}
-                <GridItem xs={12} sm={12} lg={3}>
-                  <AccountSearch
-                    label="Driver"
-                    placeholder="Search name or phone"
-                    val={driverKeyword}
-                    onSelect={handleSelectDriver}
-                    onSearch={handleSearchDriver}
-                    onClear={handleClearDriver}
-                  />
-                </GridItem>
-                {
-
-                  // model.driverId &&
-                  // <FormControl className={classes.select}>
-                  //     <InputLabel id="driver-label">{t("Driver")}</InputLabel>
-                  //     <Select id="driver"
-                  //       labelId="driver-label"
-                  //       value={model.driverId}
-                  //       onChange={handleDriverChange}>
-                  //         <MenuItem key="unassigned" value="unassigned">
-                  //             {t("Unassigned")}
-                  //         </MenuItem>
-                  //       {
-                  //         drivers.map(driver => 
-                  //           <MenuItem key={driver._id} value={driver._id}>
-                  //             {driver.username}
-                  //           </MenuItem>
-                  //         )
-                  //       }
-                  //     </Select>n
-                  //   </FormControl>
-                }
-                {/* </Box> */}
+              <GridItem xs={12}  md={3} lg={3}>
+                <AccountSearch
+                  label="Driver"
+                  placeholder="Search name or phone"
+                  val={driverKeyword}
+                  onSelect={handleSelectDriver}
+                  onSearch={handleSearchDriver}
+                  onClear={handleClearDriver}
+                />
               </GridItem>
-              <GridItem xs={12} lg={6}>
+              <GridItem xs={12}  md={3} lg={3}>
                 <Box pb={2}>
                   <TextField id="order-driver-phone"
                     label={`${t("Driver Phone")}`}
@@ -659,7 +625,7 @@ const OrderFormPage = ({ match, order, onAfterUpdate, history }) => {
                 </Box>
               </GridItem>
 
-              <GridItem xs={12} lg={12}>
+              <GridItem xs={12} md={9} lg={9}>
                 <Box pb={2}>
                   <TextField id="order-note"
                     label={`${t("Note")}`}
@@ -673,7 +639,7 @@ const OrderFormPage = ({ match, order, onAfterUpdate, history }) => {
                   />
                 </Box>
               </GridItem>
-              <GridItem>
+              <GridItem xs={12} md={4} lg={4}>
                 <KeyboardDatePicker
                   variant="inline"
                   label={t("Deliver Date")}
