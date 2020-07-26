@@ -379,6 +379,7 @@ export const TransactionForm = ({ account, transaction, items, onAfterUpdate }) 
                 <GridItem xs={12} md={4} lg={4}>
                   <FormControl className={classes.formControl} >
                     <DropdownSelect id="action-select"
+                      label={t("Action")}
                       value={model.actionCode}
                       options={actions}
                       onChange={handleActionChange}

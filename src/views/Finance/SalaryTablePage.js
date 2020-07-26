@@ -131,11 +131,7 @@ const SalaryTablePage = ({ account, loggedInAccount, location, selectTransaction
 
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(
-    getQueryParam(location, "page")
-      ? parseInt(getQueryParam(location, "page"))
-      : 0
-  );
+  const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalRows, setTotalRows] = useState(0);
   const [sort, setSort] = useState(["created", -1]);
@@ -182,6 +178,7 @@ const SalaryTablePage = ({ account, loggedInAccount, location, selectTransaction
     if(driver && driver._id){
       updateData(driver._id);
     }else if(account && account._id){
+      setDriverKeyword(account ? account.username : '');
       updateData(account._id);
     } else {
       updateData('');
@@ -328,30 +325,30 @@ const SalaryTablePage = ({ account, loggedInAccount, location, selectTransaction
 
   const handleClearDriver = () => {
     setDriverKeyword("");
-    setDriver({ _id: '', type: 'driver' });
+    setDriver({ _id: '', username: '',  type: 'driver' });
     selectTransaction(defaultSalary);
-    setAccount(null);
+    setAccount({ _id: '', username: '',  type: 'client' });
   }
 
   const handleSearchDriver = (page, rowsPerPage, keyword) => {
     return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword, ['driver']);
   }
 
-  const getBalance = (account, row) => {
-    if(account){
-      if (account.type === 'driver') {
-        return row.toId === account._id ? row.toBalance : row.fromBalance;
-      } else if (account.type === 'client') {
-        return row.toId === account._id ? row.toBalance : row.fromBalance;
-      } else if (account.type === 'merchant') {
-        return row.fromId === account._id ? row.fromBalance : row.toBalance;
-      } else {
-        return row.toBalance;
-      }
-    }else{
-      return 0;
-    }
-  }
+  // const getBalance = (account, row) => {
+  //   if(account){
+  //     if (account.type === 'driver') {
+  //       return row.toId === account._id ? row.toBalance : row.fromBalance;
+  //     } else if (account.type === 'client') {
+  //       return row.toId === account._id ? row.toBalance : row.fromBalance;
+  //     } else if (account.type === 'merchant') {
+  //       return row.fromId === account._id ? row.fromBalance : row.toBalance;
+  //     } else {
+  //       return row.toBalance;
+  //     }
+  //   }else{
+  //     return 0;
+  //   }
+  // }
 
   return (
     <GridContainer className={classes.gridContainer}>

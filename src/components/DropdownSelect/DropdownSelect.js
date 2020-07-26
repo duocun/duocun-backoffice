@@ -9,13 +9,13 @@ const useStyles = makeStyles(() => ({
     width: "100%",
   },
 }));
-export const DropdownSelect = ({id, value, options, onChange}) => {
+export const DropdownSelect = ({id, label, value, options, onChange}) => {
 
   const classes = useStyles();
 
   return (
     <div className="dc-full-select">
-      <InputLabel id={`${id}-label`}>Action</InputLabel>
+      <InputLabel id={`${id}-label`}>{label}</InputLabel>
       <Select className={classes.select}
         required
         labelId={`${id}-label`}

@@ -80,14 +80,10 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
   const [items, setItems] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(
-    getQueryParam(location, "page")
-      ? parseInt(getQueryParam(location, "page"))
-      : 0
-  );
+  const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalRows, setTotalRows] = useState(0);
-  const [query, setQuery] = useState(account ? account.username : (getQueryParam(location, "search") || ""));
+  const [query, setQuery] = useState(account ? account.username : "");
   const [sort, setSort] = useState(["created", -1]);
 
   // filters
@@ -186,13 +182,14 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
 
   const handleSelectAccount = account => {
     const type = account ? account.type : 'client';
-    setAccount({ _id: account ? account._id : '', type });
-    setQuery(account ? account.username : '');
+    const username = account? account.username : '';
+    setAccount({ _id: account ? account._id : '', username, type });
+    setQuery(username);
   }
 
   const handleClearAccount = () => {
     setQuery("");
-    setAccount({ _id: '', type: '' });
+    setAccount({ _id: '', username:'', type: '' });
   }
 
   const handleSearchAccount = (page, rowsPerPage, keyword) => {

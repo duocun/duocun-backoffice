@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { connect } from "react-redux";
+import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
+
+import { makeStyles } from "@material-ui/core/styles";
 
 import { Save as SaveIcon, FormatListBulleted as FormatListBulletedIcon } from "@material-ui/icons";
 import { TextField, Button, Checkbox,
@@ -16,46 +21,44 @@ import CardFooter from "components/Card/CardFooter.js";
 import EditSkeleton from "../Common/EditSkeleton";
 import ApiAccountService from "services/api/ApiAccountService";
 
-const defaultAccountsModelState = {
-  _id: 'new',
-  username: "",
-  imageurl: "",
-  realm: "",
-  sex: "",
-  openId: "",
-  type: "merchant",
-  balance: 0,
-  phone: "",
-  created: "",
-  verificationCode: "",
-  verified: true,
-  attributes: []
-}
-const AccountsForm = ({}) => {
+import { setAccount } from "redux/actions/account"; 
+import { defaultAccount, AccountAttribute, ROLE_MAPPING, ATTRIBUTES_MAPPING } from "views/Accounts/AccountModel.js"
+
+const useStyles = makeStyles({
+  formControl: {
+    marginTop: "27px"
+  }
+});
+const AccountFormPage = ({match, account, setAccount}) => {
   const { t } = useTranslation();
+  const classes = useStyles();
+  
   const [loading, setLoading] = useState(false);
   const [processing, setProcessing] = useState(false);
 
   // for model
-  const [model, setModel] = useState(defaultAccountsModelState);
+  const [model, setModel] = useState(defaultAccount);
   const [alert, setAlert] = useState({ message: "", severity: "info" });
-
-  const _ATTRIBUTES = {
-    I: "INDOOR", 
-    G: "GARDENING", 
-    R: "ROOFING", 
-    O: "OFFICE", 
-    P: "PLAZA", 
-    H: "HOUSE", 
-    C: "CONDO",
-  }
 
   //////////////////// For data fetch
   const getAccountData = () => {
 
   }
 
-  /////////////////// For render and events 
+  useEffect(() => {
+    if (match.params.id === 'new') {
+          // setModel({
+          //   ...model
+          // });
+      }else{
+        const accountId = match.params.id;
+        ApiAccountService.getAccount(accountId).then(({data}) => {
+          setModel({
+            ...data.data
+          });
+        });
+      }
+  }, [account]);
 
   const _renderUserInfo = ()=> {
     return <React.Fragment>
@@ -71,7 +74,6 @@ const AccountsForm = ({}) => {
             <MenuItem value={'driver'}>Driver</MenuItem>
             <MenuItem value={'client'}>Client</MenuItem>
             <MenuItem value={'system'}>System</MenuItem>
-            <MenuItem value={'freight'}>Freight</MenuItem>
           </Select>
         </FormControl>
       </GridItem>
@@ -101,7 +103,7 @@ const AccountsForm = ({}) => {
       </GridItem>
       <GridItem xs={12} md={6} lg={6}>
         <TextField id="account-phone" label={`${t("Phone")}`}
-          disabled className="dc-full" value={model.phone}
+          required className="dc-full" value={model.phone}
           onChange={e => { setModel({  ...model, phone: e.target.value }); }}
         />
       </GridItem>
@@ -129,12 +131,13 @@ const AccountsForm = ({}) => {
       <GridItem xs={12} lg={12} >
         <GridContainer>
           {
-            Object.keys(_ATTRIBUTES).map( _key => {
+            model && model.attributes &&
+            Object.keys(AccountAttribute).map( _key => {
               return <GridItem xs={6} lg={6} >
                   <FormControlLabel
                     control={<Checkbox checked={model.attributes.indexOf(_key)>=0}
                       onChange={(e) => _attributeClick(e, _key)} color="primary" />}
-                    label={_ATTRIBUTES[_key]||_key}
+                    label={AccountAttribute[_key]||_key}
                     labelPlacement="end"
                   />
                 </GridItem>
@@ -167,26 +170,46 @@ const AccountsForm = ({}) => {
   // For submit
   const saveModel = () => {
     setProcessing(true);
-    ApiAccountService.createAccount(model).then(
-      ({ data }) => {
-        setProcessing(false);
-        if ( data.code === "success" ) {
-          // success 
-          setAlert({
-            message: "Created success!",
-            severity: "success"
-          });
-        } else {
-          // failure
-          setAlert({
-            message: data.data,
-            severity: "error"
-          });
+    if(model && (!model._id || model._id === 'new')){
+      ApiAccountService.createAccount(model).then(
+        ({ data }) => {
+          setProcessing(false);
+          if ( data.code === "success" ) {
+            // success 
+            setAlert({
+              message: "Created success!",
+              severity: "success"
+            });
+          } else {
+            // failure
+            setAlert({
+              message: data.data,
+              severity: "error"
+            });
+          }
         }
-      }
-    );
+      );
+    }else{
+      ApiAccountService.updateAccount(model._id, model).then(
+        ({ data }) => {
+          setProcessing(false);
+          if ( data.code === "success" ) {
+            // success 
+            setAlert({
+              message: "Update account success!",
+              severity: "success"
+            });
+          } else {
+            // failure
+            setAlert({
+              message: data.data,
+              severity: "error"
+            });
+          }
+        }
+      );
+    }
   }
-
   return (
     <GridContainer>
       <GridItem xs={12} lg={12}>
@@ -196,7 +219,7 @@ const AccountsForm = ({}) => {
             {!loading && (
               <h4>
                 {model._id && model._id !== "new"
-                  ? t("Edit Account") + ": " + model.name
+                  ? t("Edit Account") + ": " + model.username
                   : t("Add Account")}
               </h4>
             )}
@@ -222,9 +245,12 @@ const AccountsForm = ({}) => {
                   <SaveIcon /> {t("Save")}
                 </Button>
                 &nbsp;&nbsp;&nbsp;&nbsp;
-                <Button variant="contained" href="../Merchants">
-                  <FormatListBulletedIcon /> {t("Back")}
-                </Button>
+                <Link to={`/accounts`}>
+                  <Button variant="contained">
+                    <FormatListBulletedIcon /> {t("Back")}
+                  </Button>
+                </Link>
+
               </GridItem>
             </GridContainer>
           </CardFooter>
@@ -234,4 +260,25 @@ const AccountsForm = ({}) => {
   );
 };
 
-export default AccountsForm;
+AccountFormPage.propTypes = {
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.string
+    })
+  }),
+  // history: PropTypes.object
+};
+
+const mapStateToProps = (state) => ({ 
+  // accounts: state.accounts,
+  account: state.account
+});
+// const mapDispatchToProps = (dispatch) => ({
+//   loadAccounts: (payload, searchOption) => {
+//     dispatch(loadAccountsAsync(payload, searchOption));
+//   },
+// });
+export default connect(
+  mapStateToProps, 
+  {setAccount}
+)(AccountFormPage);

@@ -79,5 +79,10 @@ export default {
   },
   createAccount: (accountData = {}) => {
     return ApiService.v2().post("accounts", accountData);
-  }
+  },
+  updateAccount: (id, model) => {
+    const data = {...model};
+    delete data._id;
+    return ApiService.v2().put(`accounts/${id}`, {data});
+  },
 };

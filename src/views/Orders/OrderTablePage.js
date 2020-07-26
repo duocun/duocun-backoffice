@@ -23,21 +23,19 @@ import CardFooter from "components/Card/CardFooter.js";
 
 // import { Button } from "@material-ui/core";
 // import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
-import { getQueryParam } from "helper/index";
-import { Box } from "@material-ui/core";
+// import { getQueryParam } from "helper/index";
+// import { Box } from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
 
 import FlashStorage from "services/FlashStorage";
-import Searchbar from "components/Searchbar/Searchbar";
 import ApiOrderService, {OrderStatus} from "services/api/ApiOrderService";
 import { OrderTable } from './OrderTable';
 
 import * as moment from "moment";
 // import { deliverDate } from "redux/reducers/order";
 import { selectOrder, setDeliverDate } from 'redux/actions/order';
-import {setAccount, setLoggedInAccount} from 'redux/actions/account';
+import {setAccount} from 'redux/actions/account';
 
-import ApiAuthService from 'services/api/ApiAuthService';
 import ProductSearch from "components/ProductSearch/ProductSearch";
 import AccountSearch from "components/AccountSearch/AccountSearch";
 import ApiAccountService from "services/api/ApiAccountService";
@@ -91,12 +89,9 @@ const OrderTablePage = ({ selectOrder, account, deliverDate, setDeliverDate, set
   const [orders, setOrders] = useState([]);
   const [product, setProduct] = useState({_id:'', name:''});
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(
-    getQueryParam(location, "page")
-      ? parseInt(getQueryParam(location, "page"))
-      : 0
-  );
-  const [query, setQuery] = useState(getQueryParam(location, "search") || "");
+  const [page, setPage] = useState(0);
+
+  const [clientKeyword, setClientKeyword] = useState(account? account.username : '');
   // states related to processing
   const [alert, setAlert] = useState(
     FlashStorage.get("ORDER_ALERT") || { message: "", severity: "info" }
@@ -109,10 +104,9 @@ const OrderTablePage = ({ selectOrder, account, deliverDate, setDeliverDate, set
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [processing, setProcessing] = useState(false);
 
-  const updateData = (product) => {
+  const updateData = (product, keyword) => {
     const qProduct = product && product._id ? {'items.productId': product._id} : {};
     const qDeliverDate = deliverDate ? {deliverDate} : {};
-    const keyword = query;
     const qKeyword = keyword ? {
       $or: [
       { clientName: { $regex: keyword }},
@@ -170,13 +164,13 @@ const OrderTablePage = ({ selectOrder, account, deliverDate, setDeliverDate, set
 
   }
 
-  const handleNewOrder = () => {
-    setModel({
-      ...defaultOrder,
-      modifyBy: account ? account._id : '',
-      created: moment.utc().toISOString()
-    });
-  }
+  // const handleNewOrder = () => {
+  //   setModel({
+  //     ...defaultOrder,
+  //     modifyBy: loggedInAccount ? loggedInAccount._id : '',
+  //     created: moment.utc().toISOString()
+  //   });
+  // }
 
   const handleSelectOrder = (data) => {
     setModel(data);
@@ -197,7 +191,7 @@ const OrderTablePage = ({ selectOrder, account, deliverDate, setDeliverDate, set
               message: t("Delete successfully"),
               severity: "success"
             });
-            updateData(product);
+            updateData(product, clientKeyword);
           } else {
             setAlert({
               message: t("Delete failed"),
@@ -218,24 +212,24 @@ const OrderTablePage = ({ selectOrder, account, deliverDate, setDeliverDate, set
     }
   };
 
-  const handleSearch = () => {
-    setLoading(true);
-    if (page === 0) {
-      updateData(product);
-    } else {
-      setPage(0);
-    }
-  }
+  // const handleSearch = () => {
+  //   setLoading(true);
+  //   if (page === 0) {
+  //     updateData(product);
+  //   } else {
+  //     setPage(0);
+  //   }
+  // }
 
   const handleSelectProduct = (product) => {
     setProduct(product);
     setLoading(true);
-    updateData(product);
+    updateData(product, clientKeyword);
   }
   const handleClearProduct = () => {
     setProduct({_id:'', name:''});
     setLoading(true);
-    updateData(null);
+    updateData(null, clientKeyword);
   }
   // const [deliverDate, setDeliverDate] = useState(
   //   moment.utc().toISOString()
@@ -243,13 +237,15 @@ const OrderTablePage = ({ selectOrder, account, deliverDate, setDeliverDate, set
 
   const handleSelectClient = account => {
     const type = account ? account.type : 'client';
-    setAccount({ _id: account ? account._id : '', type });
-    setQuery(account ? account.username : '');
+    const username = account ? account.username : '';
+    setAccount({ _id: account ? account._id : '', username, type });
+    setClientKeyword(username);
     // updateData(product);
   }
 
   const handleClearClient = () => {
-    setQuery("");
+    setAccount({ _id: '', username:'', type:'client' });
+    setClientKeyword("");
   }
 
   const handleSearchClient = (page, rowsPerPage, keyword) => {
@@ -271,6 +267,11 @@ const OrderTablePage = ({ selectOrder, account, deliverDate, setDeliverDate, set
     return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword, ['driver']);
   }
 
+  // useEffect(() => {
+  //   const keyword = account? account.username : '';
+  //   setClientKeyword(keyword);
+  // }, [account]);
+
   useEffect(() => {
     // if(!account){
     //   ApiAuthService.getCurrentAccount().then(({ data }) => {
@@ -278,9 +279,9 @@ const OrderTablePage = ({ selectOrder, account, deliverDate, setDeliverDate, set
     //     updateData(product);
     //   });
     // }else{
-      updateData(product);
+      updateData(product, clientKeyword);
     // }
-  }, [page, rowsPerPage, sort, query, deliverDate]);
+  }, [page, rowsPerPage, sort, clientKeyword, deliverDate]);
 
 
   return (
@@ -292,7 +293,7 @@ const OrderTablePage = ({ selectOrder, account, deliverDate, setDeliverDate, set
                 <AccountSearch
                   label="Client"
                   placeholder="Search name or phone"
-                  val={query}
+                  val={clientKeyword}
                   onSelect={handleSelectClient}
                   onSearch={handleSearchClient}
                   onClear={handleClearClient}
@@ -365,7 +366,7 @@ OrderTablePage.propTypes = {
 
 const mapStateToProps = (state) => ({
   deliverDate: state.deliverDate,
-  account: state.loggedInAccount
+  account: state.account
 });
 // const mapDispatchToProps = (dispatch) => ({
 //   loadAccounts: (payload, searchOption) => {
@@ -375,7 +376,6 @@ const mapStateToProps = (state) => ({
 export default connect(
   mapStateToProps,
   {
-    selectOrder, setDeliverDate, setAccount, 
-    // setLoggedInAccount
+    selectOrder, setDeliverDate, setAccount
   }
 )(OrderTablePage);
