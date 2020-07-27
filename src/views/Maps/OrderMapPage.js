@@ -11,6 +11,7 @@ import GridContainer from "components/Grid/GridContainer.js";
 import { DrawingManager } from "react-google-maps/lib/components/drawing/DrawingManager";
 
 import ApiOrderService, { OrderStatus } from "services/api/ApiOrderService";
+import ApiAssignmentService from "services/api/ApiAssignmentService";
 import useViewportDimensions from "helper/useViewportDimensions";
 
 import gBlack from 'assets/img/maps/g-black.png';
@@ -47,6 +48,9 @@ const useStyles = makeStyles({
     height: "100%"
   } 
 });
+
+export const UNASSIGNED_DRIVER_ID = 'unassigned';
+export const UNASSIGNED_DRIVER_NAME = 'Unassigned';
 
 const N_COLORS = 11;
 const COLOR_MAP = {
@@ -209,6 +213,7 @@ const OrderMap = withScriptjs(
         }
       </GoogleMap>
     ))
+
 );
 
 const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
@@ -223,7 +228,8 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
   const [assignments, setAssignments] = useState([]);
 
   useEffect(() => {
-    ApiOrderService.getAssignments(deliverDate).then(({data}) => {
+    const q = deliverDate ? {deliverDate} : {};
+    ApiAssignmentService.getAssignments(q).then(({data}) => {
       const assignments = data.data;
       ApiAccountService.getAccounts({ type: 'driver', status: 'A' }).then(({ data }) => {
         let i = 0;
@@ -236,45 +242,70 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
           d.url = url;
           i++;
         });
-        const drivers = data.data;
+        const driverMap = getDriverMap(assignments);
+        const drivers = updateDriverDuty(driverMap, data.data);
+
         setAssignments(assignments);
         setDrivers(drivers);
         // setLines(routes);
         if (!deliverDate) {
           const date = moment().format('YYYY-MM-DD');
           setDeliverDate(date);
-          updateMarkers(date, drivers);
+          updateMarkers(date, drivers, assignments);
         } else {
-          updateMarkers(deliverDate, drivers);
+          updateMarkers(deliverDate, drivers, assignments);
         }
       });
     });
   }, []);
 
 
-  const updateMarkers = (deliverDate, drivers) => {
+  const getDriverMap = (assignments) => {
+    const driverMap = {};
+    assignments.forEach(a => {
+      const driverId = a.driverId ? a.driverId.toString() : UNASSIGNED_DRIVER_ID;
+      const driverName = a.driverName ? a.driverName : UNASSIGNED_DRIVER_NAME;
+      driverMap[driverId] = { driverId, driverName };
+    });
+    return driverMap;
+  }
+
+  const getColorMap = (drivers) => {
+    let colorMap = {};
+    drivers.forEach(d => {
+      colorMap[d._id] = d.colorId;
+    });
+    return colorMap;
+  }
+
+  // driverMapFromAssignment
+  const updateDriverDuty = (driverMapFromAssignment, drivers) => {
+    const onDutyDriverIds = Object.keys(driverMapFromAssignment);
+
+    drivers.forEach(d => {
+      const onDuty = onDutyDriverIds.find(id => id === d._id);
+      d.onDuty = onDuty ? true : false;
+    });
+    return drivers;
+  }
+
+
+  const updateMarkers = (deliverDate, drivers, assignments) => {
     // {markers: [{orderId, lat, lng, type, status, icon}], driverMap:{driverId:{driverId, driverName}} }
     ApiOrderService.getAutoRoutes(deliverDate).then(({data}) => {
       const routes = data ? data.data.routes : [];
-      ApiOrderService.getMapMarkers(deliverDate).then(({ data }) => {
-        let colorMap = {};
-        const onDutyDriverIds = Object.keys(data.data.driverMap);
+      const colorMap = getColorMap(drivers);
 
-        drivers.forEach(d => {
-          const onDuty = onDutyDriverIds.find(id => id === d._id);
-          d.onDuty = onDuty ? true : false;
-          colorMap[d._id] = d.colorId;
-        });
-
-        data.data.markers.forEach(marker => {
-          if (marker.driverId === 'unassigned') {
+      if(assignments){
+        assignments.forEach(marker => {
+          if (marker.driverId === UNASSIGNED_DRIVER_ID) {
             marker.icon = 'gRed';
           } else {
             marker.icon = marker.status === OrderStatus.DONE ? 'gGreen' : colorMap[marker.driverId];
           }
         });
 
-        setMarkers(data.data.markers);
+        setMarkers(assignments);
         if(routes && routes.length>0){
           routes.forEach(r => {
             const driverId = r.driverId;
@@ -284,15 +315,22 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
           });
         }
         setLines(routes);
-      });
-      
+
+      }
     });
   }
 
   const handleDateChange = (m) => {
     const date = m.format('YYYY-MM-DD');
     setDeliverDate(date);
-    updateMarkers(date, drivers);
+    ApiAssignmentService.getAssignments({deliverDate: date}).then(({data}) => {
+      const assignments = data.data;
+      setAssignments(assignments);
+      const driverMap = getDriverMap(assignments);
+      const ds = updateDriverDuty(driverMap, drivers);
+      setDrivers(ds);
+      updateMarkers(date, ds, assignments);
+    });
   }
 
 
@@ -339,11 +377,6 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
     // setOverlays([...overlays, overlay]);
   }
 
-
-  const reloadMarkers = () => {
-    updateMarkers(deliverDate, drivers);
-  }
-
   const handleAssign = (driver) => {
     const driverId = driver._id;
     const driverName = driver.username;
@@ -375,9 +408,9 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
         }
       });
       setAssignments(cloned);
-      ApiOrderService.updateAssignments(deliverDate, driverId, driverName, orderIds, orderIdMap, cloned).then(({ data }) => {
-        const r = data.data;
-        reloadMarkers();
+
+      ApiAssignmentService.updateAssignments(deliverDate, cloned).then(({ data }) => {
+        updateMarkers(deliverDate, drivers, cloned);
       });
     }
   }

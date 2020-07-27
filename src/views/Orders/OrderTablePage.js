@@ -39,6 +39,7 @@ import {setAccount} from 'redux/actions/account';
 import ProductSearch from "components/ProductSearch/ProductSearch";
 import AccountSearch from "components/AccountSearch/AccountSearch";
 import ApiAccountService from "services/api/ApiAccountService";
+import { UNASSIGNED_DRIVER_ID } from "views/Maps/OrderMapPage";
 
 const styles = {
   cardTitleWhite: {
@@ -107,11 +108,12 @@ const OrderTablePage = ({ selectOrder, account, deliverDate, setDeliverDate, set
   const updateData = (product, keyword) => {
     const qProduct = product && product._id ? {'items.productId': product._id} : {};
     const qDeliverDate = deliverDate ? {deliverDate} : {};
+    const qDriver = (driver._id && driver._id !== UNASSIGNED_DRIVER_ID) ? {driverId: driver._id} : {};
     const qKeyword = keyword ? {
       $or: [
       { clientName: { $regex: keyword }},
       { clientPhone: { $regex: keyword }},
-      { code: { $regex: keyword }}
+      { code: { $regex: keyword }},
     ]} : {};
 
     const condition = {
@@ -122,6 +124,7 @@ const OrderTablePage = ({ selectOrder, account, deliverDate, setDeliverDate, set
       ...qKeyword,
       ...qDeliverDate,
       ...qProduct,
+      ...qDriver
     };
 
     ApiOrderService.getOrders(page, rowsPerPage, condition, [sort]).then(
@@ -261,6 +264,7 @@ const OrderTablePage = ({ selectOrder, account, deliverDate, setDeliverDate, set
 
   const handleClearDriver = () => {
     setDriverKeyword("");
+    setDriver({_id:'', username:''});
   }
 
   const handleSearchDriver = (page, rowsPerPage, keyword) => {
@@ -281,7 +285,7 @@ const OrderTablePage = ({ selectOrder, account, deliverDate, setDeliverDate, set
     // }else{
       updateData(product, clientKeyword);
     // }
-  }, [page, rowsPerPage, sort, clientKeyword, deliverDate]);
+  }, [page, rowsPerPage, sort, clientKeyword, driverKeyword, deliverDate]);
 
 
   return (

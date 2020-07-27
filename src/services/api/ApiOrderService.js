@@ -81,13 +81,7 @@ export default {
     let query = {delivered};
     return ApiService.v2().get(`orders/duplicates`, query);
   },
-  // return {markers: [{orderId, lat, lng, type, status, icon}], driverMap:{driverId:{driverId, driverName}} }
-  getMapMarkers: (deliverDate) => {
-    let query = {};
-    const conditions = {deliverDate};
-    query.query = buildQuery(conditions);
-    return ApiService.v2().get("orders/map-markers", query);
-  },
+
   splitOrder: (id, items) => {
     return ApiService.v2().put(`orders/splitOrder/${id}`, {items});
   },
