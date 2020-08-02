@@ -11,6 +11,7 @@ import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
 import MenuItem from "@material-ui/core/MenuItem";
 
+
 const useStyles = makeStyles(styles);
 
 const Searchbar = ({
@@ -21,8 +22,9 @@ const Searchbar = ({
   options = [],
   optionTitle = "option",
   getOption,
+  placeholder="Search",
   //if Search is for finance page, since for transaction there is no direct search, actual search is searching the account list
-  ifSearch = true,
+  ifSearch = true
 }) => {
   const classes = useStyles();
   const { t } = useTranslation();
@@ -57,7 +59,7 @@ const Searchbar = ({
           className: classes.margin + " " + classes.search,
         }}
         inputProps={{
-          placeholder: t("Search"),
+          placeholder: t(placeholder),
           inputProps: {
             "aria-label": t("Search"),
           },

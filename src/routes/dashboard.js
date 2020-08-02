@@ -40,7 +40,7 @@ import StaticPage from "views/Pages/Pages.js";
 import SupportPage from 'views/Support/Support.js';
 import DashboardRoute from "views/Dashboard/DashboardRoute.js";
 
-import AccountsPage from "views/Accounts/AccountsPage";
+import AccountsRoute from "views/Accounts/AccountsRoute";
 import MerchantsPage from "views/Merchants/MerchantsPage";
 import WidgetsIcon from "@material-ui/icons/Widgets";
 
@@ -112,7 +112,7 @@ const dashboardRoutes = [
     path: "/accounts",
     name: "Accounts",
     icon: Person,
-    component: AccountsPage,
+    component: AccountsRoute,
     layout: "/"
   },
   {

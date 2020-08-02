@@ -8,7 +8,7 @@ import AuthService from "services/AuthService";
 import Admin from "layouts/Admin.js";
 import Login from "views/Login/Login.js";
 const history = createBrowserHistory({
-  basename: "/admin2" // "/duocun-backoffice"
+  basename: "/" // admin2"/duocun-backoffice"
 });
 const Root = props => {
   const [isAuthorized, setIsAuthorized] = useState(AuthService.isLoggedIn());

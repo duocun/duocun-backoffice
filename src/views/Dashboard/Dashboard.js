@@ -65,7 +65,7 @@ const Dashboard = ({summary, loadStatisticsSummary, history}) => {
       <GridContainer>
         <GridItem xs={12} sm={6} md={3}>
           <Card>
-            <CardHeader color="warning" stats icon onClick={()=>{history.push("/dashboard/products")}}>
+            <CardHeader color="warning" stats icon onClick={()=>{history.push("/dashboard/order-summary")}}>
               <CardIcon color="warning">
                 <Icon>content_copy</Icon>
               </CardIcon>
@@ -116,18 +116,14 @@ const Dashboard = ({summary, loadStatisticsSummary, history}) => {
         <GridItem xs={12} sm={6} md={3}>
           <Card>
           {/* onClick={()=>{history.push("/dashboard/pickup/all")} */}
-            <CardHeader href="/products" color="danger" stats icon >
-              <Link to="/dashboard/pickup/all">
+            <CardHeader color="danger" stats icon >
               <CardIcon color="danger">
                 <Icon>info_outline</Icon>
               </CardIcon>
-              {/* <IconButton aria-label="driverSummary" href="dashboard/pickup">
-                <AccountBoxOutlinedIcon />
-              </IconButton> */}
-
-              <p className={classes.cardCategory}>Products</p>
-              <h3 className={classes.cardTitle}>{summary.nProducts}</h3>
-            </Link>
+              <Link to="/dashboard/pickup/all">
+                <p className={classes.cardCategory}>Products</p>
+                <h3 className={classes.cardTitle}>{summary.nProducts}</h3>
+              </Link>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -143,8 +139,10 @@ const Dashboard = ({summary, loadStatisticsSummary, history}) => {
               <CardIcon color="info">
                 <Accessibility />
               </CardIcon>
-              <p className={classes.cardCategory}>Followers</p>
+              <Link to="/dashboard/salary">
+              <p className={classes.cardCategory}>Salary</p>
               <h3 className={classes.cardTitle}>+245</h3>
+              </Link>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>

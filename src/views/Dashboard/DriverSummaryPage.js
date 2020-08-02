@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import {connect} from "react-redux";
+import { connect } from "react-redux";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 import { useTranslation } from "react-i18next";
@@ -64,69 +64,68 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-
-const DriverSummaryPage = ({match, history, deliverDate, setDeliverDate}) => {
+// deliverDate: redux state
+const DriverSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
   const classes = useStyles();
   const { t } = useTranslation();
   const [driverSummary, setDriverSummary] = useState({});
-  const [drivers, setDriverList] = useState([]);
-  const [driver, setDriver] = useState({_id: '', name: ''});
+  const [options, setDriverList] = useState([]);
+  const [driver, setDriver] = useState({ _id: '', name: '' });
   const [dupClients, setDupClientList] = useState([]);
 
   useEffect(() => {
     const now = moment().toISOString();
     ApiOrderService.getDuplicates(now).then(
-      ({data}) => {
+      ({ data }) => {
         setDupClientList(data);
       });
   }, []);
 
   useEffect(() => {
-    if(!deliverDate){
+    if (!deliverDate) {
       const date = moment().format('YYYY-MM-DD');
       setDeliverDate(date);
       loadData(deliverDate);
-    }else{
+    } else {
       loadData(deliverDate);
     }
   }, []);
 
   const loadData = (deliverDate) => {
-    ApiStatisticsService.saveDriverStatistic(deliverDate).then(({data}) => {
-        const summary = data.data;
-        setDriverSummary(summary);
-        
-        setDriverList(Object.keys(summary).map(driverId => ({
-            _id: driverId, 
-            name: data.data[driverId].driverName}
-          ))
-        );
+    ApiStatisticsService.getDriverStatistic(deliverDate).then(({ data }) => {
+      const summary = data.data;
+      setDriverSummary(summary);
 
-        if(match.params && match.params.id){
-          const driverId = Object.keys(summary).find(id => id === match.params.id); 
-          if(driverId){
-            const defaultDriver = summary[driverId];
-            if(defaultDriver){
-              setDriver({_id: defaultDriver.driverId, name: defaultDriver.driverName});
-            }
-          }else{
-            const defaultDriver = Object.values(summary)[0];
-            if(defaultDriver){
-              setDriver({_id: defaultDriver.driverId, name: defaultDriver.driverName});
-            }
+      setDriverList(Object.keys(summary).map(driverId => ({
+        _id: driverId,
+        name: data.data[driverId].driverName
+      })));
+
+      if (match.params && match.params.id) {
+        const driverId = Object.keys(summary).find(id => id === match.params.id);
+        if (driverId) {
+          const defaultDriver = summary[driverId];
+          if (defaultDriver) {
+            setDriver({ _id: defaultDriver.driverId, name: defaultDriver.driverName });
           }
-        }else{
+        } else {
           const defaultDriver = Object.values(summary)[0];
-          if(defaultDriver){
-            setDriver({_id: defaultDriver.driverId, name: defaultDriver.driverName});
+          if (defaultDriver) {
+            setDriver({ _id: defaultDriver.driverId, name: defaultDriver.driverName });
           }
         }
-      });
+      } else {
+        const defaultDriver = Object.values(summary)[0];
+        if (defaultDriver) {
+          setDriver({ _id: defaultDriver.driverId, name: defaultDriver.driverName });
+        }
+      }
+    });
   }
 
   const handleDriverChange = (driverId) => {
-    const d = drivers.find(d => d._id === driverId);
-    setDriver({_id: driverId, name: d? d._id: ''});
+    const d = options.find(d => d._id === driverId);
+    setDriver({ _id: driverId, name: d ? d._id : '' });
   }
 
   const handleDateChange = (m) => {
@@ -136,133 +135,89 @@ const DriverSummaryPage = ({match, history, deliverDate, setDeliverDate}) => {
   }
 
   return (
-
-      <GridContainer>
-          {/* <Card>
-            <CardHeader color="primary"> */}
-            <GridItem xs={12} sm={6} md={6}>
-            {
-            <FormControl className={classes.formControl}>
-              <InputLabel id="driver-select-label">{t('Driver')}</InputLabel>
-              <Select required labelId="driver-select-label" id="driver-select"
-                value={driver ? driver._id : ''} onChange={e => handleDriverChange(e.target.value)} >
-                {
-                  drivers && drivers.length > 0 &&
-                  drivers.map(d => <MenuItem key={d._id} value={d._id}>{d.name}</MenuItem>)
-                }
-              </Select>
-            </FormControl>
-            }
-            </GridItem>
-            <GridItem xs={12} sm={6} md={6}>
-              <KeyboardDatePicker
-                variant="inline"
-                label={`${t("Deliver Date")}`}
-                format="YYYY-MM-DD"
-                value={moment.utc(deliverDate)}
-                InputLabelProps={{
-                  shrink: deliverDate,
-                }}
-                onChange={handleDateChange}
-              />
-            </GridItem>
-              {/* <div>
-              <List component="nav" aria-label="Device settings">
-                <ListItem
-                    button
-                    onClick={handleClickListItem}
-                 >
-                <ListItemText primary={
-                <div>
-                    <span>请点击此处选择司机</span>
-                    <span><ArrowDropDownIcon/></span>
-                </div>
-                    } />
-         
-                </ListItem>
-                <div>司机：{selectedDriver?selectedDriver.driverName:"N/A"}</div>
-              </List>
-              <Menu
-                id="lock-menu"
-                anchorEl={anchorEl}
-                keepMounted
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-              >
-             {driverSummary.map((v, index) => (
-                <MenuItem
-                  key={v.merchantName}
-                  selected={index === selectedIndex}
-                  onClick={(event) => handleMenuItemClick(event, driver,index)}
-                >
-                 {driver.driverName}
-                </MenuItem>
-            ))}
-            </Menu>
-             </div> */}
-            {/* </CardHeader>
+    <GridContainer>
+      <GridItem xs={12} sm={6} md={6}>
+        {
+          <FormControl className={classes.formControl}>
+            <InputLabel id="driver-select-label">{t('Driver')}</InputLabel>
+            <Select required labelId="driver-select-label" id="driver-select"
+              value={driver ? driver._id : ''} onChange={e => handleDriverChange(e.target.value)} >
+              {
+                options && options.length > 0 &&
+                options.map(d => <MenuItem key={d._id} value={d._id}>{t(d.name)}</MenuItem>)
+              }
+            </Select>
+          </FormControl>
+        }
+      </GridItem>
+      <GridItem xs={12} sm={6} md={6}>
+        <KeyboardDatePicker
+          variant="inline"
+          label={`${t("Deliver Date")}`}
+          format="YYYY-MM-DD"
+          value={moment.utc(deliverDate)}
+          InputLabelProps={{
+            shrink: deliverDate ? true : false,
+          }}
+          onChange={handleDateChange}
+        />
+      </GridItem>
+      {
+        driverSummary && Object.keys(driverSummary).length > 0 && driver && driverSummary[driver._id] &&
+        driverSummary[driver._id].merchants.map(m =>
+          // <GridItem xs={12} sm={12} md={12}>
+          <Card>
+            <CardHeader color="primary">
+              <div key={m.merchantName}>
+                <div>{m.merchantName}</div>
+              </div>
+            </CardHeader>
             <CardBody>
-              <GridContainer> */}
-                {
-                  driverSummary && Object.keys(driverSummary).length > 0 && driver && driverSummary[driver._id] &&
-                  driverSummary[driver._id].merchants.map(m =>
-                    // <GridItem xs={12} sm={12} md={12}>
-                    <Card>
-                    <CardHeader color="primary">
-                        <div key={m.merchantName}>
-                          <div>{m.merchantName}</div>
-                        </div>
-                    </CardHeader>
-                    <CardBody>
-                    <Table >
-                      <TableBody>
-                          {m.items.map((prop, key) => 
-                              <TableRow key={key} >
-                                <TableCell className={classes.itemRow}>
-                                  {prop.productName}
-                                </TableCell>
-                                <TableCell className={classes.itemRow}>
-                                  x{prop.quantity}
-                                </TableCell>
-                                <TableCell className={classes.itemRow}>
-                                  {prop.status==='P' ? '已提' : '未提'}
-                                </TableCell>
-                              </TableRow>
-                          )}
-                        </TableBody>
-                      </Table>
-                      </CardBody>
-                      </Card>
-                    // </GridItem>
-                  )
-                }
-              {/* </GridContainer>
+              <Table >
+                <TableBody>
+                  {m.items.map((prop, key) =>
+                    <TableRow key={key} >
+                      <TableCell className={classes.itemRow}>
+                        {prop.productName}
+                      </TableCell>
+                      <TableCell className={classes.itemRow}>
+                        x{prop.quantity}
+                      </TableCell>
+                      <TableCell className={classes.itemRow}>
+                        {prop.status === 'P' ? '已提' : '未提'}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
             </CardBody>
-          </Card> */}
-
-          {
-            dupClients && dupClients.length > 0 &&
+          </Card>
+          // </GridItem>
+        )
+      }
+      {
+        dupClients && dupClients.length > 0 &&
         <Card>
           <CardHeader color="primary">
             有重复订单的客户
           </CardHeader>
           <Table>
             <TableBody>
-                {dupClients.map((prop) => 
-                    <TableRow key={prop.clientPhone} >
-                      <TableCell>
-                        {prop.clientName}
-                      </TableCell>
-                      <TableCell>
-                        {prop.clientPhone}
-                      </TableCell>
-                    </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </Card>
-          }
-      </GridContainer>
+              {dupClients.map((prop) =>
+                <TableRow key={prop.clientPhone} >
+                  <TableCell>
+                    {prop.clientName}
+                  </TableCell>
+                  <TableCell>
+                    {prop.clientPhone}
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </Card>
+      }
+    </GridContainer>
   );
 }
 

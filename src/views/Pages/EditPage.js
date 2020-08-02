@@ -47,40 +47,40 @@ const defaultModel = {
   keywords: "",
   content: "请输入内容",
   contentEN: "",
-  status: "draft"
+  status: "draft",
 };
 
-const useStyle = makeStyles(theme => {
+const useStyle = makeStyles((theme) => {
   return {
     input: {
-      marginTop: "1rem"
+      marginTop: "1rem",
     },
     textarea: {
-      width: "100%"
+      width: "100%",
     },
     inlineInput: {
       display: "inline-block",
-      marginLeft: "1rem"
+      marginLeft: "1rem",
     },
     subheading: {
       fontWeight: 600,
-      fontSize: "1rem"
+      fontSize: "1rem",
     },
     inlineSubheading: {
       fontWeight: 600,
       fontSize: "1rem",
-      display: "inline-block"
+      display: "inline-block",
     },
     bordered: {
-      border: "1px solid #eeeeee"
+      border: "1px solid #eeeeee",
     },
     w100: {
-      width: "100%"
+      width: "100%",
     },
     modal: {
       display: "flex",
       alignItems: "center",
-      justifyContent: "center"
+      justifyContent: "center",
     },
     paper: {
       backgroundColor: theme.palette.background.paper,
@@ -88,19 +88,19 @@ const useStyle = makeStyles(theme => {
       boxShadow: theme.shadows[5],
       padding: theme.spacing(2, 4, 3),
       maxHeight: "calc(100vh - 72px)",
-      overflowY: "scroll"
+      overflowY: "scroll",
     },
     modalSize: {
       sm: {
-        width: 320
+        width: 320,
       },
       md: {
-        width: 768
+        width: 768,
       },
       lg: {
-        width: 1280
-      }
-    }
+        width: 1280,
+      },
+    },
   };
 });
 
@@ -159,7 +159,7 @@ export default function EditPage({ match, history }) {
   const removeAlert = () => {
     setAlert({
       message: "",
-      severity: "info"
+      severity: "info",
     });
   };
 
@@ -171,15 +171,15 @@ export default function EditPage({ match, history }) {
         } else {
           setAlert({
             message: t("Data not found"),
-            severity: "error"
+            severity: "error",
           });
         }
       })
-      .catch(e => {
+      .catch((e) => {
         console.error(e);
         setAlert({
           message: t("Data not found"),
-          severity: "error"
+          severity: "error",
         });
       })
       .finally(() => {
@@ -195,7 +195,7 @@ export default function EditPage({ match, history }) {
         if (data.code === "success") {
           const newAlert = {
             message: t("Saved successfully"),
-            severity: "success"
+            severity: "success",
           };
           if (model._id === "new") {
             FlashStorage.set("PAGE_ALERT", newAlert);
@@ -208,16 +208,16 @@ export default function EditPage({ match, history }) {
         } else {
           setAlert({
             message: t(data.message || "Save failed"),
-            severity: "error"
+            severity: "error",
           });
         }
         setProcessing(false);
       })
-      .catch(e => {
+      .catch((e) => {
         console.error(e);
         setAlert({
           message: t("Save failed"),
-          severity: "error"
+          severity: "error",
         });
         setProcessing(false);
       });
@@ -277,7 +277,7 @@ export default function EditPage({ match, history }) {
                             <Select
                               id="input-lang"
                               value={lang}
-                              onChange={e => setLang(e.target.value)}
+                              onChange={(e) => setLang(e.target.value)}
                             >
                               <MenuItem value="zh">中文</MenuItem>
                               <MenuItem value="en">English</MenuItem>
@@ -324,7 +324,8 @@ export default function EditPage({ match, history }) {
                           </GridItem>
                           <div
                             style={{
-                              display: lang === "zh" ? "block" : "none"
+                              display: lang === "zh" ? "block" : "none",
+                              width: "100%",
                             }}
                           >
                             <GridItem xs={12}>
@@ -334,16 +335,16 @@ export default function EditPage({ match, history }) {
                                   id="input-title"
                                   formControlProps={{
                                     fullWidth: true,
-                                    required: true
+                                    required: true,
                                   }}
                                   inputProps={{
                                     value: model.title,
-                                    onChange: e => {
+                                    onChange: (e) => {
                                       setModel({
                                         ...model,
-                                        title: e.target.value
+                                        title: e.target.value,
                                       });
-                                    }
+                                    },
                                   }}
                                 />
                               </Box>
@@ -366,7 +367,7 @@ export default function EditPage({ match, history }) {
                                   onChange={(event, editor) => {
                                     setModel({
                                       ...model,
-                                      content: editor.getData()
+                                      content: editor.getData(),
                                     });
                                   }}
                                 />
@@ -376,7 +377,8 @@ export default function EditPage({ match, history }) {
 
                           <div
                             style={{
-                              display: lang === "en" ? "block" : "none"
+                              display: lang === "en" ? "block" : "none",
+                              width: "100%",
                             }}
                           >
                             <GridItem xs={12}>
@@ -385,16 +387,16 @@ export default function EditPage({ match, history }) {
                                   labelText={t("Title (English)")}
                                   id="input-title-en"
                                   formControlProps={{
-                                    fullWidth: true
+                                    fullWidth: true,
                                   }}
                                   inputProps={{
                                     value: model.titleEN,
-                                    onChange: e => {
+                                    onChange: (e) => {
                                       setModel({
                                         ...model,
-                                        titleEN: e.target.value
+                                        titleEN: e.target.value,
                                       });
-                                    }
+                                    },
                                   }}
                                 />
                               </Box>
@@ -414,7 +416,7 @@ export default function EditPage({ match, history }) {
                                   onChange={(event, editor) => {
                                     setModel({
                                       ...model,
-                                      contentEN: editor.getData()
+                                      contentEN: editor.getData(),
                                     });
                                   }}
                                 />
@@ -435,16 +437,16 @@ export default function EditPage({ match, history }) {
                                 id="input-slug"
                                 formControlProps={{
                                   fullWidth: true,
-                                  required: true
+                                  required: true,
                                 }}
                                 inputProps={{
                                   value: model.slug,
-                                  onChange: e => {
+                                  onChange: (e) => {
                                     setModel({
                                       ...model,
-                                      slug: e.target.value
+                                      slug: e.target.value,
                                     });
-                                  }
+                                  },
                                 }}
                               />
                             </Box>
@@ -459,10 +461,10 @@ export default function EditPage({ match, history }) {
                                 className={classes.textarea}
                                 variant="outlined"
                                 value={model.description}
-                                onChange={e => {
+                                onChange={(e) => {
                                   setModel({
                                     ...model,
-                                    description: e.target.value
+                                    description: e.target.value,
                                   });
                                 }}
                               />
@@ -478,10 +480,10 @@ export default function EditPage({ match, history }) {
                                 className={classes.textarea}
                                 variant="outlined"
                                 value={model.keywords}
-                                onChange={e => {
+                                onChange={(e) => {
                                   setModel({
                                     ...model,
-                                    keywords: e.target.value
+                                    keywords: e.target.value,
                                   });
                                 }}
                               />
@@ -497,9 +499,7 @@ export default function EditPage({ match, history }) {
                               <SerpPreview
                                 title={model.title}
                                 metaDescription={model.description}
-                                url={
-                                  "https://duocun.ca/mall/page/" + model.slug
-                                }
+                                url={"https://duocun.ca/page/" + model.slug}
                               />
                             </Box>
                           </GridItem>
@@ -515,10 +515,10 @@ export default function EditPage({ match, history }) {
                                       id="select-status"
                                       labelId="label-select-status"
                                       value={model.status}
-                                      onChange={e => {
+                                      onChange={(e) => {
                                         setModel({
                                           ...model,
-                                          status: e.target.value
+                                          status: e.target.value,
                                         });
                                       }}
                                     >
@@ -582,7 +582,7 @@ export default function EditPage({ match, history }) {
         closeAfterTransition
         BackdropComponent={Backdrop}
         BackdropProps={{
-          timeout: 500
+          timeout: 500,
         }}
       >
         <Fade in={modalOpen}>
@@ -595,7 +595,7 @@ export default function EditPage({ match, history }) {
                     ? model.content
                     : model.contentEN
                     ? model.contentEN
-                    : model.content
+                    : model.content,
               }}
             />
           </div>
@@ -608,8 +608,8 @@ export default function EditPage({ match, history }) {
 EditPage.propTypes = {
   match: PropTypes.shape({
     params: PropTypes.shape({
-      id: PropTypes.string
-    })
+      id: PropTypes.string,
+    }),
   }),
-  history: PropTypes.object
+  history: PropTypes.object,
 };

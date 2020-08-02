@@ -5,7 +5,7 @@ export const accounts = (state = [], action) => {
   return state;
 };
 
-export const account = (state = [], action) => {
+export const account = (state = null, action) => {
   if (action && action.type === "SET_ACCOUNT") {
     return {...action.payload};
   }

@@ -81,23 +81,29 @@ export default {
     let query = {delivered};
     return ApiService.v2().get(`orders/duplicates`, query);
   },
-  // return {markers: [{orderId, lat, lng, type, status, icon}], driverMap:{driverId:{driverId, driverName}} }
-  getMapMarkers: (deliverDate) => {
-    let query = {};
-    const conditions = {deliverDate};
-    query.query = buildQuery(conditions);
-    return ApiService.v2().get("orders/map-markers", query);
-  },
+
   splitOrder: (id, items) => {
     return ApiService.v2().put(`orders/splitOrder/${id}`, {items});
   },
-  assign: (driverId, driverName, orderIds) => {
-    return ApiService.v2().put(`orders/assign`, {driverId, driverName, orderIds});
+  getAssignments: (deliverDate) => {
+    let query = {};
+    const conditions = {deliverDate};
+    query.query = buildQuery(conditions);
+    return ApiService.v2().get(`orders/assignments`, query);
   },
-  getChargeFromOrderItems(
+  updateAssignments: (deliverDate, driverId, driverName, orderIds, orderIdMap, assignments) => {
+    return ApiService.v2().put(`orders/assignments`, {deliverDate, driverId, driverName, orderIds, orderIdMap, assignments});
+  },
+  getAutoRoutes: (deliverDate) => {
+    // let query = {};
+    // const conditions = {deliverDate};
+    // query.query = buildQuery(conditions);
+    return ApiService.v2().get(`orders/routes?deliverDate=${deliverDate}`);
+  },
+  getChargeFromOrderItems: (
     items, // IOrderItem[],
     overRangeCharge = 0
-  ) {
+  ) => {
     let price = 0;
     let cost = 0;
     let tax = 0;

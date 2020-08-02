@@ -2,6 +2,7 @@ import { whiteColor } from "assets/jss/material-dashboard-react.js";
 
 const searchBarStyle = theme => ({
   search: {
+    width: "240px",
     "& > div": {
       marginTop: "0"
     },
@@ -11,7 +12,7 @@ const searchBarStyle = theme => ({
       paddingTop: "1px",
       paddingBottom: "1px",
       padding: "0!important",
-      width: "60%",
+      width: "75%",
       marginTop: "40px",
       "& input": {
         color: whiteColor
@@ -21,14 +22,14 @@ const searchBarStyle = theme => ({
   searchButton: {
     [theme.breakpoints.down("sm")]: {
       top: "-50px !important",
-      marginRight: "22px",
+      marginRight: "12px",
       float: "right"
     }
   },
   searchWrapper: {
     [theme.breakpoints.down("sm")]: {
       width: "-webkit-fill-available",
-      margin: "10px 15px 0"
+      margin: "10px 0px 0"
     },
     display: "inline-block"
   },

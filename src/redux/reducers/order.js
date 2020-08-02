@@ -1,5 +1,14 @@
-export const deliverDate = (state = null, action) => {
+import * as moment from "moment";
+
+export const deliverDate = (state = moment().format('YYYY-MM-DD'), action) => {
   if (action && action.type === "SET_DELIVER_DATE") {
+    return action.payload;
+  }
+  return state;
+};
+
+export const orderDate = (state = moment().format('YYYY-MM-DD'), action) => {
+  if (action && action.type === "SET_ORDER_DATE") {
     return action.payload;
   }
   return state;

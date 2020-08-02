@@ -5,98 +5,58 @@ import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
 import * as moment from 'moment';
 import { KeyboardDatePicker } from "@material-ui/pickers";
-// import TimePicker from "components/TimePicker/TimePicker";
-
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
 import Box from "@material-ui/core/Box";
 
+import TextField from "@material-ui/core/TextField";
+
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-
-// import FormLabel from "@material-ui/core/FormLabel";
 import FormControl from "@material-ui/core/FormControl";
-// import FormGroup from "@material-ui/core/FormGroup";
-// import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Select from "@material-ui/core/Select";
-// import Checkbox from "@material-ui/core/Checkbox";
-
-// import Skeleton from "@material-ui/lab/Skeleton";
 import Alert from "@material-ui/lab/Alert";
 import CustomInput from "components/CustomInput/CustomInput";
-// import TextField from "@material-ui/core/TextField";
-import InputLabel from "@material-ui/core/InputLabel";
-import MenuItem from "@material-ui/core/MenuItem";
+
 import Button from "@material-ui/core/Button";
-// import IconButton from "@material-ui/core/IconButton";
 
 import FormatListBulletedIcon from "@material-ui/icons/FormatListBulleted";
 import SaveIcon from "@material-ui/icons/Save";
-// import EditIcon from "@material-ui/icons/Edit";
-// import DeleteIcon from "@material-ui/icons/Delete";
-// import CancelIcon from "@material-ui/icons/Cancel";
-
 import FlashStorage from "services/FlashStorage";
+
+import {DropdownSelect} from "components/DropdownSelect/DropdownSelect";
 
 import AuthService from "services/AuthService";
 import ApiAuthService from 'services/api/ApiAuthService';
 import ApiAccountService from 'services/api/ApiAccountService';
 import ApiTransactionService from 'services/api/ApiTransactionService';
 
-import AccountSearch from "./AccountSearch";
-// import moment from 'moment-timezone/moment-timezone';
+import AccountSearch from "components/AccountSearch/AccountSearch.js";
 
 
-const useStyles = makeStyles(() => ({
-  textarea: {
-    width: "100%"
-  },
-  select: {
-    width: "100%",
-    marginTop: 27
-  },
-  heading: {
-    marginBottom: "0.5rem",
-    size: "1.5rem",
-    fontWeight: 600
-  },
-  table: {
-    minWidth: 750
-  },
-  editingCell: {
-    padding: "0 5px"
-  },
+const useStyles = makeStyles({
   formControl: {
-    display: "block"
+    width: "100%",
+    display: "block",
+    marginTop: "27px"
   },
-  formControlLabel: {
-    marginTop: "1rem",
-    marginBottom: "1rem",
-    fontWeight: 600
-  },
-  formGroup: {
-    border: "1px solid #eee",
-    borderRadius: 5,
-    padding: 5
-  }
-}));
+});
 
 const defaultActions = [
-  { code: 'ACTC', text: 'Add Credit to Client' },
-  { code: 'PS', text: 'Pay Salary' },
-  { code: 'PDCH', text: 'Pay Driver Cash' },
-  { code: 'T', text: 'Transfer' },
-  { code: 'RC', text: 'Refund to Client' },
-  { code: 'PMCH', text: 'Pay Merchant Cash' },
-  { code: 'PMC', text: 'Pay Merchant from Bank' },
-  { code: 'POR', text: 'Pay Office Rent' },
-  { code: 'D', text: 'Discount' },
-  { code: 'S', text: 'Supplies' },
-  { code: 'BM', text: 'Buy Material'},
-  { code: 'BE', text: 'Buy Equipment'},
-  { code: 'BA', text: 'Buy Advertisement'},
-  { code: 'OFD', text: 'Order From Duocun'}
+  { key: 'ACTC', text: 'Add Credit to Client' },
+  { key: 'PS', text: 'Pay Salary' },
+  { key: 'PDCH', text: 'Pay Driver Cash' },
+  { key: 'T', text: 'Transfer' },
+  { key: 'RC', text: 'Refund to Client' },
+  { key: 'PMCH', text: 'Pay Merchant Cash' },
+  { key: 'PMC', text: 'Pay Merchant from Bank' },
+  { key: 'POR', text: 'Pay Office Rent' },
+  { key: 'D', text: 'Discount' },
+  { key: 'S', text: 'Supplies' },
+  { key: 'BM', text: 'Buy Material' },
+  { key: 'BE', text: 'Buy Equipment' },
+  { key: 'BA', text: 'Buy Advertisement' },
+  { key: 'OFD', text: 'Order From Duocun' }
 ];
 
 export const TransactionForm = ({ account, transaction, items, onAfterUpdate }) => {
@@ -109,14 +69,15 @@ export const TransactionForm = ({ account, transaction, items, onAfterUpdate }) 
   // }
   const { t } = useTranslation();
   const classes = useStyles();
-  const [drivers, setDrivers] = useState([{_id:'', username:''}]);
   const [actions, setActions] = useState(defaultActions);
   const [modifyByAccount, setModifyByAccount] = useState({ _id: '', username: '' });
-  const [accounts, setAccounts] = useState([]);
   const [model, setModel] = useState(transaction);
+
   const [fromQuery, setFromQuery] = useState("");
   const [toQuery, setToQuery] = useState("");
   const [clientQuery, setClientQuery] = useState("");
+  const [staffQuery, setStaffQuery] = useState("");
+
 
   const [processing, setProcessing] = useState(false);
   const removeAlert = () => {
@@ -141,27 +102,57 @@ export const TransactionForm = ({ account, transaction, items, onAfterUpdate }) 
     }
   }
 
-  const handleFromAccountChange = (fromAccount) => {
+  const handleSelectFromAccount = (fromAccount) => {
     setFromQuery(fromAccount ? fromAccount.username : '');
     setModel({ ...model, fromId: fromAccount._id, fromName: fromAccount.username });
   }
 
-  const handleToAccountChange = (toAccount) => {
+  const handleClearFromAccount = () => {
+    setFromQuery("");
+  }
+
+  const handleSearchFromAccount = (page, rowsPerPage, keyword) => {
+    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword);
+  }
+  const handleSelectToAccount = (toAccount) => {
     setToQuery(toAccount ? toAccount.username : '');
     setModel({ ...model, toId: toAccount._id, toName: toAccount.username });
   }
 
-  const handleClientChange = (client) => {
+  const handleClearToAccount = () => {
+    setToQuery("");
+  }
+
+  const handleSearchToAccount = (page, rowsPerPage, keyword) => {
+    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword);
+  }
+
+  const handleSelectClient = (client) => {
     setClientQuery(client ? client.username : '');
     setModel({ ...model, clientId: client._id, clientName: client.username });
   }
 
-  const handleStaffChange = (staffId) => {
-    const staff = drivers.find(a => a._id === staffId);
-    const staffName = staff ? staff.username : ''
-    setModel({ ...model, staffId, staffName, note: `Pay salary to ${staffName}` });
+  const handleClearClient = () => {
+    setClientQuery("");
   }
 
+  const handleSearchClient = (page, rowsPerPage, keyword) => {
+    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword);
+  }
+
+  const handleSearchStaff = (page, rowsPerPage, keyword) => {
+    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword, ['driver']);
+  }
+
+  const handleSelectStaff = (account) => {
+    const staffName = account ? account.username : '';
+    setStaffQuery(account ? account.username : '');
+    setModel({ ...model, staffId: account._id, staffName, note: `Pay salary to ${staffName}` });
+  }
+
+  const handleClearStaff = () => {
+    setStaffQuery("");
+  }
 
   const handleCreate = () => {
     if (model.fromId && model.toId) {
@@ -260,54 +251,45 @@ export const TransactionForm = ({ account, transaction, items, onAfterUpdate }) 
     ApiAuthService.getCurrentUser(token).then(({ data }) => {
       const account = { ...data.data };
 
-      if(transaction && transaction.fromId && transaction.toId){
+      if (transaction && transaction.fromId && transaction.toId) {
         let ids = [transaction.fromId, transaction.toId];
-        if(transaction.actionCode === 'PS'){
+        if (transaction.actionCode === 'PS') {
           ids = [transaction.fromId, transaction.toId, transaction.staffId];
         }
-        if(transaction.actionCode === 'RC'){
+        if (transaction.actionCode === 'RC') {
           ids = [transaction.fromId, transaction.toId, transaction.clientId];
         }
-        ApiAccountService.getAccounts({_id:{$in: ids}}).then(({data}) => {
+        ApiAccountService.getAccounts({ _id: { $in: ids } }).then(({ data }) => {
           const fromAccount = data.data.find(d => d._id === transaction.fromId);
           const toAccount = data.data.find(d => d._id === transaction.toId);
-          let staff;
           let client;
-          if(transaction.actionCode === 'PS'){
+          if (transaction.actionCode === 'PS') {
             // staff = data.data.find(d => d._id === transaction.staffId);
-            // setFromQuery(staff.username);
+            setStaffQuery(transaction.staffName);
           }
-          if(transaction.actionCode === 'RC'){
+          if (transaction.actionCode === 'RC') {
             client = data.data.find(d => d._id === transaction.clientId);
-            if(client){
+            if (client) {
               setClientQuery(client.username);
             }
           }
-          ApiAccountService.getAccountList(null, null, { type: { $in: ['driver'] } }).then(({ data }) => {
-            setDrivers(data.data);
-            setModifyByAccount(account);
-            if (transaction) {
-              if(fromAccount){
-                setFromQuery(fromAccount.username);
-              }
-              if(toAccount){
-                setToQuery(toAccount.username);
-              }
-              setModel({ ...transaction, modifyBy: modifyByAccount._id });
-            }
-          });
-        });
-      }else{
-        ApiAccountService.getAccountList(null, null, { type: { $in: ['driver'] } }).then(({ data }) => {
-          setDrivers(data.data);
           setModifyByAccount(account);
-          if (transaction && transaction.fromId && transaction.toId) {
+          if (transaction) {
+            if (fromAccount) {
+              setFromQuery(fromAccount.username);
+            }
+            if (toAccount) {
+              setToQuery(toAccount.username);
+            }
             setModel({ ...transaction, modifyBy: modifyByAccount._id });
           }
         });
+      } else {
+        setModifyByAccount(account);
+        if (transaction && transaction.fromId && transaction.toId) {
+          setModel({ ...transaction, modifyBy: modifyByAccount._id });
+        }
       }
-
-
     });
   }, [transaction]);
 
@@ -331,82 +313,78 @@ export const TransactionForm = ({ account, transaction, items, onAfterUpdate }) 
                   </Alert>
                 </GridItem>
               )}
-              <GridItem xs={12} md={6} lg={6}>
-                <Box pb={2}>
+
+              <GridItem xs={12} md={4} lg={4}>
+                <FormControl className={classes.formControl}>
                   <AccountSearch
                     label="From Account"
-                    placeholder="Name or phone"
+                    placeholder="Search name or phone"
                     val={fromQuery}
-                    id={model.fromId}
-                    handleSelectAccount={handleFromAccountChange}
+                    onSelect={handleSelectFromAccount}
+                    onSearch={handleSearchFromAccount}
+                    onClear={handleClearFromAccount}
                   />
-                </Box>
+                </FormControl>
               </GridItem>
 
-              <GridItem xs={12} md={6} lg={6}>
-                <Box pb={2}>
+              <GridItem xs={12} md={4} lg={4}>
+                <FormControl className={classes.formControl}>
                   <AccountSearch
                     label="To Account"
-                    placeholder="Name or phone"
+                    placeholder="Search name or phone"
                     val={toQuery}
-                    id={model.toId}
-                    handleSelectAccount={handleToAccountChange}
+                    onSelect={handleSelectToAccount}
+                    onSearch={handleSearchToAccount}
+                    onClear={handleClearToAccount}
                   />
-                </Box>
+                </FormControl>
               </GridItem>
 
               {
                 model.actionCode === 'RC' &&
-                <GridItem xs={12} md={6} lg={6}>
-                  <Box pb={2}>
+                <GridItem xs={12} md={4} lg={4}>
+                  <FormControl className={classes.formControl}>
                     <AccountSearch
                       label="Client"
-                      placeholder="Name or phone"
+                      placeholder="Search name or phone"
                       val={clientQuery}
                       id={model.clientId}
-                      handleSelectAccount={handleClientChange}
+                      onSelect={handleSelectClient}
+                      onSearch={handleSearchClient}
+                      onClear={handleClearClient}
                     />
-                  </Box>
+                  </FormControl>
                 </GridItem>
               }
 
-              <GridItem xs={12} md={6} lg={6}>
-                <Box pb={2}>
-                  <FormControl className={classes.select}>
-                    <InputLabel id="action-label">Action</InputLabel>
-                    <Select required
-                      labelId="action-select-label"
-                      id="action-select"
-                      value={model.actionCode}
-                      onChange={e => handleActionChange(e.target.value)}
-                    >
-                      {
-                        actions.map(action => <MenuItem key={action.code} value={action.code}>{action.text}</MenuItem>)
-                      }
-                    </Select>
-                  </FormControl>
-                </Box>
-              </GridItem>
-
               {
                 model.actionCode === 'PS' &&
-                <GridItem xs={12} md={6}lg={6}>
-                  <Box pb={2}>
-                    <FormControl className={classes.select}>
-                      <InputLabel id="staff-select-label">Pay Salary To</InputLabel>
-                      <Select required
-                        labelId="staff-select-label"
-                        id="staff-select"
-                        value={model.staffId}
-                        onChange={e => handleStaffChange(e.target.value)}
-                      >
-                        {
-                          drivers && drivers.length > 0 &&
-                          drivers.map(d => <MenuItem key={d._id} value={d._id}>{d.username}</MenuItem>)
-                        }
-                      </Select>
+                <GridItem xs={12} md={4} lg={4}>
+                  <FormControl className={classes.formControl}>
+                    <AccountSearch
+                      label="Pay Salary To"
+                      placeholder="Search name or phone"
+                      val={staffQuery}
+                      id={model.staffId}
+                      onSelect={handleSelectStaff}
+                      onSearch={handleSearchStaff}
+                      onClear={handleClearStaff}
+                    />
+                  </FormControl>
+                </GridItem>
+              }
+
+              {
+                actions && actions.length > 0 && model &&
+                <GridItem xs={12} md={4} lg={4}>
+                  <FormControl className={classes.formControl} >
+                    <DropdownSelect id="action-select"
+                      label={t("Action")}
+                      value={model.actionCode}
+                      options={actions}
+                      onChange={handleActionChange}
+                    />
                     </FormControl>
-                  </Box>
                 </GridItem>
               }
 
@@ -419,26 +397,21 @@ export const TransactionForm = ({ account, transaction, items, onAfterUpdate }) 
                 </GridItem>
               }
 
-              <GridItem xs={12} lg={6}>
-                <Box pb={2}>
-                  <CustomInput
-                    labelText={t("Amount")}
-                    id="amount"
-                    formControlProps={{
-                      fullWidth: true
-                    }}
-                    inputProps={{
-                      value: model.amount,
-                      onChange: e => {
-                        setModel({ ...model, amount: e.target.value });
-                      }
-                    }}
-                    InputLabelProps={{ shrink: model.amount !== null ? true : false }}
-                  />
-                </Box>
-              </GridItem>
+              {
+                model && model.amount!==undefined &&
+                <GridItem xs={12} md={4} lg={4}>
+                  <FormControl className={classes.formControl}>
+                    <TextField id="transaction-amount"
+                      label={t("Amount")}
+                      value={model.amount}
+                      InputLabelProps={{ shrink: true }}
+                      onChange={e => { setModel({ ...model, amount: e.target.value }); }}
+                    />
+                  </FormControl>
+                </GridItem>
+              }
 
-              <GridItem xs={12} md={12} lg={12}>
+              <GridItem xs={12} md={9} lg={9}>
                 <Box pb={2}>
                   <CustomInput
                     labelText={t("Note")}
@@ -452,10 +425,13 @@ export const TransactionForm = ({ account, transaction, items, onAfterUpdate }) 
                         setModel({ ...model, note: e.target.value });
                       }
                     }}
+                    labelProps={{ shrink: model.note !== null ? true : false }}
                   />
+
                 </Box>
+
               </GridItem>
-              <GridItem xs={12} md={6} lg={6}>
+              <GridItem xs={12} md={4} lg={4}>
                 <KeyboardDatePicker
                   variant="inline"
                   label={t("Created Date")}
@@ -465,6 +441,7 @@ export const TransactionForm = ({ account, transaction, items, onAfterUpdate }) 
                   onChange={(m) => setModel({ ...model, created: m.toISOString() })}
                 />
               </GridItem>
+
               <GridItem xs={12} container direction="row-reverse">
                 <Box mt={2} mr={2}>
                   <Link to={`../transactions`}>
