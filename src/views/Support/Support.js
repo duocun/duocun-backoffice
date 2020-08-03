@@ -245,7 +245,7 @@ export default function SupportPage() {
     if(startTime){
       return timeAgo.format(startTime);
     }else{
-      return t("Undefined");
+      return t("");
     }
   }
 

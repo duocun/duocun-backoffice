@@ -113,11 +113,11 @@
     "Error: slug is duplicated": "Error：slug重复",
     "Do you really want to remove this image?": "您真的要删除该图像吗？",
     "Product Image": "产品图片",
-    "Search Code or Phone number": "查送货单号或电话号码"
+    "Search Code or Phone number": "查送货单号或电话号码",
     "Support": "客服",
     "Send": "发送",
     "Undefined": "Undefined",
     "User": "用户",
-    "Image Arrived": "Image Arrived",
-    "Please select customer": "Please select customer"
+    "Image Arrived": "图片",
+    "Please select customer": "请选择用户"
 }
