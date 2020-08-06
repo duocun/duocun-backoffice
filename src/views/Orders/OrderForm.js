@@ -39,10 +39,10 @@ import FormatListBulletedIcon from "@material-ui/icons/FormatListBulleted";
 import SaveIcon from "@material-ui/icons/Save";
 import HistoryIcon from '@material-ui/icons/History';
 
-
-
 import FlashStorage from "services/FlashStorage";
 
+
+import AccountSearch from "components/AccountSearch/AccountSearch";
 import AddressSearch from "components/AddressSearch/AddressSearch";
 import OrderItemEditor from "views/Orders/OrderItemEditor";
 
@@ -58,9 +58,11 @@ const useStyles = makeStyles(theme => ({
 
 }));
 
-
-// const OrderForm = ({ account, order, data, update, toTransactionHistory }) => {
-const OrderForm = ({ mode, account, data, onAfterUpdate, history }) => {
+/**
+ * props: data, onAfterUpdate
+ * 
+ */
+const OrderForm = ({ data, onAfterUpdate, history }) => {
   // const { register, handleSubmit, watch, errors } = useForm();
   // moment.tz.add("America/Toronto|EST EDT EWT EPT|50 40 40 40|01010101010101010101010101010101010101010101012301010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010|-25TR0 1in0 11Wu 1nzu 1fD0 WJ0 1wr0 Nb0 1Ap0 On0 1zd0 On0 1wp0 TX0 1tB0 TX0 1tB0 TX0 1tB0 WL0 1qN0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 WL0 1qN0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 WL0 1qN0 4kM0 8x40 iv0 1o10 11z0 1nX0 11z0 1o10 11z0 1o10 1qL0 11D0 1nX0 11B0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 11z0 1o10 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0|65e5");
 
@@ -79,9 +81,9 @@ const OrderForm = ({ mode, account, data, onAfterUpdate, history }) => {
   const [merchants, setMerchants] = useState([]);
   const [model, setModel] = useState(data);
   const [itemMap, setItemMap] = useState({});
-
+  const [drivers, setDriverList] = useState([]);
   const [productMap, setCheckMap] = useState({});
-
+  const [driverKeyword, setDriverKeyword] = useState("");
   const [processing, setProcessing] = useState(false);
   const removeAlert = () => {
     setAlert({
@@ -98,29 +100,34 @@ const OrderForm = ({ mode, account, data, onAfterUpdate, history }) => {
     ApiMerchantService.getMerchants({type: 'G', status:'A'}).then(({data}) => {
       setMerchants(data.data);
     });
-  }, [])
+  }, []);
+
 
   useEffect(() => {
-    // set products for remove products function
-    if(data){
-      if (data.items && data.items.length > 0) {
-        const checkMap = {};
-        data.items.forEach(it => {
-          checkMap[it.productId] = { ...it, status: false };
-        });
-        setCheckMap(checkMap);
-      }
+    ApiAccountService.getAccounts({ type: 'driver', status: 'A' }).then((d) => {
+      const staffs = d.data.data;
+      setDriverList(staffs);
+      // set products for remove products function
+      if(data){
+        if (data.items && data.items.length > 0) {
+          const checkMap = {};
+          data.items.forEach(it => {
+            checkMap[it.productId] = { ...it, status: false };
+          });
+          setCheckMap(checkMap);
+        }
 
-      // set model for save function
-      if (data.actionCode === 'PS') {
-        setModel({
-          ...data,
-          modifyBy: modifyByAccount._id
-        });
-      } else {
-        setModel({ ...data, modifyBy: modifyByAccount._id });
+        // set model for save function
+        if (data.actionCode === 'PS') {
+          setModel({
+            ...data,
+            modifyBy: modifyByAccount._id
+          });
+        } else {
+          setModel({ ...data, modifyBy: modifyByAccount._id });
+        }
       }
-    }
+    });
   }, [data]);
 
   useEffect(() => {
@@ -158,7 +165,7 @@ const OrderForm = ({ mode, account, data, onAfterUpdate, history }) => {
               return;
             } else {
               setAlert(newAlert);
-              onAfterUpdate(account._id);
+              onAfterUpdate();
             }
           } else {
             setAlert({
@@ -180,7 +187,7 @@ const OrderForm = ({ mode, account, data, onAfterUpdate, history }) => {
   };
 
   const handleUpdate = () => {
-    if (model._id && modifyByAccount._id) {
+    if (model._id !== 'new' && model._id !== 'clone' && modifyByAccount._id) {
       removeAlert();
       setProcessing(true);
       setModel({ ...model, modifyBy: modifyByAccount._id })
@@ -290,8 +297,36 @@ const OrderForm = ({ mode, account, data, onAfterUpdate, history }) => {
     setModel({ ...model, items: [item] });
   }
 
+  const handleDriverChange = (e) => {
+    const driverId = e.target.value;
+    const driver = drivers.find(d => d._id === driverId);
+    setModel({
+      ...model,
+      driverId: e.target.value,
+      driverName: driver ? driver.username: ''
+    });
+  }
+
+  const handleSelectDriver = account => {
+    // const type = account ? account.type : 'driver';
+    setDriverKeyword(account ? account.username : '');
+    setModel({
+      ...model,
+      driverId: account._id,
+      driverName: account ? account.username: ''
+    });
+  }
+
+  const handleClearDriver = () => {
+    setDriverKeyword("");
+  }
+
+  const handleSearchDriver = (page, rowsPerPage, keyword) => {
+    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword, ['driver']);
+  }
+
   const getTitle = () => {
-    if (mode === 'new' || mode === 'clone') {
+    if (model._id === 'new' || model._id === 'clone') {
       return 'New Order';
     } else {
       return 'Edit Order';
@@ -319,7 +354,7 @@ const OrderForm = ({ mode, account, data, onAfterUpdate, history }) => {
                 </GridItem>
               )}
               {
-                !(mode === 'new' || mode === 'clone') &&
+                !(model._id === 'new' || model._id === 'clone') &&
                 <GridItem xs={12} lg={12}>
                   <Box pb={2}>
                     <TextField id="order-code"
@@ -369,7 +404,7 @@ const OrderForm = ({ mode, account, data, onAfterUpdate, history }) => {
               </GridItem>
 
               {
-                (mode === "new" || mode === "clone") &&
+                (model._id === "new" || model._id === "clone") &&
                 <GridItem xs={12} lg={6}>
                   <Box pb={2}>
                     <FormControl className={classes.select}>
@@ -404,7 +439,7 @@ const OrderForm = ({ mode, account, data, onAfterUpdate, history }) => {
               }
 
               {
-                (mode === "new" || mode === "clone") &&
+                (model._id === "new" || model._id === "clone") &&
                 <GridItem xs={12} lg={12}>
                   <Box pb={2}>
                     <OrderItemEditor merchantId={model.merchantId} onUpdateItemMap={handleUpdateItemMap} />
@@ -413,7 +448,7 @@ const OrderForm = ({ mode, account, data, onAfterUpdate, history }) => {
               }
 
               {
-                !(mode === 'new' || mode === 'clone') &&
+                !(model._id === 'new' || model._id === 'clone') &&
                 <GridItem xs={12} lg={12}>
                   <Box pb={2}>
                     {
@@ -454,16 +489,48 @@ const OrderForm = ({ mode, account, data, onAfterUpdate, history }) => {
               </GridItem>
 
               <GridItem xs={12} lg={6}>
-                <Box pb={2}>
-                  <TextField id="order-driver"
+                {/* <Box pb={5}> */}
+                  {/* <TextField id="order-driver"
                     label={`${t("Driver")}`}
                     value={model.driverName}
                     InputLabelProps={{ shrink: model.driverId ? true : false }}
                     InputProps={{
                       readOnly: true,
                     }}
-                  />
-                </Box>
+                  /> */}
+              <GridItem xs={12} sm={12} lg={3}>
+                <AccountSearch
+                  label="Driver"
+                  placeholder="Search name or phone"
+                  val={driverKeyword}
+                  onSelect={handleSelectDriver}
+                  onSearch={handleSearchDriver}
+                  onClear={handleClearDriver}
+                />
+              </GridItem>
+                  {
+                    
+                    // model.driverId &&
+                  // <FormControl className={classes.select}>
+                  //     <InputLabel id="driver-label">{t("Driver")}</InputLabel>
+                  //     <Select id="driver"
+                  //       labelId="driver-label"
+                  //       value={model.driverId}
+                  //       onChange={handleDriverChange}>
+                  //         <MenuItem key="unassigned" value="unassigned">
+                  //             {t("Unassigned")}
+                  //         </MenuItem>
+                  //       {
+                  //         drivers.map(driver => 
+                  //           <MenuItem key={driver._id} value={driver._id}>
+                  //             {driver.username}
+                  //           </MenuItem>
+                  //         )
+                  //       }
+                  //     </Select>n
+                  //   </FormControl>
+                    }
+                {/* </Box> */}
               </GridItem>
               <GridItem xs={12} lg={6}>
                 <Box pb={2}>
@@ -500,7 +567,7 @@ const OrderForm = ({ mode, account, data, onAfterUpdate, history }) => {
                   value={moment.utc(model.delivered)}
                   onChange={(m) => handleDeliverDateChange(m)}
                   InputLabelProps={{
-                    shrink: model.delivered,
+                    shrink: model.delivered ? true : false,
                   }}
                 />
               </GridItem>

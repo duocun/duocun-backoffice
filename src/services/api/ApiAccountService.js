@@ -2,14 +2,14 @@ import ApiService from "services/api/ApiService";
 import { buildQuery, buildPaginationQuery } from "helper/index";
 
 export default {
-  getAccountList: (page, pageSize, {username, type}, sort = []) => {
+  getAccountList: (page, pageSize, { username, type }, sort = []) => {
     let query = {};
     let conditions = {};
     if (username) {
-      conditions.username = {  $regex: username };
+      conditions.username = { $regex: username };
     }
     if (type) {
-      conditions.type = type; 
+      conditions.type = type;
     }
     query.query = buildPaginationQuery(page, pageSize, conditions, [], sort);
     return ApiService.v2().get("accounts", query);
@@ -23,17 +23,19 @@ export default {
     return ApiService.v2().get("accounts/" + accountId);
   },
 
-  getAccountByKeyword: (page, pageSize, keyword = "", sort = []) => {
+  getAccountByKeyword: (page, pageSize, keyword = "", accountTypes=[], sort = []) => {
     let query = {};
+    const type =  accountTypes && accountTypes.length > 0 ? {type: {$in: accountTypes}} : {};
     const condition = {
+      ...type,
       $or: [
         {
-          username: { $regex: keyword }
+          username: { $regex: keyword },
         },
         {
-          phone: { $regex: keyword }
-        }
-      ]
+          phone: { $regex: keyword },
+        },
+      ],
     };
     query.keyword = query.query = buildPaginationQuery(
       page,
@@ -75,7 +77,7 @@ export default {
     );
     return ApiService.v2().get("accounts", query);
   },
-  createAccount: (accountData = {}) => {
-    return ApiService.v2().post("accounts", accountData);
-  }
+  saveAccount: (model) => {
+    return ApiService.v2().post(`accounts/${model._id}`, { data: model });
+  },
 };

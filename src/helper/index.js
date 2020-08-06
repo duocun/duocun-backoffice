@@ -182,9 +182,8 @@ export const countProductFromDate = (
 };
 
 export const getPictureUrl = src => {
-  const [fname, ext] = src.split('.');
-  return `${MEDIA_PATH}/${fname}_960.${ext}`;
-  // return process.env.REACT_APP_MEIDA_URL + `/${src}`;
+  // const [fname, ext] = src.split('.');
+  return `${MEDIA_PATH}/${src}`;
 };
 
 //dateString parser
@@ -198,19 +197,20 @@ export const toDateString = (s = null) => {
     : "";
 };
 
-//debounce not really good
+export const arrayToggleElem = (arr, elem) => {
+  const elemIndex = arr.indexOf(elem);
+  if (elemIndex === -1) {
+    arr.push(elem);
+  } else {
+    arr.splice(elemIndex, 1);
+	}
+	return arr;
+};
 
-// export function debounce(func, args, wait, immediate = false) {
-// 	var timeout;
-// 	return function() {
-// 		var context = this;
-// 		var later = function() {
-//       timeout = null;
-// 			if (!immediate) func.call(context, args);
-// 		};
-// 		var callNow = immediate && !timeout;
-// 		clearTimeout(timeout);
-// 		timeout = setTimeout(later, wait);
-// 		if (callNow) func.call(context, args);
-// 	};
-// };
+export const enumLikeObj = (obj) => {
+  const enumObj = {...obj };
+  for (const key in enumObj) {
+    enumObj[enumObj[key]] = key;
+  };
+  return enumObj;
+};

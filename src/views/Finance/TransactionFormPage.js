@@ -3,39 +3,9 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
-// import * as moment from 'moment';
-// import { KeyboardDatePicker } from "@material-ui/pickers";
-// import TimePicker from "components/TimePicker/TimePicker";
 
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
-// import Box from "@material-ui/core/Box";
-
-// import Card from "components/Card/Card.js";
-// import CardHeader from "components/Card/CardHeader.js";
-// import CardBody from "components/Card/CardBody.js";
-
-// // import FormLabel from "@material-ui/core/FormLabel";
-// import FormControl from "@material-ui/core/FormControl";
-// // import FormGroup from "@material-ui/core/FormGroup";
-// // import FormControlLabel from "@material-ui/core/FormControlLabel";
-// import Select from "@material-ui/core/Select";
-// // import Checkbox from "@material-ui/core/Checkbox";
-
-// // import Skeleton from "@material-ui/lab/Skeleton";
-// import Alert from "@material-ui/lab/Alert";
-// import CustomInput from "components/CustomInput/CustomInput";
-// // import TextField from "@material-ui/core/TextField";
-// import InputLabel from "@material-ui/core/InputLabel";
-// import MenuItem from "@material-ui/core/MenuItem";
-// import Button from "@material-ui/core/Button";
-// import IconButton from "@material-ui/core/IconButton";
-
-// import FormatListBulletedIcon from "@material-ui/icons/FormatListBulleted";
-// import SaveIcon from "@material-ui/icons/Save";
-// import EditIcon from "@material-ui/icons/Edit";
-// import DeleteIcon from "@material-ui/icons/Delete";
-// import CancelIcon from "@material-ui/icons/Cancel";
 
 import FlashStorage from "services/FlashStorage";
 
@@ -44,44 +14,14 @@ import ApiAuthService from 'services/api/ApiAuthService';
 import ApiAccountService from 'services/api/ApiAccountService';
 import ApiTransactionService from 'services/api/ApiTransactionService';
 
-// import moment from 'moment-timezone/moment-timezone';
+import { defaultTransaction } from "views/Finance/FinanceModel";
 import { TransactionForm } from "./TransactionForm";
 
 import { selectTransaction } from 'redux/actions/transaction';
 import { setAccount } from 'redux/actions/account';
 
 const useStyles = makeStyles(() => ({
-  textarea: {
-    width: "100%"
-  },
-  select: {
-    width: "100%",
-    marginTop: 27
-  },
-  heading: {
-    marginBottom: "0.5rem",
-    size: "1.5rem",
-    fontWeight: 600
-  },
-  table: {
-    minWidth: 750
-  },
-  editingCell: {
-    padding: "0 5px"
-  },
-  formControl: {
-    display: "block"
-  },
-  formControlLabel: {
-    marginTop: "1rem",
-    marginBottom: "1rem",
-    fontWeight: 600
-  },
-  formGroup: {
-    border: "1px solid #eee",
-    borderRadius: 5,
-    padding: 5
-  }
+
 }));
 
 const defaultActions = [
@@ -102,10 +42,9 @@ const TransactionFormPage = ({ match, history, account, transaction, update }) =
   const { t } = useTranslation();
   const classes = useStyles();
   const [items, setItems] = useState([]);
-  const [actions, setActions] = useState(defaultActions);
   const [modifyByAccount, setModifyByAccount] = useState({ _id: '', username: '' });
   const [accounts, setAccounts] = useState([]);
-  const [model, setModel] = useState(transaction);
+  const [model, setModel] = useState(defaultTransaction);
   const [processing, setProcessing] = useState(false);
   const removeAlert = () => {
     setAlert({
@@ -120,25 +59,35 @@ const TransactionFormPage = ({ match, history, account, transaction, update }) =
   useEffect(() => {
     if (!model._id) {
       if (match.params.id === 'new') {
-        const s = 'new';
+        if (model.actionCode === 'PS') {
+          ApiAccountService.getAccountList(null, null, { username: 'Expense', type: 'system' }).then(({ data }) => {
+            const expense = data.data[0];
+            const toName = expense ? expense.username : '';
+            const staffName = account ? account.username : '';
+            setModel({
+              ...model,
+              toId: expense ? expense._id : '',
+              toName,
+              staffId: account ? account._id : '',
+              staffName,
+              note: account ? `Pay salary to ${account.username}` : '',
+              modifyBy: modifyByAccount._id
+            });
+          });
+        }else{
+          setModel({
+            ...model,
+            modifyBy: modifyByAccount._id
+          });
+        }
       } else {
         ApiTransactionService.getTransaction(match.params.id).then(({ data }) => {
           const tr = data.data;
-          if (tr.actionCode === 'PS') {
-            setModel({
-              ...tr,
-              staffId: account._id,
-              staffName: account.username,
-              note: `Pay salary to ${account.username}`,
-              modifyBy: modifyByAccount._id
-            });
-          } else {
-            setModel({ ...tr, modifyBy: modifyByAccount._id });
-          }
+          setModel({ ...tr, modifyBy: modifyByAccount._id });
         });
       }
     }
-  }, [model]);
+  }, []);
 
   useEffect(() => {
     const token = AuthService.getAuthToken();

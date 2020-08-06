@@ -37,6 +37,9 @@ const useCustomStyles = makeStyles(theme => ({
   pageContent: {
     padding: '0px',
     marginTop: '80px'
+  },
+  map:{
+    height: '100%'
   }
 }));
 

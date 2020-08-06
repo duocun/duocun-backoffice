@@ -33,11 +33,13 @@ import ApiOrderService from "services/api/ApiOrderService";
 import { getQueryParam } from "helper/index";
 import FlashStorage from "services/FlashStorage";
 
-import AccountSearch from "./AccountSearch";
+import AccountSearch from "components/AccountSearch/AccountSearch.js";
 
 import { TransactionTable } from "./TransactionTable";
-
 import { setAccount } from "redux/actions/account";
+import { defaultTransaction } from "views/Finance/FinanceModel";
+
+import ApiAccountService from "services/api/ApiAccountService";
 
 const useStyles = makeStyles(() => ({
   table: {
@@ -49,16 +51,6 @@ const useStyles = makeStyles(() => ({
 //   return new URLSearchParams(useLocation().search);
 // }
 
-const defaultTransaction = {
-  actionCode: '',
-  amount: 0,
-  fromId: '',
-  toId: '',
-  note: '',
-  staffId: '',
-  staffName: '',
-  modifyBy: '',
-}
 
 const defaultActions = [
   { code: 'A', text: 'All' },
@@ -78,7 +70,7 @@ const defaultActions = [
   { code: 'BE', text: 'Buy Equipment' },
   { code: 'BA', text: 'Buy Advertisement' }
 ];
-
+// account --- redux state
 const TransactionTablePage = ({ account, setAccount, location, history }) => {
   const { t } = useTranslation();
   const classes = useStyles();
@@ -88,19 +80,16 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
   const [items, setItems] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(
-    getQueryParam(location, "page")
-      ? parseInt(getQueryParam(location, "page"))
-      : 0
-  );
+  const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalRows, setTotalRows] = useState(0);
-  const [query, setQuery] = useState(account ? account.username : (getQueryParam(location, "search") || ""));
-  const [sort, setSort] = useState(["_id", 1]);
+  const [query, setQuery] = useState(account ? account.username : "");
+  const [sort, setSort] = useState(["created", -1]);
 
   // filters
-  // const [account, setAccount] = useState({ _id: '', type: '' }); // selected account
   const [actionCode, setActionCode] = useState('A');
+
+  // startDate and endDate is deprecated now.
   const [startDate, setStartDate] = useState(moment.utc().toISOString());
   const [endDate, setEndDate] = useState(moment.utc().toISOString());
 
@@ -117,7 +106,7 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
     } else {
       updateData(null, actionCode, startDate, endDate);
     }
-  }, [page, rowsPerPage, sort, account, actionCode, startDate, endDate]);
+  }, [page, rowsPerPage, sort, account, actionCode, startDate, endDate, query]);
 
   const updateData = (accountId, actionCode, startDate, endDate) => {
     const createdQuery = {}; // (startDate && endDate) ? {created: {$gte: startDate, $lte: endDate}} : {};
@@ -193,16 +182,24 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
 
   const handleSelectAccount = account => {
     const type = account ? account.type : 'client';
-    setAccount({ _id: account ? account._id : '', type });
-    setQuery(account ? account.username : '');
+    const username = account? account.username : '';
+    setAccount({ _id: account ? account._id : '', username, type });
+    setQuery(username);
+  }
+
+  const handleClearAccount = () => {
+    setQuery("");
+    setAccount({ _id: '', username:'', type: '' });
+  }
+
+  const handleSearchAccount = (page, rowsPerPage, keyword) => {
+    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword);
   }
 
   const handleActionChange = (actionCode) => {
     setActionCode(actionCode);
     updateData(account._id, actionCode, startDate, endDate);
   }
-
-
 
   const handleStartDateChange = (s) => {
     setStartDate(s);
@@ -306,16 +303,16 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
     }
   };
   
+  const handleSearch = (i, rowsPerPage, keyword) => {
+    ApiAccountService.getAccountByKeyword(0, rowsPerPage, keyword); // .then(({data}) => {
+    // });
+  } 
 
   return (
       <GridContainer>
           <Card>
             <CardHeader color="primary">
               <GridContainer>
-                <GridItem xs={12} sm={12} lg={12}>
-                  <h4>{t("Transaction")}</h4>
-                </GridItem>
-
                   {/* <GridItem xs={12} sm={12} lg={12} align="left">
                   <KeyboardDatePicker
                   variant="inline"
@@ -335,18 +332,17 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
                 />
                   </GridItem> */}
                 <GridItem xs={12} sm={6} lg={4}>
-                  <Box pb={2}>
-                    <AccountSearch
-                      label="Account"
-                      placeholder="Search name or phone"
-                      val={query}
-                      handleSelectAccount={handleSelectAccount}
-                    />
-                  </Box>
+                  <AccountSearch
+                    label="Account"
+                    placeholder="Search name or phone"
+                    val={query}
+                    onSelect={handleSelectAccount}
+                    onSearch={handleSearchAccount}
+                    onClear={handleClearAccount}
+                  />
                 </GridItem>
 
                 <GridItem xs={6} sm={6} lg={3}>
-                  <Box >
                     <FormControl className={classes.select}>
                       <InputLabel id="action-label">{t("Action")}</InputLabel>
                       <Select required
@@ -360,21 +356,19 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
                         }
                       </Select>
                     </FormControl>
-                  </Box>
                 </GridItem>
                 
 
                 <GridItem xs={6} sm={6} lg={3}>
                   <Box  mt={2}>
                     <Link to={`transactions/new`}>
-                    <Button
-                      color="default"
-                      variant="contained"
-                      disabled={processing}
-                    >
-                      <AddCircleOutlineIcon />
-                      {t("New Transaction")}
-                    </Button>
+                      <Button
+                        color="default"
+                        variant="contained"
+                        disabled={processing}
+                      >
+                        <AddCircleOutlineIcon />{t("New Transaction")}
+                      </Button>
                     </Link>
                   </Box>
                 </GridItem>

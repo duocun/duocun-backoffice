@@ -198,5 +198,19 @@ describe("helper", () => {
       let date = "2020-05-09";
       expect(helper.toDateString(new Date(date))).to.eql(date);
     });
-  });
+	});
+	describe('arrayToggleElem', () => {
+		context('when element not exists in the array', () => {
+			it('pushes the given element', () => {
+				const arr = [0, 1, 2];
+				expect(helper.arrayToggleElem(arr, 3)).to.eql([0, 1, 2, 3]);
+			});
+		});
+		context('when element exists in the array', () => {
+			it('removes the given element', () => {
+				const arr = [0, 1, 2];
+				expect(helper.arrayToggleElem(arr, 2)).to.eql([0, 1]);
+			});
+		});
+	});
 });
