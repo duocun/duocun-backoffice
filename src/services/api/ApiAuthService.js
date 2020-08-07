@@ -2,11 +2,11 @@ import ApiService from "services/api/ApiService";
 import Auth from "../AuthService";
 
 export default {
-  login: (username, password) => {
+  login: (email, password) => {
     return ApiService.v1().post(
       "accounts/login",
       {
-        username,
+        email,
         password
       },
       false

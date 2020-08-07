@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import Avatar from "@material-ui/core/Avatar";
@@ -39,15 +39,15 @@ const useStyles = makeStyles(theme => ({
 const Login = ({ signIn, history, isAuthorized }) => {
   const classes = useStyles();
   const { t } = useTranslation();
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [failed, setFailed] = useState(false);
 
-  const handleLogin = () => {
-    ApiAuthService.login(username, password)
+  const handleLogin = useCallback(() => {
+    ApiAuthService.login(email, password)
       .then(({ data }) => {
         if (data.code === 'success') {
-          const tokenId = data.data;
+          const tokenId = data.token;
           ApiAuthService.getCurrentUser(tokenId).then(({ data }) => {
             const account = data;
             if (AuthService.isAuthorized(account)) {
@@ -69,7 +69,7 @@ const Login = ({ signIn, history, isAuthorized }) => {
         console.error(e);
         setFailed(true);
       });
-  };
+  }, [email, password]);
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -91,11 +91,11 @@ const Login = ({ signIn, history, isAuthorized }) => {
             margin="normal"
             required
             fullWidth
-            id="username"
-            label={t("Username")}
-            name="username"
+            id="email"
+            label={t("Email")}
+            name="email"
             autoFocus
-            onChange={e => setUsername(e.target.value)}
+            onChange={e => setEmail(e.target.value)}
           />
           <TextField
             variant="outlined"
