@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Box, Card } from "@material-ui/core";
+import { Card } from "@material-ui/core";
 import { useTranslation } from "react-i18next";
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
@@ -31,14 +31,14 @@ const EditAccount = ({ match, history }) => {
         } else {
           setAlert({
             severity: "error",
-            message: t("Cannot load data"),
+            message: t("Cannot load data")
           });
         }
       } catch (e) {
         console.error(e);
         setAlert({
           severity: "error",
-          message: t("Cannot load data"),
+          message: t("Cannot load data")
         });
       }
       setLoading(false);
@@ -55,28 +55,28 @@ const EditAccount = ({ match, history }) => {
           if (id && id === "new") {
             FlashStorage.set("ACCOUNT_ALERT", {
               severity: "info",
-              message: t("Saved successfully"),
+              message: t("Saved successfully")
             });
             history.goBack();
           } else {
             setAlert({
               severity: "info",
-              message: t("Saved successfully"),
+              message: t("Saved successfully")
             });
             setModel(data.data);
           }
         } else {
           setAlert({
             severity: "error",
-            message: data.message || t("Save failed"),
+            message: data.message || t("Save failed")
           });
         }
       })
-      .catch((e) => {
+      .catch(e => {
         console.error(e);
         setAlert({
           severity: "error",
-          message: t("Save failed"),
+          message: t("Save failed")
         });
       })
       .finally(() => {
@@ -97,7 +97,7 @@ const EditAccount = ({ match, history }) => {
           <CardBody
             model={model}
             loading={loading}
-            onChange={(newModel) => setModel(newModel)}
+            onChange={newModel => setModel(newModel)}
           />
           <CardFooter
             processing={false}

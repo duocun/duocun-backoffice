@@ -1,8 +1,8 @@
-import React from 'react';
+import React from "react";
 import { useTranslation } from "react-i18next";
 import CardHeader from "components/Card/CardHeader";
 
-const Header = ({ model, loading }) => { 
+const Header = ({ model, loading }) => {
   const { t } = useTranslation();
   const title = loading
     ? t("Account")

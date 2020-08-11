@@ -13,10 +13,10 @@ export default {
     );
   },
   getCurrentUser: tokenId => {
-    return ApiService.v1().get("accounts/current", {tokenId});
+    return ApiService.v1().get("accounts/current", { tokenId });
   },
   getCurrentAccount: () => {
     const tokenId = Auth.getAuthToken();
-    return ApiService.v1().get("accounts/current", {tokenId});
+    return ApiService.v1().get("accounts/current", { tokenId });
   }
 };

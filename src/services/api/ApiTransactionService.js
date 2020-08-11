@@ -17,14 +17,14 @@ export default {
   //     return ApiService.v2().get(`products/${id}`);
   //   },
 
-  getTransaction: (id) => {
+  getTransaction: id => {
     return ApiService.v2().get("Transactions/" + id);
   },
   createTransaction: model => {
     return ApiService.v2().post(`Transactions/`, model);
   },
   updateTransaction: model => {
-    const data = {...model};
+    const data = { ...model };
     delete data._id;
     return ApiService.v2().put(`Transactions/${model._id}`, data);
   },
@@ -38,7 +38,7 @@ export default {
     return ApiService.v2().delete(`Transactions/${id}`);
   },
   exportRevenue: (startDate, endDate) => {
-    const query = {query: buildQuery({startDate, endDate})};
+    const query = { query: buildQuery({ startDate, endDate }) };
     return ApiService.v2().get("Transactions/revenue", query);
   }
 };

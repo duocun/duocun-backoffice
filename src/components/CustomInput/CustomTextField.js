@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
 import { TextField } from "@material-ui/core";
 
-const CustomTextField = (props) => {
+const CustomTextField = props => {
   const { t } = useTranslation();
   const classes = useStyles();
   return (
@@ -13,7 +13,7 @@ const CustomTextField = (props) => {
       label={t(props.label)}
       className={classes.w100}
       value={props.value}
-      onChange={(e) => props.onChange(e.target.value)}
+      onChange={e => props.onChange(e.target.value)}
     />
   );
 };
@@ -21,19 +21,19 @@ const CustomTextField = (props) => {
 CustomTextField.propTypes = {
   label: PropTypes.string,
   value: PropTypes.any,
-  onChange: PropTypes.func,
+  onChange: PropTypes.func
 };
 
 CustomTextField.defaultProps = {
   label: "",
   value: "",
-  onChange: () => {},
+  onChange: () => {}
 };
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   w100: {
-    width: "100%",
-  },
+    width: "100%"
+  }
 }));
 
 export default CustomTextField;

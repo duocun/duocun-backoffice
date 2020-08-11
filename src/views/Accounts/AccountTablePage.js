@@ -17,7 +17,7 @@ import {
   TableBody,
   TableRow,
   TableSortLabel,
-  Switch,
+  Switch
 } from "@material-ui/core";
 
 import LocalMallIcon from "@material-ui/icons/LocalMall";
@@ -49,15 +49,15 @@ import Searchbar from "components/Searchbar/Searchbar";
 import {
   ROLES as ROLE_MAPPING,
   ATTRIBUTES as ATTRIBUTES_MAPPING,
-  ACCOUNT_TYPES,
+  ACCOUNT_TYPES
 } from "views/Accounts/AccountModel.js";
 
 const useStyles = makeStyles({
   formControl: {
     width: "100%",
-    display: "block",
+    display: "block"
     // marginTop: "27px"
-  },
+  }
 });
 
 const AccountTablePage = ({ location, account, setAccount }) => {
@@ -78,9 +78,9 @@ const AccountTablePage = ({ location, account, setAccount }) => {
   const [sort, setSort] = useState(["created", -1]);
   const [types, setTypes] = useState([
     { key: "all", text: "All" },
-    ...ACCOUNT_TYPES.map((type) => {
+    ...ACCOUNT_TYPES.map(type => {
       return { key: type.toLowerCase(), text: type };
-    }),
+    })
   ]);
   const [type, setType] = useState("all");
 
@@ -93,7 +93,7 @@ const AccountTablePage = ({ location, account, setAccount }) => {
     const qType = type && type !== "all" ? { type } : {};
     const query = {
       ...q,
-      ...qType,
+      ...qType
     };
     ApiAccountService.getAccountList(page, rowsPerPage, query, [sort]).then(
       ({ data }) => {
@@ -104,11 +104,11 @@ const AccountTablePage = ({ location, account, setAccount }) => {
     );
   };
 
-  const handleTypeChange = (type) => {
+  const handleTypeChange = type => {
     setType(type);
   };
 
-  const handleSelectAccount = (account) => {
+  const handleSelectAccount = account => {
     const type = account ? account.type : "client";
     const username = account ? account.username : "";
     setAccount({ _id: account ? account._id : "", username, type });
@@ -133,7 +133,7 @@ const AccountTablePage = ({ location, account, setAccount }) => {
           </GridItem>
           <GridItem xs={12} md={4} lg={4}>
             <Searchbar
-              onChange={(e) => {
+              onChange={e => {
                 const { target } = e;
                 setQuery(target.value);
               }}
@@ -192,7 +192,7 @@ const AccountTablePage = ({ location, account, setAccount }) => {
                   { field: "balance", label: "Balance" },
                   { field: "status", label: "Status" },
                   { field: "attribute", label: "Attribute" },
-                  { field: "actions", label: "Actions" },
+                  { field: "actions", label: "Actions" }
                 ]}
                 sort={sort}
                 onSetSort={setSort}
@@ -226,8 +226,8 @@ const AccountTablePage = ({ location, account, setAccount }) => {
                     <TableCell>
                       {row.roles &&
                         row.roles
-                          .map((item) => ROLE_MAPPING[item] || item)
-                          .map((item) => (
+                          .map(item => ROLE_MAPPING[item] || item)
+                          .map(item => (
                             // eslint-disable-next-line react/jsx-key
                             <React.Fragment key={`${item}`}>
                               <Chip
@@ -242,8 +242,8 @@ const AccountTablePage = ({ location, account, setAccount }) => {
                     <TableCell>
                       {row.attributes &&
                         row.attributes
-                          .map((item) => ATTRIBUTES_MAPPING[item] || item)
-                          .map((item) => (
+                          .map(item => ATTRIBUTES_MAPPING[item] || item)
+                          .map(item => (
                             // eslint-disable-next-line react/jsx-key
                             <React.Fragment key={`${item}`}>
                               <Chip
@@ -289,12 +289,12 @@ const AccountTablePage = ({ location, account, setAccount }) => {
 };
 
 AccountTablePage.propTypes = {
-  location: PropTypes.object,
+  location: PropTypes.object
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
   // accounts: state.accounts,
-  account: state.account,
+  account: state.account
 });
 // const mapDispatchToProps = (dispatch) => ({
 //   loadAccounts: (payload, searchOption) => {

@@ -15,11 +15,27 @@ const DashboardRoute = () => {
       <Route exact path="/dashboard" component={Dashboard} />
       <Route exact path="/dashboard/pickup/:id" component={DriverSummaryPage} />
       <Route exact path="/dashboard/salary" component={SalarySummaryPage} />
-      <Route exact path="/dashboard/productSummary" component={ProductSummaryPage} />
+      <Route
+        exact
+        path="/dashboard/productSummary"
+        component={ProductSummaryPage}
+      />
       <Route exact path="/dashboard/sales" component={SalesPage} />
-      <Route exact path="/dashboard/order-summary" component={OrderSummaryPage} />
-      <Route exact path="/dashboard/order-analytics" component={OrderAnalytics} />
-      <Route exact path="/dashboard/product-analytics" component={ProductAnalytics} />
+      <Route
+        exact
+        path="/dashboard/order-summary"
+        component={OrderSummaryPage}
+      />
+      <Route
+        exact
+        path="/dashboard/order-analytics"
+        component={OrderAnalytics}
+      />
+      <Route
+        exact
+        path="/dashboard/product-analytics"
+        component={ProductAnalytics}
+      />
     </Switch>
   );
 };

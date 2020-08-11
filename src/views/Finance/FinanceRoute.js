@@ -10,10 +10,22 @@ import SalaryFormPage from "./SalaryFormPage";
 const Finance = () => {
   return (
     <Switch>
-      <Route exact path="/finance/transactions" component={TransactionTablePage}></Route>
-      <Route exact path="/finance/transactions/:id" component={TransactionFormPage}></Route>
+      <Route
+        exact
+        path="/finance/transactions"
+        component={TransactionTablePage}
+      ></Route>
+      <Route
+        exact
+        path="/finance/transactions/:id"
+        component={TransactionFormPage}
+      ></Route>
       <Route exact path="/finance/salary" component={SalaryTablePage}></Route>
-      <Route exact path="/finance/salary/:id" component={SalaryFormPage}></Route>
+      <Route
+        exact
+        path="/finance/salary/:id"
+        component={SalaryFormPage}
+      ></Route>
       {/* <Route exact path="/finance/exception" component={FinanceException}></Route> */}
     </Switch>
   );

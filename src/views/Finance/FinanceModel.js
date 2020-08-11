@@ -1,16 +1,15 @@
-
-import * as moment from 'moment';
+import * as moment from "moment";
 
 export const defaultTransaction = {
-  actionCode: '',
+  actionCode: "",
   amount: 0,
-  fromId: '',
-  fromName: '',
-  toId: '',
-  toName: '',
-  note: '',
-  staffId: '',
-  staffName: '',
-  modifyBy: '',
+  fromId: "",
+  fromName: "",
+  toId: "",
+  toName: "",
+  note: "",
+  staffId: "",
+  staffName: "",
+  modifyBy: "",
   created: moment.utc().toISOString()
-}
+};

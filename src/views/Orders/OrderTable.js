@@ -27,24 +27,13 @@ const useStyles = makeStyles({
 
 const formatAddress = location => {
   if (!location) return "";
-  return (
-    location.streetNumber +
-    " " +
-    location.streetName
-  );
+  return location.streetNumber + " " + location.streetName;
 };
 
 const formatAddressLine2 = location => {
   if (!location) return "";
-  return (
-    location.city +
-    " " +
-    location.province +
-    ", " +
-    location.postalCode
-  );
+  return location.city + " " + location.province + ", " + location.postalCode;
 };
-
 
 export const OrderTable = ({
   rows,
@@ -69,22 +58,21 @@ export const OrderTable = ({
   const [processing, setProcessing] = useState(false);
 
   if (!rows.length) {
-    return (
-      <div>{t("No data to display")}</div>
-    );
+    return <div>{t("No data to display")}</div>;
   } else {
     return (
       <TableContainer>
         <Table className={classes.table} aria-label="Order Table" size="small">
-          <TableHeader data={[
-            { field: 'code', label: 'Code' },
-            { field: 'delivered', label: 'Deliver Date' },
-            { field: 'clientName', label: 'Client' },
-            { field: 'address', label: 'Address' },
-            { field: 'merchantName', label: 'Merchant' },
-            { field: 'items', label: 'Product' },
-            { field: 'actions', label: 'Actions' }
-          ]}
+          <TableHeader
+            data={[
+              { field: "code", label: "Code" },
+              { field: "delivered", label: "Deliver Date" },
+              { field: "clientName", label: "Client" },
+              { field: "address", label: "Address" },
+              { field: "merchantName", label: "Merchant" },
+              { field: "items", label: "Product" },
+              { field: "actions", label: "Actions" }
+            ]}
             sort={sort}
             onSetSort={setSort}
           />
@@ -92,59 +80,58 @@ export const OrderTable = ({
             {loading ? (
               <TableBodySkeleton colCount={7} rowCount={rowsPerPage} />
             ) : (
-                // <OrderTable rows={orders} page={page} rowsPerPage={rowsPerPage} processing={processing}/>
-                <React.Fragment>
-                  {
-                    rows && rows.length > 0 &&
-                    rows.map((row, idx) =>
-                      <TableRow key={idx} onClick={() => selectData(row)}>
-                        <TableCell>{row.code}</TableCell>
-                        <TableCell>{toDateString(row.delivered)}</TableCell>
-                        <TableCell>
-                          <div>{row.clientName ? row.clientName : ""}</div>
-                          <div>{row.clientPhone ? row.clientPhone : "N/A"}</div>
-                        </TableCell>
-                        <TableCell>
-                          <div>{formatAddress(row.location)}</div>
-                          <div>{formatAddressLine2(row.location)}</div>
-                        </TableCell>
-                        <TableCell>
-                          {row.merchantName ? row.merchantName : "N/A"}
-                        </TableCell>
-                        <TableCell>
-                          {row.items &&
-                            row.items.length > 0 &&
-                            row.items.map(it => (
-                              <div key={it.productId}>
-                                {it.productName} x{it.quantity}
-                              </div>
-                            ))}
-                        </TableCell>
+              // <OrderTable rows={orders} page={page} rowsPerPage={rowsPerPage} processing={processing}/>
+              <React.Fragment>
+                {rows &&
+                  rows.length > 0 &&
+                  rows.map((row, idx) => (
+                    <TableRow key={idx} onClick={() => selectData(row)}>
+                      <TableCell>{row.code}</TableCell>
+                      <TableCell>{toDateString(row.delivered)}</TableCell>
+                      <TableCell>
+                        <div>{row.clientName ? row.clientName : ""}</div>
+                        <div>{row.clientPhone ? row.clientPhone : "N/A"}</div>
+                      </TableCell>
+                      <TableCell>
+                        <div>{formatAddress(row.location)}</div>
+                        <div>{formatAddressLine2(row.location)}</div>
+                      </TableCell>
+                      <TableCell>
+                        {row.merchantName ? row.merchantName : "N/A"}
+                      </TableCell>
+                      <TableCell>
+                        {row.items &&
+                          row.items.length > 0 &&
+                          row.items.map(it => (
+                            <div key={it.productId}>
+                              {it.productName} x{it.quantity}
+                            </div>
+                          ))}
+                      </TableCell>
 
-                        <TableCell className={classes.operationRow}>
-                          <Link to={`orders/clone`}>
-                            <IconButton aria-label="clone">
-                              <FileCopyIcon />
-                            </IconButton>
-                          </Link>
-                          <Link to={`orders/${row._id}`}>
-                            <IconButton aria-label="edit">
-                              <EditIcon />
-                            </IconButton>
-                          </Link>
-                          <IconButton
-                            aria-label="delete"
-                            disabled={processing}
-                            onClick={() => removeData(row._id)}
-                          >
-                            <DeleteIcon />
+                      <TableCell className={classes.operationRow}>
+                        <Link to={`orders/clone`}>
+                          <IconButton aria-label="clone">
+                            <FileCopyIcon />
                           </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    )
-                  }
-                </React.Fragment>
-              )}
+                        </Link>
+                        <Link to={`orders/${row._id}`}>
+                          <IconButton aria-label="edit">
+                            <EditIcon />
+                          </IconButton>
+                        </Link>
+                        <IconButton
+                          aria-label="delete"
+                          disabled={processing}
+                          onClick={() => removeData(row._id)}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </React.Fragment>
+            )}
           </TableBody>
         </Table>
 

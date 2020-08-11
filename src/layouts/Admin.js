@@ -35,14 +35,13 @@ const switchRoutes = (
 const useStyles = makeStyles(styles);
 const useCustomStyles = makeStyles(theme => ({
   pageContent: {
-    padding: '0px',
-    marginTop: '80px'
+    padding: "0px",
+    marginTop: "80px"
   },
-  map:{
-    height: '100%'
+  map: {
+    height: "100%"
   }
 }));
-
 
 export default function Admin({ ...rest }) {
   // styles
@@ -83,7 +82,7 @@ export default function Admin({ ...rest }) {
       window.removeEventListener("resize", resizeFunction);
     };
   }, [mainPanel]);
-  
+
   return (
     <div className={classes.wrapper}>
       <Sidebar

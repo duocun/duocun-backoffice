@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {connect} from "react-redux";
+import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 // import { useLocation } from "react-router-dom";
 
@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
 // import { connect } from "react-redux";
 
-import * as moment from 'moment';
+import * as moment from "moment";
 // import { KeyboardDatePicker } from "@material-ui/pickers";
 
 import GridContainer from "components/Grid/GridContainer.js";
@@ -43,32 +43,31 @@ import ApiAccountService from "services/api/ApiAccountService";
 
 const useStyles = makeStyles(() => ({
   table: {
-    minWidth: 750,
-  },
+    minWidth: 750
+  }
 }));
 
 // const useQuery = () => {
 //   return new URLSearchParams(useLocation().search);
 // }
 
-
 const defaultActions = [
-  { code: 'A', text: 'All' },
-  { code: 'ACTC', text: 'Add Credit to Client' },
-  { code: 'PS', text: 'Pay Salary' },
-  { code: 'PDCH', text: 'Pay Driver Cash' },
-  { code: 'PC', text: 'Client Pay by card' },
-  { code: 'PW', text: 'Client Pay by Wechat' },
-  { code: 'T', text: 'Transfer' },
-  { code: 'RC', text: 'Refund to Client' },
-  { code: 'PMCH', text: 'Pay Merchant Cash' },
-  { code: 'PMC', text: 'Pay Merchant from Bank' },
-  { code: 'POR', text: 'Pay Office Rent' },
-  { code: 'D', text: 'Discount' },
-  { code: 'S', text: 'Supplies' },
-  { code: 'BM', text: 'Buy Material' },
-  { code: 'BE', text: 'Buy Equipment' },
-  { code: 'BA', text: 'Buy Advertisement' }
+  { code: "A", text: "All" },
+  { code: "ACTC", text: "Add Credit to Client" },
+  { code: "PS", text: "Pay Salary" },
+  { code: "PDCH", text: "Pay Driver Cash" },
+  { code: "PC", text: "Client Pay by card" },
+  { code: "PW", text: "Client Pay by Wechat" },
+  { code: "T", text: "Transfer" },
+  { code: "RC", text: "Refund to Client" },
+  { code: "PMCH", text: "Pay Merchant Cash" },
+  { code: "PMC", text: "Pay Merchant from Bank" },
+  { code: "POR", text: "Pay Office Rent" },
+  { code: "D", text: "Discount" },
+  { code: "S", text: "Supplies" },
+  { code: "BM", text: "Buy Material" },
+  { code: "BE", text: "Buy Equipment" },
+  { code: "BA", text: "Buy Advertisement" }
 ];
 // account --- redux state
 const TransactionTablePage = ({ account, setAccount, location, history }) => {
@@ -87,7 +86,7 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
   const [sort, setSort] = useState(["created", -1]);
 
   // filters
-  const [actionCode, setActionCode] = useState('A');
+  const [actionCode, setActionCode] = useState("A");
 
   // startDate and endDate is deprecated now.
   const [startDate, setStartDate] = useState(moment.utc().toISOString());
@@ -110,33 +109,29 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
 
   const updateData = (accountId, actionCode, startDate, endDate) => {
     const createdQuery = {}; // (startDate && endDate) ? {created: {$gte: startDate, $lte: endDate}} : {};
-    const accountQuery = accountId ? {
-      $or: [
-        {fromId: accountId},
-        {toId: accountId},
-      ]
-    } : {};
+    const accountQuery = accountId
+      ? {
+          $or: [{ fromId: accountId }, { toId: accountId }]
+        }
+      : {};
 
-    const condition = actionCode === 'A' ? 
-    {
-      ...createdQuery,
-      ...accountQuery,
-      status: { $nin: ['bad', 'tmp'] }
-    }
-    :
-    {
-      ...createdQuery,
-      ...accountQuery,
-      status: { $nin: ['bad', 'tmp'] },
-      actionCode
-    };
+    const condition =
+      actionCode === "A"
+        ? {
+            ...createdQuery,
+            ...accountQuery,
+            status: { $nin: ["bad", "tmp"] }
+          }
+        : {
+            ...createdQuery,
+            ...accountQuery,
+            status: { $nin: ["bad", "tmp"] },
+            actionCode
+          };
 
-    ApiTransactionService.getTransactionList(
-      page,
-      rowsPerPage,
-      condition,
-      [sort]
-    ).then(({ data }) => {
+    ApiTransactionService.getTransactionList(page, rowsPerPage, condition, [
+      sort
+    ]).then(({ data }) => {
       setTransactions(data.data);
       setTotalRows(data.count);
       setLoading(false);
@@ -146,89 +141,90 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
   const removeAlert = () => {
     setAlert({
       message: "",
-      severity: "info",
+      severity: "info"
     });
   };
 
   const handleNewTransaction = () => {
     setModel({
       ...defaultTransaction,
-      modifyBy: account ? account._id : '',
+      modifyBy: account ? account._id : "",
       created: moment.utc().toISOString()
     });
-  }
+  };
 
-  const handelSelectTransaction = (tr) => {
-    if(tr && tr.actionCode === 'OFD'){
+  const handelSelectTransaction = tr => {
+    if (tr && tr.actionCode === "OFD") {
       const orderId = tr.orderId;
-      ApiOrderService.getOrder(orderId).then(({data}) => {
+      ApiOrderService.getOrder(orderId).then(({ data }) => {
         const order = data.data;
         setItems(order.items);
         if (tr.note) {
-          setModel({ ...tr, modifyBy: account ? account._id : '' });
+          setModel({ ...tr, modifyBy: account ? account._id : "" });
         } else {
-          setModel({ ...tr, note: '', modifyBy: account ? account._id : '' });
+          setModel({ ...tr, note: "", modifyBy: account ? account._id : "" });
         }
       });
-    }else{
+    } else {
       setItems([]);
       if (tr.note) {
-        setModel({ ...tr, modifyBy: account ? account._id : '' });
+        setModel({ ...tr, modifyBy: account ? account._id : "" });
       } else {
-        setModel({ ...tr, note: '', modifyBy: account ? account._id : '' });
+        setModel({ ...tr, note: "", modifyBy: account ? account._id : "" });
       }
     }
-  }
+  };
 
   const handleSelectAccount = account => {
-    const type = account ? account.type : 'client';
-    const username = account? account.username : '';
-    setAccount({ _id: account ? account._id : '', username, type });
+    const type = account ? account.type : "client";
+    const username = account ? account.username : "";
+    setAccount({ _id: account ? account._id : "", username, type });
     setQuery(username);
-  }
+  };
 
   const handleClearAccount = () => {
     setQuery("");
-    setAccount({ _id: '', username:'', type: '' });
-  }
+    setAccount({ _id: "", username: "", type: "" });
+  };
 
   const handleSearchAccount = (page, rowsPerPage, keyword) => {
     return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword);
-  }
+  };
 
-  const handleActionChange = (actionCode) => {
+  const handleActionChange = actionCode => {
     setActionCode(actionCode);
     updateData(account._id, actionCode, startDate, endDate);
-  }
+  };
 
-  const handleStartDateChange = (s) => {
+  const handleStartDateChange = s => {
     setStartDate(s);
     updateData(account._id, actionCode, startDate, endDate);
-  }
+  };
 
-  const handleEndDateChange = (s) => {
+  const handleEndDateChange = s => {
     setEndDate(s);
     updateData(account._id, actionCode, startDate, endDate);
-  }
+  };
 
   const handleUpdateAccount = () => {
     if (account && account._id) {
       removeAlert();
       setProcessing(true);
-      ApiTransactionService.updateTransactions(account._id).then(({ data }) => {
-        if (data.code === 'success') {
-          setAlert({
-            message: t("Update account balance successfully"),
-            severity: "success"
-          });
-        } else {
-          setAlert({
-            message: t("Update account balance failed"),
-            severity: "error"
-          });
-        }
-        setProcessing(false);
-      })
+      ApiTransactionService.updateTransactions(account._id)
+        .then(({ data }) => {
+          if (data.code === "success") {
+            setAlert({
+              message: t("Update account balance successfully"),
+              severity: "success"
+            });
+          } else {
+            setAlert({
+              message: t("Update account balance failed"),
+              severity: "error"
+            });
+          }
+          setProcessing(false);
+        })
         .catch(e => {
           console.error(e);
           setAlert({
@@ -240,25 +236,26 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
     }
   };
 
-  const handleDeleteTransaction = (transactionId) => {
-    if (window.confirm('Are you sure to delete this transaction?')) {
+  const handleDeleteTransaction = transactionId => {
+    if (window.confirm("Are you sure to delete this transaction?")) {
       if (transactionId) {
         removeAlert();
         setProcessing(true);
-        ApiTransactionService.deleteTransaction(transactionId).then(({ data }) => {
-          if (data.code === 'success') {
-            setAlert({
-              message: t("Delete transaction successfully"),
-              severity: "success"
-            });
-          } else {
-            setAlert({
-              message: t("Delete transaction failed"),
-              severity: "error"
-            });
-          }
-          setProcessing(false);
-        })
+        ApiTransactionService.deleteTransaction(transactionId)
+          .then(({ data }) => {
+            if (data.code === "success") {
+              setAlert({
+                message: t("Delete transaction successfully"),
+                severity: "success"
+              });
+            } else {
+              setAlert({
+                message: t("Delete transaction failed"),
+                severity: "error"
+              });
+            }
+            setProcessing(false);
+          })
           .catch(e => {
             console.error(e);
             setAlert({
@@ -272,48 +269,50 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
   };
 
   const handleExportRevenue = () => {
-    if (window.confirm(`Are you sure to export the revenue from ${startDate}?`)) {
+    if (
+      window.confirm(`Are you sure to export the revenue from ${startDate}?`)
+    ) {
       if (startDate) {
         removeAlert();
         setProcessing(true);
-        ApiTransactionService.exportRevenue(startDate, endDate).then(({ data }) => {
-
-          // if (data.code === 'success') {
+        ApiTransactionService.exportRevenue(startDate, endDate)
+          .then(({ data }) => {
+            // if (data.code === 'success') {
             setAlert({
               message: t("Export Revenue successfully"),
               severity: "success"
             });
-          // } else {
-          //   setAlert({
-          //     message: t("Export Revenue failed"),
-          //     severity: "error"
-          //   });
-          // }
-          setProcessing(false);
-        })
-        .catch(e => {
-          console.error(e);
-          setAlert({
-            message: t("Export Revenue failed"),
-            severity: "error"
+            // } else {
+            //   setAlert({
+            //     message: t("Export Revenue failed"),
+            //     severity: "error"
+            //   });
+            // }
+            setProcessing(false);
+          })
+          .catch(e => {
+            console.error(e);
+            setAlert({
+              message: t("Export Revenue failed"),
+              severity: "error"
+            });
+            setProcessing(false);
           });
-          setProcessing(false);
-        });
       }
     }
   };
-  
+
   const handleSearch = (i, rowsPerPage, keyword) => {
     ApiAccountService.getAccountByKeyword(0, rowsPerPage, keyword); // .then(({data}) => {
     // });
-  } 
+  };
 
   return (
-      <GridContainer>
-          <Card>
-            <CardHeader color="primary">
-              <GridContainer>
-                  {/* <GridItem xs={12} sm={12} lg={12} align="left">
+    <GridContainer>
+      <Card>
+        <CardHeader color="primary">
+          <GridContainer>
+            {/* <GridItem xs={12} sm={12} lg={12} align="left">
                   <KeyboardDatePicker
                   variant="inline"
                   label="Start Date"
@@ -331,111 +330,112 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
                   onChange={(m) => handleEndDateChange(m.toISOString()) }
                 />
                   </GridItem> */}
-                <GridItem xs={12} sm={6} lg={4}>
-                  <AccountSearch
-                    label="Account"
-                    placeholder="Search name or phone"
-                    val={query}
-                    onSelect={handleSelectAccount}
-                    onSearch={handleSearchAccount}
-                    onClear={handleClearAccount}
-                  />
-                </GridItem>
+            <GridItem xs={12} sm={6} lg={4}>
+              <AccountSearch
+                label="Account"
+                placeholder="Search name or phone"
+                val={query}
+                onSelect={handleSelectAccount}
+                onSearch={handleSearchAccount}
+                onClear={handleClearAccount}
+              />
+            </GridItem>
 
-                <GridItem xs={6} sm={6} lg={3}>
-                    <FormControl className={classes.select}>
-                      <InputLabel id="action-label">{t("Action")}</InputLabel>
-                      <Select required
-                        labelId="action-label"
-                        id="action-select"
-                        value={actionCode}
-                        onChange={e => handleActionChange(e.target.value)}
-                      >
-                        {
-                          defaultActions.map(d => <MenuItem key={d.code} value={d.code}>{d.text}</MenuItem>)
-                        }
-                      </Select>
-                    </FormControl>
-                </GridItem>
-                
+            <GridItem xs={6} sm={6} lg={3}>
+              <FormControl className={classes.select}>
+                <InputLabel id="action-label">{t("Action")}</InputLabel>
+                <Select
+                  required
+                  labelId="action-label"
+                  id="action-select"
+                  value={actionCode}
+                  onChange={e => handleActionChange(e.target.value)}
+                >
+                  {defaultActions.map(d => (
+                    <MenuItem key={d.code} value={d.code}>
+                      {d.text}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </GridItem>
 
-                <GridItem xs={6} sm={6} lg={3}>
-                  <Box  mt={2}>
-                    <Link to={`transactions/new`}>
-                      <Button
-                        color="default"
-                        variant="contained"
-                        disabled={processing}
-                      >
-                        <AddCircleOutlineIcon />{t("New Transaction")}
-                      </Button>
-                    </Link>
-                  </Box>
-                </GridItem>
-
-              </GridContainer>
-            </CardHeader>
-            <CardBody>
-              <GridContainer>
-                {!!alert.message && (
-                  <GridItem xs={12}>
-                    <Alert severity={alert.severity} onClose={removeAlert}>
-                      {alert.message}
-                    </Alert>
-                  </GridItem>
-                )}
-                <GridItem xs={12}>
-                  <TransactionTable
-                    account={account}
-                    rows={transactions}
-                    page={page}
-                    rowsPerPage={rowsPerPage}
-                    totalRows={totalRows}
-                    sort={sort}
-                    loading={loading}
-                    setRowsPerPage={setRowsPerPage}
-                    setSort={setSort}
-                    setPage={setPage}
-                    selectRow={handelSelectTransaction}
-                    deleteRow={handleDeleteTransaction}
-                  />
-                </GridItem>
-              </GridContainer>
-            </CardBody>
-            <CardFooter>
-              <GridContainer>
-                <GridItem xs={12} container direction="row-reverse">
-
-                  <Box mt={2} mr={2}>
-                    <Button
-                      color="primary"
-                      variant="contained"
-                      disabled={processing}
-                      onClick={handleUpdateAccount}
-                    >
-                      <SaveIcon />
-                      {t("Update")}
-                    </Button>
-                  </Box>
-                  <Box mt={2} mr={2}>
-                    <Button
-                      color="primary"
-                      variant="contained"
-                      disabled={processing}
-                      onClick={handleExportRevenue}
-                    >
-                      <SaveIcon />
-                      {t("Export Revenue")}
-                    </Button>
-                    {/* <a href="http://localhost:8001/uploads/revenue.csv" download="revenue.csv">Download revenue.csv</a> */}
-                  </Box>
-                </GridItem>
-              </GridContainer>
-            </CardFooter>
-          </Card>
-      </GridContainer>
+            <GridItem xs={6} sm={6} lg={3}>
+              <Box mt={2}>
+                <Link to={`transactions/new`}>
+                  <Button
+                    color="default"
+                    variant="contained"
+                    disabled={processing}
+                  >
+                    <AddCircleOutlineIcon />
+                    {t("New Transaction")}
+                  </Button>
+                </Link>
+              </Box>
+            </GridItem>
+          </GridContainer>
+        </CardHeader>
+        <CardBody>
+          <GridContainer>
+            {!!alert.message && (
+              <GridItem xs={12}>
+                <Alert severity={alert.severity} onClose={removeAlert}>
+                  {alert.message}
+                </Alert>
+              </GridItem>
+            )}
+            <GridItem xs={12}>
+              <TransactionTable
+                account={account}
+                rows={transactions}
+                page={page}
+                rowsPerPage={rowsPerPage}
+                totalRows={totalRows}
+                sort={sort}
+                loading={loading}
+                setRowsPerPage={setRowsPerPage}
+                setSort={setSort}
+                setPage={setPage}
+                selectRow={handelSelectTransaction}
+                deleteRow={handleDeleteTransaction}
+              />
+            </GridItem>
+          </GridContainer>
+        </CardBody>
+        <CardFooter>
+          <GridContainer>
+            <GridItem xs={12} container direction="row-reverse">
+              <Box mt={2} mr={2}>
+                <Button
+                  color="primary"
+                  variant="contained"
+                  disabled={processing}
+                  onClick={handleUpdateAccount}
+                >
+                  <SaveIcon />
+                  {t("Update")}
+                </Button>
+              </Box>
+              <Box mt={2} mr={2}>
+                <Button
+                  color="primary"
+                  variant="contained"
+                  disabled={processing}
+                  onClick={handleExportRevenue}
+                >
+                  <SaveIcon />
+                  {t("Export Revenue")}
+                </Button>
+                {/* <a href="http://localhost:8001/uploads/revenue.csv" download="revenue.csv">Download revenue.csv</a> */}
+              </Box>
+            </GridItem>
+          </GridContainer>
+        </CardFooter>
+      </Card>
+    </GridContainer>
   );
-}
+};
 
 TransactionTablePage.propTypes = {
   location: PropTypes.object,
@@ -444,8 +444,7 @@ TransactionTablePage.propTypes = {
   history: PropTypes.object
 };
 
-
-const mapStateToProps = (state) => ({ 
+const mapStateToProps = state => ({
   // accounts: state.accounts,
   account: state.account
 });
@@ -455,6 +454,6 @@ const mapStateToProps = (state) => ({
 //   },
 // });
 export default connect(
-  mapStateToProps, 
-  {setAccount}
+  mapStateToProps,
+  { setAccount }
 )(TransactionTablePage);

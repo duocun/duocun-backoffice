@@ -14,28 +14,37 @@ export default {
     query.query = buildPaginationQuery(page, pageSize, conditions, [], sort);
     return ApiService.v2().get("accounts", query);
   },
-  getAccounts: (conditions) => {
+  getAccounts: conditions => {
     let query = {};
     query.query = buildQuery(conditions);
     return ApiService.v2().get("accounts", query);
   },
-  getAccount: (accountId) => {
+  getAccount: accountId => {
     return ApiService.v2().get("accounts/" + accountId);
   },
 
-  getAccountByKeyword: (page, pageSize, keyword = "", accountTypes=[], sort = []) => {
+  getAccountByKeyword: (
+    page,
+    pageSize,
+    keyword = "",
+    accountTypes = [],
+    sort = []
+  ) => {
     let query = {};
-    const type =  accountTypes && accountTypes.length > 0 ? {type: {$in: accountTypes}} : {};
+    const type =
+      accountTypes && accountTypes.length > 0
+        ? { type: { $in: accountTypes } }
+        : {};
     const condition = {
       ...type,
       $or: [
         {
-          username: { $regex: keyword },
+          username: { $regex: keyword }
         },
         {
-          phone: { $regex: keyword },
-        },
-      ],
+          phone: { $regex: keyword }
+        }
+      ]
     };
     query.keyword = query.query = buildPaginationQuery(
       page,
@@ -51,8 +60,8 @@ export default {
     let query = {};
     const condition = {
       phone: {
-        $regex: phone,
-      },
+        $regex: phone
+      }
     };
     query.keyword = query.query = buildPaginationQuery(
       page,
@@ -63,10 +72,10 @@ export default {
     );
     return ApiService.v2().get("accounts", query);
   },
-  getAccountsByType: (type) => {
+  getAccountsByType: type => {
     let query = {};
     const condition = {
-      type: type,
+      type: type
     };
     query.keyword = query.query = buildPaginationQuery(
       null,
@@ -77,7 +86,7 @@ export default {
     );
     return ApiService.v2().get("accounts", query);
   },
-  saveAccount: (model) => {
+  saveAccount: model => {
     return ApiService.v2().post(`accounts/${model._id}`, { data: model });
-  },
+  }
 };

@@ -4,12 +4,12 @@ import {
   MenuItem,
   Select,
   FormControl,
-  InputLabel,
+  InputLabel
 } from "@material-ui/core";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 
-const SelectWithLabel = (props) => {
+const SelectWithLabel = props => {
   const { t } = useTranslation();
   const classes = useStyles();
   return (
@@ -22,7 +22,7 @@ const SelectWithLabel = (props) => {
         labelId="input-label"
         value={props.value}
         required={props.required}
-        onChange={(e) => props.onChange(e.target.value)}
+        onChange={e => props.onChange(e.target.value)}
         {...props.selectProps}
       >
         {props.itemData.map((data, index) => (
@@ -35,10 +35,10 @@ const SelectWithLabel = (props) => {
   );
 };
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   w100: {
-    width: "100%",
-  },
+    width: "100%"
+  }
 }));
 
 SelectWithLabel.propTypes = {
@@ -49,7 +49,7 @@ SelectWithLabel.propTypes = {
   value: PropTypes.any,
   onChange: PropTypes.func,
   itemData: PropTypes.array,
-  required: PropTypes.bool,
+  required: PropTypes.bool
 };
 
 SelectWithLabel.defaultProps = {
@@ -60,7 +60,7 @@ SelectWithLabel.defaultProps = {
   value: "",
   onChange: () => {},
   itemData: [],
-  required: true,
+  required: true
 };
 
 export default SelectWithLabel;

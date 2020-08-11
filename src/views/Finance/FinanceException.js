@@ -31,8 +31,8 @@ import { Throttle } from "react-throttle";
 
 const useStyles = makeStyles(() => ({
   table: {
-    minWidth: 750,
-  },
+    minWidth: 750
+  }
 }));
 
 export const FinanceException = ({ location, history }) => {
@@ -53,10 +53,16 @@ export const FinanceException = ({ location, history }) => {
   const [selectUserId, setSelectUserId] = useState("");
   const [showList, setShowList] = useState(false);
 
-  const [startDate, setStartDate] = useState(moment().utc().toISOString());
-  const [endDate, setEndDate] = useState(moment().utc().toISOString());
-
-
+  const [startDate, setStartDate] = useState(
+    moment()
+      .utc()
+      .toISOString()
+  );
+  const [endDate, setEndDate] = useState(
+    moment()
+      .utc()
+      .toISOString()
+  );
 
   // states related to processing
   const [alert, setAlert] = useState(
@@ -73,7 +79,7 @@ export const FinanceException = ({ location, history }) => {
     }
   }, [query]);
 
-  const handleOnchange = (e) => {
+  const handleOnchange = e => {
     const { target } = e;
     setQuery(target.value);
   };
@@ -82,15 +88,17 @@ export const FinanceException = ({ location, history }) => {
     const condition = {
       $or: [
         {
-          fromId: selectUserId,
+          fromId: selectUserId
         },
         {
-          toId: selectUserId,
-        },
+          toId: selectUserId
+        }
       ],
-      status: { $nin: ['bad', 'tmp'] }
+      status: { $nin: ["bad", "tmp"] }
     };
-    ApiTransactionService.getTransactionList(page, rowsPerPage, condition, [sort,]).then(({ data }) => {
+    ApiTransactionService.getTransactionList(page, rowsPerPage, condition, [
+      sort
+    ]).then(({ data }) => {
       setTransactions(data.data);
       setTotalRows(data.count);
       setLoading(false);
@@ -105,7 +113,7 @@ export const FinanceException = ({ location, history }) => {
   const removeAlert = () => {
     setAlert({
       message: "",
-      severity: "info",
+      severity: "info"
     });
   };
 
@@ -131,7 +139,7 @@ export const FinanceException = ({ location, history }) => {
                   <SecondaryNav
                     tabs={[
                       { title: "Finance", route: "/finance" },
-                      { title: "Exception", route: "/finance/exception" },
+                      { title: "Exception", route: "/finance/exception" }
                     ]}
                     history={history}
                   />
@@ -141,7 +149,7 @@ export const FinanceException = ({ location, history }) => {
                     style={{
                       display: "flex",
                       justifyContent: "center",
-                      alignItems: "center",
+                      alignItems: "center"
                     }}
                   >
                     <TimePicker
@@ -169,7 +177,7 @@ export const FinanceException = ({ location, history }) => {
                       }}
                       onFocus={handleShowList}
                       onBlur={handleHideList}
-                      ifSearch = {false}
+                      ifSearch={false}
                     />
                   </Throttle>
                   <SearchDropDown
@@ -211,7 +219,7 @@ export const FinanceException = ({ location, history }) => {
       </GridContainer>
     </div>
   );
-}
+};
 
 FinanceException.propTypes = {
   location: PropTypes.object,
@@ -219,7 +227,6 @@ FinanceException.propTypes = {
   accounts: PropTypes.array,
   history: PropTypes.object
 };
-
 
 // const mapStateToProps = (state) => ({ accounts: state.accounts });
 // const mapDispatchToProps = (dispatch) => ({

@@ -7,7 +7,7 @@ import { ATTRIBUTES } from "models/account";
 import { arrayToggleElem } from "helper/index";
 import { useTranslation } from "react-i18next";
 
-const Attributes = (props) => {
+const Attributes = props => {
   const { t } = useTranslation();
 
   return (
@@ -17,7 +17,7 @@ const Attributes = (props) => {
       </GridItem>
       <GridItem xs={12} lg={12}>
         <GridContainer>
-          {Object.keys(ATTRIBUTES).map((key) => {
+          {Object.keys(ATTRIBUTES).map(key => {
             return (
               <GridItem xs={6} lg={4} key={key}>
                 <FormControlLabel
@@ -26,7 +26,7 @@ const Attributes = (props) => {
                   control={
                     <Checkbox
                       checked={props.model.attributes.includes(key)}
-                      onChange={(e) => {
+                      onChange={e => {
                         const newModel = { ...props.model };
                         arrayToggleElem(newModel.attributes, key);
                         props.onChange(newModel);
@@ -46,7 +46,7 @@ const Attributes = (props) => {
 
 Attributes.propTypes = {
   model: PropTypes.object,
-  onChange: PropTypes.func,
+  onChange: PropTypes.func
 };
 
 export default Attributes;

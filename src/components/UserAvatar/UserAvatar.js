@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import Avatar from "@material-ui/core/Avatar";
 
-const UserAvatar = (props) => (
+const UserAvatar = props => (
   <Avatar {...props} alt={props.user.username} src={props.user.imageurl}>
     {props.user.imageurl
       ? null
@@ -13,12 +13,12 @@ const UserAvatar = (props) => (
 );
 
 UserAvatar.defaultProps = {
-  onClick: () => {},
+  onClick: () => {}
 };
 
 UserAvatar.propTypes = {
   user: PropTypes.object,
-  onClick: PropTypes.func,
+  onClick: PropTypes.func
 };
 
 export default UserAvatar;

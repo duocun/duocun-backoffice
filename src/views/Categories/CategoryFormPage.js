@@ -1,10 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { Save as SaveIcon, FormatListBulleted as FormatListBulletedIcon } from "@material-ui/icons";
-import { TextField, ButtonGroup, Button, List, ListItem,
-    Select, MenuItem, InputLabel, FormControl } from "@material-ui/core";
-import { Alert } from "@material-ui/lab"
+import {
+  Save as SaveIcon,
+  FormatListBulleted as FormatListBulletedIcon
+} from "@material-ui/icons";
+import {
+  TextField,
+  ButtonGroup,
+  Button,
+  List,
+  ListItem,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl
+} from "@material-ui/core";
+import { Alert } from "@material-ui/lab";
 
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
@@ -18,11 +30,11 @@ import ApiAccountService from "services/api/ApiAccountService";
 import ApiCategoryService from "services/api/ApiCategoryService";
 
 const defaultCategory = {
-  name: '',
-  nameEN: '',
-  description: '',
-  descriptionEN: ''
-}
+  name: "",
+  nameEN: "",
+  description: "",
+  descriptionEN: ""
+};
 
 export const CategoryFormPage = ({}) => {
   const { t } = useTranslation();
@@ -40,9 +52,7 @@ export const CategoryFormPage = ({}) => {
 
   ////////////////////////////////////
   // For data fetch
-  const getCategoryData = () => {
-
-  }
+  const getCategoryData = () => {};
   const getAccountsData = () => {
     // ApiAccountService.getAccountList(0, 1000, {type: "category"}).then(
     //   ({ data }) => {
@@ -50,14 +60,15 @@ export const CategoryFormPage = ({}) => {
     //     setAccountLoading(false);
     //   }
     // );
-  }
-  useEffect( ()=> {
+  };
+  useEffect(() => {
     // only call once
-    getAccountsData() 
+    getAccountsData();
   }, []);
 
-  return <React.Fragment>
-  {/* <GridItem xs={12}>
+  return (
+    <React.Fragment>
+      {/* <GridItem xs={12}>
     <h5>{t("Basic Information")}</h5>
   </GridItem>
   <GridItem xs={12} lg={12} >
@@ -102,7 +113,8 @@ export const CategoryFormPage = ({}) => {
       }}
     />
   </GridItem> */}
-</React.Fragment>
-}
+    </React.Fragment>
+  );
+};
 
 // export default CategoryFormPage;

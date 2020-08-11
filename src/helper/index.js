@@ -1,7 +1,7 @@
 import queryString from "query-string";
 import moment, * as moments from "moment";
 
-const MEDIA_PATH = 'https://s3.amazonaws.com/pictures.duocun.ca/media';
+const MEDIA_PATH = "https://s3.amazonaws.com/pictures.duocun.ca/media";
 
 export const getQueryParam = (location, key) => {
   if (location.search) {
@@ -203,14 +203,14 @@ export const arrayToggleElem = (arr, elem) => {
     arr.push(elem);
   } else {
     arr.splice(elemIndex, 1);
-	}
-	return arr;
+  }
+  return arr;
 };
 
-export const enumLikeObj = (obj) => {
-  const enumObj = {...obj };
+export const enumLikeObj = obj => {
+  const enumObj = { ...obj };
   for (const key in enumObj) {
     enumObj[enumObj[key]] = key;
-  };
+  }
   return enumObj;
 };

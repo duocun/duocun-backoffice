@@ -25,8 +25,10 @@ import CategoryIcon from "@material-ui/icons/Category";
 import StoreIcon from "@material-ui/icons/Store";
 import TransactionIcon from "@material-ui/icons/AttachMoney";
 import SalaryIcon from "@material-ui/icons/PeopleAlt";
-import ListAltIcon from "@material-ui/icons/ListAlt";
-// core components/views for Admin layout
+import WidgetsIcon from "@material-ui/icons/Widgets";
+import SupervisorAccountIcon from "@material-ui/icons/SupervisorAccount";
+
+import DashboardRoute from "views/Dashboard/DashboardRoute.js";
 import CategoriesPage from "views/Categories/Categories.js";
 import FinanceRoute from "views/Finance/FinanceRoute.js";
 import ProductPage from "views/Products/Products.js";
@@ -36,12 +38,9 @@ import OrderRoute from "views/Orders/OrderRoute.js";
 import MapRoute from "views/Maps/MapRoute.js";
 import TableList from "views/TableList/TableList.js";
 import StaticPage from "views/Pages/Pages.js";
-import Assignment from "views/Assignment/AssignmentRoute";
-import DashboardRoute from "views/Dashboard/DashboardRoute.js";
-
 import AccountsRoute from "views/Accounts/AccountsRoute";
 import MerchantsPage from "views/Merchants/MerchantsPage";
-import WidgetsIcon from "@material-ui/icons/Widgets";
+import RolesPage from "views/Roles/Roles";
 
 const dashboardRoutes = [
   {
@@ -133,6 +132,13 @@ const dashboardRoutes = [
     name: "Static Page",
     icon: LocationIcon,
     component: StaticPage,
+    layout: "/"
+  },
+  {
+    path: "/roles",
+    name: "Roles & Permissions",
+    icon: SupervisorAccountIcon,
+    component: RolesPage,
     layout: "/"
   },
   // {

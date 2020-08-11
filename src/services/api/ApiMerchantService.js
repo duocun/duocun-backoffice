@@ -18,9 +18,9 @@ export default {
   createMerchant: (merchantData = {}) => {
     return ApiService.v2().post("merchants", merchantData);
   },
-  getMerchants: (conditions) => {
+  getMerchants: conditions => {
     let query = {};
     query.query = buildQuery(conditions);
     return ApiService.v2().get("merchants", query);
-  },
+  }
 };

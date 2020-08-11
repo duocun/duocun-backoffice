@@ -1,7 +1,7 @@
 import { enumLikeObj } from "helper/index";
 
 export const defaultAccount = {
-  _id: 'new',
+  _id: "new",
   username: "",
   imageurl: "",
   realm: "",
@@ -14,17 +14,17 @@ export const defaultAccount = {
   verificationCode: "",
   verified: true,
   attributes: []
-}
+};
 
 export const AccountAttribute = {
-  I: "INDOOR", 
-  G: "GARDENING", 
-  R: "ROOFING", 
-  O: "OFFICE", 
-  P: "PLAZA", 
-  H: "HOUSE", 
-  C: "CONDO",
-}
+  I: "INDOOR",
+  G: "GARDENING",
+  R: "ROOFING",
+  O: "OFFICE",
+  P: "PLAZA",
+  H: "HOUSE",
+  C: "CONDO"
+};
 
 export const DEFAULT_MODEL = {
   _id: "new",
@@ -44,7 +44,7 @@ export const DEFAULT_MODEL = {
   passwordRaw: "",
   roles: [],
   secondPhone: "",
-  created: new Date(),
+  created: new Date()
 };
 
 export const ACCOUNT_TYPES = [
@@ -55,7 +55,7 @@ export const ACCOUNT_TYPES = [
   "Freight",
   "Customer Service",
   "Stock Manager",
-  "Admin",
+  "Admin"
 ];
 
 export const ATTRIBUTES = {
@@ -65,7 +65,7 @@ export const ATTRIBUTES = {
   O: "OFFICE",
   P: "PLAZA",
   H: "HOUSE",
-  C: "CONDO",
+  C: "CONDO"
 };
 
 export const ROLES = {
@@ -76,10 +76,10 @@ export const ROLES = {
   5: "DRIVER",
   6: "CLIENT",
   7: "CUSTOMER SERVICE",
-  8: "STORAGE ADMIN",
+  8: "STORAGE ADMIN"
 };
 
-export const getRolesFromAccountTypes = (accountType) => {
+export const getRolesFromAccountTypes = accountType => {
   if (accountType === "admin") {
     return Object.keys(ROLES);
   }

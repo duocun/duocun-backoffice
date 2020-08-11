@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { connect } from "react-redux";
 import { useTranslation } from "react-i18next";
 import PropTypes from "prop-types";
-import * as moment from 'moment';
+import * as moment from "moment";
 
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
@@ -37,7 +37,7 @@ import FlashStorage from "services/FlashStorage";
 import { getQueryParam } from "helper/index";
 
 import ApiTransactionService from "services/api/ApiTransactionService";
-import ApiAccountService from 'services/api/ApiAccountService';
+import ApiAccountService from "services/api/ApiAccountService";
 
 import { selectTransaction } from "redux/actions/transaction";
 import { setAccount } from "redux/actions/account";
@@ -47,7 +47,6 @@ import AccountSearch from "components/AccountSearch/AccountSearch";
 //helper function
 import { toDateString } from "../../helper";
 import { TableHeader } from "components/Table/TableHeader";
-
 
 // const useStyles = makeStyles((theme) => ({
 //   table: {
@@ -67,7 +66,7 @@ const useStyles = makeStyles(() => ({
     margin: "0px"
   },
   table: {
-    minWidth: 750,
+    minWidth: 750
   },
   cardCategoryWhite: {
     "&,& a,& a:hover,& a:focus": {
@@ -75,11 +74,11 @@ const useStyles = makeStyles(() => ({
       margin: "0",
       fontSize: "14px",
       marginTop: "0",
-      marginBottom: "0",
+      marginBottom: "0"
     },
     "& a,& a:hover,& a:focus": {
-      color: "#FFFFFF",
-    },
+      color: "#FFFFFF"
+    }
   },
   cardTitleWhite: {
     color: "#FFFFFF",
@@ -93,36 +92,45 @@ const useStyles = makeStyles(() => ({
       color: "#777",
       fontSize: "65%",
       fontWeight: "400",
-      lineHeight: "1",
-    },
+      lineHeight: "1"
+    }
   }
-
 }));
 
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
-}
+};
 
 export const defaultSalary = {
-  actionCode: 'PS',
+  actionCode: "PS",
   amount: 0,
-  fromId: '',
-  fromName: '',
-  toId: '',
-  toName: '',
-  note: '',
-  staffId: '',
-  staffName: '',
-  modifyBy: '',
+  fromId: "",
+  fromName: "",
+  toId: "",
+  toName: "",
+  note: "",
+  staffId: "",
+  staffName: "",
+  modifyBy: "",
   created: moment.utc().toISOString()
-}
+};
 
 // redux --- account, loggedInAccount, selectTransaction, setAccount
-const SalaryTablePage = ({ account, loggedInAccount, location, selectTransaction, setAccount }) => {
+const SalaryTablePage = ({
+  account,
+  loggedInAccount,
+  location,
+  selectTransaction,
+  setAccount
+}) => {
   const classes = useStyles();
   const { t } = useTranslation();
   // form related
-  const [driver, setDriver] = useState({ _id: '', username: '', type: 'driver' });
+  const [driver, setDriver] = useState({
+    _id: "",
+    username: "",
+    type: "driver"
+  });
   const [model, setModel] = useState(defaultSalary);
 
   const [driverKeyword, setDriverKeyword] = useState("");
@@ -175,56 +183,59 @@ const SalaryTablePage = ({ account, loggedInAccount, location, selectTransaction
   // }, []);
 
   useEffect(() => {
-    if(driver && driver._id){
+    if (driver && driver._id) {
       updateData(driver._id);
-    }else if(account && account._id){
-      setDriverKeyword(account ? account.username : '');
+    } else if (account && account._id) {
+      setDriverKeyword(account ? account.username : "");
       updateData(account._id);
     } else {
-      updateData('');
+      updateData("");
     }
   }, [page, rowsPerPage, sort, driver]);
 
-
   const saveSalaryToRedux = (driver, loggedInAccount) => {
-    ApiAccountService.getAccountList(null, null, { username: 'Expense', type: 'system' }).then(({ data }) => {
+    ApiAccountService.getAccountList(null, null, {
+      username: "Expense",
+      type: "system"
+    }).then(({ data }) => {
       const expense = data.data[0];
-      const staffName = driver ? driver.username : '';
+      const staffName = driver ? driver.username : "";
       const tr = {
         ...defaultSalary,
-        actionCode: 'PS',
+        actionCode: "PS",
         toId: expense._id,
         toName: expense.username,
-        staffId: driver ? driver._id : '',
+        staffId: driver ? driver._id : "",
         staffName,
         note: `Pay salary to ${staffName}`,
-        modifyBy: loggedInAccount ? loggedInAccount._id : '',
+        modifyBy: loggedInAccount ? loggedInAccount._id : "",
         created: moment.utc().toISOString()
-      }
+      };
       setAccount(driver);
       selectTransaction(tr);
     });
-  }
+  };
 
   const handleUpdate = () => {
     if (driver._id) {
       removeAlert();
       setProcessing(true);
-      ApiTransactionService.updateTransactions(driver._id).then(({ data }) => {
-        if (data.code === 'success') {
-          setAlert({
-            message: t("Update successfully"),
-            severity: "success"
-          });
-          updateData(driver._id);
-        } else {
-          setAlert({
-            message: t("Update failed"),
-            severity: "error"
-          });
-        }
-        setProcessing(false);
-      })
+      ApiTransactionService.updateTransactions(driver._id)
+        .then(({ data }) => {
+          if (data.code === "success") {
+            setAlert({
+              message: t("Update successfully"),
+              severity: "success"
+            });
+            updateData(driver._id);
+          } else {
+            setAlert({
+              message: t("Update failed"),
+              severity: "error"
+            });
+          }
+          setProcessing(false);
+        })
         .catch(e => {
           console.error(e);
           setAlert({
@@ -236,34 +247,35 @@ const SalaryTablePage = ({ account, loggedInAccount, location, selectTransaction
     }
   };
 
-  const handelSelectRow = (tr) => {
+  const handelSelectRow = tr => {
     if (tr.note) {
       setModel(tr);
     } else {
-      setModel({ ...tr, note: '' });
+      setModel({ ...tr, note: "" });
     }
-  }
+  };
 
-  const handleDeleteTransaction = (transactionId) => {
-    if (window.confirm('Are you sure to delete this transaction?')) {
+  const handleDeleteTransaction = transactionId => {
+    if (window.confirm("Are you sure to delete this transaction?")) {
       if (transactionId) {
         removeAlert();
         setProcessing(true);
-        ApiTransactionService.deleteTransaction(transactionId).then(({ data }) => {
-          if (data.code === 'success') {
-            setAlert({
-              message: t("Delete transaction successfully"),
-              severity: "success"
-            });
-            updateData(driver._id);
-          } else {
-            setAlert({
-              message: t("Delete transaction failed"),
-              severity: "error"
-            });
-          }
-          setProcessing(false);
-        })
+        ApiTransactionService.deleteTransaction(transactionId)
+          .then(({ data }) => {
+            if (data.code === "success") {
+              setAlert({
+                message: t("Delete transaction successfully"),
+                severity: "success"
+              });
+              updateData(driver._id);
+            } else {
+              setAlert({
+                message: t("Delete transaction failed"),
+                severity: "error"
+              });
+            }
+            setProcessing(false);
+          })
           .catch(e => {
             console.error(e);
             setAlert({
@@ -276,28 +288,26 @@ const SalaryTablePage = ({ account, loggedInAccount, location, selectTransaction
     }
   };
 
-
-  const updateData = (accountId) => {
-    const query = accountId ? {
-      $or: [
-        { fromId: accountId },
-        { toId: accountId },
-        { staffId: accountId }
-      ]
-    } : {};
+  const updateData = accountId => {
+    const query = accountId
+      ? {
+          $or: [
+            { fromId: accountId },
+            { toId: accountId },
+            { staffId: accountId }
+          ]
+        }
+      : {};
 
     const condition = {
       ...query,
-      actionCode: { $in: ['PS'] },
-      status: { $nin: ['bad', 'tmp'] }
+      actionCode: { $in: ["PS"] },
+      status: { $nin: ["bad", "tmp"] }
     };
 
-    ApiTransactionService.getTransactionList(
-      page,
-      rowsPerPage,
-      condition,
-      [sort]
-    ).then(({ data }) => {
+    ApiTransactionService.getTransactionList(page, rowsPerPage, condition, [
+      sort
+    ]).then(({ data }) => {
       setTransactions(data.data);
       setTotalRows(data.count);
       setLoading(false);
@@ -315,24 +325,26 @@ const SalaryTablePage = ({ account, loggedInAccount, location, selectTransaction
   // }
 
   const handleSelectDriver = account => {
-    const type = account ? account.type : 'driver';
-    setDriver({ _id: account ? account._id : '', type });
-    setDriverKeyword(account ? account.username : '');
+    const type = account ? account.type : "driver";
+    setDriver({ _id: account ? account._id : "", type });
+    setDriverKeyword(account ? account.username : "");
     // updateData(product);
     // create an empty transaction for create new salary
     saveSalaryToRedux(account, loggedInAccount);
-  }
+  };
 
   const handleClearDriver = () => {
     setDriverKeyword("");
-    setDriver({ _id: '', username: '',  type: 'driver' });
+    setDriver({ _id: "", username: "", type: "driver" });
     selectTransaction(defaultSalary);
-    setAccount({ _id: '', username: '',  type: 'client' });
-  }
+    setAccount({ _id: "", username: "", type: "client" });
+  };
 
   const handleSearchDriver = (page, rowsPerPage, keyword) => {
-    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword, ['driver']);
-  }
+    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword, [
+      "driver"
+    ]);
+  };
 
   // const getBalance = (account, row) => {
   //   if(account){
@@ -377,7 +389,6 @@ const SalaryTablePage = ({ account, loggedInAccount, location, selectTransaction
                 </Link>
               </Box>
             </GridItem>
-
           </GridContainer>
         </CardHeader>
 
@@ -394,47 +405,50 @@ const SalaryTablePage = ({ account, loggedInAccount, location, selectTransaction
               <Table
                 className={classes.table}
                 aria-label="Transaction Table"
-                size="small">
-                  <TableHeader data={[
-                      {field: 'created', label: 'Created Date'},
-                      {field: 'fromName', label: 'From Name'},
-                      {field: 'toName', label: 'To Name'},
-                      {field: 'amount', label: 'Amount'},
-                      {field: 'note', label: 'Note'},
-                      {field: 'actions', label: 'Actions'}
-                    ]}
-                    sort={sort}
-                    onSetSort={setSort} 
-                  />
+                size="small"
+              >
+                <TableHeader
+                  data={[
+                    { field: "created", label: "Created Date" },
+                    { field: "fromName", label: "From Name" },
+                    { field: "toName", label: "To Name" },
+                    { field: "amount", label: "Amount" },
+                    { field: "note", label: "Note" },
+                    { field: "actions", label: "Actions" }
+                  ]}
+                  sort={sort}
+                  onSetSort={setSort}
+                />
                 <TableBody>
                   {loading ? (
                     <TableBodySkeleton colCount={7} rowCount={rowsPerPage} />
+                  ) : !transactions.length ? (
+                    <TableRow>
+                      <TableCell align="center" colSpan={7} size="medium">
+                        {t("No data to display")}
+                      </TableCell>
+                    </TableRow>
                   ) : (
-                      (!transactions.length) ? (
-                        <TableRow>
-                          <TableCell align="center" colSpan={7} size="medium">
-                            {t("No data to display")}
-                          </TableCell>
-                        </TableRow>
-                      ) : (
-                          transactions.map((row, idx) => (
-                            <TableRow key={idx} onClick={() => handelSelectRow(row)}>
-                              {/* <TableCell>{page * rowsPerPage + idx + 1}</TableCell> */}
-                              <TableCell>{toDateString(row.created)}</TableCell>
-                              <TableCell>{row.fromName}</TableCell>
-                              <TableCell>{row.toName}</TableCell>
-                              <TableCell>{row.amount}</TableCell>
-                              {/* <TableCell>{getBalance(account, row)}</TableCell> */}
-                              <TableCell>{row.note}</TableCell>
-                              <TableCell>
-                                <Link to={`salary/${row._id}`}>
-                                  <IconButton aria-label="edit"> <EditIcon /></IconButton>
-                                </Link>
-                              </TableCell>
-                            </TableRow>
-                          ))
-                        )
-                    )}
+                    transactions.map((row, idx) => (
+                      <TableRow key={idx} onClick={() => handelSelectRow(row)}>
+                        {/* <TableCell>{page * rowsPerPage + idx + 1}</TableCell> */}
+                        <TableCell>{toDateString(row.created)}</TableCell>
+                        <TableCell>{row.fromName}</TableCell>
+                        <TableCell>{row.toName}</TableCell>
+                        <TableCell>{row.amount}</TableCell>
+                        {/* <TableCell>{getBalance(account, row)}</TableCell> */}
+                        <TableCell>{row.note}</TableCell>
+                        <TableCell>
+                          <Link to={`salary/${row._id}`}>
+                            <IconButton aria-label="edit">
+                              {" "}
+                              <EditIcon />
+                            </IconButton>
+                          </Link>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
 
@@ -463,7 +477,8 @@ const SalaryTablePage = ({ account, loggedInAccount, location, selectTransaction
                   disabled={processing}
                   onClick={handleUpdate}
                 >
-                  <SaveIcon />{t("Update")}
+                  <SaveIcon />
+                  {t("Update")}
                 </Button>
               </Box>
             </GridItem>
@@ -472,8 +487,7 @@ const SalaryTablePage = ({ account, loggedInAccount, location, selectTransaction
       </Card>
     </GridContainer>
   );
-}
-
+};
 
 // const mapStateToProps = (state) => ({ driverSummary: state.driverSummary });
 // // const mapDispatchToProps = (dispatch) => ({

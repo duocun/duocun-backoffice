@@ -19,13 +19,12 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import CheckIcon from "@material-ui/icons/Check";
 import CloseIcon from "@material-ui/icons/Close";
 
-
 const styles = {
-  container:{
-    maxWidth:700,
-    width:'50%',
-    "& .MuiTablePagination-root":{
-      overflow: 'hidden'
+  container: {
+    maxWidth: 700,
+    width: "50%",
+    "& .MuiTablePagination-root": {
+      overflow: "hidden"
     }
   },
   cardCategoryWhite: {
@@ -59,7 +58,17 @@ const styles = {
 
 const useStyles = makeStyles(styles);
 
-export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, setRowsPerPage, setSort, setPage }) => {
+export const OrderTable = ({
+  rows,
+  page,
+  rowsPerPage,
+  totalRows,
+  sort,
+  loading,
+  setRowsPerPage,
+  setSort,
+  setPage
+}) => {
   const { t } = useTranslation();
   const classes = useStyles();
   // const [page, setPage] = useState(
@@ -95,8 +104,8 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
   };
 
   const toDateString = s => {
-    return s ? s.split('T')[0] : '';
-  }
+    return s ? s.split("T")[0] : "";
+  };
 
   if (!rows.length) {
     return (
@@ -108,15 +117,9 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
       // </TableRow>
     );
   } else {
-
-
     return (
       <TableContainer className={classes.container}>
-        <Table
-          className={classes.table}
-          aria-label="Order Table"
-          size="small"
-        >
+        <Table className={classes.table} aria-label="Order Table" size="small">
           <TableHead>
             <TableRow>
               <TableCell>#</TableCell>
@@ -197,51 +200,50 @@ export const OrderTable = ({ rows, page, rowsPerPage, totalRows, sort, loading, 
           </TableHead>
           <TableBody>
             {loading ? (
-              <TableBodySkeleton
-                colCount={7}
-                rowCount={rowsPerPage}
-              />
+              <TableBodySkeleton colCount={7} rowCount={rowsPerPage} />
             ) : (
-                // <OrderTable rows={orders} page={page} rowsPerPage={rowsPerPage} processing={processing}/>
-                <React.Fragment>
-                  {rows.map((row, idx) => (
-                    <TableRow key={idx}>
-                      <TableCell>{page * rowsPerPage + idx + 1}</TableCell>
-                      <TableCell>{row.code}</TableCell>
-                      <TableCell>{toDateString(row.delivered)}</TableCell>
-                      <TableCell>{row.clientName}</TableCell>
-                      <TableCell>{row.clientPhone ? row.clientPhone : 'N/A'}</TableCell>
-                      <TableCell>{row.merchantName ? row.merchantName: 'N/A'}</TableCell>
-                      <TableCell>{row.price}</TableCell>
-                      <TableCell>{row.cost}</TableCell>
-                      <TableCell>
-                        <IconButton
-                          disabled={processing}
+              // <OrderTable rows={orders} page={page} rowsPerPage={rowsPerPage} processing={processing}/>
+              <React.Fragment>
+                {rows.map((row, idx) => (
+                  <TableRow key={idx}>
+                    <TableCell>{page * rowsPerPage + idx + 1}</TableCell>
+                    <TableCell>{row.code}</TableCell>
+                    <TableCell>{toDateString(row.delivered)}</TableCell>
+                    <TableCell>{row.clientName}</TableCell>
+                    <TableCell>
+                      {row.clientPhone ? row.clientPhone : "N/A"}
+                    </TableCell>
+                    <TableCell>
+                      {row.merchantName ? row.merchantName : "N/A"}
+                    </TableCell>
+                    <TableCell>{row.price}</TableCell>
+                    <TableCell>{row.cost}</TableCell>
+                    <TableCell>
+                      <IconButton
+                        disabled={processing}
                         // onClick={() => {
                         //   toggleFeature(row._id);
                         // }}
-                        >
-                          {row.featured ? (
-                            <CheckIcon color="primary"></CheckIcon>
-                          ) : (
-                              <CloseIcon color="error"></CloseIcon>
-                            )}
-                        </IconButton>
-                      </TableCell>
-                      <TableCell>
-                        <IconButton aria-label="edit" href={`orders/${row._id}`}>
-                          <EditIcon />
-                        </IconButton>
-                        <IconButton aria-label="delete" disabled={processing}>
-                          <DeleteIcon />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </React.Fragment>
-
-
-              )}
+                      >
+                        {row.featured ? (
+                          <CheckIcon color="primary"></CheckIcon>
+                        ) : (
+                          <CloseIcon color="error"></CloseIcon>
+                        )}
+                      </IconButton>
+                    </TableCell>
+                    <TableCell>
+                      <IconButton aria-label="edit" href={`orders/${row._id}`}>
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton aria-label="delete" disabled={processing}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </React.Fragment>
+            )}
           </TableBody>
         </Table>
 

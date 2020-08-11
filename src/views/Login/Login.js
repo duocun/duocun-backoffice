@@ -46,7 +46,7 @@ const Login = ({ signIn, history, isAuthorized }) => {
   const handleLogin = useCallback(() => {
     ApiAuthService.login(email, password)
       .then(({ data }) => {
-        if (data.code === 'success') {
+        if (data.code === "success") {
           const tokenId = data.token;
           ApiAuthService.getCurrentUser(tokenId).then(({ data }) => {
             const account = data;
@@ -138,7 +138,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   signIn: () => dispatch(signIn()),
-  signOut: () => dispatch(signOut()),
+  signOut: () => dispatch(signOut())
 });
 
 export default connect(

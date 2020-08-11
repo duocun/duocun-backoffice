@@ -1,7 +1,7 @@
 import React from "react";
 import { Switch, Route } from "react-router-dom";
 import ListCategories from "views/Categories/ListCategories";
-import {CategoryFormPage} from "views/Categories/CategoryFormPage";
+import { CategoryFormPage } from "views/Categories/CategoryFormPage";
 
 // import EditCategory from "views/Categories/EditCategory";
 const Attributes = () => {

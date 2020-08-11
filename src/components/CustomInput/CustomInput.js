@@ -15,8 +15,8 @@ import IconButton from "@material-ui/core/IconButton";
 import styles from "assets/jss/material-dashboard-react/components/customInputStyle.js";
 
 const useStyles = makeStyles(styles);
-const useCustomStyle = makeStyles((theme)=>({
-  clearBtn:{
+const useCustomStyle = makeStyles(theme => ({
+  clearBtn: {
     position: "absolute",
     right: "0px",
     top: "10px"
@@ -50,10 +50,10 @@ export default function CustomInput(props) {
     [classes.marginTop]: labelText === undefined
   });
   const handleClear = () => {
-    if(onClear){
+    if (onClear) {
       onClear();
     }
-  }
+  };
   return (
     <FormControl
       {...formControlProps}
@@ -77,12 +77,11 @@ export default function CustomInput(props) {
         id={id}
         {...inputProps}
       />
-      {
-        onClear &&
+      {onClear && (
         <IconButton className={customClasses.clearBtn} onClick={handleClear}>
           <Clear />
         </IconButton>
-      }
+      )}
 
       {error ? (
         <Clear className={classes.feedback + " " + classes.labelRootError} />

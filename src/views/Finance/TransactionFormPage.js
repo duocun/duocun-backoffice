@@ -10,28 +10,31 @@ import GridItem from "components/Grid/GridItem.js";
 import FlashStorage from "services/FlashStorage";
 
 import AuthService from "services/AuthService";
-import ApiAuthService from 'services/api/ApiAuthService';
-import ApiAccountService from 'services/api/ApiAccountService';
-import ApiTransactionService from 'services/api/ApiTransactionService';
+import ApiAuthService from "services/api/ApiAuthService";
+import ApiAccountService from "services/api/ApiAccountService";
+import ApiTransactionService from "services/api/ApiTransactionService";
 
 import { defaultTransaction } from "views/Finance/FinanceModel";
 import { TransactionForm } from "./TransactionForm";
 
-import { selectTransaction } from 'redux/actions/transaction';
-import { setAccount } from 'redux/actions/account';
+import { selectTransaction } from "redux/actions/transaction";
+import { setAccount } from "redux/actions/account";
 
-const useStyles = makeStyles(() => ({
-
-}));
+const useStyles = makeStyles(() => ({}));
 
 const defaultActions = [
-  { code: 'PS', text: 'Pay Salary' },
-  { code: 'PDCH', text: 'Pay Driver Cash' },
-  { code: 'T', text: 'Transfer' }
+  { code: "PS", text: "Pay Salary" },
+  { code: "PDCH", text: "Pay Driver Cash" },
+  { code: "T", text: "Transfer" }
 ];
 
-const TransactionFormPage = ({ match, history, account, transaction, update }) => {
-
+const TransactionFormPage = ({
+  match,
+  history,
+  account,
+  transaction,
+  update
+}) => {
   // moment.tz.add("America/Toronto|EST EDT EWT EPT|50 40 40 40|01010101010101010101010101010101010101010101012301010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010|-25TR0 1in0 11Wu 1nzu 1fD0 WJ0 1wr0 Nb0 1Ap0 On0 1zd0 On0 1wp0 TX0 1tB0 TX0 1tB0 TX0 1tB0 WL0 1qN0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 WL0 1qN0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 WL0 1qN0 4kM0 8x40 iv0 1o10 11z0 1nX0 11z0 1o10 11z0 1o10 1qL0 11D0 1nX0 11B0 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1o10 11z0 1qN0 11z0 1o10 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0|65e5");
 
   // // localTime --- 'YYYY-MM-DDTHH:mm:ss'
@@ -42,7 +45,10 @@ const TransactionFormPage = ({ match, history, account, transaction, update }) =
   const { t } = useTranslation();
   const classes = useStyles();
   const [items, setItems] = useState([]);
-  const [modifyByAccount, setModifyByAccount] = useState({ _id: '', username: '' });
+  const [modifyByAccount, setModifyByAccount] = useState({
+    _id: "",
+    username: ""
+  });
   const [accounts, setAccounts] = useState([]);
   const [model, setModel] = useState(defaultTransaction);
   const [processing, setProcessing] = useState(false);
@@ -58,33 +64,38 @@ const TransactionFormPage = ({ match, history, account, transaction, update }) =
 
   useEffect(() => {
     if (!model._id) {
-      if (match.params.id === 'new') {
-        if (model.actionCode === 'PS') {
-          ApiAccountService.getAccountList(null, null, { username: 'Expense', type: 'system' }).then(({ data }) => {
+      if (match.params.id === "new") {
+        if (model.actionCode === "PS") {
+          ApiAccountService.getAccountList(null, null, {
+            username: "Expense",
+            type: "system"
+          }).then(({ data }) => {
             const expense = data.data[0];
-            const toName = expense ? expense.username : '';
-            const staffName = account ? account.username : '';
+            const toName = expense ? expense.username : "";
+            const staffName = account ? account.username : "";
             setModel({
               ...model,
-              toId: expense ? expense._id : '',
+              toId: expense ? expense._id : "",
               toName,
-              staffId: account ? account._id : '',
+              staffId: account ? account._id : "",
               staffName,
-              note: account ? `Pay salary to ${account.username}` : '',
+              note: account ? `Pay salary to ${account.username}` : "",
               modifyBy: modifyByAccount._id
             });
           });
-        }else{
+        } else {
           setModel({
             ...model,
             modifyBy: modifyByAccount._id
           });
         }
       } else {
-        ApiTransactionService.getTransaction(match.params.id).then(({ data }) => {
-          const tr = data.data;
-          setModel({ ...tr, modifyBy: modifyByAccount._id });
-        });
+        ApiTransactionService.getTransaction(match.params.id).then(
+          ({ data }) => {
+            const tr = data.data;
+            setModel({ ...tr, modifyBy: modifyByAccount._id });
+          }
+        );
       }
     }
   }, []);
@@ -100,75 +111,86 @@ const TransactionFormPage = ({ match, history, account, transaction, update }) =
       //     setModel({ ...tr, modifyBy: account._id });
       //   }
       // setModel({ ...model, modifyBy: account._id });
-      ApiAccountService.getAccountList(null, null, { type: { $in: ['driver', 'system'] } }).then(({ data }) => {
+      ApiAccountService.getAccountList(null, null, {
+        type: { $in: ["driver", "system"] }
+      }).then(({ data }) => {
         setAccounts(data.data);
       });
       // });
     });
   }, []);
 
-
-  const handleActionChange = (actionCode) => {
+  const handleActionChange = actionCode => {
     if (model._id) {
       if (actionCode === transaction.actionCode) {
-        setModel({ ...model, actionCode, note: transaction.note ? transaction.note : '' });
+        setModel({
+          ...model,
+          actionCode,
+          note: transaction.note ? transaction.note : ""
+        });
       } else {
-        setModel({ ...model, actionCode, note: '' });
+        setModel({ ...model, actionCode, note: "" });
       }
     } else {
-      if (actionCode === 'PS') {
+      if (actionCode === "PS") {
         setModel({ ...model, actionCode });
       } else {
-        setModel({ ...model, actionCode, note: '' });
+        setModel({ ...model, actionCode, note: "" });
       }
     }
-  }
+  };
 
-  const handleFromAccountChange = (fromId) => {
+  const handleFromAccountChange = fromId => {
     const account = accounts.find(a => a._id === fromId);
-    setModel({ ...model, fromId, fromName: account ? account.username : '' });
-  }
+    setModel({ ...model, fromId, fromName: account ? account.username : "" });
+  };
 
-  const handleToAccountChange = (toId) => {
+  const handleToAccountChange = toId => {
     const account = accounts.find(a => a._id === toId);
-    setModel({ ...model, toId, toName: account ? account.username : '' });
-  }
+    setModel({ ...model, toId, toName: account ? account.username : "" });
+  };
 
-  const handleStaffChange = (staffId) => {
+  const handleStaffChange = staffId => {
     const account = accounts.find(a => a._id === staffId);
-    const staffName = account ? account.username : ''
-    setModel({ ...model, staffId, staffName, note: `Pay salary to ${staffName}` });
-  }
+    const staffName = account ? account.username : "";
+    setModel({
+      ...model,
+      staffId,
+      staffName,
+      note: `Pay salary to ${staffName}`
+    });
+  };
 
-  const handleUpdateData = (accountId) => {
+  const handleUpdateData = accountId => {
     // updateData(accountId, actionCode, startDate, endDate);
-  }
+  };
 
   const handleCreate = () => {
     if (model.fromId && model.staffId) {
       removeAlert();
       setProcessing(true);
-      ApiTransactionService.createTransaction(model).then(({ data }) => {
-        if (data.code === 'success') {
-          const newAlert = {
-            message: t("Saved successfully"),
-            severity: "success"
-          };
-          if (model._id === "new") {
-            FlashStorage.set("SALARY_ALERT", newAlert);
-            return;
+      ApiTransactionService.createTransaction(model)
+        .then(({ data }) => {
+          if (data.code === "success") {
+            const newAlert = {
+              message: t("Saved successfully"),
+              severity: "success"
+            };
+            if (model._id === "new") {
+              FlashStorage.set("SALARY_ALERT", newAlert);
+              return;
+            } else {
+              setAlert(newAlert);
+              update(account._id);
+            }
           } else {
-            setAlert(newAlert);
-            update(account._id);
+            setAlert({
+              message: t("Save failed"),
+              severity: "error"
+            });
           }
-        } else {
-          setAlert({
-            message: t("Save failed"),
-            severity: "error"
-          });
-        }
-        setProcessing(false);
-      })
+          setProcessing(false);
+        })
         .catch(e => {
           console.error(e);
           setAlert({
@@ -184,21 +206,22 @@ const TransactionFormPage = ({ match, history, account, transaction, update }) =
     if (model.fromId && model.toId) {
       removeAlert();
       setProcessing(true);
-      ApiTransactionService.updateTransaction(model).then(({ data }) => {
-        if (data.code === 'success') {
-          setAlert({
-            message: t("Update successfully"),
-            severity: "success"
-          });
-          update(account._id);
-        } else {
-          setAlert({
-            message: t("Update failed"),
-            severity: "error"
-          });
-        }
-        setProcessing(false);
-      })
+      ApiTransactionService.updateTransaction(model)
+        .then(({ data }) => {
+          if (data.code === "success") {
+            setAlert({
+              message: t("Update successfully"),
+              severity: "success"
+            });
+            update(account._id);
+          } else {
+            setAlert({
+              message: t("Update failed"),
+              severity: "error"
+            });
+          }
+          setProcessing(false);
+        })
         .catch(e => {
           console.error(e);
           setAlert({
@@ -208,7 +231,7 @@ const TransactionFormPage = ({ match, history, account, transaction, update }) =
           setProcessing(false);
         });
     }
-  }
+  };
 
   const handleSubmit = () => {
     if (model._id) {
@@ -216,12 +239,9 @@ const TransactionFormPage = ({ match, history, account, transaction, update }) =
     } else {
       handleCreate();
     }
-  }
+  };
 
-  const handleBack = () => {
-
-  }
-
+  const handleBack = () => {};
 
   return (
     <GridContainer>
@@ -400,12 +420,12 @@ const TransactionFormPage = ({ match, history, account, transaction, update }) =
           account={account}
           transaction={model}
           items={items}
-          onAfterUpdate={handleUpdateData} />
+          onAfterUpdate={handleUpdateData}
+        />
       </GridItem>
     </GridContainer>
-  )
-}
-
+  );
+};
 
 TransactionFormPage.propTypes = {
   match: PropTypes.shape({
@@ -416,8 +436,7 @@ TransactionFormPage.propTypes = {
   history: PropTypes.object
 };
 
-
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
   transaction: state.transaction,
   // deliverDate: state.deliverDate,
   account: state.account

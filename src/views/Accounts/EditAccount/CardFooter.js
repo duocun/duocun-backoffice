@@ -38,13 +38,13 @@ const Footer = ({ onSave, onBack, processing }) => {
 Footer.propTypes = {
   onSave: PropTypes.func,
   onBack: PropTypes.func,
-  processing: PropTypes.bool,
+  processing: PropTypes.bool
 };
 
 Footer.defaultProps = {
   onSave: () => {},
   onBack: () => {},
-  processing: false,
+  processing: false
 };
 
 export default Footer;

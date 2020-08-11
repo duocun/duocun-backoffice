@@ -8,31 +8,31 @@ import Tab from "@material-ui/core/Tab";
 function a11yProps(index) {
   return {
     id: `full-width-tab-${index}`,
-    "aria-controls": `full-width-tabpanel-${index}`,
+    "aria-controls": `full-width-tabpanel-${index}`
   };
 }
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   root: {
     flexGrow: 1,
     width: "100%",
     [theme.breakpoints.down("md")]: {
-      marginBottom: "20px",
+      marginBottom: "20px"
     },
     "& .MuiTabs-indicator": {
-      backgroundColor: "transparent",
+      backgroundColor: "transparent"
     },
     "& .MuiTabs-flexContainer": {
-      backgroundColor: "transparent",
+      backgroundColor: "transparent"
     },
     "& .MuiPaper-root": {
       backgroundColor: "transparent",
-      boxShadow: "none",
+      boxShadow: "none"
     },
     "& .MuiTab-wrapper": {
-      color: "rgba(0, 0, 0, 0.54)",
-    },
-  },
+      color: "rgba(0, 0, 0, 0.54)"
+    }
+  }
 }));
 
 export default function SecondaryNav({ tabs, history }) {

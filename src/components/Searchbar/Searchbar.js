@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
@@ -11,7 +11,6 @@ import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
 import MenuItem from "@material-ui/core/MenuItem";
 
-
 const useStyles = makeStyles(styles);
 
 const Searchbar = ({
@@ -22,17 +21,17 @@ const Searchbar = ({
   options = [],
   optionTitle = "option",
   getOption,
-  placeholder="Search",
+  placeholder = "Search",
   //if Search is for finance page, since for transaction there is no direct search, actual search is searching the account list
   ifSearch = true
 }) => {
   const classes = useStyles();
   const { t } = useTranslation();
 
-  const [searchValue, setSearchValue] = useState(options[0])
+  const [searchValue, setSearchValue] = useState(options[0]);
 
-  const handleOptionChange = (e) => {
-    setSearchValue(e.target.value)
+  const handleOptionChange = e => {
+    setSearchValue(e.target.value);
     getOption(e.target.value);
   };
 
@@ -49,30 +48,32 @@ const Searchbar = ({
           >
             {options.length > 0 &&
               options.map((option, index) => (
-                <MenuItem key={index} value={option}>{option}</MenuItem>
+                <MenuItem key={index} value={option}>
+                  {option}
+                </MenuItem>
               ))}
           </Select>
         </FormControl>
       )}
       <CustomInput
         formControlProps={{
-          className: classes.margin + " " + classes.search,
+          className: classes.margin + " " + classes.search
         }}
         inputProps={{
           placeholder: t(placeholder),
           inputProps: {
-            "aria-label": t("Search"),
+            "aria-label": t("Search")
           },
           style: { color: "white" },
           onChange: onChange,
-          onKeyDown: (event) => {
+          onKeyDown: event => {
             const { key } = event;
             if (key === "Enter" && ifSearch) {
               return onSearch();
             }
           },
           onFocus: onFocus,
-          onBlur: onBlur,
+          onBlur: onBlur
         }}
       />
       <Button
@@ -95,7 +96,7 @@ Searchbar.propTypes = {
   onFocus: PropTypes.func,
   onBlur: PropTypes.func,
   options: PropTypes.array,
-  value: PropTypes.string,
+  value: PropTypes.string
 };
 
 export default Searchbar;

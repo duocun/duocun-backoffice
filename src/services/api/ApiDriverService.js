@@ -14,5 +14,5 @@ export default {
     //   []
     // );
     return ApiService.v2().get("drivers");
-  },
+  }
 };

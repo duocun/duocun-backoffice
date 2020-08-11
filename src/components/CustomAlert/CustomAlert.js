@@ -20,14 +20,14 @@ const CustomAlert = ({ alert, onClose, containerProps, alertProps }) => {
 CustomAlert.defaultProps = {
   onClose: () => {},
   containerProps: {},
-  alertProps: {},
+  alertProps: {}
 };
 
 CustomAlert.propTypes = {
   alert: PropTypes.object,
   onClose: PropTypes.func,
   containerProps: PropTypes.object,
-  alertProps: PropTypes.object,
+  alertProps: PropTypes.object
 };
 
 export default CustomAlert;

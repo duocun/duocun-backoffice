@@ -17,8 +17,7 @@ import Searchbar from "components/Searchbar/Searchbar";
 
 import ApiMerchantService from "services/api/ApiMerchantService";
 import { getQueryParam } from "helper/index";
-import MerchantsTable from './MerchantsTable';
-
+import MerchantsTable from "./MerchantsTable";
 
 export default function MerchantsTablePage({ location }) {
   const { t } = useTranslation();
@@ -98,9 +97,14 @@ export default function MerchantsTablePage({ location }) {
             <CardBody>
               <GridContainer>
                 <GridItem xs={12}>
-                  {
-                    MerchantsTable({merchants, toggleSort, rowsPerPage, sort, page, loading})
-                  }
+                  {MerchantsTable({
+                    merchants,
+                    toggleSort,
+                    rowsPerPage,
+                    sort,
+                    page,
+                    loading
+                  })}
                 </GridItem>
               </GridContainer>
             </CardBody>

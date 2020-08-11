@@ -34,8 +34,8 @@ const useStyles = makeStyles({
     display: "flex",
     justifyContent: "space-between",
     flexDirection: "row",
-    width: "100%",
-  },
+    width: "100%"
+  }
 });
 
 function AssignmentPage({ location, accounts, loadDrivers, history, drivers }) {
@@ -98,7 +98,7 @@ function AssignmentPage({ location, accounts, loadDrivers, history, drivers }) {
   const removeAlert = () => {
     setAlert({
       message: "",
-      severity: "info",
+      severity: "info"
     });
   };
 
@@ -117,7 +117,7 @@ function AssignmentPage({ location, accounts, loadDrivers, history, drivers }) {
                     style={{
                       display: "flex",
                       justifyContent: "center",
-                      alignItems: "center",
+                      alignItems: "center"
                     }}
                   >
                     <TimePicker
@@ -133,7 +133,7 @@ function AssignmentPage({ location, accounts, loadDrivers, history, drivers }) {
                   </div>
                   <Throttle time="1000" handler="onChange">
                     <Searchbar
-                      onChange={(e) => {
+                      onChange={e => {
                         const { target } = e;
                         setQuery(target.value);
                       }}
@@ -172,8 +172,14 @@ function AssignmentPage({ location, accounts, loadDrivers, history, drivers }) {
                       setSort={setSort}
                       setPage={setPage}
                     />
-                    <div style={{width:'50%' ,display:'flex', justifyContent:'center'}}>
-                      <AssignmentMap orders={orders}/>
+                    <div
+                      style={{
+                        width: "50%",
+                        display: "flex",
+                        justifyContent: "center"
+                      }}
+                    >
+                      <AssignmentMap orders={orders} />
                       <DriverTable drivers={drivers} />
                     </div>
                   </div>
@@ -192,17 +198,17 @@ AssignmentPage.propTypes = {
   loadAccounts: PropTypes.func,
   accounts: PropTypes.array,
   history: PropTypes.object,
-  drivers: PropTypes.array,
+  drivers: PropTypes.array
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
   accounts: state.accounts,
-  drivers: state.drivers,
+  drivers: state.drivers
 });
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = dispatch => ({
   loadDrivers: () => {
     dispatch(loadDriversAsync());
-  },
+  }
 });
 export default connect(
   mapStateToProps,

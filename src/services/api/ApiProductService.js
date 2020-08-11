@@ -31,7 +31,7 @@ export default {
       productId
     });
   },
-  getProducts: (conditions) => {
+  getProducts: conditions => {
     let query = {};
     query.query = buildQuery(conditions);
     return ApiService.v2().get("products", query);
@@ -75,9 +75,9 @@ export default {
           description: { $regex: keyword }
         }
       ],
-      type:'G'
+      type: "G"
     };
     query.query = buildQuery(condition);
     return ApiService.v2().get("products", query);
-  },
+  }
 };

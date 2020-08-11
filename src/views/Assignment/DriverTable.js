@@ -10,24 +10,24 @@ import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 
 const useStyles = makeStyles({
-  container:{
-    height:'100%',
-    maxHeight:'400px',
-    maxWidth:100,
-    width:'100%',
-    overflowY:'scroll',
-    overflowX:'hidden'
+  container: {
+    height: "100%",
+    maxHeight: "400px",
+    maxWidth: 100,
+    width: "100%",
+    overflowY: "scroll",
+    overflowX: "hidden"
   },
   table: {
     minWidth: 650,
-    position:'relative',
-    borderCollapse: 'collapse', 
-    "& .MuiTableCell-head":{
-      position:'sticky',
+    position: "relative",
+    borderCollapse: "collapse",
+    "& .MuiTableCell-head": {
+      position: "sticky",
       top: 0,
-      backgroundColor:'white'
+      backgroundColor: "white"
     }
-  },
+  }
 });
 
 export default function DriverTable({ drivers }) {
@@ -43,7 +43,7 @@ export default function DriverTable({ drivers }) {
         </TableHead>
         <TableBody>
           {drivers &&
-            drivers.map((driver) => (
+            drivers.map(driver => (
               <TableRow key={driver._id}>
                 <TableCell component="th" scope="row">
                   {driver.accountName}

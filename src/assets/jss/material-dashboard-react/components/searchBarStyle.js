@@ -33,11 +33,11 @@ const searchBarStyle = theme => ({
     },
     display: "inline-block"
   },
-  formControl:{
-    margin: '12px 10px 0 0',
-    paddingBottom:'10px',
-    "& #select-label, #simple-select":{
-      color:'white'
+  formControl: {
+    margin: "12px 10px 0 0",
+    paddingBottom: "10px",
+    "& #select-label, #simple-select": {
+      color: "white"
     }
   }
 });
