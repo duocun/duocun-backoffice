@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { Switch, Route, Redirect } from "react-router-dom";
 // creates a beautiful scrollbar
 import PerfectScrollbar from "perfect-scrollbar";
@@ -17,6 +18,14 @@ import styles from "assets/jss/material-dashboard-react/layouts/adminStyle.js";
 
 import bgImage from "assets/img/sidebar-2.jpg";
 import logo from "assets/img/reactlogo.png";
+import CustomLoader from "components/CustomLoader/CustomLoader";
+import * as ApiRoleService from "services/api/ApiRoleService";
+import ApiAccountService from "services/api/ApiAccountService";
+import AuthService from "services/AuthService";
+import RoleContext from "shared/RoleContext";
+import AuthContext from "shared/AuthContext";
+import { signOut } from "redux/actions";
+import { connect } from "react-redux";
 
 let ps;
 
@@ -33,7 +42,7 @@ const switchRoutes = (
 );
 
 const useStyles = makeStyles(styles);
-const useCustomStyles = makeStyles(theme => ({
+const useCustomStyles = makeStyles(_theme => ({
   pageContent: {
     padding: "0px",
     marginTop: "80px"
@@ -43,7 +52,7 @@ const useCustomStyles = makeStyles(theme => ({
   }
 }));
 
-export default function Admin({ ...rest }) {
+const Admin = ({ signOut, ...rest }) => {
   // styles
   const classes = useStyles();
   const customClasses = useCustomStyles();
@@ -53,6 +62,9 @@ export default function Admin({ ...rest }) {
   const image = bgImage;
   const color = "red";
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [roleLoading, setRoleLoading] = React.useState(true);
+  const [roleData, setRoleData] = React.useState(null);
+  const [userInfo, setUserInfo] = React.useState(null);
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
@@ -64,6 +76,29 @@ export default function Admin({ ...rest }) {
       setMobileOpen(false);
     }
   };
+
+  React.useEffect(() => {
+    ApiRoleService.load().then(({ data }) => {
+      if (data.code === "success") {
+        console.log(data);
+        setRoleLoading(false);
+        setRoleData(data.data);
+      }
+    });
+    ApiAccountService.getCurrentAccount(AuthService.getAuthToken())
+      .then(({ data }) => {
+        if (data.code === "success") {
+          setUserInfo(data.data);
+        } else {
+          signOut();
+        }
+      })
+      .catch(e => {
+        console.error(e);
+        signOut();
+      });
+  }, []);
+
   // initialize and destroy the PerfectScrollbar plugin
   React.useEffect(() => {
     if (navigator.platform.indexOf("Win") > -1) {
@@ -83,33 +118,54 @@ export default function Admin({ ...rest }) {
     };
   }, [mainPanel]);
 
+  if (!roleData || !userInfo) {
+    return <CustomLoader />;
+  }
+
   return (
-    <div className={classes.wrapper}>
-      <Sidebar
-        routes={routes}
-        logoText={"Duocun"}
-        logo={logo}
-        image={image}
-        handleDrawerToggle={handleDrawerToggle}
-        open={mobileOpen}
-        color={color}
-        {...rest}
-      />
-      <div className={classes.mainPanel} ref={mainPanel}>
-        <Navbar
-          routes={routes}
-          handleDrawerToggle={handleDrawerToggle}
-          {...rest}
-        />
-        {getRoute() ? (
-          <div className={customClasses.pageContent}>
-            <div className={classes.container}>{switchRoutes}</div>
+    <AuthContext.Provider value={userInfo}>
+      <RoleContext.Provider value={roleData}>
+        <div className={classes.wrapper}>
+          <Sidebar
+            routes={routes}
+            logoText={"Duocun"}
+            logo={logo}
+            image={image}
+            handleDrawerToggle={handleDrawerToggle}
+            open={mobileOpen}
+            color={color}
+            {...rest}
+          />
+          <div className={classes.mainPanel} ref={mainPanel}>
+            <Navbar
+              routes={routes}
+              handleDrawerToggle={handleDrawerToggle}
+              {...rest}
+            />
+            {getRoute() ? (
+              <div className={customClasses.pageContent}>
+                <div className={classes.container}>{switchRoutes}</div>
+              </div>
+            ) : (
+              <div className={classes.map}>{switchRoutes}</div>
+            )}
+            {getRoute() ? <Footer /> : null}
           </div>
-        ) : (
-          <div className={classes.map}>{switchRoutes}</div>
-        )}
-        {getRoute() ? <Footer /> : null}
-      </div>
-    </div>
+        </div>
+      </RoleContext.Provider>
+    </AuthContext.Provider>
   );
-}
+};
+
+Admin.propTypes = {
+  signOut: PropTypes.func
+};
+
+const mapDispatchToProps = dispatch => ({
+  signOut: () => dispatch(signOut())
+});
+
+export default connect(
+  null,
+  mapDispatchToProps
+)(Admin);

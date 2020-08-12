@@ -33,12 +33,8 @@ import EditSkeleton from "../Common/EditSkeleton";
 import ApiAccountService from "services/api/ApiAccountService";
 
 import { setAccount } from "redux/actions/account";
-import {
-  defaultAccount,
-  AccountAttribute,
-  ROLE_MAPPING,
-  ATTRIBUTES_MAPPING
-} from "views/Accounts/AccountModel.js";
+import { DEFAULT_MODEL as defaultAccount } from "models/account";
+import { ATTRIBUTES as AccountAttribute } from "models/account";
 
 const useStyles = makeStyles({
   formControl: {

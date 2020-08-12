@@ -7,7 +7,14 @@ import { useTranslation } from "react-i18next";
 import { ROLES } from "models/account";
 import { FormControlLabel, Checkbox } from "@material-ui/core";
 
-const Roles = props => {
+const humanizeRoleName = (key) => {
+  if (!ROLES[key]) {
+    return key;
+  }
+  return String(ROLES[key]).replace(/_/g, " ");
+};
+
+const Roles = (props) => {
   const { t } = useTranslation();
   return (
     <GridContainer>
@@ -16,16 +23,16 @@ const Roles = props => {
       </GridItem>
       <GridItem xs={12}>
         <GridContainer>
-          {Object.keys(ROLES).map(key => (
+          {Object.keys(ROLES).map((key) => (
             <GridItem xs={6} md={4} key={key}>
               <FormControlLabel
                 color="primary"
-                label={t(ROLES[key] || key)}
+                label={t(humanizeRoleName(key))}
                 labelPlacement="end"
                 control={
                   <Checkbox
                     checked={(props.model.roles || []).includes(Number(key))}
-                    onChange={e => {
+                    onChange={(e) => {
                       const newModel = { ...props.model };
                       if (!newModel.roles) {
                         newModel.roles = [];
@@ -46,7 +53,7 @@ const Roles = props => {
 
 Roles.propTypes = {
   model: PropTypes.object,
-  onChange: PropTypes.func
+  onChange: PropTypes.func,
 };
 
 export default Roles;

@@ -41,6 +41,9 @@ import StaticPage from "views/Pages/Pages.js";
 import AccountsRoute from "views/Accounts/AccountsRoute";
 import MerchantsPage from "views/Merchants/MerchantsPage";
 import RolesPage from "views/Roles/Roles";
+import { ROLE_ENUM } from "models/account";
+import { RESOURCES } from "models/account";
+import { PERMISSIONS } from "models/account";
 
 const dashboardRoutes = [
   {
@@ -48,14 +51,21 @@ const dashboardRoutes = [
     name: "Dashboard",
     icon: Dashboard,
     component: DashboardRoute,
-    layout: "/"
+    layout: "/",
+    perm: {
+      resource: RESOURCES.STATISTICS,
+      permission: PERMISSIONS.READ
+    }
   },
   {
     path: "/categories",
     name: "Categories",
     icon: CategoryIcon,
     component: CategoriesPage,
-    layout: "/"
+    layout: "/",
+    perm: {
+      resource: RESOURCES.CATEGORY
+    }
   },
   // {
   //   path: "/finance",
@@ -69,7 +79,10 @@ const dashboardRoutes = [
     name: "Order",
     icon: "content_paste",
     component: OrderRoute,
-    layout: "/"
+    layout: "/",
+    perm: {
+      resource: RESOURCES.ORDER
+    }
   },
   {
     path: "/finance/transactions",
@@ -90,64 +103,81 @@ const dashboardRoutes = [
     name: "Products",
     icon: LocalMallIcon,
     component: ProductPage,
-    layout: "/"
+    layout: "/",
+    perm: {
+      resource: RESOURCES.PRODUCT
+    }
   },
   {
     path: "/stocks",
     name: "Stock",
     icon: WidgetsIcon,
     component: StockPage,
-    layout: "/"
+    layout: "/",
+    perm: {
+      resource: RESOURCES.STOCK
+    }
   },
   {
     path: "/attributes",
     name: "Attributes",
     icon: EditAttributesIcon,
     component: AttributePage,
-    layout: "/"
+    layout: "/",
+    perm: {
+      role: ROLE_ENUM.SUPER
+    }
   },
   {
     path: "/accounts",
     name: "Accounts",
     icon: Person,
     component: AccountsRoute,
-    layout: "/"
+    layout: "/",
+    perm: {
+      role: ROLE_ENUM.SUPER
+    }
   },
   {
     path: "/merchants",
     name: "Merchants",
     icon: StoreIcon,
     component: MerchantsPage,
-    layout: "/"
+    layout: "/",
+    perm: {
+      role: ROLE_ENUM.MERCHANT_ADMIN
+    }
   },
   {
     path: "/maps",
     name: "Assignment",
     icon: LocationIcon,
     component: MapRoute,
-    layout: "/"
+    layout: "/",
+    perm: {
+      role: ROLE_ENUM.SUPER
+    }
   },
   {
     path: "/pages",
     name: "Static Page",
     icon: LocationIcon,
     component: StaticPage,
-    layout: "/"
+    layout: "/",
+    perm: {
+      role: ROLE_ENUM.SUPER
+    }
   },
   {
     path: "/roles",
     name: "Roles & Permissions",
     icon: SupervisorAccountIcon,
     component: RolesPage,
-    layout: "/"
+    layout: "/",
+    perm: {
+      role: ROLE_ENUM.SUPER
+    }
   },
-  // {
-  //   path: "/assignment",
-  //   name: "Assignment",
-  //   icon: LocationIcon,
-  //   component: Assignment,
-  //   layout: "/"
-  // },
   {
     path: "/table",
     name: "Table List",
@@ -155,41 +185,6 @@ const dashboardRoutes = [
     component: TableList,
     layout: "/"
   }
-  // {
-  //   path: "/typography",
-  //   name: "Typography",
-  //   icon: LibraryBooks,
-  //   component: Typography,
-  //   layout: "/"
-  // },
-  // {
-  //   path: "/icons",
-  //   name: "Icons",
-  //   icon: BubbleChart,
-  //   component: Icons,
-  //   layout: "/"
-  // },
-  // {
-  //   path: "/maps",
-  //   name: "Maps",
-  //   icon: LocationOn,
-  //   component: Maps,
-  //   layout: "/"
-  // },
-  // {
-  //   path: "/user",
-  //   name: "User Profile",
-  //   icon: Person,
-  //   component: UserProfile,
-  //   layout: "/"
-  // },
-  // {
-  //   path: "/notifications",
-  //   name: "Notifications",
-  //   icon: Notifications,
-  //   component: NotificationsPage,
-  //   layout: "/"
-  // }
 ];
 
 export default dashboardRoutes;

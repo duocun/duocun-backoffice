@@ -88,5 +88,8 @@ export default {
   },
   saveAccount: model => {
     return ApiService.v2().post(`accounts/${model._id}`, { data: model });
+  },
+  getCurrentAccount: token => {
+    return ApiService.v2().get(`accounts/token/${token}`);
   }
 };

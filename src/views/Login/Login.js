@@ -52,7 +52,7 @@ const Login = ({ signIn, history, isAuthorized }) => {
             const account = data;
             if (AuthService.isAuthorized(account)) {
               AuthService.login(tokenId);
-              signIn();
+              signIn({ data: account });
               history.push("/admin/dashboard");
             } else {
               if (isAuthorized) {
@@ -133,7 +133,8 @@ Login.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  isAuthorized: state.isAuthorized
+  isAuthorized: state.isAuthorized,
+  user: state.user
 });
 
 const mapDispatchToProps = dispatch => ({

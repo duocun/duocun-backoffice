@@ -18,7 +18,7 @@ export const DEFAULT_MODEL = {
   passwordRaw: "",
   roles: [],
   secondPhone: "",
-  created: new Date()
+  created: new Date(),
 };
 
 export const ACCOUNT_TYPES = [
@@ -29,7 +29,7 @@ export const ACCOUNT_TYPES = [
   "Freight",
   "Customer Service",
   "Stock Manager",
-  "Admin"
+  "Admin",
 ];
 
 export const ATTRIBUTES = {
@@ -39,18 +39,18 @@ export const ATTRIBUTES = {
   O: "OFFICE",
   P: "PLAZA",
   H: "HOUSE",
-  C: "CONDO"
+  C: "CONDO",
 };
 
 export const ROLES = {
   1: "SUPER",
-  2: "MERCHANT ADMIN",
-  3: "MERCHANT STUFF",
+  2: "MERCHANT_ADMIN",
+  3: "MERCHANT_STUFF",
   4: "MANAGER",
   5: "DRIVER",
   6: "CLIENT",
-  7: "CUSTOMER SERVICE",
-  8: "STORAGE ADMIN"
+  7: "CUSTOMER_SERVICE",
+  8: "STORAGE_ADMIN",
 };
 
 export const ROLE_ENUM = enumLikeObj(ROLES);
@@ -60,14 +60,14 @@ export const RESOURCES = {
   CATEGORY: "CATEGORY",
   PRODUCT: "PRODUCT",
   ORDER: "ORDER",
-  STOCK: "STOCK"
+  STOCK: "STOCK",
 };
 
 export const PERMISSIONS = {
   CREATE: "CREATE",
   READ: "READ",
   UPDATE: "UPDATE",
-  DELETE: "DELETE"
+  DELETE: "DELETE",
 };
 
 export const RESOURCES_PERMISSIONS = {
@@ -76,80 +76,45 @@ export const RESOURCES_PERMISSIONS = {
     PERMISSIONS.READ,
     PERMISSIONS.CREATE,
     PERMISSIONS.UPDATE,
-    PERMISSIONS.DELETE
+    PERMISSIONS.DELETE,
   ],
   [RESOURCES.PRODUCT]: [
     PERMISSIONS.READ,
     PERMISSIONS.CREATE,
     PERMISSIONS.UPDATE,
-    PERMISSIONS.DELETE
+    PERMISSIONS.DELETE,
   ],
   [RESOURCES.ORDER]: [
     PERMISSIONS.READ,
     PERMISSIONS.CREATE,
     PERMISSIONS.UPDATE,
-    PERMISSIONS.DELETE
+    PERMISSIONS.DELETE,
   ],
-  [RESOURCES.STOCK]: [PERMISSIONS.READ, PERMISSIONS.UPDATE]
+  [RESOURCES.STOCK]: [PERMISSIONS.READ, PERMISSIONS.UPDATE],
 };
 
-export const getRolesFromAccountTypes = accountType => {
-  if (accountType === "admin") {
-    return Object.keys(ROLES);
+export const hasRole = (user, role, rbacData) => {
+  if (!role) {
+    return true;
   }
-  const rolesEnum = ROLE_ENUM;
-  if (accountType === "merchant") {
-    return [rolesEnum["MERCHANT ADMIN"], rolesEnum["MERCHANT STUFF"]];
+  if (!user || !user.roles) {
+    return false;
   }
-  if (accountType === "driver") {
-    return [rolesEnum["DRIVER"]];
+  if (user.roles.includes(ROLE_ENUM.SUPER)) {
+    return true;
   }
-  if (accountType === "customer service") {
-    return [rolesEnum["CUSTOMER SERVICE"]];
+  if (role.role) {
+    return user.roles.includes(role);
   }
-  return [rolesEnum.CLIENT];
-};
-
-export const ROLES_PERMISSIONS = {
-  SUPER: { ...RESOURCES_PERMISSIONS },
-  "MERCHANT ADMIN": {
-    [RESOURCES.STATISTICS]: [],
-    [RESOURCES.CATEGORY]: [
-      PERMISSIONS.READ,
-      PERMISSIONS.CREATE,
-      PERMISSIONS.UPDATE,
-      PERMISSIONS.DELETE
-    ],
-    [RESOURCES.PRODUCT]: [
-      PERMISSIONS.READ,
-      PERMISSIONS.CREATE,
-      PERMISSIONS.UPDATE,
-      PERMISSIONS.DELETE
-    ],
-    [RESOURCES.ORDER]: [
-      PERMISSIONS.READ,
-      PERMISSIONS.CREATE,
-      PERMISSIONS.UPDATE,
-      PERMISSIONS.DELETE
-    ],
-    [RESOURCES.STOCK]: [PERMISSIONS.READ, PERMISSIONS.UPDATE]
-  },
-  "MERCHANT STUFF": {
-    [RESOURCES.STATISTICS]: [],
-    [RESOURCES.CATEGORY]: [PERMISSIONS.READ],
-    [RESOURCES.PRODUCT]: [PERMISSIONS.READ],
-    [RESOURCES.ORDER]: [PERMISSIONS.READ],
-    [RESOURCES.STOCK]: [PERMISSIONS.READ, PERMISSIONS.UPDATE]
-  },
-  MANAGER: {},
-  DRIVER: {},
-  CLIENT: {},
-  "CUSTOMER SERVICE": {},
-  "STORAGE ADMIN": {
-    [RESOURCES.STATISTICS]: [],
-    [RESOURCES.CATEGORY]: [PERMISSIONS.READ],
-    [RESOURCES.PRODUCT]: [PERMISSIONS.READ],
-    [RESOURCES.ORDER]: [PERMISSIONS.READ],
-    [RESOURCES.STOCK]: [PERMISSIONS.READ, PERMISSIONS.UPDATE]
+  if (role.resource) {
+    if (!rbacData) {
+      return false;
+    }
+    for (const r of user.roles) {
+      if (rbacData[r][role.resource]) {
+        return true;
+      }
+    }
   }
+  return false;
 };

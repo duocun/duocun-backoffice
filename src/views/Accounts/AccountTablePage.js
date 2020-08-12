@@ -50,7 +50,7 @@ import {
   ROLES as ROLE_MAPPING,
   ATTRIBUTES as ATTRIBUTES_MAPPING,
   ACCOUNT_TYPES
-} from "views/Accounts/AccountModel.js";
+} from "models/account";
 
 const useStyles = makeStyles({
   formControl: {

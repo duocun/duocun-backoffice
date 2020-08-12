@@ -7,6 +7,7 @@ import { signIn } from "redux/actions";
 import AuthService from "services/AuthService";
 import Admin from "layouts/Admin.js";
 import Login from "views/Login/Login.js";
+
 const history = createBrowserHistory({
   basename: "/" // admin2"/duocun-backoffice"
 });
@@ -16,6 +17,10 @@ const Root = props => {
   useEffect(() => {
     setIsAuthorized(props.isAuthorized);
   }, [props.isAuthorized]);
+
+  useEffect(() => {
+    console.log("user", props.user);
+  }, [props.user]);
 
   useEffect(() => {
     if (AuthService.isLoggedIn()) {
@@ -41,12 +46,14 @@ const Root = props => {
 
 Root.propTypes = {
   isAuthorized: PropTypes.bool,
-  signIn: PropTypes.func
+  signIn: PropTypes.func,
+  user: PropTypes.any
 };
 
 const mapStateToProps = ({ authReducer }) => {
   return {
-    isAuthorized: authReducer.isAuthorized
+    isAuthorized: authReducer.isAuthorized,
+    user: authReducer.user
   };
 };
 
