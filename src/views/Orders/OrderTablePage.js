@@ -317,6 +317,9 @@ const OrderTablePage = ({
                 onSelect={handleSelectClient}
                 onSearch={handleSearchClient}
                 onClear={handleClearClient}
+                onEndClicked={keyword => {
+                  setClientKeyword(keyword);
+                }}
               />
             </GridItem>
 

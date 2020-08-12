@@ -2,15 +2,6 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
-// import {
-//   warningCardHeader,
-//   successCardHeader,
-//   dangerCardHeader,
-//   infoCardHeader,
-//   primaryCardHeader,
-//   roseCardHeader,
-//   grayColor
-// } from "assets/jss/material-dashboard-react.js";
 import FormControl from "@material-ui/core/FormControl";
 import MenuItem from "@material-ui/core/MenuItem";
 
@@ -47,6 +38,7 @@ const SearchDropDown = ({
   hasMore,
   fetchData,
   selectData,
+  onEndClicked = () => {},
   show = false
 }) => {
   const classes = useStyles();
@@ -56,31 +48,17 @@ const SearchDropDown = ({
     selectData(d);
   };
   return (
-    <FormControl
-      className={classes.list}
-      // style={{ visibility: getVisibility(show) }}
-    >
+    <FormControl className={classes.list}>
       <InfiniteScroll
         className={classes.list}
-        dataLength={data.length} //This is important field to render the next data
+        dataLength={data.length}
         next={fetchData}
         hasMore={hasMore}
         loader={<h4>Loading...</h4>}
         height={200}
         endMessage={
-          <p style={{ textAlign: "center" }}>
-            <b>Yay! You have seen it all</b>
-          </p>
+          <button onClick={onEndClicked}>Search with given string</button>
         }
-        // below props only if you need pull down functionality
-        // refreshFunction={this.refresh}
-        // pullDownToRefresh
-        // pullDownToRefreshContent={
-        //   <h3 style={{textAlign: 'center'}}>&#8595; Pull down to refresh</h3>
-        // }
-        // releaseToRefreshContent={
-        //   <h3 style={{textAlign: 'center'}}>&#8593; Release to refresh</h3>
-        // }
       >
         {data &&
           data.length > 0 &&
@@ -102,7 +80,8 @@ const SearchDropDown = ({
 SearchDropDown.propTypes = {
   onClick: PropTypes.func,
   data: PropTypes.array,
-  hide: PropTypes.bool
+  hide: PropTypes.bool,
+  onEndClicked: PropTypes.func
 };
 
 export default SearchDropDown;
