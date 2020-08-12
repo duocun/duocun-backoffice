@@ -100,19 +100,28 @@ export const hasRole = (user, role, rbacData) => {
   if (!user || !user.roles) {
     return false;
   }
-  if (user.roles.includes(ROLE_ENUM.SUPER)) {
+  const userRoles = user.roles.map((r) => String(r));
+  if (userRoles.includes(String(ROLE_ENUM.SUPER))) {
     return true;
   }
   if (role.role) {
-    return user.roles.includes(role);
+    const hasRole = userRoles.includes(String(role.role));
+    return hasRole;
   }
   if (role.resource) {
     if (!rbacData) {
       return false;
     }
-    for (const r of user.roles) {
+    for (const r of userRoles) {
+      if (!rbacData[r]) {
+        return false;
+      }
       if (rbacData[r][role.resource]) {
-        return true;
+        if (!role.permission) {
+          return true;
+        } else {
+          return rbacData[r][role.resource].includes(role.permission);
+        }
       }
     }
   }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
@@ -37,11 +37,16 @@ import ConfirmDialog from "components/ConfirmDialog/ConfirmDialog";
 import ApiCategoryService from "services/api/ApiCategoryService";
 import FlashStorage from "services/FlashStorage";
 import { getQueryParam } from "helper/index";
+import AuthContext from "shared/AuthContext";
+import RoleContext from "shared/RoleContext";
+import { hasRole } from "models/account";
+import { RESOURCES } from "models/account";
+import { PERMISSIONS } from "models/account";
 
 const useStyles = makeStyles(() => ({
   table: {
-    minWidth: 750
-  }
+    minWidth: 750,
+  },
 }));
 
 export default function ListCategories({ location }) {
@@ -66,13 +71,30 @@ export default function ListCategories({ location }) {
   const [processing, setProcessing] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [removeId, setRemoveId] = useState(null);
+  const roleData = useContext(RoleContext);
+  const user = useContext(AuthContext);
+  const canEdit = hasRole(
+    user,
+    { resource: RESOURCES.CATEGORY, permission: PERMISSIONS.UPDATE },
+    roleData
+  );
+  const canAdd = hasRole(
+    user,
+    { resource: RESOURCES.CATEGORY, permission: PERMISSIONS.CREATE },
+    roleData
+  );
+  const canDelete = hasRole(
+    user,
+    { resource: RESOURCES.CATEGORY, permission: PERMISSIONS.DELETE },
+    roleData
+  );
 
   // const structurePanelRef = useRef();
 
   const removeAlert = () => {
     setAlert({
       message: "",
-      severity: "info"
+      severity: "info",
     });
   };
 
@@ -82,11 +104,11 @@ export default function ListCategories({ location }) {
         setRows(data.data);
         setTotalRows(data.count);
       })
-      .catch(e => {
+      .catch((e) => {
         console.error(e);
         setAlert({
           message: "Cannot load data",
-          severity: "error"
+          severity: "error",
         });
       })
       .finally(() => {
@@ -94,7 +116,7 @@ export default function ListCategories({ location }) {
       });
   };
 
-  const toggleSort = fieldName => {
+  const toggleSort = (fieldName) => {
     // sort only one field
     if (sort && sort[0] === fieldName) {
       setSort([fieldName, sort[1] === 1 ? -1 : 1]);
@@ -103,7 +125,7 @@ export default function ListCategories({ location }) {
     }
   };
 
-  const renderSort = fieldName => {
+  const renderSort = (fieldName) => {
     return (
       <TableSortLabel
         active={sort && sort[0] === fieldName}
@@ -141,7 +163,7 @@ export default function ListCategories({ location }) {
     );
   };
 
-  const onConfirmModal = value => {
+  const onConfirmModal = (value) => {
     setModalOpen(false);
     if (!value) {
       setRemoveId(null);
@@ -153,7 +175,7 @@ export default function ListCategories({ location }) {
         if (data.code === "success") {
           setAlert({
             message: "Removed successfully",
-            severity: "success"
+            severity: "success",
           });
           if (page === 0) {
             updateRows();
@@ -163,15 +185,15 @@ export default function ListCategories({ location }) {
         } else {
           setAlert({
             message: "Remove failed",
-            severity: "error"
+            severity: "error",
           });
         }
       })
-      .catch(e => {
+      .catch((e) => {
         console.error(e);
         setAlert({
           message: "Remove failed",
-          severity: "error"
+          severity: "error",
         });
       })
       .finally(() => {
@@ -201,15 +223,17 @@ export default function ListCategories({ location }) {
                 direction="row-reverse"
                 alignItems="center"
               >
-                <Button
-                  variant="contained"
-                  color="default"
-                  href="categories/new"
-                  disabled={processing}
-                >
-                  <AddCircleOutlineIcon />
-                  {t("Add Category")}
-                </Button>
+                {canAdd && (
+                  <Button
+                    variant="contained"
+                    color="default"
+                    href="categories/new"
+                    disabled={processing}
+                  >
+                    <AddCircleOutlineIcon />
+                    {t("Add Category")}
+                  </Button>
+                )}
               </GridItem>
             </GridContainer>
           </CardHeader>
@@ -250,15 +274,6 @@ export default function ListCategories({ location }) {
                           {t("Category Name (English)")}
                           {renderSort("nameEN")}
                         </TableCell>
-                        {/* <TableCell
-                          onClick={() => {
-                            toggleSort("order");
-                          }}
-                          style={{ cursor: "pointer" }}
-                        >
-                          {t("Display Order")}
-                          {renderSort("order")}
-                        </TableCell> */}
                         <TableCell>{t("Actions")}</TableCell>
                       </TableRow>
                     </TableHead>
@@ -278,26 +293,26 @@ export default function ListCategories({ location }) {
                               </TableCell>
                               <TableCell>{row.name}</TableCell>
                               <TableCell>{row.nameEN}</TableCell>
-                              {/* <TableCell>{row.order}</TableCell> */}
                               <TableCell>
-                                {/* <IconButton disabled={processing}>
-                                  <OpenWithIcon></OpenWithIcon>
-                                </IconButton> */}
-                                <IconButton
-                                  disabled={processing}
-                                  href={`categories/${row._id}`}
-                                >
-                                  <EditIcon></EditIcon>
-                                </IconButton>
-                                <IconButton
-                                  disabled={processing}
-                                  onClick={() => {
-                                    setModalOpen(true);
-                                    setRemoveId(row._id);
-                                  }}
-                                >
-                                  <DeleteIcon />
-                                </IconButton>
+                                {canEdit && (
+                                  <IconButton
+                                    disabled={processing}
+                                    href={`categories/${row._id}`}
+                                  >
+                                    <EditIcon></EditIcon>
+                                  </IconButton>
+                                )}
+                                {canDelete && (
+                                  <IconButton
+                                    disabled={processing}
+                                    onClick={() => {
+                                      setModalOpen(true);
+                                      setRemoveId(row._id);
+                                    }}
+                                  >
+                                    <DeleteIcon />
+                                  </IconButton>
+                                )}
                               </TableCell>
                             </TableRow>
                           ))
@@ -341,5 +356,5 @@ export default function ListCategories({ location }) {
 }
 
 ListCategories.propTypes = {
-  location: PropTypes.object
+  location: PropTypes.object,
 };

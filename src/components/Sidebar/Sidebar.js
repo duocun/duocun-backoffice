@@ -59,9 +59,6 @@ export default function Sidebar(props) {
   const { color, logo, image, logoText, routes } = props;
   const rbacData = useContext(RoleContext);
   const currentUser = useContext(AuthContext);
-  useEffect(() => {
-    console.log(rbacData, currentUser);
-  }, [rbacData, currentUser]);
   var links = (
     <List className={classes.list}>
       {routes.map((prop, key) => {

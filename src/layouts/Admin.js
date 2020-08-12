@@ -80,7 +80,6 @@ const Admin = ({ signOut, ...rest }) => {
   React.useEffect(() => {
     ApiRoleService.load().then(({ data }) => {
       if (data.code === "success") {
-        console.log(data);
         setRoleLoading(false);
         setRoleData(data.data);
       }
