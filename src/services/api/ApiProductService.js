@@ -27,7 +27,7 @@ export default {
     return ApiService.v2().get("products", query);
   },
   toggleFeature: productId => {
-    return ApiService.v2().post("products/toggle-feature", {
+    return ApiService.v2().put("products/toggle-feature", {
       productId
     });
   },
@@ -41,15 +41,19 @@ export default {
   },
   saveProduct: model => {
     model._id = model._id || "new";
-    return ApiService.v2().post(`products/${model._id}`, model);
+    return ApiService.v2().post(`products/${model._id}`, { data: model });
+  },
+  deleteProduct: id => { 
+    return ApiService.v2().delete(`products/${id}`);
   },
   getProductDeliveries: id => {
     return ApiService.v2().get(`products/delivery/${id}`);
   },
 
-  changeStatus: (productId, currentStatus) => {
-    const data = { data: { status: currentStatus === "A" ? "I" : "A" } };
-    return ApiService.v2().put("products/" + productId, data);
+  changeStatus: (productId, _currentStatus) => {
+    return ApiService.v2().put("products/toggle-status", {
+      productId
+    });
   },
 
   updateProduct: (productId, data) => {

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
+import { Link } from "react-router-dom";
 
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
@@ -45,24 +46,29 @@ import ApiCategoryService from "services/api/ApiCategoryService";
 import ApiProductService from "services/api/ApiProductService";
 import { getQueryParam } from "helper/index";
 import FlashStorage from "services/FlashStorage";
+import AuthContext from "shared/AuthContext";
+import RoleContext from "shared/RoleContext";
+import { hasRole } from "models/account";
+import { RESOURCES } from "models/account";
+import { PERMISSIONS } from "models/account";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   table: {
-    minWidth: 750
+    minWidth: 750,
   },
   formControl: {
     margin: theme.spacing(1),
-    minWidth: 120
+    minWidth: 120,
   },
   selectEmpty: {
-    marginTop: theme.spacing(2)
-  }
+    marginTop: theme.spacing(2),
+  },
 }));
 
 const defaultProduct = {
   name: "",
   description: "",
-  category: { _id: "", name: "" }
+  category: { _id: "", name: "" },
 };
 
 export default function Product({ location }) {
@@ -86,7 +92,7 @@ export default function Product({ location }) {
 
   // type
   const [productType, setType] = useState("G"); // grocery
-  const handleTypeChange = type => {
+  const handleTypeChange = (type) => {
     setType(type);
     updateData(type);
   };
@@ -105,6 +111,25 @@ export default function Product({ location }) {
     setModel({ ...model, category: { _id: catId } });
   };
 
+  // permissions
+  const user = useContext(AuthContext);
+  const roleData = useContext(RoleContext);
+  const canAdd = hasRole(
+    user,
+    { resource: RESOURCES.PRODUCT, permission: PERMISSIONS.CREATE },
+    roleData
+  );
+  const canEdit = hasRole(
+    user,
+    { resource: RESOURCES.PRODUCT, permission: PERMISSIONS.UPDATE },
+    roleData
+  );
+  const canDelete = hasRole(
+    user,
+    { resource: RESOURCES.PRODUCT, permission: PERMISSIONS.DELETE },
+    roleData
+  );
+
   // states related to processing
   const [alert, setAlert] = useState(
     FlashStorage.get("PRODUCT_ALERT") || { message: "", severity: "info" }
@@ -117,17 +142,17 @@ export default function Product({ location }) {
     );
   };
 
-  const updateData = type => {
+  const updateData = (type) => {
     const params = { type };
     ApiProductService.getProductList(page, rowsPerPage, query, params, [
-      sort
+      sort,
     ]).then(({ data }) => {
       setProducts(data.data);
       setTotalRows(data.count);
       setLoading(false);
     });
   };
-  const toggleSort = fieldName => {
+  const toggleSort = (fieldName) => {
     // sort only one field
     if (sort && sort[0] === fieldName) {
       setSort([fieldName, sort[1] === 1 ? -1 : 1]);
@@ -138,7 +163,7 @@ export default function Product({ location }) {
   const removeAlert = () => {
     setAlert({
       message: "",
-      severity: "info"
+      severity: "info",
     });
   };
 
@@ -150,21 +175,21 @@ export default function Product({ location }) {
         if (data.code === "success") {
           setAlert({
             message: t("Saved successfully"),
-            severtiy: "success"
+            severtiy: "success",
           });
           updateData(productType);
         } else {
           setAlert({
             message: t("Save failed"),
-            severity: "error"
+            severity: "error",
           });
         }
       })
-      .catch(e => {
+      .catch((e) => {
         console.error(e);
         setAlert({
           message: t("Save exception"),
-          severity: "error"
+          severity: "error",
         });
       })
       .finally(() => {
@@ -178,31 +203,31 @@ export default function Product({ location }) {
     setProcessing(true);
     ApiProductService.toggleFeature(productId)
       .then(({ data }) => {
-        if (data.success) {
+        if (data.code === "success") {
           setAlert({
             message: t("Saved successfully"),
-            severtiy: "success"
+            severtiy: "success",
           });
           updateData(type);
         } else {
           setAlert({
             message: t("Save failed"),
-            severity: "error"
+            severity: "error",
           });
         }
       })
-      .catch(e => {
+      .catch((e) => {
         console.error(e);
         setAlert({
           message: t("Save failed"),
-          severity: "error"
+          severity: "error",
         });
       })
       .finally(() => {
         setProcessing(false);
       });
   };
-  const renderRows = rows => {
+  const renderRows = (rows) => {
     if (!rows.length) {
       return (
         <TableRow>
@@ -237,13 +262,13 @@ export default function Product({ location }) {
                   labelId="category-select-label"
                   id="category-select"
                   value={row.categoryId}
-                  onChange={e =>
+                  onChange={(e) =>
                     handleCategoryChange(e.target.value, productType, row)
                   }
                 >
                   {categories &&
                     categories.length > 0 &&
-                    categories.map(cat => (
+                    categories.map((cat) => (
                       <MenuItem key={cat._id} value={cat._id}>
                         {cat.name}
                       </MenuItem>
@@ -269,26 +294,29 @@ export default function Product({ location }) {
               </IconButton>
             </TableCell>
             <TableCell>
-              <Tooltip title="修改">
-                <IconButton aria-label="edit" href={`products/${row._id}`}>
-                  <EditIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="删除">
-                <IconButton aria-label="delete" disabled={processing}>
-                  <DeleteIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="上架/下架">
-                <IconButton
-                  size="medium"
-                  aria-label="status"
-                  disabled={processing}
-                  onClick={() => onChangeProductStatus(row._id, row.status)}
-                >
-                  {row.status === "A" ? <ToggleOffIcon /> : <ToggleOnIcon />}
-                </IconButton>
-              </Tooltip>
+              {canEdit && (
+                <Tooltip title="修改">
+                  <IconButton
+                    aria-label="edit"
+                    component={Link}
+                    to={`products/${row._id}`}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
+              {canEdit && (
+                <Tooltip title="上架/下架">
+                  <IconButton
+                    size="medium"
+                    aria-label="status"
+                    disabled={processing}
+                    onClick={() => onChangeProductStatus(row._id, row.status)}
+                  >
+                    {row.status === "A" ? <ToggleOffIcon /> : <ToggleOnIcon />}
+                  </IconButton>
+                </Tooltip>
+              )}
             </TableCell>
           </TableRow>
         ))}
@@ -323,37 +351,34 @@ export default function Product({ location }) {
                   <h4>{t("Products")}</h4>
                 </GridItem>
                 <GridItem xs={12} lg={6} align="right">
-                  <Box mr={2} style={{ display: "inline-block" }}>
-                    <Button
-                      href="products/new"
-                      variant="contained"
-                      color="default"
-                    >
-                      <AddCircleOutlineIcon />
-                      {t("New Product")}
-                    </Button>
-                  </Box>
-
-                  {
-                    <FormControl className={classes.formControl}>
-                      <InputLabel id="type-select-label">
-                        {t("Type")}
-                      </InputLabel>
-                      <Select
-                        required
-                        labelId="type-select-label"
-                        id="type-select"
-                        value={productType}
-                        onChange={e => handleTypeChange(e.target.value)}
+                  {canAdd && (
+                    <Box mr={2} style={{ display: "inline-block" }}>
+                      <Button
+                        component={Link}
+                        variant="contained"
+                        color="default"
+                        to="products/new"
                       >
-                        <MenuItem value={"F"}>{t("Food")}</MenuItem>
-                        <MenuItem value={"G"}>{t("Grocery")}</MenuItem>
-                      </Select>
-                    </FormControl>
-                  }
-
+                        <AddCircleOutlineIcon />
+                        {t("New Product")}
+                      </Button>
+                    </Box>
+                  )}
+                  <FormControl className={classes.formControl}>
+                    <InputLabel id="type-select-label">{t("Type")}</InputLabel>
+                    <Select
+                      required
+                      labelId="type-select-label"
+                      id="type-select"
+                      value={productType}
+                      onChange={(e) => handleTypeChange(e.target.value)}
+                    >
+                      <MenuItem value={"F"}>{t("Food")}</MenuItem>
+                      <MenuItem value={"G"}>{t("Grocery")}</MenuItem>
+                    </Select>
+                  </FormControl>
                   <Searchbar
-                    onChange={e => {
+                    onChange={(e) => {
                       const { target } = e;
                       setQuery(target.value);
                     }}
@@ -486,5 +511,5 @@ export default function Product({ location }) {
 }
 
 Product.propTypes = {
-  location: PropTypes.object
+  location: PropTypes.object,
 };
