@@ -4,7 +4,7 @@ import Grid from "@material-ui/core/Grid";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
 const CustomLoader = ({ containerProps, progressProps }) => (
-  <Grid xs={12} container justify="center" {...containerProps}>
+  <Grid container justify="center" {...containerProps}>
     <CircularProgress {...progressProps} />
   </Grid>
 );

@@ -15,7 +15,7 @@ import Alert from "@material-ui/lab/Alert";
 import Skeleton from "@material-ui/lab/Skeleton";
 import Button from "@material-ui/core/Button";
 import { TextField } from "@material-ui/core";
-import FormLabel from "@material-ui/core/FormLabel";
+
 import CustomInput from "components/CustomInput/CustomInput";
 
 import SaveIcon from "@material-ui/icons/Save";
@@ -23,7 +23,6 @@ import FormatListBulletedIcon from "@material-ui/icons/FormatListBulleted";
 
 import FlashStorage from "services/FlashStorage";
 import ApiCategoryService from "services/api/ApiCategoryService";
-import CategoryTree from "./CategoryTree";
 
 const useStyles = makeStyles(() => ({
   textarea: {
@@ -39,8 +38,6 @@ const defaultModelState = {
   descriptionEN: "",
   parentId: "0"
 };
-
-const defaultTreeState = [];
 
 const EditCategorySkeleton = () => (
   <React.Fragment>
@@ -67,7 +64,7 @@ const EditCategory = ({ match, history }) => {
   const classes = useStyles();
   // states related to model
   const [model, setModel] = useState(defaultModelState);
-  const [categoryTreeData, setCategoryTreeData] = useState(defaultTreeState);
+  // const [categoryTreeData, setCategoryTreeData] = useState(defaultTreeState);
   const [loading, setLoading] = useState(false);
   // states related to processing
   const [alert, setAlert] = useState(
@@ -87,7 +84,7 @@ const EditCategory = ({ match, history }) => {
     setProcessing(true);
     ApiCategoryService.saveCategory(model)
       .then(({ data }) => {
-        if (data.success) {
+        if (data.code === "success") {
           const newAlert = {
             message: t("Saved successfully"),
             severity: "success"
@@ -101,7 +98,7 @@ const EditCategory = ({ match, history }) => {
           }
         } else {
           setAlert({
-            message: t("Save failed"),
+            message: t(data.message || "Save failed"),
             severity: "error"
           });
         }
@@ -121,9 +118,8 @@ const EditCategory = ({ match, history }) => {
   const updateData = () => {
     ApiCategoryService.getCategory(match.params.id)
       .then(({ data }) => {
-        if (data.success) {
+        if (data.code === "success") {
           setModel(data.data);
-          setCategoryTreeData(data.meta.tree);
         } else {
           setAlert({
             message: t("Data not found"),
@@ -148,27 +144,7 @@ const EditCategory = ({ match, history }) => {
     if (match.params.id && match.params.id !== "new") {
       updateData();
     } else if (match.params.id === "new") {
-      ApiCategoryService.getCategoryTree()
-        .then(({ data }) => {
-          if (data.success) {
-            setCategoryTreeData(data.data);
-          } else {
-            setAlert({
-              message: t("Data not found"),
-              severity: "error"
-            });
-          }
-        })
-        .catch(e => {
-          console.error(e);
-          setAlert({
-            message: t("Data not found"),
-            severity: "error"
-          });
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+      setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -265,7 +241,7 @@ const EditCategory = ({ match, history }) => {
                       />
                     </Box>
                   </GridItem>
-                  <GridItem xs={12} container direction="row" justify="center">
+                  {/* <GridItem xs={12} container direction="row" justify="center">
                     <GridItem xs={12} lg={8}>
                       <Box p={4}>
                         <FormLabel component="legend">
@@ -283,7 +259,7 @@ const EditCategory = ({ match, history }) => {
                         />
                       </Box>
                     </GridItem>
-                  </GridItem>
+                  </GridItem> */}
                 </React.Fragment>
               )}
               <GridItem xs={12} container direction="row-reverse">

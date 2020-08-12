@@ -89,14 +89,20 @@ const dashboardRoutes = [
     name: "Transaction",
     icon: TransactionIcon,
     component: FinanceRoute,
-    layout: "/"
+    layout: "/",
+    perm: {
+      role: ROLE_ENUM.SUPER
+    }
   },
   {
     path: "/finance/salary",
     name: "Salary",
     icon: SalaryIcon,
     component: FinanceRoute,
-    layout: "/"
+    layout: "/",
+    perm: {
+      role: ROLE_ENUM.SUPER
+    }
   },
   {
     path: "/products",

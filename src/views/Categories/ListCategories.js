@@ -80,7 +80,7 @@ export default function ListCategories({ location }) {
     ApiCategoryService.getCategoryList(page, rowsPerPage, parentId, [sort])
       .then(({ data }) => {
         setRows(data.data);
-        setTotalRows(data.meta.count);
+        setTotalRows(data.count);
       })
       .catch(e => {
         console.error(e);
@@ -150,23 +150,21 @@ export default function ListCategories({ location }) {
     setProcessing(true);
     ApiCategoryService.removeCategory(removeId)
       .then(({ data }) => {
-        if (data.success) {
-          if (data.success) {
-            setAlert({
-              message: "Removed successfully",
-              severity: "success"
-            });
-            if (page === 0) {
-              updateRows();
-            } else {
-              setPage(0);
-            }
+        if (data.code === "success") {
+          setAlert({
+            message: "Removed successfully",
+            severity: "success"
+          });
+          if (page === 0) {
+            updateRows();
           } else {
-            setAlert({
-              message: "Remove failed",
-              severity: "error"
-            });
+            setPage(0);
           }
+        } else {
+          setAlert({
+            message: "Remove failed",
+            severity: "error"
+          });
         }
       })
       .catch(e => {

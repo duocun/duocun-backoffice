@@ -33,7 +33,7 @@ export default {
     if (!model.id) {
       model._id ? (model.id = model._id) : (model.id = "new");
     }
-    return ApiService.v2().post(`categories/${model.id}`, model);
+    return ApiService.v2().post(`categories/${model.id}`, { data: model });
   },
   getCategory: id => {
     return ApiService.v2().get(`categories/${id}`);

@@ -18,8 +18,36 @@ import RoleContext from "shared/RoleContext";
 import AuthContext from "shared/AuthContext";
 
 import styles from "assets/jss/material-dashboard-react/components/sidebarStyle.js";
+import { ROLE_ENUM } from "models/account";
 
 const useStyles = makeStyles(styles);
+
+const hasRole = (currentUser, perm, rbacData) => {
+  if (!perm) {
+    return true;
+  }
+  if (!rbacData) {
+    return false;
+  }
+  if (!currentUser || !currentUser.roles) {
+    return false;
+  }
+  if (currentUser.roles.includes(Number(ROLE_ENUM.SUPER))) {
+    return true;
+  }
+  let hasRole = true;
+  if (perm.role) {
+    hasRole = hasRole && currentUser.roles.includes(Number(perm.role));
+  }
+  if (perm.resource) {
+    for (const r of currentUser.roles) {
+      if (rbacData[r][perm.resource]) {
+        return hasRole;
+      }
+    }
+  }
+  return false;
+};
 
 export default function Sidebar(props) {
   const classes = useStyles();
@@ -31,10 +59,16 @@ export default function Sidebar(props) {
   const { color, logo, image, logoText, routes } = props;
   const rbacData = useContext(RoleContext);
   const currentUser = useContext(AuthContext);
-
+  useEffect(() => {
+    console.log(rbacData, currentUser);
+  }, [rbacData, currentUser]);
   var links = (
     <List className={classes.list}>
       {routes.map((prop, key) => {
+        const isAllowed = hasRole(currentUser, prop.perm, rbacData);
+        if (!isAllowed) {
+          return null;
+        }
         var activePro = " ";
         var listItemClasses;
         listItemClasses = classNames({
