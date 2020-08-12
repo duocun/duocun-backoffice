@@ -89,6 +89,9 @@ export default {
   saveAccount: model => {
     return ApiService.v2().post(`accounts/${model._id}`, { data: model });
   },
+  toggleStatus: id => {
+    return ApiService.v2().put(`accounts/toggle-status`, { id });
+  },
   getCurrentAccount: token => {
     return ApiService.v2().get(`accounts/token/${token}`);
   }
