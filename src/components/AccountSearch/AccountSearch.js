@@ -7,15 +7,15 @@ import SearchDropDown from "components/SearchDropDown/SearchDropDown.js";
 
 import InfiniteScroll from "react-infinite-scroll-component";
 
-const useStyles = makeStyles((styles) => ({
+const useStyles = makeStyles(styles => ({
   searchWrapper: {
-    width: "100%",
+    width: "100%"
   },
   inputBox: {
-    width: "100%",
+    width: "100%"
   },
   margin: {
-    marginTop: "0px",
+    marginTop: "0px"
   },
   dropdownList: {
     position: "absolute",
@@ -23,8 +23,8 @@ const useStyles = makeStyles((styles) => ({
     background: "gray",
     width: "320px",
     height: "200px",
-    overflowY: "scroll",
-  },
+    overflowY: "scroll"
+  }
   // list: {
   //   position: "absolute",
   //   backgroundColor: "white",
@@ -50,7 +50,7 @@ const AccountSearch = ({
   onSearch,
   onSelect,
   onEndClicked = () => {},
-  onClear,
+  onClear
 }) => {
   const classes = useStyles();
   const { t } = useTranslation();
@@ -72,7 +72,7 @@ const AccountSearch = ({
       setSearching(true);
       onSearch(page, rowsPerPage, keyword).then(({ data }) => {
         const dMap = {};
-        data.data.forEach((d) => {
+        data.data.forEach(d => {
           dMap[d._id] = d;
         });
         setAccounts(dMap);
@@ -96,7 +96,7 @@ const AccountSearch = ({
     setAccount({ _id: id, username: val });
   }, [id, val]);
 
-  const handleSelectData = (account) => {
+  const handleSelectData = account => {
     onSelect(account);
     setAccount(account);
     setDropdown(false);
@@ -113,7 +113,7 @@ const AccountSearch = ({
 
     onSearch(page, rowsPerPage, keyword).then(({ data }) => {
       const dMap = { ...accounts };
-      data.data.forEach((d) => {
+      data.data.forEach(d => {
         dMap[d._id] = d;
       });
       setAccounts(dMap);
@@ -150,32 +150,32 @@ const AccountSearch = ({
         labelText={t(label)}
         formControlProps={{
           fullWidth: true,
-          className: classes.margin + " " + classes.search,
+          className: classes.margin + " " + classes.search
         }}
         labelProps={{ shrink: keyword ? true : false }}
         inputProps={{
           value: keyword,
           placeholder: t(placeholder),
           inputProps: {
-            "aria-label": t(placeholder),
+            "aria-label": t(placeholder)
           },
           style: { color: "black" },
           onChange: handleKeywordChange,
-          onKeyDown: (event) => {
+          onKeyDown: event => {
             const { key } = event;
             if (key === "Enter") {
               return handleSearch(keyword, page);
             }
           },
           onFocus: handleFocus,
-          onBlur: handleBlur,
+          onBlur: handleBlur
         }}
         onClear={onClear}
       />
       <div style={divStyle}>
         {dropdown && (
           <SearchDropDown
-            data={Object.keys(accounts).map((id) => accounts[id])}
+            data={Object.keys(accounts).map(id => accounts[id])}
             hasMore={hasMoreAccounts}
             fetchData={fetchData}
             selectData={handleSelectData}

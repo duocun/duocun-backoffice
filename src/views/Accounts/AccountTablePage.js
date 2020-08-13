@@ -231,15 +231,15 @@ const AccountTablePage = ({ location, account, setAccount }) => {
                         onChange={() => {
                           ApiAccountService.toggleStatus(row._id).then(
                             ({ data }) => {
-                              const newAccounts = [...accounts];
-                              const index = newAccounts.findIndex(
-                                (item) => item._id == data._id
-                              );
-                              if (index === -1) {
+                              if (data.code !== "success") {
                                 return;
                               }
-                              newAccounts[index] = data.data;
-                              setAccount(newAccounts);
+                              const newAccounts = [...accounts];
+                              newAccounts[idx] = {
+                                ...newAccounts[idx],
+                                verified: !row.verified
+                              };
+                              setAccounts(newAccounts);
                             }
                           );
                         }}
