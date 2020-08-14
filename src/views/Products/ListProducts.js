@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
@@ -52,23 +52,23 @@ import { hasRole } from "models/account";
 import { RESOURCES } from "models/account";
 import { PERMISSIONS } from "models/account";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   table: {
-    minWidth: 750,
+    minWidth: 750
   },
   formControl: {
     margin: theme.spacing(1),
-    minWidth: 120,
+    minWidth: 120
   },
   selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
+    marginTop: theme.spacing(2)
+  }
 }));
 
 const defaultProduct = {
   name: "",
   description: "",
-  category: { _id: "", name: "" },
+  category: { _id: "", name: "" }
 };
 
 export default function Product({ location }) {
@@ -92,7 +92,7 @@ export default function Product({ location }) {
 
   // type
   const [productType, setType] = useState("G"); // grocery
-  const handleTypeChange = (type) => {
+  const handleTypeChange = type => {
     setType(type);
     updateData(type);
   };
@@ -106,10 +106,38 @@ export default function Product({ location }) {
     });
   }, []);
 
-  const handleCategoryChange = (catId, productType, row) => {
-    updateProduct(row._id, productType, { categoryId: catId });
-    setModel({ ...model, category: { _id: catId } });
-  };
+  const handleCategoryChange = useCallback(
+    (catId, productType, row) => {
+      removeAlert();
+      setProcessing(true);
+      ApiProductService.saveProduct({ ...row, categoryId: catId })
+        .then(({ data }) => {
+          if (data.code === "success") {
+            setAlert({
+              message: t("Saved successfully"),
+              severtiy: "success"
+            });
+            updateData(productType);
+          } else {
+            setAlert({
+              message: t("Save failed"),
+              severity: "error"
+            });
+          }
+        })
+        .catch(e => {
+          console.error(e);
+          setAlert({
+            message: t("Save exception"),
+            severity: "error"
+          });
+        })
+        .finally(() => {
+          setProcessing(false);
+        });
+    },
+    [updateData]
+  );
 
   // permissions
   const user = useContext(AuthContext);
@@ -142,17 +170,17 @@ export default function Product({ location }) {
     );
   };
 
-  const updateData = (type) => {
+  const updateData = type => {
     const params = { type };
     ApiProductService.getProductList(page, rowsPerPage, query, params, [
-      sort,
+      sort
     ]).then(({ data }) => {
       setProducts(data.data);
       setTotalRows(data.count);
       setLoading(false);
     });
   };
-  const toggleSort = (fieldName) => {
+  const toggleSort = fieldName => {
     // sort only one field
     if (sort && sort[0] === fieldName) {
       setSort([fieldName, sort[1] === 1 ? -1 : 1]);
@@ -163,38 +191,8 @@ export default function Product({ location }) {
   const removeAlert = () => {
     setAlert({
       message: "",
-      severity: "info",
+      severity: "info"
     });
-  };
-
-  const updateProduct = (productId, productType, params) => {
-    removeAlert();
-    setProcessing(true);
-    ApiProductService.updateProduct(productId, params)
-      .then(({ data }) => {
-        if (data.code === "success") {
-          setAlert({
-            message: t("Saved successfully"),
-            severtiy: "success",
-          });
-          updateData(productType);
-        } else {
-          setAlert({
-            message: t("Save failed"),
-            severity: "error",
-          });
-        }
-      })
-      .catch((e) => {
-        console.error(e);
-        setAlert({
-          message: t("Save exception"),
-          severity: "error",
-        });
-      })
-      .finally(() => {
-        setProcessing(false);
-      });
   };
 
   // change status
@@ -206,28 +204,28 @@ export default function Product({ location }) {
         if (data.code === "success") {
           setAlert({
             message: t("Saved successfully"),
-            severtiy: "success",
+            severtiy: "success"
           });
           updateData(type);
         } else {
           setAlert({
             message: t("Save failed"),
-            severity: "error",
+            severity: "error"
           });
         }
       })
-      .catch((e) => {
+      .catch(e => {
         console.error(e);
         setAlert({
           message: t("Save failed"),
-          severity: "error",
+          severity: "error"
         });
       })
       .finally(() => {
         setProcessing(false);
       });
   };
-  const renderRows = (rows) => {
+  const renderRows = rows => {
     if (!rows.length) {
       return (
         <TableRow>
@@ -261,14 +259,15 @@ export default function Product({ location }) {
                   required
                   labelId="category-select-label"
                   id="category-select"
+                  disabled={!canEdit}
                   value={row.categoryId}
-                  onChange={(e) =>
+                  onChange={e =>
                     handleCategoryChange(e.target.value, productType, row)
                   }
                 >
                   {categories &&
                     categories.length > 0 &&
-                    categories.map((cat) => (
+                    categories.map(cat => (
                       <MenuItem key={cat._id} value={cat._id}>
                         {cat.name}
                       </MenuItem>
@@ -371,14 +370,14 @@ export default function Product({ location }) {
                       labelId="type-select-label"
                       id="type-select"
                       value={productType}
-                      onChange={(e) => handleTypeChange(e.target.value)}
+                      onChange={e => handleTypeChange(e.target.value)}
                     >
                       <MenuItem value={"F"}>{t("Food")}</MenuItem>
                       <MenuItem value={"G"}>{t("Grocery")}</MenuItem>
                     </Select>
                   </FormControl>
                   <Searchbar
-                    onChange={(e) => {
+                    onChange={e => {
                       const { target } = e;
                       setQuery(target.value);
                     }}
@@ -511,5 +510,5 @@ export default function Product({ location }) {
 }
 
 Product.propTypes = {
-  location: PropTypes.object,
+  location: PropTypes.object
 };
