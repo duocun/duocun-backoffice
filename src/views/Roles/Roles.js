@@ -12,7 +12,7 @@ import {
   TableRow,
   TableCell,
   Button,
-  makeStyles
+  makeStyles,
 } from "@material-ui/core";
 import Checkbox from "components/CustomInput/CustomCheckbox";
 import CardHeader from "components/Card/CardHeader";
@@ -23,7 +23,7 @@ import {
   ROLE_ENUM,
   RESOURCES,
   RESOURCES_PERMISSIONS,
-  ROLES_PERMISSIONS
+  ROLES_PERMISSIONS,
 } from "models/account";
 import FormGroup from "@material-ui/core/FormGroup";
 import _ from "lodash";
@@ -72,7 +72,7 @@ const Roles = ({ history }) => {
           setModel(data.data);
         }
       })
-      .catch(e => {
+      .catch((e) => {
         console.error(e);
         setAlert({ message: t("Cannot load data"), severity: "error" });
       })
@@ -81,7 +81,7 @@ const Roles = ({ history }) => {
       });
   }, []);
 
-  const saveModel = useCallback(data => {
+  const saveModel = useCallback((data) => {
     setProcessing(true);
     ApiRoleService.save(data)
       .then(({ data }) => {
@@ -92,7 +92,7 @@ const Roles = ({ history }) => {
           setModel(data.data);
         }
       })
-      .catch(e => {
+      .catch((e) => {
         console.error(e);
         setAlert({ message: t("Save failed"), severity: "error" });
       })
@@ -121,7 +121,7 @@ const Roles = ({ history }) => {
                 <Table aria-label="role permission table" size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell>Role</TableCell>
+                      <TableCell>{t("Role")}</TableCell>
                       {_.map(RESOURCES, (resource, key) => (
                         <TableCell key={`resource_${key}`}>
                           {resource}
@@ -144,7 +144,7 @@ const Roles = ({ history }) => {
                                     label={perm}
                                     checkboxProps={{
                                       color: "primary",
-                                      className: classes.checkbox
+                                      className: classes.checkbox,
                                     }}
                                     checked={hasPermission(
                                       model,
@@ -202,11 +202,11 @@ const Roles = ({ history }) => {
   );
 };
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   checkbox: {
     margin: 0,
-    padding: 0
-  }
+    padding: 0,
+  },
 }));
 
 export default Roles;
