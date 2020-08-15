@@ -41,6 +41,7 @@ import StaticPage from "views/Pages/Pages.js";
 import AccountsRoute from "views/Accounts/AccountsRoute";
 import MerchantsPage from "views/Merchants/MerchantsPage";
 import RolesPage from "views/Roles/Roles";
+import ProfilePage from "views/Profile/Profile";
 import { ROLE_ENUM } from "models/account";
 import { RESOURCES } from "models/account";
 import { PERMISSIONS } from "models/account";
@@ -183,6 +184,13 @@ const dashboardRoutes = [
     perm: {
       role: ROLE_ENUM.SUPER
     }
+  },
+  {
+    path: "/profile",
+    name: "Profile",
+    component: ProfilePage,
+    layout: "/",
+    hide: true,
   },
   {
     path: "/table",

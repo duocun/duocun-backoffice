@@ -89,10 +89,19 @@ export default {
   saveAccount: model => {
     return ApiService.v2().post(`accounts/${model._id}`, { data: model });
   },
+  saveProfile: model => {
+    return ApiService.v2().post(`accounts/save-profile`, { data: model });
+  },
   toggleStatus: id => {
     return ApiService.v2().put(`accounts/toggle-status`, { id });
   },
   getCurrentAccount: token => {
     return ApiService.v2().get(`accounts/token/${token}`);
+  },
+  sendOtpCode: email => {
+    return ApiService.v2().post("accounts/forgot-password", { email });
+  },
+  verifyOtp: (email, code) => {
+    return ApiService.v2().post("accounts/login-by-otp", { email, code });
   }
 };

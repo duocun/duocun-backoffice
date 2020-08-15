@@ -7,11 +7,12 @@ import { signIn } from "redux/actions";
 import AuthService from "services/AuthService";
 import Admin from "layouts/Admin.js";
 import Login from "views/Login/Login.js";
+import ForgotPassword from "views/ForgotPassword/ForgotPassword";
 
 const history = createBrowserHistory({
-  basename: "/" // admin2"/duocun-backoffice"
+  basename: "/", // admin2"/duocun-backoffice"
 });
-const Root = props => {
+const Root = (props) => {
   const [isAuthorized, setIsAuthorized] = useState(AuthService.isLoggedIn());
 
   useEffect(() => {
@@ -38,6 +39,7 @@ const Root = props => {
     <Router history={history}>
       <Switch>
         <Route path="/login" component={Login} />
+        <Route path="/forgot-password" component={ForgotPassword} />
         <Redirect from="/" to="/login" />
       </Switch>
     </Router>
@@ -47,18 +49,18 @@ const Root = props => {
 Root.propTypes = {
   isAuthorized: PropTypes.bool,
   signIn: PropTypes.func,
-  user: PropTypes.any
+  user: PropTypes.any,
 };
 
 const mapStateToProps = ({ authReducer }) => {
   return {
     isAuthorized: authReducer.isAuthorized,
-    user: authReducer.user
+    user: authReducer.user,
   };
 };
 
-const mapDispatchToProps = dispatch => ({
-  signIn: () => dispatch(signIn())
+const mapDispatchToProps = (dispatch) => ({
+  signIn: () => dispatch(signIn()),
 });
 
 export default connect(
