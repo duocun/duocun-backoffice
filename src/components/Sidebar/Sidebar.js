@@ -61,53 +61,55 @@ export default function Sidebar(props) {
   const currentUser = useContext(AuthContext);
   var links = (
     <List className={classes.list}>
-      {routes.map((prop, key) => {
-        const isAllowed = hasRole(currentUser, prop.perm, rbacData);
-        if (!isAllowed) {
-          return null;
-        }
-        var activePro = " ";
-        var listItemClasses;
-        listItemClasses = classNames({
-          [" " + classes[color]]: activeRoute(prop.path),
-        });
-        const whiteFontClasses = classNames({
-          [" " + classes.whiteFont]: activeRoute(prop.path),
-        });
-        return (
-          <NavLink
-            to={prop.path}
-            className={activePro + classes.item}
-            activeClassName="active"
-            key={key}
-          >
-            <ListItem button className={classes.itemLink + listItemClasses}>
-              {typeof prop.icon === "string" ? (
-                <Icon
-                  className={classNames(classes.itemIcon, whiteFontClasses, {
-                    [classes.itemIconRTL]: props.rtlActive,
+      {routes
+        .filter((prop) => !prop.hide)
+        .map((prop, key) => {
+          const isAllowed = hasRole(currentUser, prop.perm, rbacData);
+          if (!isAllowed) {
+            return null;
+          }
+          var activePro = " ";
+          var listItemClasses;
+          listItemClasses = classNames({
+            [" " + classes[color]]: activeRoute(prop.path),
+          });
+          const whiteFontClasses = classNames({
+            [" " + classes.whiteFont]: activeRoute(prop.path),
+          });
+          return (
+            <NavLink
+              to={prop.path}
+              className={activePro + classes.item}
+              activeClassName="active"
+              key={key}
+            >
+              <ListItem button className={classes.itemLink + listItemClasses}>
+                {typeof prop.icon === "string" ? (
+                  <Icon
+                    className={classNames(classes.itemIcon, whiteFontClasses, {
+                      [classes.itemIconRTL]: props.rtlActive,
+                    })}
+                  >
+                    {prop.icon}
+                  </Icon>
+                ) : (
+                  <prop.icon
+                    className={classNames(classes.itemIcon, whiteFontClasses, {
+                      [classes.itemIconRTL]: props.rtlActive,
+                    })}
+                  />
+                )}
+                <ListItemText
+                  primary={t(prop.name)}
+                  className={classNames(classes.itemText, whiteFontClasses, {
+                    [classes.itemTextRTL]: props.rtlActive,
                   })}
-                >
-                  {prop.icon}
-                </Icon>
-              ) : (
-                <prop.icon
-                  className={classNames(classes.itemIcon, whiteFontClasses, {
-                    [classes.itemIconRTL]: props.rtlActive,
-                  })}
+                  disableTypography={true}
                 />
-              )}
-              <ListItemText
-                primary={t(prop.name)}
-                className={classNames(classes.itemText, whiteFontClasses, {
-                  [classes.itemTextRTL]: props.rtlActive,
-                })}
-                disableTypography={true}
-              />
-            </ListItem>
-          </NavLink>
-        );
-      })}
+              </ListItem>
+            </NavLink>
+          );
+        })}
     </List>
   );
   var brand = (

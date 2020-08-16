@@ -1,5 +1,6 @@
 import React from "react";
 import { useState, useCallback } from "react";
+import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import Avatar from "@material-ui/core/Avatar";
@@ -109,6 +110,7 @@ const Login = ({ signIn, history, isAuthorized }) => {
             autoComplete="current-password"
             onChange={e => setPassword(e.target.value)}
           />
+          <Link to="/forgot-password">{t("Forgot password?")}</Link>
           <Button
             type="button"
             fullWidth
