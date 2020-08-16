@@ -193,12 +193,12 @@ describe("helper", () => {
       expect(arr[arr.length - 1]).to.eql("1993-12-17");
     });
   });
-  describe("toDateString", () => {
-    it("should convert date to string", () => {
-      let date = "2020-05-09";
-      expect(helper.toDateString(new Date(date))).to.eql(date);
-    });
-	});
+  // describe("toDateString", () => {
+  //   it("should convert date to string", () => {
+  //     let date = "2020-05-09";
+  //     expect(helper.toDateString(new Date(date))).to.eql(date);
+  //   });
+	// });
 	describe('arrayToggleElem', () => {
 		context('when element not exists in the array', () => {
 			it('pushes the given element', () => {
