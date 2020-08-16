@@ -13,10 +13,8 @@ import {
   Table,
   TableCell,
   TableContainer,
-  TableHead,
   TableBody,
   TableRow,
-  TableSortLabel,
   Switch,
 } from "@material-ui/core";
 
@@ -26,7 +24,7 @@ import IconButton from "@material-ui/core/IconButton";
 import EditIcon from "@material-ui/icons/Edit";
 
 import { makeStyles } from "@material-ui/core/styles";
-import { Button, Box } from "@material-ui/core";
+import { Button } from "@material-ui/core";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 
 import TablePagination from "components/Table/TablePagniation.js";
@@ -38,12 +36,11 @@ import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
 
 import ApiAccountService from "services/api/ApiAccountService";
-import { toDateString, getQueryParam } from "helper/index";
+import { toDateString } from "helper/index";
 import { TableHeader } from "components/Table/TableHeader";
 import { DropdownSelect } from "components/DropdownSelect/DropdownSelect";
 
 import { setAccount } from "redux/actions/account";
-// import AccountSearch from "components/AccountSearch/AccountSearch";
 import Searchbar from "components/Searchbar/Searchbar";
 
 import {
@@ -111,29 +108,13 @@ const AccountTablePage = ({ location, account, setAccount }) => {
     setType(type);
   };
 
-  const handleSelectAccount = (account) => {
-    const type = account ? account.type : "client";
-    const username = account ? account.username : "";
-    setAccount({ _id: account ? account._id : "", username, type });
-    setQuery(username);
-  };
-
-  const handleClearAccount = () => {
-    setQuery("");
-    setAccount({ _id: "", username: "", type: "" });
-  };
-
-  const handleSearchAccount = (page, rowsPerPage, keyword) => {
-    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword);
-  };
-
   const refreshPage = useCallback(() => {
     if (page === 0) {
       updateData(query, type);
     } else {
       setPage(0);
     }
-  }, [page, query, type, rowsPerPage, sort]);
+  }, [page, query, type, rowsPerPage, sort, updateData, setPage]);
 
   return (
     <Card>

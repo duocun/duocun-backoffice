@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-// @material-ui/core components
+
 import { makeStyles } from "@material-ui/core/styles";
 import { connect } from "react-redux";
 
 import { useTranslation } from "react-i18next";
-// core components
 import AppBar from "@material-ui/core/AppBar";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
@@ -14,7 +13,6 @@ import GridContainer from "components/Grid/GridContainer.js";
 import ToggleButton from "@material-ui/lab/ToggleButton";
 import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
 
-import * as moment from "moment";
 import { DatePicker } from "components/DatePicker/DatePicker.js";
 import Chart from "react-apexcharts";
 
@@ -205,7 +203,7 @@ const OrderSummaryPage = ({
 
   useEffect(() => {
     updateData(deliverDate, "Delivery Date");
-  }, []);
+  }, [deliverDate]);
 
   const handelDateChange = m => {
     const dt = m.toISOString();

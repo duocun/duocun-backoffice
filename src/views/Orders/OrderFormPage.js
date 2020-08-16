@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-// import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
 import * as moment from "moment";
 import { KeyboardDatePicker } from "@material-ui/pickers";
-// import {useForm} from "react-hook-form";
-// import TimePicker from "components/TimePicker/TimePicker";
 
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
@@ -20,20 +17,15 @@ import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 
-// import FormLabel from "@material-ui/core/FormLabel";
-// import FormGroup from "@material-ui/core/FormGroup";
 import FormControl from "@material-ui/core/FormControl";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Checkbox from "@material-ui/core/Checkbox";
 import Select from "@material-ui/core/Select";
 
-// import Skeleton from "@material-ui/lab/Skeleton";
 import Alert from "@material-ui/lab/Alert";
-// import CustomInput from "components/CustomInput/CustomInput";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import Button from "@material-ui/core/Button";
-// import IconButton from "@material-ui/core/IconButton";
 
 // icons
 import FormatListBulletedIcon from "@material-ui/icons/FormatListBulleted";
@@ -52,13 +44,8 @@ import ApiAccountService from "services/api/ApiAccountService";
 import ApiOrderService from "services/api/ApiOrderService";
 import ApiMerchantService from "services/api/ApiMerchantService";
 
-// import { Save as SaveIcon, FormatListBulleted as FormatListBulletedIcon } from "@material-ui/icons";
-// import { TextField, Button, Checkbox,
-//     Select, MenuItem, InputLabel, FormControl, FormControlLabel } from "@material-ui/core";
-
 import { selectOrder, setDeliverDate } from "redux/actions/order";
 import { setAccount } from "redux/actions/account";
-// import ApiAccountService from "services/api/ApiAccountService";
 
 const useStyles = makeStyles(() => ({}));
 
@@ -311,20 +298,6 @@ const OrderFormPage = ({ match, order, onAfterUpdate, history }) => {
     }
   };
 
-  // location --- ILocation
-  const getAddrString = location => {
-    if (location) {
-      const city = location.subLocality ? location.subLocality : location.city;
-      const province = location.province;
-      const streetName = location.streetName;
-      return (
-        location.streetNumber + " " + streetName + ", " + city + ", " + province
-      );
-    } else {
-      return "";
-    }
-  };
-
   const handleSubmit = () => {
     if (model._id && model._id !== "new" && model._id !== "clone") {
       handleUpdate();
@@ -347,8 +320,6 @@ const OrderFormPage = ({ match, order, onAfterUpdate, history }) => {
     }
   };
 
-  const handleBack = () => {};
-
   const handleUpdateItemMap = itemMap => {
     setItemMap(itemMap);
     const vs = Object.values(itemMap);
@@ -370,22 +341,7 @@ const OrderFormPage = ({ match, order, onAfterUpdate, history }) => {
     });
   };
 
-  const handleSelectProduct = item => {
-    setModel({ ...model, items: [item] });
-  };
-
-  const handleDriverChange = e => {
-    const driverId = e.target.value;
-    const driver = drivers.find(d => d._id === driverId);
-    setModel({
-      ...model,
-      driverId: e.target.value,
-      driverName: driver ? driver.username : ""
-    });
-  };
-
   const handleSelectDriver = account => {
-    // const type = account ? account.type : 'driver';
     setDriverKeyword(account ? account.username : "");
     setModel({
       ...model,
@@ -415,50 +371,7 @@ const OrderFormPage = ({ match, order, onAfterUpdate, history }) => {
   // const [alert, setAlert] = useState({ message: "", severity: "info" });
 
   //////////////////// For data fetch
-  const getOrderData = () => {};
 
-  const updateData = () => {
-    // const qDeliverDate = deliverDate ? {deliverDate} : {};
-    // const keyword = query;
-    // const condition = {
-    //   $or: [
-    //     { clientName: { $regex: keyword }},
-    //     { clientPhone: { $regex: keyword }},
-    //     { code: { $regex: keyword }}
-    //   ],
-    //   status: {
-    //     $nin: [OrderStatus.BAD, OrderStatus.DELETED, OrderStatus.TEMP],
-    //   },
-    //   ...qDeliverDate
-    // };
-    // ApiOrderService.getOrders(page, rowsPerPage, condition, [sort]).then(
-    //   ({ data }) => {
-    //     setOrders(data.data);
-    //     setTotalRows(data.count);
-    //     setLoading(false);
-    //     if(data.data && data.data.length>0){
-    //       const d = data.data[0];
-    //       const _id = d.clientId ? d.clientId : '';
-    //       const username = d.clientName ? d.clientName: '';
-    //       setAccount({_id, username, type: 'client'});
-    //     }
-    //   }
-    // );
-  };
-
-  // const updateFormData = (id) => {
-  //   if(id){
-  //     ApiOrderService.getOrder(id).then(({data}) => {
-  //       const order = data.data;
-  //       setModel(order);
-  //     });
-  //   }
-  // }
-
-  // const handleAfterUpdate = () => {
-  //   updateFormData(model._id);
-  //   updateData();
-  // }
 
   /////////////////// For render and events
 

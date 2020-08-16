@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-// @material-ui/core components
-import { makeStyles } from "@material-ui/core/styles";
 
 // core components
 import GridItem from "components/Grid/GridItem.js";
@@ -12,24 +10,7 @@ import CardBody from "components/Card/CardBody.js";
 import * as moment from "moment";
 import { KeyboardDatePicker } from "@material-ui/pickers";
 import Chart from "react-apexcharts";
-// import InputLabel from '@material-ui/core/InputLabel';
-// import MenuItem from '@material-ui/core/MenuItem';
-// // import FormHelperText from '@material-ui/core/FormHelperText';
-// import FormControl from '@material-ui/core/FormControl';
-// import Select from '@material-ui/core/Select';
-
-// import Table from "@material-ui/core/Table";
-// import TableRow from "@material-ui/core/TableRow";
-// import TableBody from "@material-ui/core/TableBody";
-// import TableCell from "@material-ui/core/TableCell";
-
 import ApiStatisticsService from "services/api/ApiStatisticsService";
-
-const useStyles = makeStyles(theme => ({
-  title: {
-    fontSize: "10px"
-  }
-}));
 
 const defaultChart = {
   series: [
@@ -139,8 +120,7 @@ const getChart = (series, categories, height) => {
   };
 };
 
-const OrderAnalytics = ({}) => {
-  const classes = useStyles();
+const OrderAnalytics = () => {
   const [fromDate, setFromDate] = useState(moment().toISOString());
   const [chart, setChart] = useState(defaultChart);
 
@@ -171,12 +151,12 @@ const OrderAnalytics = ({}) => {
     setFromDate(dt);
     updateData(dt);
   };
+
   useEffect(() => {
     updateData(fromDate);
-  }, []);
+  }, [fromDate]);
 
   return (
-    <div>
       <GridContainer>
         <GridItem xs={12} sm={12} md={12}>
           <Card>
@@ -206,7 +186,6 @@ const OrderAnalytics = ({}) => {
           </Card>
         </GridItem>
       </GridContainer>
-    </div>
   );
 };
 

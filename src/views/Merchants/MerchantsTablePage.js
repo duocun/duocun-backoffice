@@ -12,7 +12,6 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 import TablePagination from "components/Table/TablePagniation.js";
-import TableSortLabel from "@material-ui/core/TableSortLabel";
 import Searchbar from "components/Searchbar/Searchbar";
 
 import ApiMerchantService from "services/api/ApiMerchantService";

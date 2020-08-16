@@ -12,9 +12,8 @@ import moment from "moment";
 import Attributes from "./Attributes";
 import Roles from "./Roles";
 
-const Body = ({ model, loading, onChange }) => {
+const Body = ({ model, onChange }) => {
   const { t } = useTranslation();
-  const classes = useStyles();
   return (
     <CardBody>
       <GridContainer>

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { useTranslation } from "react-i18next";
-import { makeStyles } from "@material-ui/core/styles";
 
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
@@ -20,17 +19,9 @@ import { TransactionForm } from "./TransactionForm";
 import { selectTransaction } from "redux/actions/transaction";
 import { setAccount } from "redux/actions/account";
 
-const useStyles = makeStyles(() => ({}));
-
-const defaultActions = [
-  { code: "PS", text: "Pay Salary" },
-  { code: "PDCH", text: "Pay Driver Cash" },
-  { code: "T", text: "Transfer" }
-];
 
 const TransactionFormPage = ({
   match,
-  history,
   account,
   transaction,
   update
@@ -43,7 +34,6 @@ const TransactionFormPage = ({
   // }
 
   const { t } = useTranslation();
-  const classes = useStyles();
   const [items, setItems] = useState([]);
   const [modifyByAccount, setModifyByAccount] = useState({
     _id: "",
@@ -232,16 +222,6 @@ const TransactionFormPage = ({
         });
     }
   };
-
-  const handleSubmit = () => {
-    if (model._id) {
-      handleUpdate();
-    } else {
-      handleCreate();
-    }
-  };
-
-  const handleBack = () => {};
 
   return (
     <GridContainer>

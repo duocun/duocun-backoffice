@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
 import PropTypes from "prop-types";
-import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
 import FormControl from "@material-ui/core/FormControl";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -38,12 +37,10 @@ const SearchDropDown = ({
   hasMore,
   fetchData,
   selectData,
-  onEndClicked = () => {},
-  show = false
+  onEndClicked = () => {}
 }) => {
   const classes = useStyles();
 
-  // const getVisibility = (show) => (show ? "visible" : "hidden");
   const handleSelectData = d => {
     selectData(d);
   };

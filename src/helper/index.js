@@ -153,12 +153,15 @@ export const countProductFromDate = (
   productId,
   dir = "after"
 ) => {
+
   let todayString = moment()
     .local()
     .format("YYYY-MM-DD");
-  if (todayString == date) {
+
+  if (todayString === date) {
     return 0;
   }
+
   let afterToday = todayString <= date;
   let ordersToCount = afterToday
     ? orders.filter(

@@ -244,20 +244,6 @@ const OrderForm = ({ data, onAfterUpdate, history }) => {
     }
   };
 
-  // location --- ILocation
-  const getAddrString = location => {
-    if (location) {
-      const city = location.subLocality ? location.subLocality : location.city;
-      const province = location.province;
-      const streetName = location.streetName;
-      return (
-        location.streetNumber + " " + streetName + ", " + city + ", " + province
-      );
-    } else {
-      return "";
-    }
-  };
-
   const handleSubmit = () => {
     if (model._id && model._id !== "new" && model._id !== "clone") {
       handleUpdate();
@@ -280,8 +266,6 @@ const OrderForm = ({ data, onAfterUpdate, history }) => {
     }
   };
 
-  const handleBack = () => {};
-
   const handleUpdateItemMap = itemMap => {
     setItemMap(itemMap);
     const vs = Object.values(itemMap);
@@ -300,20 +284,6 @@ const OrderForm = ({ data, onAfterUpdate, history }) => {
       ...model,
       deliverDate,
       delivered: `${deliverDate}T15:00:00.000Z`
-    });
-  };
-
-  const handleSelectProduct = item => {
-    setModel({ ...model, items: [item] });
-  };
-
-  const handleDriverChange = e => {
-    const driverId = e.target.value;
-    const driver = drivers.find(d => d._id === driverId);
-    setModel({
-      ...model,
-      driverId: e.target.value,
-      driverName: driver ? driver.username : ""
     });
   };
 

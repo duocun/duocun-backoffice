@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 // @material-ui/core components
-import { makeStyles } from "@material-ui/core/styles";
 
 // core components
 import GridItem from "components/Grid/GridItem.js";
@@ -25,7 +24,6 @@ import Chart from "react-apexcharts";
 
 import ApiStatisticsService from "services/api/ApiStatisticsService";
 
-const useStyles = makeStyles(theme => ({}));
 
 const defaultChart = {
   series: [
@@ -125,8 +123,7 @@ const getChart = (series, categories, height) => {
   };
 };
 
-const SalesPage = ({}) => {
-  const classes = useStyles();
+const SalesPage = () => {
   const [fromDate, setFromDate] = useState(moment().toISOString());
   const [chart, setChart] = useState(defaultChart);
 
@@ -162,7 +159,7 @@ const SalesPage = ({}) => {
   };
   useEffect(() => {
     updateData(fromDate);
-  }, []);
+  }, [fromDate]);
 
   return (
     <div>
