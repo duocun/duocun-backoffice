@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 import { connect } from "react-redux";
 import moment from "moment";
@@ -238,7 +238,7 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
   const [lines, setLines] = useState([]);
   const [assignments, setAssignments] = useState([]);
 
-  const updateMarkers = (deliverDate, drivers, assignments) => {
+  const updateMarkers = useCallback((deliverDate, drivers, assignments) => {
     // {markers: [{orderId, lat, lng, type, status, icon}], driverMap:{driverId:{driverId, driverName}} }
     ApiOrderService.getAutoRoutes(deliverDate).then(({ data }) => {
       const routes = data ? data.data.routes : [];
@@ -268,7 +268,7 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
         setLines(routes);
       }
     });
-  };
+  }, []);
 
   useEffect(() => {
     const q = deliverDate ? { deliverDate } : {};

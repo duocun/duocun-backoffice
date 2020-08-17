@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 // @material-ui/core components
@@ -72,7 +72,7 @@ const DriverSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
   const [dupClients, setDupClientList] = useState([]);
 
 
-  const loadData = deliverDate => {
+  const loadData = useCallback( deliverDate => {
     ApiStatisticsService.getDriverStatistic(deliverDate).then(({ data }) => {
       const summary = data.data;
       setDriverSummary(summary);
@@ -115,7 +115,7 @@ const DriverSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
         }
       }
     });
-  };
+  }, []);
 
   const handleDriverChange = driverId => {
     const d = options.find(d => d._id === driverId);

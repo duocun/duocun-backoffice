@@ -88,7 +88,7 @@ const TransactionFormPage = ({
         );
       }
     }
-  }, []);
+  }, [account, match.params.id, model, modifyByAccount._id]);
 
   useEffect(() => {
     const token = AuthService.getAuthToken();

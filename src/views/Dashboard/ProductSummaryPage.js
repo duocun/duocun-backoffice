@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 // @material-ui/core components
@@ -83,13 +83,13 @@ const ProductSummaryPage = ({
     } else {
       loadData(deliverDate);
     }
-  }, []);
+  }, [deliverDate, setDeliverDate]);
 
-  const loadData = deliverDate => {
+  const loadData = useCallback( deliverDate => {
     ApiStatisticsService.getProductStatistic(deliverDate).then(({ data }) => {
       setProductList(data.data);
     });
-  };
+  }, [deliverDate]);
 
   const handleDateChange = m => {
     const date = m.format("YYYY-MM-DD");

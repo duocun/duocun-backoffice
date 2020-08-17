@@ -151,7 +151,7 @@ const OrderFormPage = ({ match, order, onAfterUpdate, history }) => {
         });
       });
     }
-  }, []);
+  }, [match.params, model, modifyByAccount._id, order]);
 
   const getCheckMap = model => {
     if (model.items && model.items.length > 0) {

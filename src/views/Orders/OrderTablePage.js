@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { connect } from "react-redux";
@@ -99,7 +99,8 @@ const OrderTablePage = ({
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [processing, setProcessing] = useState(false);
 
-  const updateData = (product, keyword) => {
+  const updateData = useCallback(
+   (product, keyword) => {
     const qProduct =
       product && product._id ? { "items.productId": product._id } : {};
     const qDeliverDate = deliverDate ? { deliverDate } : {};
@@ -142,7 +143,7 @@ const OrderTablePage = ({
         }
       }
     );
-  };
+  }, [deliverDate, driver._id, page, rowsPerPage, setAccount, sort]);
 
   const removeAlert = () => {
     setAlert({
@@ -277,7 +278,7 @@ const OrderTablePage = ({
     // }else{
     updateData(product, clientKeyword);
     // }
-  }, [page, rowsPerPage, sort, clientKeyword, driverKeyword, deliverDate]);
+  }, [page, rowsPerPage, sort, clientKeyword, driverKeyword, deliverDate, product, updateData]);
 
   return (
     <div className={classes.orderPage}>
@@ -337,7 +338,10 @@ const OrderTablePage = ({
               </Alert>
             </GridItem>
           )}
-          <OrderTable
+
+          {
+            !processing &&
+            <OrderTable
             rows={orders}
             page={page}
             rowsPerPage={rowsPerPage}
@@ -349,7 +353,9 @@ const OrderTablePage = ({
             setPage={setPage}
             selectData={handleSelectOrder}
             removeData={handleDeleteOrder}
-          />
+            />
+          }
+
         </CardBody>
         <CardFooter></CardFooter>
       </Card>

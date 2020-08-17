@@ -118,9 +118,9 @@ export default function TableList() {
   };
 
   // scale image inside frame
-  const resizeImage = (frame_w, frame_h, w, h) => {
-    return { w: Math.round(frame_w), h: Math.round(frame_h), padding_top: 0 };
-  };
+  // const resizeImage = (frame_w, frame_h, w, h) => {
+  //   return { w: Math.round(frame_w), h: Math.round(frame_h), padding_top: 0 };
+  // };
 
   const getBlob = (image, size = "sm") => {
     const canvas = document.createElement("canvas");

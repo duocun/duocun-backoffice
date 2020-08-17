@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
@@ -87,7 +87,7 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
     FlashStorage.get("TRANSACTION_ALERT") || { message: "", severity: "info" }
   );
 
-  const updateData = (accountId, actionCode, startDate=null, endDate=null) => {
+  const updateData = useCallback((accountId, actionCode, startDate=null, endDate=null) => {
     const createdQuery = {};
     const accountQuery = accountId
       ? {
@@ -116,7 +116,7 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
       setTotalRows(data.count);
       setLoading(false);
     });
-  };
+  }, []);
 
   const removeAlert = () => {
     setAlert({

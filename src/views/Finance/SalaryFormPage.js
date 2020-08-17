@@ -144,7 +144,7 @@ const SalaryFormPage = ({ match, account }) => {
         );
       }
     }
-  }, [account]);
+  }, [account, match.params.id, model, modifyByAccount._id]);
 
   const handleSelectFromAccount = fromAccount => {
     setFromQuery(fromAccount ? fromAccount.username : "");
@@ -285,7 +285,7 @@ const SalaryFormPage = ({ match, account }) => {
     }
   };
 
-  const handleBack = () => {};
+  // const handleBack = () => {};
 
   return (
     <Card>

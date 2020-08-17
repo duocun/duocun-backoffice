@@ -169,7 +169,7 @@ const ProductAnalytics = () => {
   };
   useEffect(() => {
     updateData(fromDate);
-  }, []);
+  }, [fromDate]);
 
   return (
     <div>
