@@ -47,7 +47,7 @@ const useStyles = makeStyles(styles);
 export default function TableList() {
   const classes = useStyles();
   const [fname, setFileName] = useState("");
-  const size = {};
+
   const uploadUrl = "/files/upload";
 
   const onFileChange = event => {
@@ -125,7 +125,7 @@ export default function TableList() {
   const getBlob = (image, size = "sm") => {
     const canvas = document.createElement("canvas");
 
-    const d = resizeImage(600, 450, image.width, image.height);
+    // const d = resizeImage(600, 450, image.width, image.height);
     canvas.width = image.width;
     canvas.height = image.height;
 

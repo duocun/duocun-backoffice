@@ -5,8 +5,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import CustomInput from "components/CustomInput/CustomInput.js";
 import SearchDropDown from "components/SearchDropDown/SearchDropDown.js";
 
-import InfiniteScroll from "react-infinite-scroll-component";
-
 const useStyles = makeStyles(styles => ({
   searchWrapper: {
     width: "100%"
@@ -57,7 +55,7 @@ const AccountSearch = ({
   const [page, setPage] = useState(0);
   const [keyword, setKeyword] = useState(val); // getQueryParam(location, "search") || "");
 
-  const [account, setAccount] = useState({ _id: id, username: val });
+  // const [account, setAccount] = useState({ _id: id, username: val });
   const [searching, setSearching] = useState(false);
   const [dropdown, setDropdown] = useState(false);
   const [accounts, setAccounts] = useState({});
@@ -93,12 +91,12 @@ const AccountSearch = ({
 
   useEffect(() => {
     setKeyword(val); // fix me
-    setAccount({ _id: id, username: val });
+    // setAccount({ _id: id, username: val });
   }, [id, val]);
 
   const handleSelectData = account => {
     onSelect(account);
-    setAccount(account);
+    // setAccount(account);
     setDropdown(false);
     const str = account.username + " " + (account.phone ? account.phone : "");
     setKeyword(str);
@@ -125,7 +123,7 @@ const AccountSearch = ({
   const handleKeywordChange = ({ target }) => {
     const str = target.value;
     setKeyword(str);
-    setAccount({ _id: "", username: "" });
+    // setAccount({ _id: "", username: "" });
     setPage(0);
     setDropdown(true);
     handleSearch(str, 0);

@@ -1,15 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
-// import { useLocation } from "react-router-dom";
-
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
-// import { connect } from "react-redux";
-
-import * as moment from "moment";
-// import { KeyboardDatePicker } from "@material-ui/pickers";
 
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
@@ -29,15 +23,14 @@ import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 
 import Alert from "@material-ui/lab/Alert";
 import ApiTransactionService from "services/api/ApiTransactionService";
-import ApiOrderService from "services/api/ApiOrderService";
-import { getQueryParam } from "helper/index";
+// import ApiOrderService from "services/api/ApiOrderService";
 import FlashStorage from "services/FlashStorage";
 
 import AccountSearch from "components/AccountSearch/AccountSearch.js";
 
 import { TransactionTable } from "./TransactionTable";
 import { setAccount } from "redux/actions/account";
-import { defaultTransaction } from "views/Finance/FinanceModel";
+// import { defaultTransaction } from "views/Finance/FinanceModel";
 
 import ApiAccountService from "services/api/ApiAccountService";
 
@@ -76,7 +69,6 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
   // states related to list and pagniation
   // const searchParams = useQuery();
 
-  const [items, setItems] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
@@ -88,27 +80,15 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
   // filters
   const [actionCode, setActionCode] = useState("A");
 
-  // startDate and endDate is deprecated now.
-  const [startDate, setStartDate] = useState(moment.utc().toISOString());
-  const [endDate, setEndDate] = useState(moment.utc().toISOString());
-
-  const [model, setModel] = useState(defaultTransaction);
+  // const [model, setModel] = useState(defaultTransaction);
   const [processing, setProcessing] = useState(false);
 
   const [alert, setAlert] = useState(
     FlashStorage.get("TRANSACTION_ALERT") || { message: "", severity: "info" }
   );
 
-  useEffect(() => {
-    if (account && account._id) {
-      updateData(account._id, actionCode, startDate, endDate);
-    } else {
-      updateData(null, actionCode, startDate, endDate);
-    }
-  }, [page, rowsPerPage, sort, account, actionCode, startDate, endDate, query]);
-
-  const updateData = (accountId, actionCode, startDate, endDate) => {
-    const createdQuery = {}; // (startDate && endDate) ? {created: {$gte: startDate, $lte: endDate}} : {};
+  const updateData = (accountId, actionCode, startDate=null, endDate=null) => {
+    const createdQuery = {};
     const accountQuery = accountId
       ? {
           $or: [{ fromId: accountId }, { toId: accountId }]
@@ -145,34 +125,32 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
     });
   };
 
-  const handleNewTransaction = () => {
-    setModel({
-      ...defaultTransaction,
-      modifyBy: account ? account._id : "",
-      created: moment.utc().toISOString()
-    });
-  };
+  // const handleNewTransaction = () => {
+  //   setModel({
+  //     ...defaultTransaction,
+  //     modifyBy: account ? account._id : "",
+  //     created: moment.utc().toISOString()
+  //   });
+  // };
 
   const handelSelectTransaction = tr => {
-    if (tr && tr.actionCode === "OFD") {
-      const orderId = tr.orderId;
-      ApiOrderService.getOrder(orderId).then(({ data }) => {
-        const order = data.data;
-        setItems(order.items);
-        if (tr.note) {
-          setModel({ ...tr, modifyBy: account ? account._id : "" });
-        } else {
-          setModel({ ...tr, note: "", modifyBy: account ? account._id : "" });
-        }
-      });
-    } else {
-      setItems([]);
-      if (tr.note) {
-        setModel({ ...tr, modifyBy: account ? account._id : "" });
-      } else {
-        setModel({ ...tr, note: "", modifyBy: account ? account._id : "" });
-      }
-    }
+    // if (tr && tr.actionCode === "OFD") {
+    //   // const orderId = tr.orderId;
+    //   // ApiOrderService.getOrder(orderId).then(({ data }) => {
+    //   //   const order = data.data;
+    //   //   if (tr.note) {
+    //   //     setModel({ ...tr, modifyBy: account ? account._id : "" });
+    //   //   } else {
+    //   //     setModel({ ...tr, note: "", modifyBy: account ? account._id : "" });
+    //   //   }
+    //   // });
+    // } else {
+    //   if (tr.note) {
+    //     setModel({ ...tr, modifyBy: account ? account._id : "" });
+    //   } else {
+    //     setModel({ ...tr, note: "", modifyBy: account ? account._id : "" });
+    //   }
+    // }
   };
 
   const handleSelectAccount = account => {
@@ -193,18 +171,18 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
 
   const handleActionChange = actionCode => {
     setActionCode(actionCode);
-    updateData(account._id, actionCode, startDate, endDate);
+    updateData(account._id, actionCode);
   };
 
-  const handleStartDateChange = s => {
-    setStartDate(s);
-    updateData(account._id, actionCode, startDate, endDate);
-  };
+  // const handleStartDateChange = s => {
+  //   setStartDate(s);
+  //   updateData(account._id, actionCode, startDate, endDate);
+  // };
 
-  const handleEndDateChange = s => {
-    setEndDate(s);
-    updateData(account._id, actionCode, startDate, endDate);
-  };
+  // const handleEndDateChange = s => {
+  //   setEndDate(s);
+  //   updateData(account._id, actionCode, startDate, endDate);
+  // };
 
   const handleUpdateAccount = () => {
     if (account && account._id) {
@@ -268,44 +246,50 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
     }
   };
 
-  const handleExportRevenue = () => {
-    if (
-      window.confirm(`Are you sure to export the revenue from ${startDate}?`)
-    ) {
-      if (startDate) {
-        removeAlert();
-        setProcessing(true);
-        ApiTransactionService.exportRevenue(startDate, endDate)
-          .then(({ data }) => {
-            // if (data.code === 'success') {
-            setAlert({
-              message: t("Export Revenue successfully"),
-              severity: "success"
-            });
-            // } else {
-            //   setAlert({
-            //     message: t("Export Revenue failed"),
-            //     severity: "error"
-            //   });
-            // }
-            setProcessing(false);
-          })
-          .catch(e => {
-            console.error(e);
-            setAlert({
-              message: t("Export Revenue failed"),
-              severity: "error"
-            });
-            setProcessing(false);
-          });
-      }
+  useEffect(() => {
+    if (account && account._id) {
+      updateData(account._id, actionCode);
+    } else {
+      updateData(null, actionCode);
     }
-  };
+  }, [page, rowsPerPage, sort, account, actionCode, query, updateData]);
 
-  const handleSearch = (i, rowsPerPage, keyword) => {
-    ApiAccountService.getAccountByKeyword(0, rowsPerPage, keyword); // .then(({data}) => {
-    // });
-  };
+  // const handleExportRevenue = (startDate, endDate) => {
+  //   if (
+  //     window.confirm(`Are you sure to export the revenue ?`)
+  //   ) {
+  //       removeAlert();
+  //       setProcessing(true);
+  //       ApiTransactionService.exportRevenue(startDate, endDate)
+  //         .then(({ data }) => {
+  //           // if (data.code === 'success') {
+  //           setAlert({
+  //             message: t("Export Revenue successfully"),
+  //             severity: "success"
+  //           });
+  //           // } else {
+  //           //   setAlert({
+  //           //     message: t("Export Revenue failed"),
+  //           //     severity: "error"
+  //           //   });
+  //           // }
+  //           setProcessing(false);
+  //         })
+  //         .catch(e => {
+  //           console.error(e);
+  //           setAlert({
+  //             message: t("Export Revenue failed"),
+  //             severity: "error"
+  //           });
+  //           setProcessing(false);
+  //         });
+  //   }
+  // };
+
+  // const handleSearch = (i, rowsPerPage, keyword) => {
+  //   ApiAccountService.getAccountByKeyword(0, rowsPerPage, keyword); // .then(({data}) => {
+  //   // });
+  // };
 
   return (
     <GridContainer>
@@ -417,7 +401,7 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
                   {t("Update")}
                 </Button>
               </Box>
-              <Box mt={2} mr={2}>
+              {/* <Box mt={2} mr={2}>
                 <Button
                   color="primary"
                   variant="contained"
@@ -427,8 +411,7 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
                   <SaveIcon />
                   {t("Export Revenue")}
                 </Button>
-                {/* <a href="http://localhost:8001/uploads/revenue.csv" download="revenue.csv">Download revenue.csv</a> */}
-              </Box>
+              </Box> */}
             </GridItem>
           </GridContainer>
         </CardFooter>

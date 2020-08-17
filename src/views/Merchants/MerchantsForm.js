@@ -58,7 +58,8 @@ const defaultMerchantsModelState = {
     }
   ]
 };
-const MerchantsForm = ({}) => {
+
+const MerchantsForm = () => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -75,7 +76,7 @@ const MerchantsForm = ({}) => {
 
   ////////////////////////////////////
   // For data fetch
-  const getMerchantData = () => {};
+  // const getMerchantData = () => {};
   const getAccountsData = () => {
     ApiAccountService.getAccountList(0, 1000, { type: "merchant" }).then(
       ({ data }) => {

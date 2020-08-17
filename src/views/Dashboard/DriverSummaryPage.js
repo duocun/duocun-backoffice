@@ -71,22 +71,6 @@ const DriverSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
   const [driver, setDriver] = useState({ _id: "", name: "" });
   const [dupClients, setDupClientList] = useState([]);
 
-  useEffect(() => {
-    const now = moment().toISOString();
-    ApiOrderService.getDuplicates(now).then(({ data }) => {
-      setDupClientList(data);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (!deliverDate) {
-      const date = moment().format("YYYY-MM-DD");
-      setDeliverDate(date);
-      loadData(deliverDate);
-    } else {
-      loadData(deliverDate);
-    }
-  }, []);
 
   const loadData = deliverDate => {
     ApiStatisticsService.getDriverStatistic(deliverDate).then(({ data }) => {
@@ -143,6 +127,23 @@ const DriverSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
     setDeliverDate(date);
     loadData(date);
   };
+
+  useEffect(() => {
+    const now = moment().toISOString();
+    ApiOrderService.getDuplicates(now).then(({ data }) => {
+      setDupClientList(data);
+    });
+  }, [deliverDate, setDeliverDate]);
+
+  useEffect(() => {
+    if (!deliverDate) {
+      const date = moment().format("YYYY-MM-DD");
+      setDeliverDate(date);
+      loadData(deliverDate);
+    } else {
+      loadData(deliverDate);
+    }
+  }, [deliverDate, loadData, setDeliverDate]);
 
   return (
     <GridContainer>

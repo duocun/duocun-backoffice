@@ -230,13 +230,45 @@ const OrderMap = withScriptjs(
 const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
   const { t } = useTranslation();
   const classes = useStyles();
-  const { height, width } = useViewportDimensions();
+  const { height } = useViewportDimensions();
   const [markers, setMarkers] = useState([]);
   const [drivers, setDrivers] = useState([]);
   const [overlays, setOverlays] = useState([]);
   const [bounds, setBounds] = useState([]);
   const [lines, setLines] = useState([]);
   const [assignments, setAssignments] = useState([]);
+
+  const updateMarkers = (deliverDate, drivers, assignments) => {
+    // {markers: [{orderId, lat, lng, type, status, icon}], driverMap:{driverId:{driverId, driverName}} }
+    ApiOrderService.getAutoRoutes(deliverDate).then(({ data }) => {
+      const routes = data ? data.data.routes : [];
+      const colorMap = getColorMap(drivers);
+
+      if (assignments) {
+        assignments.forEach(marker => {
+          if (marker.driverId === UNASSIGNED_DRIVER_ID) {
+            marker.icon = "gRed";
+          } else {
+            marker.icon =
+              marker.status === OrderStatus.DONE
+                ? "gGreen"
+                : colorMap[marker.driverId];
+          }
+        });
+
+        setMarkers(assignments);
+        if (routes && routes.length > 0) {
+          routes.forEach(r => {
+            const driverId = r.driverId;
+            const driver = drivers.find(d => d._id === driverId);
+            const colorId = driver ? driver.colorId : "gRed";
+            r.color = COLOR_MAP[colorId].val;
+          });
+        }
+        setLines(routes);
+      }
+    });
+  };
 
   useEffect(() => {
     const q = deliverDate ? { deliverDate } : {};
@@ -270,7 +302,7 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
         }
       );
     });
-  }, []);
+  }, [deliverDate, setDeliverDate, updateMarkers]);
 
   const getDriverMap = assignments => {
     const driverMap = {};
@@ -301,38 +333,6 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
       d.onDuty = onDuty ? true : false;
     });
     return drivers;
-  };
-
-  const updateMarkers = (deliverDate, drivers, assignments) => {
-    // {markers: [{orderId, lat, lng, type, status, icon}], driverMap:{driverId:{driverId, driverName}} }
-    ApiOrderService.getAutoRoutes(deliverDate).then(({ data }) => {
-      const routes = data ? data.data.routes : [];
-      const colorMap = getColorMap(drivers);
-
-      if (assignments) {
-        assignments.forEach(marker => {
-          if (marker.driverId === UNASSIGNED_DRIVER_ID) {
-            marker.icon = "gRed";
-          } else {
-            marker.icon =
-              marker.status === OrderStatus.DONE
-                ? "gGreen"
-                : colorMap[marker.driverId];
-          }
-        });
-
-        setMarkers(assignments);
-        if (routes && routes.length > 0) {
-          routes.forEach(r => {
-            const driverId = r.driverId;
-            const driver = drivers.find(d => d._id === driverId);
-            const colorId = driver ? driver.colorId : "gRed";
-            r.color = COLOR_MAP[colorId].val;
-          });
-        }
-        setLines(routes);
-      }
-    });
   };
 
   const handleDateChange = m => {
@@ -377,8 +377,9 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
       let xj = vs[j].lat,
         yj = vs[j].lng;
 
-      let intersect =
-        yi > y != yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+      let intersect = ((yi > y) !== (yj > y)) 
+        && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+
       if (intersect) inside = !inside;
     }
 
@@ -392,7 +393,7 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
   };
 
   const handleOverlayComplete = e => {
-    const overlay = e.overlay;
+    // const overlay = e.overlay;
     // setOverlays([...overlays, overlay]);
   };
 
@@ -464,7 +465,7 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
             <div className="leftCol">
               <div style={{ width: "80%", float: "left" }}>未分配</div>
               <div style={{ width: "20%", float: "left" }}>
-                <img src={gRed} />
+                <img src={gRed} alt="unassigned"/>
               </div>
             </div>
             <div
@@ -473,7 +474,7 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
             >
               <div style={{ width: "80%", float: "left" }}>已完成</div>
               <div style={{ width: "20%", float: "left" }}>
-                <img src={gGreen} />
+                <img src={gGreen} alt="finished"/>
               </div>
             </div>
             {drivers.map(
@@ -486,7 +487,7 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
                     {d.username}
                   </div>
                   <div style={{ width: "15%", float: "left" }}>
-                    <img src={d.url} />
+                    <img src={d.url} alt="assigned"/>
                   </div>
                   {d.onDuty && (
                     <Link

@@ -250,8 +250,6 @@ export const TransactionForm = ({
     }
   };
 
-  const handleBack = () => {};
-
   // useEffect(() => {
   //   if (transaction.actionCode === 'PS') {
   //     setModel({

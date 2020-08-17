@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import { useTranslation } from "react-i18next";
 import PropTypes from "prop-types";
@@ -34,8 +34,6 @@ import SaveIcon from "@material-ui/icons/Save";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 
 import FlashStorage from "services/FlashStorage";
-import { getQueryParam } from "helper/index";
-
 import ApiTransactionService from "services/api/ApiTransactionService";
 import ApiAccountService from "services/api/ApiAccountService";
 
@@ -97,9 +95,6 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-const useQuery = () => {
-  return new URLSearchParams(useLocation().search);
-};
 
 export const defaultSalary = {
   actionCode: "PS",
@@ -119,7 +114,6 @@ export const defaultSalary = {
 const SalaryTablePage = ({
   account,
   loggedInAccount,
-  location,
   selectTransaction,
   setAccount
 }) => {
@@ -131,7 +125,7 @@ const SalaryTablePage = ({
     username: "",
     type: "driver"
   });
-  const [model, setModel] = useState(defaultSalary);
+  // const [model, setModel] = useState(defaultSalary);
 
   const [driverKeyword, setDriverKeyword] = useState("");
 
@@ -248,45 +242,45 @@ const SalaryTablePage = ({
   };
 
   const handelSelectRow = tr => {
-    if (tr.note) {
-      setModel(tr);
-    } else {
-      setModel({ ...tr, note: "" });
-    }
+    // if (tr.note) {
+    //   setModel(tr);
+    // } else {
+    //   setModel({ ...tr, note: "" });
+    // }
   };
 
-  const handleDeleteTransaction = transactionId => {
-    if (window.confirm("Are you sure to delete this transaction?")) {
-      if (transactionId) {
-        removeAlert();
-        setProcessing(true);
-        ApiTransactionService.deleteTransaction(transactionId)
-          .then(({ data }) => {
-            if (data.code === "success") {
-              setAlert({
-                message: t("Delete transaction successfully"),
-                severity: "success"
-              });
-              updateData(driver._id);
-            } else {
-              setAlert({
-                message: t("Delete transaction failed"),
-                severity: "error"
-              });
-            }
-            setProcessing(false);
-          })
-          .catch(e => {
-            console.error(e);
-            setAlert({
-              message: t("Delete transaction failed"),
-              severity: "error"
-            });
-            setProcessing(false);
-          });
-      }
-    }
-  };
+  // const handleDeleteTransaction = transactionId => {
+  //   if (window.confirm("Are you sure to delete this transaction?")) {
+  //     if (transactionId) {
+  //       removeAlert();
+  //       setProcessing(true);
+  //       ApiTransactionService.deleteTransaction(transactionId)
+  //         .then(({ data }) => {
+  //           if (data.code === "success") {
+  //             setAlert({
+  //               message: t("Delete transaction successfully"),
+  //               severity: "success"
+  //             });
+  //             updateData(driver._id);
+  //           } else {
+  //             setAlert({
+  //               message: t("Delete transaction failed"),
+  //               severity: "error"
+  //             });
+  //           }
+  //           setProcessing(false);
+  //         })
+  //         .catch(e => {
+  //           console.error(e);
+  //           setAlert({
+  //             message: t("Delete transaction failed"),
+  //             severity: "error"
+  //           });
+  //           setProcessing(false);
+  //         });
+  //     }
+  //   }
+  // };
 
   const updateData = accountId => {
     const query = accountId

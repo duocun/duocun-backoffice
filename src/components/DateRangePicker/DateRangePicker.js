@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useTranslation } from "react-i18next";
+// import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
 import PropTypes from "prop-types";
 import {
@@ -35,7 +35,7 @@ export default function DateRangePicker({
   maxDate = undefined,
   onChange
 }) {
-  const { t } = useTranslation();
+  // const { t } = useTranslation();
   const classes = useStyle();
   const [startDate, setStartDate] = useState(defaultStartDate);
   const [endDate, setEndDate] = useState(defaultEndDate);

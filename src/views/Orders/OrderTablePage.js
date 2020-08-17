@@ -1,17 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { connect } from "react-redux";
 
-// @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
-// core components
 import { DatePicker } from "components/DatePicker/DatePicker.js";
-import {
-  Clear as ClearIcon,
-  InsertInvitation as CalendarIcon
-} from "@material-ui/icons";
 
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
@@ -21,18 +14,12 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 
-// import { Button } from "@material-ui/core";
-// import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
-// import { getQueryParam } from "helper/index";
-// import { Box } from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
 
 import FlashStorage from "services/FlashStorage";
 import ApiOrderService, { OrderStatus } from "services/api/ApiOrderService";
 import { OrderTable } from "./OrderTable";
 
-import * as moment from "moment";
-// import { deliverDate } from "redux/reducers/order";
 import { selectOrder, setDeliverDate } from "redux/actions/order";
 import { setAccount } from "redux/actions/account";
 
@@ -61,40 +48,37 @@ const styles = {
 
 const useStyles = makeStyles(styles);
 
-const defaultOrder = {
-  code: "",
-  clientId: "",
-  clientName: "",
-  merchantId: "",
-  merchantName: "",
-  items: [],
-  location: null,
-  price: 0,
-  cost: 0,
-  total: 0,
-  type: "G",
-  status: "N",
-  paymentStatus: "U",
-  paymentMethod: "PC",
-  paymentId: "",
-  deliverDate: moment().format("YYYY-MM-DD"),
-  delivered: moment().toISOString(),
-  note: ""
-};
+// const defaultOrder = {
+//   code: "",
+//   clientId: "",
+//   clientName: "",
+//   merchantId: "",
+//   merchantName: "",
+//   items: [],
+//   location: null,
+//   price: 0,
+//   cost: 0,
+//   total: 0,
+//   type: "G",
+//   status: "N",
+//   paymentStatus: "U",
+//   paymentMethod: "PC",
+//   paymentId: "",
+//   deliverDate: moment().format("YYYY-MM-DD"),
+//   delivered: moment().toISOString(),
+//   note: ""
+// };
 
 const OrderTablePage = ({
   selectOrder,
   account,
   deliverDate,
   setDeliverDate,
-  setAccount,
-  location,
-  history
+  setAccount
 }) => {
   const { t } = useTranslation();
   const classes = useStyles();
 
-  const [model, setModel] = useState({});
   const [orders, setOrders] = useState([]);
   const [product, setProduct] = useState({ _id: "", name: "" });
   const [loading, setLoading] = useState(true);
@@ -181,16 +165,7 @@ const OrderTablePage = ({
 
   const handleDeliverDateClick = () => {};
 
-  // const handleNewOrder = () => {
-  //   setModel({
-  //     ...defaultOrder,
-  //     modifyBy: loggedInAccount ? loggedInAccount._id : '',
-  //     created: moment.utc().toISOString()
-  //   });
-  // }
-
   const handleSelectOrder = data => {
-    setModel(data);
     selectOrder(data);
     const _id = data.clientId;
     const username = data.clienName;

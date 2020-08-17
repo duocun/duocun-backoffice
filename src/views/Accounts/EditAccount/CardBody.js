@@ -14,6 +14,7 @@ import Roles from "./Roles";
 
 const Body = ({ model, onChange }) => {
   const { t } = useTranslation();
+  const styles = useStyles();
   return (
     <CardBody>
       <GridContainer>

@@ -85,7 +85,6 @@ const OrderFormPage = ({ match, order, onAfterUpdate, history }) => {
   const [merchants, setMerchants] = useState([]);
   const [model, setModel] = useState(defaultOrdersModel);
   const [itemMap, setItemMap] = useState({});
-  const [drivers, setDriverList] = useState([]);
   const [productMap, setCheckMap] = useState({});
   const [driverKeyword, setDriverKeyword] = useState("");
   const [processing, setProcessing] = useState(false);
@@ -121,13 +120,6 @@ const OrderFormPage = ({ match, order, onAfterUpdate, history }) => {
   //     setAccounts(data.data);
   //   });
   // }, []);
-
-  useEffect(() => {
-    ApiAccountService.getAccounts({ type: "driver", status: "A" }).then(d => {
-      const staffs = d.data.data;
-      setDriverList(staffs);
-    });
-  }, []);
 
   useEffect(() => {
     if (match.params && match.params.id === FormMode.NEW) {
@@ -291,7 +283,6 @@ const OrderFormPage = ({ match, order, onAfterUpdate, history }) => {
       const r = window.confirm("拆分送货单, 为选中的商品新建一个送货单。");
       if (r) {
         ApiOrderService.splitOrder(model._id, checked).then(({ data }) => {
-          const r = data;
           updateFormData(model._id);
         });
       }
