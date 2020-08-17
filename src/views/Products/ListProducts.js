@@ -22,7 +22,6 @@ import TableRow from "@material-ui/core/TableRow";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
 import IconButton from "@material-ui/core/IconButton";
 import EditIcon from "@material-ui/icons/Edit";
-import DeleteIcon from "@material-ui/icons/Delete";
 import CheckIcon from "@material-ui/icons/Check";
 import CloseIcon from "@material-ui/icons/Close";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
@@ -65,11 +64,11 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const defaultProduct = {
-  name: "",
-  description: "",
-  category: { _id: "", name: "" }
-};
+// const defaultProduct = {
+//   name: "",
+//   description: "",
+//   category: { _id: "", name: "" }
+// };
 
 export default function Product({ location }) {
   const { t } = useTranslation();
@@ -88,7 +87,17 @@ export default function Product({ location }) {
   const [sort, setSort] = useState(["_id", 1]);
 
   // set model
-  const [model, setModel] = useState(defaultProduct);
+  // const [model, setModel] = useState(defaultProduct);
+  const updateData = useCallback(type => {
+    const params = { type };
+    ApiProductService.getProductList(page, rowsPerPage, query, params, [
+      sort
+    ]).then(({ data }) => {
+      setProducts(data.data);
+      setTotalRows(data.count);
+      setLoading(false);
+    });
+  },[page, query, rowsPerPage, sort]);
 
   // type
   const [productType, setType] = useState("G"); // grocery
@@ -99,12 +108,7 @@ export default function Product({ location }) {
 
   // categories
   const [categories, setCategories] = useState([]);
-  useEffect(() => {
-    ApiCategoryService.getCategories({ type: "G" }).then(({ data }) => {
-      const cats = data.data;
-      setCategories(cats);
-    });
-  }, []);
+
 
   const handleCategoryChange = useCallback(
     (catId, productType, row) => {
@@ -136,7 +140,7 @@ export default function Product({ location }) {
           setProcessing(false);
         });
     },
-    [updateData]
+    [updateData, t]
   );
 
   // permissions
@@ -152,11 +156,11 @@ export default function Product({ location }) {
     { resource: RESOURCES.PRODUCT, permission: PERMISSIONS.UPDATE },
     roleData
   );
-  const canDelete = hasRole(
-    user,
-    { resource: RESOURCES.PRODUCT, permission: PERMISSIONS.DELETE },
-    roleData
-  );
+  // const canDelete = hasRole(
+  //   user,
+  //   { resource: RESOURCES.PRODUCT, permission: PERMISSIONS.DELETE },
+  //   roleData
+  // );
 
   // states related to processing
   const [alert, setAlert] = useState(
@@ -170,16 +174,13 @@ export default function Product({ location }) {
     );
   };
 
-  const updateData = type => {
-    const params = { type };
-    ApiProductService.getProductList(page, rowsPerPage, query, params, [
-      sort
-    ]).then(({ data }) => {
-      setProducts(data.data);
-      setTotalRows(data.count);
-      setLoading(false);
+  useEffect(() => {
+    ApiCategoryService.getCategories({ type: "G" }).then(({ data }) => {
+      const cats = data.data;
+      setCategories(cats);
     });
-  };
+  }, []);
+
   const toggleSort = fieldName => {
     // sort only one field
     if (sort && sort[0] === fieldName) {

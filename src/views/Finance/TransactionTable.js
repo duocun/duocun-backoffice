@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
@@ -38,7 +38,7 @@ export const TransactionTable = ({
   const { t } = useTranslation();
   const classes = useStyles();
 
-  const [processing, setProcessing] = useState(false);
+  // const [processing, setProcessing] = useState(false);
 
   const renderRows = (account, rows) => {
     const getBalance = (account, row) => {

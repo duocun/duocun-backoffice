@@ -25,7 +25,7 @@ export default function ProductImage({ src, onRemove }) {
   return (
     <div className={classes.imageWrapper}>
       <CancelIcon className={classes.deleteIcon} onClick={onRemove} />
-      <img className={classes.image} src={getPictureUrl(src)}></img>
+      <img className={classes.image} src={getPictureUrl(src)} alt=""></img>
     </div>
   );
 }

@@ -1,23 +1,10 @@
 import React, { useState, useEffect } from "react";
-// import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
-import { makeStyles } from "@material-ui/core/styles";
-
-// import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
 import Box from "@material-ui/core/Box";
 
-// import Card from "components/Card/Card.js";
-// import CardHeader from "components/Card/CardHeader.js";
-// import CardBody from "components/Card/CardBody.js";
-
-// import Table from "@material-ui/core/Table";
-// import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableRow from "@material-ui/core/TableRow";
-// import TableContainer from "@material-ui/core/TableContainer";
-// import TableHead from "@material-ui/core/TableHead";
-// import TableBodySkeleton from "components/Table/TableBodySkeleton";
 
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
@@ -25,28 +12,10 @@ import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 
 import TextField from "@material-ui/core/TextField";
-// import Skeleton from "@material-ui/lab/Skeleton";
-// import Alert from "@material-ui/lab/Alert";
-// import CustomInput from "components/CustomInput/CustomInput";
-// import Button from "@material-ui/core/Button";
-
 import IconButton from "@material-ui/core/IconButton";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 import CancelIcon from "@material-ui/icons/Cancel";
-// import SaveIcon from "@material-ui/icons/Save";
-// import EditIcon from "@material-ui/icons/Edit";
-// import DeleteIcon from "@material-ui/icons/Delete";
-// import FormatListBulletedIcon from "@material-ui/icons/FormatListBulleted";
-
-// import ProductSearch from "components/ProductSearch/ProductSearch";
 import ApiProductService from "services/api/ApiProductService";
-
-const useStyles = makeStyles(theme => ({}));
-
-const defaultValueState = {
-  _id: "",
-  name: ""
-};
 
 // item --- {productId, productName, quantity}
 const OrderItem = ({
@@ -57,7 +26,7 @@ const OrderItem = ({
   onDelete
 }) => {
   const { t } = useTranslation();
-  const classes = useStyles();
+  // const classes = useStyles();
 
   const [model, setModel] = useState(item);
   // const [keyword, setKeyword] = useState('');

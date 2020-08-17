@@ -100,7 +100,7 @@ const Admin = ({ signOut, ...rest }) => {
         console.error(e);
         signOut();
       });
-  }, []);
+  }, [signOut]);
 
   // initialize and destroy the PerfectScrollbar plugin
   React.useEffect(() => {
@@ -119,7 +119,7 @@ const Admin = ({ signOut, ...rest }) => {
       }
       window.removeEventListener("resize", resizeFunction);
     };
-  }, []); // mainPanel
+  }, [mainPanel]); // mainPanel
 
   if (!roleData || !userInfo) {
     return <CustomLoader />;
@@ -128,6 +128,9 @@ const Admin = ({ signOut, ...rest }) => {
   return (
     <AuthContext.Provider value={userInfo}>
       <RoleContext.Provider value={roleData}>
+      {
+        !roleLoading &&
+
         <div className={classes.wrapper}>
           <Sidebar
             routes={routes}
@@ -138,13 +141,13 @@ const Admin = ({ signOut, ...rest }) => {
             open={mobileOpen}
             color={color}
             {...rest}
-          />
+            />
           <div className={classes.mainPanel} ref={mainPanel}>
             <Navbar
               routes={routes}
               handleDrawerToggle={handleDrawerToggle}
               {...rest}
-            />
+              />
             {getRoute() ? (
               <div className={customClasses.pageContent}>
                 <div className={classes.container}>{switchRoutes}</div>
@@ -155,6 +158,7 @@ const Admin = ({ signOut, ...rest }) => {
             {getRoute() ? <Footer /> : null}
           </div>
         </div>
+    }
       </RoleContext.Provider>
     </AuthContext.Provider>
   );

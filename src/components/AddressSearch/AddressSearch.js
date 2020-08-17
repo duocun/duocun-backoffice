@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from "react";
-import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
 
 import MenuItem from "@material-ui/core/MenuItem";
 import CustomInput from "components/CustomInput/CustomInput.js";
-// import SearchDropDown from "components/SearchDropDown/SearchDropDown.js";
-
 import ApiLocationService from "services/api/ApiLocationService";
 
 const useStyles = makeStyles(styles => ({
@@ -29,26 +26,25 @@ const AddressSearch = ({
 }) => {
   const classes = useStyles();
   const { t } = useTranslation();
-  const [page, setPage] = useState(0);
   const val = getAddrString(location);
   const [keyword, setKeyword] = useState(val); // getQueryParam(location, "search") || "");
 
-  const placeId = location ? location.placeId : "";
-  const [address, setAddress] = useState({
-    placeId,
-    mainText: val,
-    secondaryText: ""
-  });
+  // const placeId = location ? location.placeId : "";
+  // const [address, setAddress] = useState({
+  //   placeId,
+  //   mainText: val,
+  //   secondaryText: ""
+  // });
   const [searching, setSearching] = useState(false);
   const [addresses, setAddresses] = useState([]); // [{placeId, mainText, secondaryText}]
-  const [count, setCount] = useState(10);
+  // const [count, setCount] = useState(10);
 
   const handleSearch = keyword => {
     if (keyword) {
       if (keyword.length > 2) {
         ApiLocationService.getSuggestAddressList(keyword).then(({ data }) => {
           setAddresses(data.data);
-          setCount(data.count);
+          // setCount(data.count);
         });
       } else {
         // this.setState({ keyword: keyword });
@@ -64,7 +60,7 @@ const AddressSearch = ({
   }, [location]);
 
   const handleSelectData = address => {
-    const [streetNumber, streetName] = address.mainText.split(" ");
+    const [streetNumber] = address.mainText.split(" ");
     // const addr = `${address.mainText}, ${address.secondaryText}`;
     const placeId = address.placeId;
     ApiLocationService.getLocationByGeocode({ placeId }).then(({ data }) => {
@@ -74,7 +70,7 @@ const AddressSearch = ({
 
       handleSelectLocation(location);
       const addr = getAddrString(location);
-      setAddress(address);
+      // setAddress(address);
       setKeyword(addr);
       setSearching(false);
     });
@@ -83,7 +79,7 @@ const AddressSearch = ({
   const handleKeywordChange = ({ target }) => {
     const str = target.value;
     setKeyword(str);
-    setAddress({ placeId: "", mainText: "" });
+    // setAddress({ placeId: "", mainText: "" });
     setSearching(true);
     handleSearch(str);
   };

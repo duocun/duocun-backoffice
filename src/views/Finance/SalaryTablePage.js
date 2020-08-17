@@ -297,7 +297,7 @@ const SalaryTablePage = ({
       setTotalRows(data.count);
       setLoading(false);
     });
-  });
+  }, [page, rowsPerPage, sort]);
 
   useEffect(() => {
     if (driver && driver._id) {

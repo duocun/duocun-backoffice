@@ -72,7 +72,7 @@ export const TransactionForm = ({
   // }
   const { t } = useTranslation();
   const classes = useStyles();
-  const [actions, setActions] = useState(defaultActions);
+  const actions = defaultActions;
   const [modifyByAccount, setModifyByAccount] = useState({
     _id: "",
     username: ""

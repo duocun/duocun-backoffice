@@ -1,12 +1,9 @@
-import React, { useState, useEffect } from "react";
-import PropTypes from "prop-types";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
 
 import MenuItem from "@material-ui/core/MenuItem";
 import CustomInput from "components/CustomInput/CustomInput.js";
-// import SearchDropDown from "components/SearchDropDown/SearchDropDown.js";
-
 import ApiProductService from "services/api/ApiProductService";
 
 const useStyles = makeStyles({
@@ -32,25 +29,25 @@ const useStyles = makeStyles({
   // }
 });
 
-const rowsPerPage = 10;
+// const rowsPerPage = 10;
 
 const ProductSearch = ({ label, placeholder, onSelect, onClear, name, id }) => {
   const classes = useStyles();
   const { t } = useTranslation();
-  const [page, setPage] = useState(0);
+  // const [page, setPage] = useState(0);
   const [keyword, setKeyword] = useState(name); // getQueryParam(product, "search") || "");
-  const [model, setProduct] = useState({ _id: "", name: "" });
+  // const [model, setProduct] = useState({ _id: "", name: "" });
   // const [sort, setSort] = useState(["_id", 1]);
   const [searching, setSearching] = useState(false);
   const [products, setProducts] = useState([]); // [{placeId, mainText, secondaryText}]
-  const [count, setCount] = useState(10);
+  // const [count, setCount] = useState(10);
 
   const handleSearch = keyword => {
     if (keyword) {
       if (keyword.length >= 1) {
         ApiProductService.getProductsByKeyword(keyword).then(({ data }) => {
           setProducts(data.data);
-          setCount(data.count);
+          // setCount(data.count);
         });
       } else {
         // this.setState({ keyword: keyword });
@@ -73,7 +70,7 @@ const ProductSearch = ({ label, placeholder, onSelect, onClear, name, id }) => {
   const handleKeywordChange = ({ target }) => {
     const str = target.value;
     setKeyword(str);
-    setProduct({ _id: "", name: "", description: "" });
+    // setProduct({ _id: "", name: "", description: "" });
     setSearching(true);
     handleSearch(str);
   };
@@ -86,18 +83,11 @@ const ProductSearch = ({ label, placeholder, onSelect, onClear, name, id }) => {
 
   const handleClear = () => {
     setKeyword("");
-    setProduct({ _id: "", name: "", description: "" });
+    // setProduct({ _id: "", name: "", description: "" });
     onClear();
   };
 
-  const divStyle = {
-    position: "absolute",
-    zIndex: "3000",
-    background: "gray",
-    width: "320px",
-    height: "200px",
-    overflowY: "scroll"
-  };
+
 
   return (
     <div className={classes.searchWrapper}>

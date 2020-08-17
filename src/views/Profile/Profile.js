@@ -26,7 +26,7 @@ const isValid = (model) => {
     if (model.passwordRaw.length < 6) {
       return { isValid: false, message: "Password is too short" };
     }
-    if (model.passwordRaw != model.passwordConfirm) {
+    if (model.passwordRaw !== model.passwordConfirm) {
       return { isValid: false, message: "Please confirm your password again" };
     }
   }
@@ -68,7 +68,7 @@ const Profile = ({ history }) => {
       .finally(() => {
         setProcessing(false);
       });
-  }, [model]);
+  }, [model, t]);
   return (
     <GridContainer>
       <GridItem xs={12}>

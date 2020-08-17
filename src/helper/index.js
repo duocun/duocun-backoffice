@@ -212,8 +212,11 @@ export const arrayToggleElem = (arr, elem) => {
 
 export const enumLikeObj = obj => {
   const enumObj = { ...obj };
-  for (const key in enumObj) {
-    enumObj[enumObj[key]] = key;
-  }
+  const keys = Object.keys(enumObj);
+  keys.forEach(k => {
+    const key = enumObj[k];
+    enumObj[key] = k;
+  })
+  
   return enumObj;
 };

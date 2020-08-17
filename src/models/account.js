@@ -11,7 +11,6 @@ export const DEFAULT_MODEL = {
   type: "client",
   balance: 0,
   phone: "",
-  created: "",
   verificationCode: "",
   verified: false,
   attributes: [],
@@ -112,7 +111,9 @@ export const hasRole = (user, role, rbacData) => {
     if (!rbacData) {
       return false;
     }
-    for (const r of userRoles) {
+
+    for (let i=0; i<userRoles.length; i++) {
+      const r = userRoles[i];
       if (!rbacData[r]) {
         return false;
       }

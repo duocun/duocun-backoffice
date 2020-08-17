@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 
@@ -33,11 +33,8 @@ export default function MerchantsTablePage({ location }) {
   const [query, setQuery] = useState(getQueryParam(location, "search") || "");
   const [sort, setSort] = useState(["_id", 1]);
 
-  useEffect(() => {
-    updateData();
-  }, [page, rowsPerPage, sort]);
 
-  const updateData = () => {
+  const updateData = useCallback(() => {
     ApiMerchantService.getMerchantList(page, rowsPerPage, query, [sort]).then(
       ({ data }) => {
         setMerchants(data.data);
@@ -45,7 +42,12 @@ export default function MerchantsTablePage({ location }) {
         setLoading(false);
       }
     );
-  };
+  },[page, query, rowsPerPage, sort]);
+
+  useEffect(() => {
+    updateData();
+  }, [page, rowsPerPage, sort, updateData]);
+
   const toggleSort = fieldName => {
     // sort only one field
     if (sort && sort[0] === fieldName) {

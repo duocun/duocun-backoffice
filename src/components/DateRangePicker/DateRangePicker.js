@@ -42,7 +42,7 @@ export default function DateRangePicker({
 
   useEffect(() => {
     onChange(startDate, endDate);
-  }, [startDate, endDate]);
+  }, [startDate, endDate, onChange]);
 
   return (
     <MuiPickersUtilsProvider

@@ -73,17 +73,16 @@ const AccountTablePage = ({ location, account, setAccount }) => {
   const [totalRows, setTotalRows] = useState(0);
   const [query, setQuery] = useState(""); // useState(getQueryParam(location, "search") || "");
   const [sort, setSort] = useState(["created", -1]);
-  const [types, setTypes] = useState([
+  
+  const types = [
     { key: "all", text: "All" },
     ...ACCOUNT_TYPES.map((type) => {
       return { key: type.toLowerCase(), text: type };
     }),
-  ]);
+  ];
+
   const [type, setType] = useState("all");
 
-  useEffect(() => {
-    updateData(query, type);
-  }, [page, rowsPerPage, sort, type, query]);
 
   const updateData = useCallback(
     (keyword, type) => {
@@ -100,9 +99,12 @@ const AccountTablePage = ({ location, account, setAccount }) => {
           setLoading(false);
         }
       );
-    },
-    [page, rowsPerPage, sort, type]
+    }, [page, rowsPerPage, sort]
   );
+
+  useEffect(() => {
+    updateData(query, type);
+  }, [page, rowsPerPage, sort, type, query, updateData]);
 
   const handleTypeChange = (type) => {
     setType(type);
@@ -114,7 +116,7 @@ const AccountTablePage = ({ location, account, setAccount }) => {
     } else {
       setPage(0);
     }
-  }, [page, query, type, rowsPerPage, sort, updateData, setPage]);
+  }, [page, query, type, updateData, setPage]);
 
   return (
     <Card>

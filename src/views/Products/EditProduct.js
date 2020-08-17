@@ -364,14 +364,19 @@ const ProductQuantitySchedule = ({ productId, productQuantity, days = 7 }) => {
   const { t } = useTranslation();
   const [orders, setOrders] = useState([]);
   const [dates] = useState(getDateRangeStrings(days));
-  useEffect(() => {
+  
+  const getDelivers = useCallback(() => {
     ApiProductService.getProductDeliveries(productId).then(async ({ data }) => {
       moment.locale("zh-cn");
       if (data.code && data.code === "success") {
         setOrders(data.data);
       }
     });
-  }, []);
+  }, [productId]);
+
+  useEffect(() => {
+    getDelivers();
+  }, [getDelivers]);
 
   return (
     <Card>
@@ -459,7 +464,7 @@ const EditProduct = ({ match, history }) => {
       .finally(() => {
         setLoading(false);
       });
-  }, [match.params.id]);
+  }, [match.params.id, model, t]);
 
   const uploadPicture = picture => {
     let file = picture;
@@ -515,13 +520,13 @@ const EditProduct = ({ match, history }) => {
       .finally(() => {
         setProcessing(false);
       });
-  }, [model, history]);
+  }, [model, history,t, updatePage]);
 
   useEffect(() => {
     setLoading(true);
     updatePage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [updatePage]);
   return (
     <GridContainer>
       <GridItem xs={12} lg={8}>

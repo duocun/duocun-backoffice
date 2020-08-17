@@ -5,14 +5,10 @@ import ChartistGraph from "react-chartist";
 // @material-ui/core
 import { makeStyles } from "@material-ui/core/styles";
 import Icon from "@material-ui/core/Icon";
-// @material-ui/icons
-import IconButton from "@material-ui/core/IconButton";
-import AccountBoxOutlinedIcon from "@material-ui/icons/AccountBoxOutlined";
 import * as moment from "moment";
 import { connect } from "react-redux";
 
 import Store from "@material-ui/icons/Store";
-import Warning from "@material-ui/icons/Warning";
 import DateRange from "@material-ui/icons/DateRange";
 import LocalOffer from "@material-ui/icons/LocalOffer";
 import Update from "@material-ui/icons/Update";
@@ -28,7 +24,6 @@ import GridContainer from "components/Grid/GridContainer.js";
 import Table from "components/Table/Table.js";
 import Tasks from "components/Tasks/Tasks.js";
 import CustomTabs from "components/CustomTabs/CustomTabs.js";
-import Danger from "components/Typography/Danger.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardIcon from "components/Card/CardIcon.js";
@@ -56,7 +51,7 @@ const Dashboard = ({ summary, loadStatisticsSummary, history }) => {
     const startDate = moment().format("YYYY-MM-DD");
     const endDate = moment().format("YYYY-MM-DD");
     loadStatisticsSummary(startDate, endDate);
-  }, []);
+  }, [loadStatisticsSummary]);
 
   return (
     <div>

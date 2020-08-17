@@ -70,7 +70,7 @@ const Login = ({ signIn, history, isAuthorized }) => {
         console.error(e);
         setFailed(true);
       });
-  }, [email, password]);
+  }, [email, password, history, isAuthorized, signIn]);
 
   return (
     <Container component="main" maxWidth="xs">

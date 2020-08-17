@@ -34,7 +34,8 @@ const TransactionFormPage = ({
   // }
 
   // const { t } = useTranslation();
-  const [items, setItems] = useState([]);
+  // const [items, setItems] = useState([]);
+  const items = [];
   const [modifyByAccount, setModifyByAccount] = useState({
     _id: "",
     username: ""

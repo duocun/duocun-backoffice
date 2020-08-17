@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -77,18 +77,21 @@ const MerchantsForm = () => {
   ////////////////////////////////////
   // For data fetch
   // const getMerchantData = () => {};
-  const getAccountsData = () => {
+  const getAccountsData = useCallback(() => {
+    setLoading(true);
     ApiAccountService.getAccountList(0, 1000, { type: "merchant" }).then(
       ({ data }) => {
+        setLoading(false);
         setAccounts(data.data);
         setAccountLoading(false);
       }
     );
-  };
+  },[]);
+
   useEffect(() => {
     // only call once
     getAccountsData();
-  }, []);
+  }, [getAccountsData]);
 
   ////////////////////////////////////
   // For render and events
@@ -397,7 +400,7 @@ const MerchantsForm = () => {
     const _rules = [];
     if (ruleSimple) {
       // simple mode
-      _dows.map(item => {
+      _dows.forEach(item => {
         _rules.push({
           orderEnd: {
             dow: item,
@@ -407,7 +410,7 @@ const MerchantsForm = () => {
       });
     } else {
       // complex
-      _dows.map(item => {
+      _dows.forEach(item => {
         _rules.push({
           orderEnd: {
             dow: item,

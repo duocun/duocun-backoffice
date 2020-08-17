@@ -31,14 +31,14 @@ const EditAccount = ({ match, history }) => {
         } else {
           setAlert({
             severity: "error",
-            message: t("Cannot load data")
+            message: "Cannot load data" // t("Cannot load data")
           });
         }
       } catch (e) {
         console.error(e);
         setAlert({
           severity: "error",
-          message: t("Cannot load data")
+          message: "Cannot load data" // t("Cannot load data")
         });
       }
       setLoading(false);
@@ -82,15 +82,17 @@ const EditAccount = ({ match, history }) => {
       .finally(() => {
         setProcessing(false);
       });
-  }, [model]);
+  }, [model, history, match.params, t]);
 
   useEffect(() => {
     loadModel();
-  }, []);
+  }, [loadModel]);
 
   return (
     <GridContainer>
       <GridItem xs={12}>
+        {
+          !processing &&
         <Card>
           <CardHeader model={model} loading={loading} />
           <Alert alert={alert} onClose={() => setAlert(EMPTY_ALERT)} />
@@ -98,13 +100,14 @@ const EditAccount = ({ match, history }) => {
             model={model}
             loading={loading}
             onChange={newModel => setModel(newModel)}
-          />
+            />
           <CardFooter
             processing={false}
             onBack={history.goBack}
             onSave={saveModel}
-          ></CardFooter>
+            ></CardFooter>
         </Card>
+        }
       </GridItem>
     </GridContainer>
   );

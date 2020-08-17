@@ -12,24 +12,24 @@ import ForgotPassword from "views/ForgotPassword/ForgotPassword";
 const history = createBrowserHistory({
   basename: "/", // admin2"/duocun-backoffice"
 });
-const Root = (props) => {
-  const [isAuthorized, setIsAuthorized] = useState(AuthService.isLoggedIn());
+const Root = ({user, isAuthorized, signIn}) => {
+  const [authorized, setIsAuthorized] = useState(AuthService.isLoggedIn());
 
   useEffect(() => {
-    setIsAuthorized(props.isAuthorized);
-  }, [props.isAuthorized]);
+    setIsAuthorized(isAuthorized);
+  }, [isAuthorized]);
 
   useEffect(() => {
-    console.log("user", props.user);
-  }, [props.user]);
+    console.log("user", user);
+  }, [user]);
 
   useEffect(() => {
     if (AuthService.isLoggedIn()) {
-      props.signIn();
+      signIn();
     }
-  }, [props.isLoggedIn]);
+  }, [signIn]);
 
-  return isAuthorized ? (
+  return authorized ? (
     <Router history={history}>
       <Switch>
         <Route path="/" component={Admin} />

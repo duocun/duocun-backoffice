@@ -47,7 +47,7 @@ const ForgotPassword = ({ history, signIn }) => {
       }).finally(() => {
         setProcessing(false);
       });
-  }, [email]);
+  }, [email,t]);
 
   const handleLogin = useCallback(() => {
     ApiAccountService.verifyOtp(email, code)
@@ -73,7 +73,7 @@ const ForgotPassword = ({ history, signIn }) => {
         setCodeSent(false);
         setProcessing(false);
       });
-  }, [email, code]);
+  }, [email, code, signIn, t]);
 
   return (
     <Container component="main" maxWidth="xs">

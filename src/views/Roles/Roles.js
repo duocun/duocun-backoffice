@@ -23,7 +23,7 @@ import {
   ROLE_ENUM,
   RESOURCES,
   RESOURCES_PERMISSIONS,
-  ROLES_PERMISSIONS,
+  // ROLES_PERMISSIONS,
 } from "models/account";
 import FormGroup from "@material-ui/core/FormGroup";
 import _ from "lodash";
@@ -33,7 +33,7 @@ import FormatListBulletedIcon from "@material-ui/icons/FormatListBulleted";
 import CustomLoader from "components/CustomLoader/CustomLoader";
 import * as ApiRoleService from "services/api/ApiRoleService";
 import Alert from "components/CustomAlert/CustomAlert";
-import { enumLikeObj } from "helper/index";
+// import { enumLikeObj } from "helper/index";
 
 const getPermissionRule = (roleModel, role, resource) => {
   return _.get(roleModel, `${ROLE_ENUM[String(role)]}.${resource}`, []);
@@ -79,7 +79,7 @@ const Roles = ({ history }) => {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [t]);
 
   const saveModel = useCallback((data) => {
     setProcessing(true);
@@ -99,11 +99,11 @@ const Roles = ({ history }) => {
       .finally(() => {
         setProcessing(false);
       });
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     loadModel();
-  }, []);
+  }, [loadModel]);
 
   return (
     <GridContainer>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
@@ -55,8 +55,8 @@ export const OrderTable = ({
     return s ? s.split("T")[0] : "";
   };
 
-  const [processing, setProcessing] = useState(false);
-
+  // const [processing, setProcessing] = useState(false);
+  const processing = false;
   if (!rows.length) {
     return <div>{t("No data to display")}</div>;
   } else {

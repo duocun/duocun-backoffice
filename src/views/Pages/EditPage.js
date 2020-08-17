@@ -23,7 +23,6 @@ import Fade from "@material-ui/core/Fade";
 
 import FormatListBulletedIcon from "@material-ui/icons/FormatListBulleted";
 import SaveIcon from "@material-ui/icons/Save";
-import StayCurrentPortraitIcon from "@material-ui/icons/StayCurrentPortrait";
 import PhoneIphoneIcon from "@material-ui/icons/PhoneIphone";
 import TabletIcon from "@material-ui/icons/Tablet";
 import DesktopWindowsIcon from "@material-ui/icons/DesktopWindows";
@@ -256,7 +255,7 @@ export default function EditPage({ match, history }) {
                 </GridItem>
               )}
               {loading && <EditPageSkeleton />}
-              {!loading && (
+              {!loading && !processing && (
                 <React.Fragment>
                   <GridItem xs={12}>
                     <GridContainer>
