@@ -83,6 +83,10 @@ const Admin = ({ signOut, ...rest }) => {
         setRoleLoading(false);
         setRoleData(data.data);
       }
+    }).catch(e => {
+      console.error(e);
+      setRoleLoading(false);
+      setRoleData({});
     });
     ApiAccountService.getCurrentAccount(AuthService.getAuthToken())
       .then(({ data }) => {
@@ -115,7 +119,7 @@ const Admin = ({ signOut, ...rest }) => {
       }
       window.removeEventListener("resize", resizeFunction);
     };
-  }, [mainPanel]);
+  }, []); // mainPanel
 
   if (!roleData || !userInfo) {
     return <CustomLoader />;

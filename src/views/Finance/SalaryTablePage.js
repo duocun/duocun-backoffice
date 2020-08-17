@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import { useTranslation } from "react-i18next";
@@ -176,16 +176,7 @@ const SalaryTablePage = ({
 
   // }, []);
 
-  useEffect(() => {
-    if (driver && driver._id) {
-      updateData(driver._id);
-    } else if (account && account._id) {
-      setDriverKeyword(account ? account.username : "");
-      updateData(account._id);
-    } else {
-      updateData("");
-    }
-  }, [page, rowsPerPage, sort, driver]);
+
 
   const saveSalaryToRedux = (driver, loggedInAccount) => {
     ApiAccountService.getAccountList(null, null, {
@@ -282,7 +273,7 @@ const SalaryTablePage = ({
   //   }
   // };
 
-  const updateData = accountId => {
+  const updateData = useCallback( accountId => {
     const query = accountId
       ? {
           $or: [
@@ -306,7 +297,18 @@ const SalaryTablePage = ({
       setTotalRows(data.count);
       setLoading(false);
     });
-  };
+  });
+
+  useEffect(() => {
+    if (driver && driver._id) {
+      updateData(driver._id);
+    } else if (account && account._id) {
+      setDriverKeyword(account ? account.username : "");
+      updateData(account._id);
+    } else {
+      updateData("");
+    }
+  }, [page, rowsPerPage, sort, driver, account, updateData]);
 
   // const handleDriverChange = (staffId) => {
   //   const d = drivers.find(d => d._id === staffId);

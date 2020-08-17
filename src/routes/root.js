@@ -27,7 +27,7 @@ const Root = (props) => {
     if (AuthService.isLoggedIn()) {
       props.signIn();
     }
-  }, [props]);
+  }, [props.isLoggedIn]);
 
   return isAuthorized ? (
     <Router history={history}>

@@ -313,7 +313,7 @@ export const TransactionForm = ({
         }
       }
     });
-  }, [transaction]);
+  }, [transaction, modifyByAccount._id]);
 
   return (
     <GridContainer>

@@ -115,7 +115,7 @@ const DriverSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
         }
       }
     });
-  }, []);
+  }, [match.params]);
 
   const handleDriverChange = driverId => {
     const d = options.find(d => d._id === driverId);

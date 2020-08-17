@@ -116,7 +116,7 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
       setTotalRows(data.count);
       setLoading(false);
     });
-  }, []);
+  }, [page, rowsPerPage, sort]);
 
   const removeAlert = () => {
     setAlert({

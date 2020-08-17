@@ -75,6 +75,14 @@ const ProductSummaryPage = ({
   const [productList, setProductList] = useState([]);
   const [sort, setSort] = useState(["_id", -1]);
 
+
+
+  const loadData = useCallback( deliverDate => {
+    ApiStatisticsService.getProductStatistic(deliverDate).then(({ data }) => {
+      setProductList(data.data);
+    });
+  }, []);
+
   useEffect(() => {
     if (!deliverDate) {
       const date = moment().format("YYYY-MM-DD");
@@ -83,13 +91,7 @@ const ProductSummaryPage = ({
     } else {
       loadData(deliverDate);
     }
-  }, [deliverDate, setDeliverDate]);
-
-  const loadData = useCallback( deliverDate => {
-    ApiStatisticsService.getProductStatistic(deliverDate).then(({ data }) => {
-      setProductList(data.data);
-    });
-  }, [deliverDate]);
+  }, [deliverDate, setDeliverDate, loadData]);
 
   const handleDateChange = m => {
     const date = m.format("YYYY-MM-DD");

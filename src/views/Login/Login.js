@@ -71,6 +71,7 @@ const Login = ({ signIn, history, isAuthorized }) => {
         setFailed(true);
       });
   }, [email, password]);
+
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
