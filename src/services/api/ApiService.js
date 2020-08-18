@@ -79,7 +79,7 @@ export default class ApiService {
   // don't remove, temply need here until new upload tools finish
   postV2(url, param = null, auth = true, isRelative = true) {
     if (isRelative) {
-      url = "https://duocun.com.cn/api" + url; //this.buildUrl(url);
+      url = `${API_HOST}${url}`; //this.buildUrl(url);
     }
     return auth
       ? Axios.post(url, param, this.buildAuthHeader())
