@@ -7,8 +7,10 @@ export const DEFAULT_MODEL = {
   description: "",
   areas: [],
   endTimeMargin: 0,
-  startDate: moment(),
-  endDate: moment().add("+1", "month")
+  startDate: moment(moment().format("YYYY-MM-DD 00:00:00")).toDate(),
+  endDate: moment(moment().format("YYYY-MM-DD 00:00:00"))
+    .add("+1", "month")
+    .toDate()
 };
 
 export const getAreas = (model, areas) => {
@@ -50,6 +52,18 @@ export const isInPeriod = (date, period) => {
   return startDate <= dateStr && dateStr <= endDate;
 };
 
+export const convertDataToModel = data => {
+  data.startDate = new Date(data.startDate);
+  data.endDate = new Date(data.endDate);
+  data.areas.forEach(area => {
+    area.periods.forEach(period => {
+      period.startDate = new Date(period.startDate);
+      period.endDate = new Date(period.endDate);
+    });
+  });
+  return data;
+};
+
 export const isScheduled = (model, areaId, date) => {
   const areaSchedule = model.areas.find(schedule => schedule.areaId === areaId);
   if (!areaSchedule) {
@@ -60,4 +74,13 @@ export const isScheduled = (model, areaId, date) => {
     return false;
   }
   return period.dows.includes(Number(moment(date).format("d")));
+};
+
+export const validate = model => {
+  if (!model.title) {
+    throw new Error("Please input title");
+  }
+  if (!model.areas || !model.areas.length) {
+    throw new Error("Please add areas");
+  }
 };

@@ -13,20 +13,19 @@ import Alert from "components/CustomAlert/CustomAlert";
 import CustomTextField from "components/CustomInput/CustomTextField";
 import DateRangePicker from "components/DateRangePicker/DateRangePicker";
 
-import { DEFAULT_MODEL } from "models/schedule";
-import { makeStyles, Box, Button } from "@material-ui/core";
+import { DEFAULT_MODEL, validate, convertDataToModel } from "models/schedule";
+import { Box, Button } from "@material-ui/core";
 import SaveIcon from "@material-ui/icons/Save";
 import FormatListBulletedIcon from "@material-ui/icons/FormatListBulleted";
 import CustomLoader from "components/CustomLoader/CustomLoader";
 import ScheduleTable from "./ScheduleTable";
 import * as ApiScheduleService from "services/api/ApiScheduleService";
 import AreaModal from "./AreaModal";
+import FlashStorage from "services/FlashStorage";
 
 const ScheduleEdit = ({ match, history }) => {
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
-  const classes = useStyles();
-  const dateRangeClasses = useDaterangeStyles();
   const [model, setModel] = useState(DEFAULT_MODEL);
   const [areas, setAreas] = useState([]);
   const { t } = useTranslation();
@@ -44,7 +43,7 @@ const ScheduleEdit = ({ match, history }) => {
       .then(({ data }) => {
         if (data.code === "success") {
           if (data.data) {
-            setModel(data.data);
+            setModel(convertDataToModel(data.data));
           }
           setAreas(data.meta.areas);
         } else {
@@ -62,6 +61,59 @@ const ScheduleEdit = ({ match, history }) => {
       })
       .finally(() => setLoading(false));
   }, [match, t]);
+
+  const saveModel = useCallback(() => {
+    setAlert(null);
+    try {
+      validate(model);
+    } catch (e) {
+      setAlert({
+        message: t(e.message || "Invalid data"),
+        severity: "error",
+      });
+      return;
+    }
+    setProcessing(true);
+    const scheduleData = {
+      appType: "G",
+      status: "A",
+      ...model,
+    };
+    ApiScheduleService.save(scheduleData)
+      .then(({ data }) => {
+        if (data.code === "success") {
+          if (data.data) {
+            const newAlert = {
+              message: t("Saved successfully"),
+              severity: "success",
+            };
+            if (!model._id || model._id === "new") {
+              FlashStorage.set("SCHEDULE_ALERT", newAlert);
+              history.push("../schedules");
+              return;
+            } else {
+              setAlert(newAlert);
+              loadModel();
+            }
+          }
+        } else {
+          setAlert({
+            message: t(data.message || "Save failed"),
+            severity: "error",
+          });
+        }
+      })
+      .catch((e) => {
+        console.error(e);
+        setAlert({
+          message: t("Save failed"),
+          severity: "error",
+        });
+      })
+      .finally(() => {
+        setProcessing(false);
+      });
+  }, [model, history, t, loadModel]);
 
   const handleSaveArea = useCallback(
     (areaSchedule) => {
@@ -156,9 +208,9 @@ const ScheduleEdit = ({ match, history }) => {
                     <GridItem xs={12}>
                       <Box pt={2}>
                         <DateRangePicker
-                          classNames={dateRangeClasses}
                           defaultStartDate={model.startDate}
                           defaultEndDate={model.endDate}
+                          exactDate
                           onChange={(start, end) => {
                             setModel({
                               ...model,
@@ -171,7 +223,7 @@ const ScheduleEdit = ({ match, history }) => {
                     </GridItem>
                   </GridItem>
                   <GridItem xs={12}>
-                    <Box pt={3}>
+                    <Box mt={3}>
                       <ScheduleTable
                         model={model}
                         onAddArea={() => {
@@ -204,7 +256,7 @@ const ScheduleEdit = ({ match, history }) => {
                   color="primary"
                   variant="contained"
                   disabled={processing}
-                  onClick={() => {}}
+                  onClick={saveModel}
                 >
                   <SaveIcon />
                   {t("Save")}
@@ -227,29 +279,6 @@ const ScheduleEdit = ({ match, history }) => {
     </GridContainer>
   );
 };
-
-const useStyles = makeStyles((theme) => ({
-  table: {
-    width: "100%",
-    minWidth: 750,
-  },
-}));
-
-const useDaterangeStyles = makeStyles((theme) => ({
-  daterange: {
-    label: {
-      color: "black",
-    },
-    input: {
-      color: "black",
-      marginRight: "1rem",
-      width: "160px",
-    },
-    inputIcon: {
-      fill: theme.palette.grey[100],
-    },
-  },
-}));
 
 ScheduleEdit.propTypes = {
   match: PropTypes.object,

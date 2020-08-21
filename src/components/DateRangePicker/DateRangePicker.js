@@ -16,6 +16,7 @@ export default function DateRangePicker({
   defaultEndDate,
   minDate,
   maxDate,
+  exactDate,
   classNames = undefined,
   onChange,
 }) {
@@ -31,7 +32,14 @@ export default function DateRangePicker({
   }, [classNames]);
 
   useEffect(() => {
-    onChange(startDate, endDate);
+    if (exactDate) {
+      onChange(
+        moment(moment(startDate).format("YYYY-MM-DD 00:00:00")).toDate(),
+        moment(moment(endDate).format("YYYY-MM-DD 00:00:00")).toDate()
+      );
+    } else {
+      onChange(startDate, endDate);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startDate, endDate]);
 
@@ -84,6 +92,7 @@ DateRangePicker.propTypes = {
   maxDate: PropTypes.object,
   classNames: PropTypes.object,
   onChange: PropTypes.func,
+  exactDate: PropTypes.bool,
 };
 
 DateRangePicker.defaultProps = {
@@ -91,5 +100,6 @@ DateRangePicker.defaultProps = {
   defaultEndDate: new Date(),
   minDate: undefined,
   maxDate: undefined,
+  exactDate: false,
   onChange: () => {},
 };

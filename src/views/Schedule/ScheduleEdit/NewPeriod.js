@@ -25,13 +25,13 @@ const NewPeriod = ({ startDate, endDate, onAdd }) => {
   // opt out unavailable days of week
   useEffect(() => {
     const newModel = { ...model };
-    newModel.dows = model.dows.filter((day) => availableDows.includes(day));
+    newModel.dows = model.dows.filter(day => availableDows.includes(day));
     setModel(newModel);
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [availableDows]);
 
   const onSelectDow = useCallback(
-    (dow) => {
+    dow => {
       const newModel = { ...model };
       newModel.dows = arrayToggleElem([...newModel.dows], dow);
       setModel(newModel);
@@ -42,6 +42,7 @@ const NewPeriod = ({ startDate, endDate, onAdd }) => {
     <Box>
       <GridItem xs={12}>
         <DateRangePicker
+          exactDate
           defaultStartDate={startDate}
           defaultEndDate={endDate}
           minDate={startDate}
@@ -49,15 +50,15 @@ const NewPeriod = ({ startDate, endDate, onAdd }) => {
           onChange={(newStart, newEnd) => {
             const newModel = {
               ...model,
-              startDate: newStart.toDate(),
-              endDate: newEnd.toDate(),
+              startDate: newStart,
+              endDate: newEnd
             };
             setModel(newModel);
           }}
         />
       </GridItem>
       <GridItem xs={12}>
-        {dows.map((day) => (
+        {dows.map(day => (
           <DowButton
             key={day}
             dow={day}
@@ -80,11 +81,11 @@ const NewPeriod = ({ startDate, endDate, onAdd }) => {
 NewPeriod.propTypes = {
   startDate: PropTypes.object,
   endDate: PropTypes.object,
-  onAdd: PropTypes.func,
+  onAdd: PropTypes.func
 };
 
 NewPeriod.defaultProps = {
-  onAdd: () => {},
+  onAdd: () => {}
 };
 
 export default NewPeriod;
