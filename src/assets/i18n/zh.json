@@ -113,6 +113,14 @@
   "Search Code or Phone number": "查送货单号或电话号码",
   "Phone Number": "手机号",
   "Email": "电邮",
-  "Roles & Permissions": "Roles & Permissions",
-  "Role": "Role"
+  "Roles & Permissions": "角色和权限",
+  "Role": "角色",
+  "Schedule": "时间表",
+  "dow_0": "日",
+  "dow_1": "一",
+  "dow_2": "二",
+  "dow_3": "三",
+  "dow_4": "四",
+  "dow_5": "五",
+  "dow_6": "六"
 }

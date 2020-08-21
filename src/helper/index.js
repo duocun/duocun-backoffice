@@ -34,12 +34,12 @@ export const buildPaginationQuery = (
     where: condition,
     options: {
       limit: pageSize,
-      skip: page * pageSize
-    }
+      skip: page * pageSize,
+    },
   };
   if (fields && fields.length) {
     const projection = {};
-    fields.forEach(field => {
+    fields.forEach((field) => {
       projection[field] = true;
     });
     query.options.projection = projection;
@@ -51,15 +51,15 @@ export const buildPaginationQuery = (
 };
 
 // build query without pagination
-export const buildQuery = params => {
+export const buildQuery = (params) => {
   return buildPaginationQuery(null, null, params, [], []);
 };
 
-export const groupAttributeData = flatData => {
+export const groupAttributeData = (flatData) => {
   const groupData = [];
-  flatData.forEach(data => {
+  flatData.forEach((data) => {
     const dataInGroup = groupData.find(
-      groupData => groupData.attrIdx === data.attrIdx
+      (groupData) => groupData.attrIdx === data.attrIdx
     );
     if (dataInGroup) {
       if (dataInGroup.valIndices) {
@@ -70,23 +70,23 @@ export const groupAttributeData = flatData => {
     } else {
       groupData.push({
         attrIdx: data.attrIdx,
-        valIndices: [data.valIdx]
+        valIndices: [data.valIdx],
       });
     }
   });
   return groupData;
 };
 
-export const getAllCombinations = groupData => {
+export const getAllCombinations = (groupData) => {
   if (!groupData.length) {
     return [];
   }
   if (groupData.length === 1) {
-    return groupData[0].valIndices.map(valIdx => [
+    return groupData[0].valIndices.map((valIdx) => [
       {
         attrIdx: groupData[0].attrIdx,
-        valIdx
-      }
+        valIdx,
+      },
     ]);
   }
   const result = [];
@@ -96,9 +96,9 @@ export const getAllCombinations = groupData => {
       result.push([
         {
           attrIdx: groupData[0].attrIdx,
-          valIdx: groupData[0].valIndices[j]
+          valIdx: groupData[0].valIndices[j],
         },
-        ...restCombinations[i]
+        ...restCombinations[i],
       ]);
     }
   }
@@ -135,11 +135,11 @@ export const getDateStrArrayBetween = (startDate, endDate) => {
 
 export const countProductQuantityFromOrders = (orders, productId) => {
   let count = 0;
-  orders.forEach(order => {
+  orders.forEach((order) => {
     if (order.items && order.items.length) {
       order.items
-        .filter(item => item.productId === productId)
-        .forEach(item => {
+        .filter((item) => item.productId === productId)
+        .forEach((item) => {
           count += item.quantity;
         });
     }
@@ -153,7 +153,6 @@ export const countProductFromDate = (
   productId,
   dir = "after"
 ) => {
-
   let todayString = moment()
     .local()
     .format("YYYY-MM-DD");
@@ -165,10 +164,10 @@ export const countProductFromDate = (
   let afterToday = todayString <= date;
   let ordersToCount = afterToday
     ? orders.filter(
-        order => order.deliverDate <= date && order.deliverDate > todayString
+        (order) => order.deliverDate <= date && order.deliverDate > todayString
       )
     : orders.filter(
-        order => order.deliverDate > date && order.deliverDate <= todayString
+        (order) => order.deliverDate > date && order.deliverDate <= todayString
       );
   let count = countProductQuantityFromOrders(ordersToCount, productId);
   // if (productId === "5e82ad721a577a3df456edf5") {
@@ -184,7 +183,7 @@ export const countProductFromDate = (
   }
 };
 
-export const getPictureUrl = src => {
+export const getPictureUrl = (src) => {
   // const [fname, ext] = src.split('.');
   return `${MEDIA_PATH}/${src}`;
 };
@@ -210,13 +209,45 @@ export const arrayToggleElem = (arr, elem) => {
   return arr;
 };
 
-export const enumLikeObj = obj => {
+export const enumLikeObj = (obj) => {
   const enumObj = { ...obj };
   const keys = Object.keys(enumObj);
-  keys.forEach(k => {
+  keys.forEach((k) => {
     const key = enumObj[k];
     enumObj[key] = k;
-  })
-  
+  });
+
   return enumObj;
 };
+
+export const getDowsInDateRange = (from, to) => {
+  let startDate = from;
+  let endDate = to;
+  if (startDate instanceof moment) {
+    startDate = startDate.toDate();
+  }
+  if (endDate instanceof moment) {
+    endDate = endDate.toDate();
+  }
+  if (startDate.getTime() > endDate.getTime()) {
+    return getDowsInDateRange(endDate, startDate);
+  }
+  if (Math.abs(endDate.getTime() - startDate.getTime()) >= 7 * 86400 * 1000) {
+    return [0, 1, 2, 3, 4, 5, 6];
+  }
+  let start = moment(startDate);
+  let end = moment(endDate);
+  const dows = [];
+  while (start.format("YYYYMMDD") <= end.format("YYYYMMDD")) {
+    dows.push(Number(start.format("d")));
+    start = start.add("+1", "days");
+  }
+  return dows;
+};
+
+export const isDateRangeOverlapping = (start1, end1, start2, end2) => {
+  return (
+    moment(start1).isSameOrBefore(end2) && moment(start2).isSameOrBefore(end1)
+  );
+};
+
