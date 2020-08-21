@@ -27,6 +27,8 @@ import TransactionIcon from "@material-ui/icons/AttachMoney";
 import SalaryIcon from "@material-ui/icons/PeopleAlt";
 import WidgetsIcon from "@material-ui/icons/Widgets";
 import SupervisorAccountIcon from "@material-ui/icons/SupervisorAccount";
+import DateRangeIcon from "@material-ui/icons/DateRange";
+import PostAddIcon from "@material-ui/icons/PostAdd";
 
 import DashboardRoute from "views/Dashboard/DashboardRoute.js";
 import CategoriesPage from "views/Categories/Categories.js";
@@ -41,6 +43,7 @@ import StaticPage from "views/Pages/Pages.js";
 import AccountsRoute from "views/Accounts/AccountsRoute";
 import MerchantsPage from "views/Merchants/MerchantsPage";
 import RolesPage from "views/Roles/Roles";
+import ScheduleRoute from "views/Schedule/ScheduleRoute";
 import ProfilePage from "views/Profile/Profile";
 import { ROLE_ENUM } from "models/account";
 import { RESOURCES } from "models/account";
@@ -168,7 +171,7 @@ const dashboardRoutes = [
   {
     path: "/pages",
     name: "Static Page",
-    icon: LocationIcon,
+    icon: PostAddIcon,
     component: StaticPage,
     layout: "/",
     perm: {
@@ -190,7 +193,17 @@ const dashboardRoutes = [
     name: "Profile",
     component: ProfilePage,
     layout: "/",
-    hide: true,
+    hide: true
+  },
+  {
+    path: "/schedules",
+    name: "Schedule",
+    component: ScheduleRoute,
+    layout: "/",
+    icon: DateRangeIcon,
+    perm: {
+      role: ROLE_ENUM.MERCHANT_ADMIN
+    }
   },
   {
     path: "/table",

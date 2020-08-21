@@ -74,5 +74,13 @@
   "Phone Number": "Phone Number",
   "Email": "Email",
   "Roles & Permissions": "Roles & Permissions",
-  "Role": "Role"
+  "Role": "Role",
+  "Schedule": "Schedule",
+  "dow_0": "SUN",
+  "dow_1": "MON",
+  "dow_2": "TUE",
+  "dow_3": "WED",
+  "dow_4": "THR",
+  "dow_5": "FRI",
+  "dow_6": "SAT"
 }

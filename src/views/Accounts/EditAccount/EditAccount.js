@@ -31,14 +31,14 @@ const EditAccount = ({ match, history }) => {
         } else {
           setAlert({
             severity: "error",
-            message: "Cannot load data" // t("Cannot load data")
+            message: "Cannot load data", // t("Cannot load data")
           });
         }
       } catch (e) {
         console.error(e);
         setAlert({
           severity: "error",
-          message: "Cannot load data" // t("Cannot load data")
+          message: "Cannot load data", // t("Cannot load data")
         });
       }
       setLoading(false);
@@ -55,28 +55,28 @@ const EditAccount = ({ match, history }) => {
           if (id && id === "new") {
             FlashStorage.set("ACCOUNT_ALERT", {
               severity: "info",
-              message: t("Saved successfully")
+              message: t("Saved successfully"),
             });
             history.goBack();
           } else {
             setAlert({
               severity: "info",
-              message: t("Saved successfully")
+              message: t("Saved successfully"),
             });
             setModel(data.data);
           }
         } else {
           setAlert({
             severity: "error",
-            message: data.message || t("Save failed")
+            message: data.message || t("Save failed"),
           });
         }
       })
-      .catch(e => {
+      .catch((e) => {
         console.error(e);
         setAlert({
           severity: "error",
-          message: t("Save failed")
+          message: t("Save failed"),
         });
       })
       .finally(() => {
@@ -91,23 +91,22 @@ const EditAccount = ({ match, history }) => {
   return (
     <GridContainer>
       <GridItem xs={12}>
-        {
-          !processing &&
-        <Card>
-          <CardHeader model={model} loading={loading} />
-          <Alert alert={alert} onClose={() => setAlert(EMPTY_ALERT)} />
-          <CardBody
-            model={model}
-            loading={loading}
-            onChange={newModel => setModel(newModel)}
+        {!processing && (
+          <Card>
+            <CardHeader model={model} loading={loading} />
+            <Alert alert={alert} onClose={() => setAlert(EMPTY_ALERT)} />
+            <CardBody
+              model={model}
+              loading={loading}
+              onChange={(newModel) => setModel(newModel)}
             />
-          <CardFooter
-            processing={false}
-            onBack={history.goBack}
-            onSave={saveModel}
+            <CardFooter
+              processing={false}
+              onBack={history.goBack}
+              onSave={saveModel}
             ></CardFooter>
-        </Card>
-        }
+          </Card>
+        )}
       </GridItem>
     </GridContainer>
   );

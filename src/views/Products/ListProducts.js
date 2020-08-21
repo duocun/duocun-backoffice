@@ -301,7 +301,7 @@ export default function Product({ location }) {
                     component={Link}
                     to={`products/${row._id}`}
                   >
-                    <EditIcon />
+                    <EditIcon />  
                   </IconButton>
                 </Tooltip>
               )}
