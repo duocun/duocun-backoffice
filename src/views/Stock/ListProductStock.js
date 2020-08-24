@@ -163,7 +163,7 @@ const StockRow = ({
       onSetQuantity(product, debouncedQuantity);
     }
     setAdd(0);
-  }, [debouncedQuantity, onSetQuantity, product]);
+  }, [onSetQuantity]);
 
   return (
     <TableRow className={classes.textCenter}>
@@ -419,7 +419,7 @@ export default function ListProductStock({ location }) {
     setLoading(true);
     updateData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, rowsPerPage, sort, categories]);
+  }, []); // page, rowsPerPage, sort, categories
 
   useEffect(() => {
     setLoading(true);

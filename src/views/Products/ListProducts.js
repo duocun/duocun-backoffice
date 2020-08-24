@@ -423,7 +423,6 @@ export default function Product({ location }) {
                             {t("Product Name")}
                             {renderSort("name")}
                           </TableCell>
-                          <TableCell>
                             <TableCell
                               onClick={() => {
                                 toggleSort("category");
@@ -433,7 +432,6 @@ export default function Product({ location }) {
                               {t("Category")}
                               {renderSort("category")}
                             </TableCell>
-                          </TableCell>
                           <TableCell
                             onClick={() => {
                               toggleSort("price");
