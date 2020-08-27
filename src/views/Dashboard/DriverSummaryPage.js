@@ -229,7 +229,7 @@ const DriverSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
         driverSummary[driver._id].merchants.map(
           m => (
             // <GridItem xs={12} sm={12} md={12}>
-            <Card>
+            <Card key={m.merchantName}>
               <CardHeader color="primary">
                 <div key={m.merchantName}>
                   <div>{m.merchantName}</div>
