@@ -526,7 +526,7 @@ const EditProduct = ({ match, history }) => {
     setLoading(true);
     updatePage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [updatePage]);
+  }, []);
   return (
     <GridContainer>
       <GridItem xs={12} lg={8}>
@@ -708,7 +708,7 @@ const EditProduct = ({ match, history }) => {
                             inputProps={{
                               value: model.rank,
                               onChange: e => {
-                                setModel({ ...model, rank: e.target.value });
+                                setModel({ ...model, rank: Number(e.target.value) });
                               }
                             }}
                           />

@@ -32,12 +32,6 @@ const ScheduleEdit = ({ match, history }) => {
   const [alert, setAlert] = useState(null);
   const [openModal, setOpenModal] = useState(false);
   const [editAreaId, setEditAreaId] = useState("");
-  useEffect(() => {
-    console.log(model);
-  }, [model]);
-  useEffect(() => {
-    console.log(editAreaId);
-  }, [editAreaId]);
   const loadModel = useCallback(() => {
     ApiScheduleService.get(match.params.id)
       .then(({ data }) => {
