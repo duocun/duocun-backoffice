@@ -122,5 +122,11 @@
   "dow_3": "三",
   "dow_4": "四",
   "dow_5": "五",
-  "dow_6": "六"
+  "dow_6": "六",
+  "Support": "客服",
+  "Send": "发送",
+  "Undefined": "Undefined",
+  "User": "用户",
+  "Image Arrived": "图片",
+  "Please select customer": "请选择用户"
 }

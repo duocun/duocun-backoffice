@@ -31,6 +31,8 @@ import DateRangeIcon from "@material-ui/icons/DateRange";
 import PostAddIcon from "@material-ui/icons/PostAdd";
 
 import DashboardRoute from "views/Dashboard/DashboardRoute.js";
+// import ListAltIcon from "@material-ui/icons/ListAlt";
+// core components/views for Admin layout
 import CategoriesPage from "views/Categories/Categories.js";
 import FinanceRoute from "views/Finance/FinanceRoute.js";
 import ProductPage from "views/Products/Products.js";
@@ -40,6 +42,10 @@ import OrderRoute from "views/Orders/OrderRoute.js";
 import MapRoute from "views/Maps/MapRoute.js";
 import TableList from "views/TableList/TableList.js";
 import StaticPage from "views/Pages/Pages.js";
+// import Assignment from "views/Assignment/AssignmentRoute";
+import SupportPage from 'views/Support/Support.js';
+import DashboardRoute from "views/Dashboard/DashboardRoute.js";
+
 import AccountsRoute from "views/Accounts/AccountsRoute";
 import MerchantsPage from "views/Merchants/MerchantsPage";
 import RolesPage from "views/Roles/Roles";
@@ -211,7 +217,67 @@ const dashboardRoutes = [
     icon: "content_paste",
     component: TableList,
     layout: "/"
-  }
+  },
+  // {
+  //   path: "/assignment",
+  //   name: "Assignment",
+  //   icon: LocationIcon,
+  //   component: Assignment,
+  //   layout: "/"
+  // },
+  /** 
+   * Customer Service Menu
+   * metalgear
+  */
+  {
+    path: '/support',
+    name: 'Support',
+    icon: 'help',
+    component: SupportPage,
+    layout: '/'
+  },
+  // {
+  //   path: "/table",
+  //   name: "Table List",
+  //   icon: "content_paste",
+  //   component: TableList,
+  //   layout: "/"
+  // },
+  // {
+  //   path: "/typography",
+  //   name: "Typography",
+  //   icon: LibraryBooks,
+  //   component: Typography,
+  //   layout: "/"
+  // },
+  // {
+  //   path: "/icons",
+  //   name: "Icons",
+  //   icon: BubbleChart,
+  //   component: Icons,
+  //   layout: "/"
+  // },
+  // {
+  //   path: "/maps",
+  //   name: "Maps",
+  //   icon: LocationOn,
+  //   component: Maps,
+  //   layout: "/"
+  // },
+  // {
+  //   path: "/user",
+  //   name: "User Profile",
+  //   icon: Person,
+  //   component: UserProfile,
+  //   layout: "/"
+  // },
+  // {
+  //   path: "/notifications",
+  //   name: "Notifications",
+  //   icon: Notifications,
+  //   component: NotificationsPage,
+  //   layout: "/"
+  // }
 ];
 
 export default dashboardRoutes;

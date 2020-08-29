@@ -82,5 +82,11 @@
   "dow_3": "WED",
   "dow_4": "THR",
   "dow_5": "FRI",
-  "dow_6": "SAT"
+  "dow_6": "SAT",
+  "Support": "Support",
+  "Send": "Send",
+  "Undefined": "Undefined",
+  "User": "User",
+  "Image Arrived": "Image Arrived",
+  "Please select customer": "Please select customer"
 }
