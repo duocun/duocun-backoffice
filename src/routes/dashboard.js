@@ -44,7 +44,6 @@ import TableList from "views/TableList/TableList.js";
 import StaticPage from "views/Pages/Pages.js";
 // import Assignment from "views/Assignment/AssignmentRoute";
 import SupportPage from 'views/Support/Support.js';
-import DashboardRoute from "views/Dashboard/DashboardRoute.js";
 
 import AccountsRoute from "views/Accounts/AccountsRoute";
 import MerchantsPage from "views/Merchants/MerchantsPage";

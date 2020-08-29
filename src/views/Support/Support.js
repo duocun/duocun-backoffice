@@ -20,6 +20,7 @@ import {
 import {
   Person,
   EmojiEmotions,
+  Settings,
   Image,
   Clear,
   PhotoSizeSelectLargeOutlined,
@@ -42,6 +43,14 @@ import FlashStorage from "services/FlashStorage";
 import { getSocket } from "services/SocketService";
 import TimeAgo from 'javascript-time-ago';
 import zh from 'javascript-time-ago/locale/zh';
+
+// for setting welcome message by admin
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import TextField from '@material-ui/core/TextField';
 
 TimeAgo.addLocale(zh);
 
@@ -131,6 +140,7 @@ export default function SupportPage() {
 
   const [message, setMessage] = React.useState('');
   const [emojiVisible, setEmojiVisible] = React.useState(false);
+  const [settingVisible, setSettingVisible] = React.useState(false);
   const [users, setUsers] = React.useState([]);
   const [messages, setMessages] = React.useState([]);
   const [messagesList, setMessagesList] = React.useState([]);
@@ -142,6 +152,7 @@ export default function SupportPage() {
   const [userPage, setUserPage] = React.useState(0);
   const [chatPage, setChatPage] = React.useState(0);
   const [isMessageMore, setIsMessageMore] = React.useState(false);
+  const [welcomeMessage, setWelcomeMessage] = React.useState("");
 
   // for checking current message receiver is logged in or not
   const [userLoggedIn, setUserLoggedIn] = React.useState(false);
@@ -386,6 +397,12 @@ export default function SupportPage() {
     setMedia(null);
   }
 
+  // const getWelcomeMessage = () => {
+  //   ApiService.v2().get(`setting`).then(({data}) => {
+  //     console.log(data)
+  //   });
+  // }
+
   React.useEffect(() => {
     const token = Auth.getAuthToken();
     ApiAuthService.getCurrentUser(token).then(({data}) => {
@@ -407,8 +424,21 @@ export default function SupportPage() {
   React.useEffect(() => {
     if(socket){
       receiveSocket(socket);    
-    }   
+    }
   }, [users, userId, messagesList]);
+
+  const handleCancel = () => {
+    setSettingVisible(false);
+  }
+
+  const handleChangeMessage = () => {
+    console.log(this.welcomeMessage);
+  }
+
+  const handleWelcomeMessageChange = ({target}) => {
+    const str = target.value;
+    setWelcomeMessage(target.value);
+  }
 
   return (
     <GridContainer>
@@ -659,6 +689,39 @@ export default function SupportPage() {
                         }}
                       />
                     )}
+                    {/* <IconButton
+                      color="primary"
+                      aria-label="emoji"
+                      component="span"
+                      onClick={() => setSettingVisible(!settingVisible)}
+                    >
+                      <Settings />
+                    </IconButton> */}
+                    <Dialog open={settingVisible} onClose={handleCancel} aria-labelledby="form-dialog-title">
+                      <DialogTitle id="form-dialog-title">{t('Welcome Message Setting')}</DialogTitle>
+                      <DialogContent>
+                        <DialogContentText>
+                          { t('You can set the welcome message that will appear in the inquiry form of customer service page.') }
+                        </DialogContentText>
+                        <TextField
+                          autoFocus
+                          margin="dense"
+                          id="name"
+                          label={t('Welcome Message')}
+                          value={welcomeMessage}
+                          onChange="handleWelcomeMessageChange"
+                          fullWidth
+                        />
+                      </DialogContent>
+                      <DialogActions>
+                        <Button onClick={handleCancel} color="primary">
+                          { t('Cancel') }
+                        </Button>
+                        <Button onClick={handleChangeMessage} color="primary">
+                          { t('Save') }
+                        </Button>
+                      </DialogActions>
+                    </Dialog>
                   </div>
                   <InputBase
                     inputRef={chatInputRef}
