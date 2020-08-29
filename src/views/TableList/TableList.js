@@ -61,8 +61,8 @@ export default function TableList() {
         const picFile = new File([blob], file.name);
         const ext = file.name.split(".").pop();
         const fname = uuid.v4();
+        setFileName(fname + "." + ext);
         postFile(uploadUrl, fname, ext, picFile).then(x => {
-          setFileName(fname + "." + ext);
           // if (x) {
           //   self.afterUpload.emit({
           //     fname: fname + '.' + ext,

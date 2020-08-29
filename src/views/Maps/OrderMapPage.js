@@ -48,6 +48,7 @@ const useStyles = makeStyles({
   }
 });
 
+
 export const UNASSIGNED_DRIVER_ID = "unassigned";
 export const UNASSIGNED_DRIVER_NAME = "Unassigned";
 
@@ -76,7 +77,7 @@ const OrderMap = withScriptjs(
   withGoogleMap(
     ({
       lines,
-      data,
+      markers,
       zoom,
       center,
       onPolygonComplete,
@@ -87,143 +88,142 @@ const OrderMap = withScriptjs(
       containerElement,
       mapElement
     }) => (
-      <GoogleMap
-        defaultZoom={zoom}
-        defaultCenter={center}
-        defaultOptions={{
-          scrollwheel: true,
-          zoomControl: true,
-          fullscreenControl: false,
-          mapTypeControl: false,
-          streetViewControl: false,
-          styles: [
-            {
-              featureType: "water",
-              stylers: [
-                { saturation: 43 },
-                { lightness: -11 },
-                { hue: "#0088ff" }
-              ]
-            },
-            {
-              featureType: "road",
-              elementType: "geometry.fill",
-              stylers: [
-                { hue: "#ff0000" },
-                { saturation: -100 },
-                { lightness: 99 }
-              ]
-            },
-            {
-              featureType: "road",
-              elementType: "geometry.stroke",
-              stylers: [{ color: "#808080" }, { lightness: 54 }]
-            },
-            {
-              featureType: "landscape.man_made",
-              elementType: "geometry.fill",
-              stylers: [{ color: "#ece2d9" }]
-            },
-            {
-              featureType: "poi.park",
-              elementType: "geometry.fill",
-              stylers: [{ color: "#ccdca1" }]
-            },
-            {
-              featureType: "road",
-              elementType: "labels.text.fill",
-              stylers: [{ color: "#767676" }]
-            },
-            {
-              featureType: "road",
-              elementType: "labels.text.stroke",
-              stylers: [{ color: "#ffffff" }]
-            },
-            { featureType: "poi", stylers: [{ visibility: "off" }] },
-            {
-              featureType: "landscape.natural",
-              elementType: "geometry.fill",
-              stylers: [{ visibility: "on" }, { color: "#b8cb93" }]
-            },
-            { featureType: "poi.park", stylers: [{ visibility: "on" }] },
-            {
-              featureType: "poi.sports_complex",
-              stylers: [{ visibility: "on" }]
-            },
-            { featureType: "poi.medical", stylers: [{ visibility: "on" }] },
-            {
-              featureType: "poi.business",
-              stylers: [{ visibility: "simplified" }]
-            }
-          ]
-        }}
-      >
-        <DrawingManager
-          // defaultDrawingMode={window.google.maps.drawing.OverlayType.POLYGON}
+        <GoogleMap
+          defaultZoom={zoom}
+          defaultCenter={center}
           defaultOptions={{
-            drawingControl: true,
-            drawingControlOptions: {
-              position: window.google.maps.ControlPosition.TOP_CENTER,
-              drawingModes: [window.google.maps.drawing.OverlayType.POLYGON]
-            },
-            circleOptions: {
-              fillColor: `#ffff00`,
-              fillOpacity: 1,
-              strokeWeight: 5,
-              clickable: false,
-              editable: true,
-              zIndex: 1
-            }
+            scrollwheel: true,
+            zoomControl: true,
+            fullscreenControl: false,
+            mapTypeControl: false,
+            streetViewControl: false,
+            styles: [
+              {
+                featureType: "water",
+                stylers: [
+                  { saturation: 43 },
+                  { lightness: -11 },
+                  { hue: "#0088ff" }
+                ]
+              },
+              {
+                featureType: "road",
+                elementType: "geometry.fill",
+                stylers: [
+                  { hue: "#ff0000" },
+                  { saturation: -100 },
+                  { lightness: 99 }
+                ]
+              },
+              {
+                featureType: "road",
+                elementType: "geometry.stroke",
+                stylers: [{ color: "#808080" }, { lightness: 54 }]
+              },
+              {
+                featureType: "landscape.man_made",
+                elementType: "geometry.fill",
+                stylers: [{ color: "#ece2d9" }]
+              },
+              {
+                featureType: "poi.park",
+                elementType: "geometry.fill",
+                stylers: [{ color: "#ccdca1" }]
+              },
+              {
+                featureType: "road",
+                elementType: "labels.text.fill",
+                stylers: [{ color: "#767676" }]
+              },
+              {
+                featureType: "road",
+                elementType: "labels.text.stroke",
+                stylers: [{ color: "#ffffff" }]
+              },
+              { featureType: "poi", stylers: [{ visibility: "off" }] },
+              {
+                featureType: "landscape.natural",
+                elementType: "geometry.fill",
+                stylers: [{ visibility: "on" }, { color: "#b8cb93" }]
+              },
+              { featureType: "poi.park", stylers: [{ visibility: "on" }] },
+              {
+                featureType: "poi.sports_complex",
+                stylers: [{ visibility: "on" }]
+              },
+              { featureType: "poi.medical", stylers: [{ visibility: "on" }] },
+              {
+                featureType: "poi.business",
+                stylers: [{ visibility: "simplified" }]
+              }
+            ]
           }}
-          onOverlayComplete={onOverlayComplete}
-          onPolygonComplete={onPolygonComplete}
-        />
+        >
+          <DrawingManager
+            // defaultDrawingMode={window.google.maps.drawing.OverlayType.POLYGON}
+            defaultOptions={{
+              drawingControl: true,
+              drawingControlOptions: {
+                position: window.google.maps.ControlPosition.TOP_CENTER,
+                drawingModes: [window.google.maps.drawing.OverlayType.POLYGON]
+              },
+              circleOptions: {
+                fillColor: `#ffff00`,
+                fillOpacity: 1,
+                strokeWeight: 5,
+                clickable: false,
+                editable: true,
+                zIndex: 1
+              }
+            }}
+            onOverlayComplete={onOverlayComplete}
+            onPolygonComplete={onPolygonComplete}
+          />
 
-        {data &&
-          data.length > 0 &&
-          data.map(d => (
-            <Marker
-              key={d.orderId}
-              position={{ lat: d.lat, lng: d.lng }}
-              icon={{
-                url:
-                  d.icon === "gRed"
-                    ? gRed
-                    : d.icon === "gGreen"
-                    ? gGreen
-                    : COLOR_MAP[d.icon].url
-              }}
-              label={{ text: d.clientName, fontSize: "11px" }}
+          {markers && markers.length > 0 &&
+            markers.map(d => (
+              <Marker
+                key={d.orderId}
+                position={{ lat: d.lat, lng: d.lng }}
+                icon={{
+                  url:
+                    d.icon === "gRed"
+                      ? gRed
+                      : d.icon === "gGreen"
+                        ? gGreen
+                        : COLOR_MAP[d.icon].url
+                }}
+                label={{ text: d.clientName, fontSize: "11px" }}
               // labelAnchor={{ x: 30 , y: 80 }}
               // labelStyle={{
               //   marginLeft: '30px',
               //   paddingLeft: '50px'
               // }}
-            />
-          ))}
-        {lines &&
-          lines.length > 0 &&
-          lines.map(line => (
-            <Polyline
-              key={line.driverId}
-              path={line.route}
-              geodesic={true}
-              options={{
-                strokeColor: line.color,
-                strokeOpacity: 0.75,
-                strokeWeight: 2,
-                icons: [
-                  {
-                    // icon: lineSymbol,
-                    offset: "0",
-                    repeat: "20px"
-                  }
-                ]
-              }}
-            />
-          ))}
-      </GoogleMap>
-    )
+              />
+            ))}
+          {lines &&
+            lines.length > 0 &&
+            lines.map(line => (
+              <Polyline
+                key={line.driverId}
+                path={line.route}
+                geodesic={true}
+                options={{
+                  strokeColor: line.color,
+                  strokeOpacity: 0.75,
+                  strokeWeight: 2,
+                  icons: [
+                    {
+                      // icon: lineSymbol,
+                      offset: "0",
+                      repeat: "20px"
+                    }
+                  ]
+                }}
+              />
+            ))}
+        </GoogleMap>
+      )
   )
 );
 
@@ -238,26 +238,35 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
   const [lines, setLines] = useState([]);
   const [assignments, setAssignments] = useState([]);
 
+  const updateDriverListFromAssignments = (assignments, drivers) => {
+    const driverMap = getDriverMap(assignments);
+    return updateDriverDuty(driverMap, drivers);
+  }
+
+  const getMarkerIcon = (marker, colorMap) => {
+    if (marker.driverId === UNASSIGNED_DRIVER_ID) {
+      return 'gRed';
+    } else if(marker.status === OrderStatus.DONE){
+      return 'gGreen';
+    } else if(colorMap[marker.driverId]) {
+      return colorMap[marker.driverId];
+    } else {
+      return 'gRed'; // fix me
+    }
+  }
+
   const updateMarkers = useCallback((deliverDate, drivers, assignments) => {
     // {markers: [{orderId, lat, lng, type, status, icon}], driverMap:{driverId:{driverId, driverName}} }
     ApiOrderService.getAutoRoutes(deliverDate).then(({ data }) => {
       const routes = data ? data.data.routes : [];
       const colorMap = getColorMap(drivers);
-
       if (assignments) {
         assignments.forEach(marker => {
-          if (marker.driverId === UNASSIGNED_DRIVER_ID) {
-            marker.icon = "gRed";
-          } else {
-            marker.icon =
-              marker.status === OrderStatus.DONE
-                ? "gGreen"
-                : colorMap[marker.driverId];
-          }
+            marker.icon = getMarkerIcon(marker, colorMap);
         });
 
         setMarkers(assignments);
-        if (routes && routes.length > 0) {
+        if (routes && routes.length > 0 && drivers && drivers.length>0) {
           routes.forEach(r => {
             const driverId = r.driverId;
             const driver = drivers.find(d => d._id === driverId);
@@ -286,8 +295,8 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
             d.url = url;
             i++;
           });
-          const driverMap = getDriverMap(assignments);
-          const drivers = updateDriverDuty(driverMap, data.data);
+          
+          const drivers = updateDriverListFromAssignments(assignments, data.data);
 
           setAssignments(assignments);
           setDrivers(drivers);
@@ -342,9 +351,9 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
       ({ data }) => {
         const assignments = data.data;
         setAssignments(assignments);
-        const driverMap = getDriverMap(assignments);
-        const ds = updateDriverDuty(driverMap, drivers);
+        const ds = updateDriverListFromAssignments(assignments, drivers);
         setDrivers(ds);
+
         updateMarkers(date, ds, assignments);
       }
     );
@@ -377,7 +386,7 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
       let xj = vs[j].lat,
         yj = vs[j].lng;
 
-      let intersect = ((yi > y) !== (yj > y)) 
+      let intersect = ((yi > y) !== (yj > y))
         && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
 
       if (intersect) inside = !inside;
@@ -420,8 +429,8 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
       });
       setBounds(null);
 
-      const cloned =
-        assignments && assignments.length > 0 ? [...assignments] : [];
+      const cloned = assignments && assignments.length > 0 ? [...assignments] : [];
+      
       cloned.forEach(assignment => {
         // { orderId, lat, lng, type, status, driverId, driverName, clientName }
         if (orderIdMap[assignment.orderId]) {
@@ -434,6 +443,8 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
       ApiAssignmentService.updateAssignments(deliverDate, cloned).then(
         ({ data }) => {
           updateMarkers(deliverDate, drivers, cloned);
+          const ds = updateDriverListFromAssignments(assignments, drivers);
+          setDrivers(ds);
         }
       );
     }
@@ -465,7 +476,7 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
             <div className="leftCol">
               <div style={{ width: "80%", float: "left" }}>未分配</div>
               <div style={{ width: "20%", float: "left" }}>
-                <img src={gRed} alt="unassigned"/>
+                <img src={gRed} alt="unassigned" />
               </div>
             </div>
             <div
@@ -474,7 +485,7 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
             >
               <div style={{ width: "80%", float: "left" }}>已完成</div>
               <div style={{ width: "20%", float: "left" }}>
-                <img src={gGreen} alt="finished"/>
+                <img src={gGreen} alt="finished" />
               </div>
             </div>
             {drivers.map(
@@ -487,7 +498,7 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
                     {d.username}
                   </div>
                   <div style={{ width: "15%", float: "left" }}>
-                    <img src={d.url} alt="assigned"/>
+                    <img src={d.url} alt="assigned" />
                   </div>
                   {d.onDuty && (
                     <Link
@@ -519,13 +530,13 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
                 <div style={{ height: "100%", width: `100%` }} />
               }
               mapElement={<div style={{ height: `100%` }} />}
-              data={markers}
+              markers={markers}
               lines={lines}
               zoom={9}
               center={{ lat: 43.856098, lng: -79.337021 }}
               onPolygonComplete={handlePolygonComplete}
               onOverlayComplete={handleOverlayComplete}
-              // onReloadMarkers={reloadMarkers}
+            // onReloadMarkers={reloadMarkers}
             />
           </div>
         </GridItem>

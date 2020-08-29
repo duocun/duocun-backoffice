@@ -464,7 +464,7 @@ const EditProduct = ({ match, history }) => {
       .finally(() => {
         setLoading(false);
       });
-  }, [match.params.id, model, t]);
+  }, []); // match.params.id, model, t
 
   const uploadPicture = picture => {
     let file = picture;

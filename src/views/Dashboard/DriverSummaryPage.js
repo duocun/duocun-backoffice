@@ -29,6 +29,7 @@ import ApiStatisticsService from "services/api/ApiStatisticsService";
 import ApiOrderService from "services/api/ApiOrderService";
 
 import { setDeliverDate } from "redux/actions/order";
+import { red } from "@material-ui/core/colors";
 
 const useStyles = makeStyles(theme => ({
   cardCategoryWhite: {
@@ -59,8 +60,23 @@ const useStyles = makeStyles(theme => ({
   },
   itemRow: {
     fontSize: "12px"
+  },
+  warningChanged:{
+    color: "red"
+  },
+  warningDeleted:{
+    color: "red",
+    textDecoration: "line-through"
   }
 }));
+
+
+export const PickupStatus = {
+  UNPICK_UP: 'U',
+  PICKED_UP: 'P',
+  DELETED: 'D',
+  PICKED_UP_BUT_CHANGED: 'PC',
+};
 
 // deliverDate: redux state
 const DriverSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
@@ -128,6 +144,30 @@ const DriverSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
     loadData(date);
   };
 
+  const getStatusText = status => {
+    switch(status){
+      case PickupStatus.PICKED_UP:
+        return "已提";
+      case PickupStatus.PICKED_UP_BUT_CHANGED:
+        return "已提但有新变动";
+      case PickupStatus.DELETED:
+        return "因订单或分配变更而取消";
+      default:
+        return "未提";
+    }
+  }
+
+  const getStatusTextClassName = status => {
+    switch(status){
+      case PickupStatus.PICKED_UP_BUT_CHANGED:
+        return "warningChanged";
+      case PickupStatus.DELETED:
+        return "warningDeleted";
+      default:
+        return "";
+    }
+  }
+
   useEffect(() => {
     const now = moment().toISOString();
     ApiOrderService.getDuplicates(now).then(({ data }) => {
@@ -144,6 +184,7 @@ const DriverSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
       loadData(deliverDate);
     }
   }, [deliverDate, loadData, setDeliverDate]);
+
 
   return (
     <GridContainer>
@@ -188,7 +229,7 @@ const DriverSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
         driverSummary[driver._id].merchants.map(
           m => (
             // <GridItem xs={12} sm={12} md={12}>
-            <Card>
+            <Card key={m.merchantName}>
               <CardHeader color="primary">
                 <div key={m.merchantName}>
                   <div>{m.merchantName}</div>
@@ -198,7 +239,7 @@ const DriverSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
                 <Table>
                   <TableBody>
                     {m.items.map((prop, key) => (
-                      <TableRow key={key}>
+                      <TableRow key={key} className={getStatusTextClassName(prop.status)}>
                         <TableCell className={classes.itemRow}>
                           {prop.productName}
                         </TableCell>
@@ -206,7 +247,7 @@ const DriverSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
                           x{prop.quantity}
                         </TableCell>
                         <TableCell className={classes.itemRow}>
-                          {prop.status === "P" ? "已提" : "未提"}
+                          {getStatusText(prop.status)}
                         </TableCell>
                       </TableRow>
                     ))}

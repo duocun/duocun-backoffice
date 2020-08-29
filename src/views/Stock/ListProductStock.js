@@ -421,7 +421,7 @@ export default function ListProductStock({ location }) {
       updateData();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, rowsPerPage, sort, categories]);
+  }, []); // page, rowsPerPage, sort, categories
 
   useEffect(() => {
     setLoading(true);
