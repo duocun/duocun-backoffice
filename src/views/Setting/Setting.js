@@ -13,8 +13,10 @@ import CardFooter from "components/Card/CardFooter";
 import Alert from "components/CustomAlert/CustomAlert";
 import CustomLoader from "components/CustomLoader/CustomLoader";
 import CustomSelect from "components/CustomInput/SelectWithLabel";
+import TextField from '@material-ui/core/TextField';
 import { DEFAULT_MODEL } from "models/setting";
 import * as ApiSettingService from "services/api/ApiSettingService";
+
 
 const Setting = ({ history }) => {
   const { t } = useTranslation();
@@ -96,6 +98,17 @@ const Setting = ({ history }) => {
                       onChange={(value) =>
                         setModel({ ...model, payment_method: value })
                       }
+                    />                    
+                  </GridItem>
+                  <GridItem xs = {12} md = {6}>
+                    <TextField
+                      id="welcome-message"
+                      label={t('Welcome Message')}
+                      value={model.welcome_message}
+                      onChange={(e) =>
+                        setModel({ ...model, welcome_message: e.bubblestarget.value })
+                      }
+                      fullWidth
                     />
                   </GridItem>
                 </React.Fragment>

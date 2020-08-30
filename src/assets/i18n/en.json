@@ -92,5 +92,11 @@
   "Welcome Message Setting": "Welcome Message Setting",
   "Welcome Message": "Welcome Message",
   "You can set the welcome message that will appear in the inquiry form of customer service page.": "You can set the welcome message that will appear in the inquiry form of customer service page.",
-  "Cancel": "Cancel"
+  "Cancel": "Cancel",
+  "Please input welcome message": "Please input welcome message",
+  "Product / Delivery problems": "Product / Delivery problems",
+  "Change or Cancel Order": "Change or Cancel Order",
+  "Technical Support": "Technical Support",
+  "Other": "Other",
+  "You can download this image": "You can download this image"
 }

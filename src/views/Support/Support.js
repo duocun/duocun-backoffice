@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { useTranslation } from "react-i18next";
 import {
   Avatar,
@@ -51,6 +51,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import TextField from '@material-ui/core/TextField';
+import Tooltip from '@material-ui/core/Tooltip';
 
 TimeAgo.addLocale(zh);
 
@@ -106,7 +107,8 @@ const useStyles = makeStyles((theme) => ({
   },
   chatImage: {
     maxWidth: "300px",
-    display: "block"
+    display: "block",
+    cursor: "pointer"
   },
   imageInput: {
     display: "none"
@@ -124,6 +126,14 @@ const useStyles = makeStyles((theme) => ({
   },
   sendImage:{
     objectFit: "contain"
+  },
+  content: {
+    width: "85%"
+  },
+  category: {
+    marginBottom: "2px",
+    fontSize: "12px",
+    color: "black"
   }
 
 }));
@@ -153,6 +163,7 @@ export default function SupportPage() {
   const [chatPage, setChatPage] = React.useState(0);
   const [isMessageMore, setIsMessageMore] = React.useState(false);
   const [welcomeMessage, setWelcomeMessage] = React.useState("");
+  const [category, setCategory] = React.useState("other");
 
   // for checking current message receiver is logged in or not
   const [userLoggedIn, setUserLoggedIn] = React.useState(false);
@@ -206,7 +217,6 @@ export default function SupportPage() {
   };
 
   const queryMessage = () => {
-    console.log("IMHERE");
     if(userId && userId !== ""){
       // get messages
       let query = {};
@@ -263,6 +273,8 @@ export default function SupportPage() {
   const handleUserItemClick = (selectedUserId, userIndex) => {
     if(userId !== selectedUserId){
       users[userIndex].unread = 0;
+      setCategory(users[userIndex].category);
+      console.log(users[userIndex].category);
       setUserLoggedIn(users[userIndex].userNo === 0);
       setUserId(selectedUserId);
       setMessagesList([]);
@@ -284,6 +296,7 @@ export default function SupportPage() {
           sender: managerId,
           senderImg: managerImg,
           senderName: managerName,
+          category: category,
           createdAt: Date.now()
         };
         setMessages([...messages, newMessage]);
@@ -299,8 +312,8 @@ export default function SupportPage() {
         // send data via socket
         newMessage.receiver = userId;
         newMessage.userLoggedIn = userLoggedIn;
-        console.log("SENDING DATA");
-        console.log(newMessage);
+        // console.log("SENDING DATA");
+        // console.log(newMessage);
         socket.emit('admin_send', newMessage);
       }
     }else{
@@ -354,15 +367,23 @@ export default function SupportPage() {
             setChatOffset(chatOffset + 1);
             setTimeout(() => {
               chatBoxRef.current.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
-            }, 200);
-          }else{
-            const userItem = users.splice(i, 1)[0];
+            }, 200);           
+            
+            // update current user's category 
+            const newUsers = [...users];
+            newUsers[i].category = data.category;
+            setUsers(newUsers);
+
+          } else {
+            const userItem = users.splice(i, 1)[0];            
             userItem.unread = userItem.unread + 1;
             userItem.message = data.message !== "" ? data.message: t('Image Arrived');
+            userItem.category = data.category;
             // users.unshift(userItem);
             console.log(users);
             setUsers([ userItem, ...users ]);            
           }
+
           break;
         }
       }
@@ -440,6 +461,53 @@ export default function SupportPage() {
     setWelcomeMessage(target.value);
   }
 
+  const getCategoryName = (curCategory) => {
+    if(curCategory === "problem"){
+      return t("Product / Delivery problems");
+    }else if(curCategory === "order"){
+      return t("Change or Cancel Order");
+    }else if(curCategory === "support"){
+      return t("Technical Support");
+    }else{
+      return t("Other");
+    }
+  }
+
+  // const download = (fileUrl) => {
+  //   console.log(fileUrl)
+  //   var element = document.createElement("a");
+  //   var file = new Blob(
+  //     [
+  //       fileUrl
+  //     ],
+  //     { type: "image/*" }
+  //   );
+  //   element.href = URL.createObjectURL(file);
+  //   element.download = fileUrl.split("/").pop();
+  //   element.click();
+  // };
+
+  const download = e => {
+    const fileUrl = e.target.src;
+    fetch(fileUrl, {
+      method: "GET",
+      headers: {}
+    })
+      .then(response => {
+        response.arrayBuffer().then(function(buffer) {
+          const url = window.URL.createObjectURL(new Blob([buffer]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", fileUrl.split("/").pop()); //or any other extension
+          document.body.appendChild(link);
+          link.click();
+        });
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+
   return (
     <GridContainer>
       <Card
@@ -495,25 +563,26 @@ export default function SupportPage() {
                                 </Badge>
                               </ListItemAvatar>
                               <ListItemText
-                                primary={user.senderName ? user.senderName : `${t("User")} ${user.userNo}`}
+                                primary={user.senderName ? user.senderName : `${t("User")} ${user.userNo}` + `   (${getCategoryName(user.category)})`}
                                 secondary={
                                   <Typography
                                     noWrap={true}
                                     variant="body2"
                                     color="textSecondary"
+                                    className={classes.content}
                                   >
                                     { user.message }                                    
                                   </Typography>
                                 }
                               />
-                              <ListItemSecondaryAction>
+                              <ListItemSecondaryAction>                                  
                                 <Typography
                                   component="span"
                                   variant="caption"
                                   color="textPrimary"
                                 >
                                   { getTimeStr(user.createdAt) }
-                                </Typography>
+                                </Typography>                                
                               </ListItemSecondaryAction>
                             </ListItem>
                             <Divider variant="inset" />
@@ -577,7 +646,9 @@ export default function SupportPage() {
                                         color="textPrimary"
                                       >
                                         { messageItem.image && 
-                                          <img className={classes.chatImage} src={messageItem.image}/>
+                                          <Tooltip title = {t("You can download this image")}>
+                                            <img className={classes.chatImage} src={messageItem.image} onClick={(e) => download(e)} />
+                                          </Tooltip>
                                         }
                                         { messageItem.message}
                                       </Typography>
@@ -603,7 +674,7 @@ export default function SupportPage() {
                                         variant="body1"
                                       >
                                         { messageItem.image && 
-                                          <img className={classes.chatImage} src={messageItem.image}/>
+                                          <img className={classes.chatImage} src={messageItem.image} />
                                         }
                                         {messageItem.message}
                                       </Typography>
