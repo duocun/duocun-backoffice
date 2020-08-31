@@ -14,7 +14,7 @@ import Roles from "./Roles";
 
 const Body = ({ model, onChange }) => {
   const { t } = useTranslation();
-  const styles = useStyles();
+  const classes = useStyles();
   return (
     <CardBody>
       <GridContainer>
@@ -24,8 +24,8 @@ const Body = ({ model, onChange }) => {
               <h5>{t("Basic Information")}</h5>
             </GridItem>
             <GridContainer>
-              <GridItem xs={12} md={4} style={styles.avatarContainer}>
-                <UserAvatar user={model} style={styles.avatarLarge} />
+              <GridItem xs={12} md={4} clasName={classes.avatarContainer}>
+                <UserAvatar user={model} className={classes.avatarLarge} />
               </GridItem>
               <GridItem xs={12} md={8}>
                 <GridContainer>
@@ -34,7 +34,7 @@ const Body = ({ model, onChange }) => {
                       id="input-email"
                       label={t("Email")}
                       value={model.email}
-                      onChange={value => onChange({ ...model, email: value })}
+                      onChange={(value) => onChange({ ...model, email: value })}
                     />
                   </GridItem>
                   <GridItem xs={12} md={6}>
@@ -43,7 +43,7 @@ const Body = ({ model, onChange }) => {
                       label={t("Password")}
                       value={model.passwordRaw}
                       inputProps={{ type: "password", minLength: 6 }}
-                      onChange={value =>
+                      onChange={(value) =>
                         onChange({ ...model, passwordRaw: value })
                       }
                     />
@@ -54,7 +54,7 @@ const Body = ({ model, onChange }) => {
                       label="Username"
                       required
                       value={model.username}
-                      onChange={value =>
+                      onChange={(value) =>
                         onChange({ ...model, username: value })
                       }
                     />
@@ -63,10 +63,10 @@ const Body = ({ model, onChange }) => {
                     <CustomSelect
                       label="Account Type"
                       value={model.type}
-                      itemData={ACCOUNT_TYPES.map(type => {
+                      itemData={ACCOUNT_TYPES.map((type) => {
                         return { value: type.toLowerCase(), text: type };
                       })}
-                      onChange={value => onChange({ ...model, type: value })}
+                      onChange={(value) => onChange({ ...model, type: value })}
                     />
                   </GridItem>
                   <GridItem xs={12} md={6}>
@@ -74,7 +74,7 @@ const Body = ({ model, onChange }) => {
                       id="input-phone"
                       label={t("Phone Number")}
                       value={model.phone}
-                      onChange={value => onChange({ ...model, phone: value })}
+                      onChange={(value) => onChange({ ...model, phone: value })}
                     />
                   </GridItem>
                   <GridItem xs={12} md={6}>
@@ -83,9 +83,9 @@ const Body = ({ model, onChange }) => {
                       value={String(model.verified)}
                       itemData={[
                         { value: true, text: "Yes" },
-                        { value: false, text: "No" }
+                        { value: false, text: "No" },
                       ]}
-                      onChange={value =>
+                      onChange={(value) =>
                         onChange({ ...model, verified: value })
                       }
                     />
@@ -97,7 +97,9 @@ const Body = ({ model, onChange }) => {
                       label={t("Balance")}
                       className="dc-full"
                       value={model.balance}
-                      onChange={value => onChange({ ...model, balance: value })}
+                      onChange={(value) =>
+                        onChange({ ...model, balance: value })
+                      }
                     />
                   </GridItem>
                   <GridItem xs={12} md={6}>
@@ -107,9 +109,9 @@ const Body = ({ model, onChange }) => {
                       itemData={[
                         { value: 0, text: "Unknown" },
                         { value: 1, text: "Male" },
-                        { value: 2, text: "Female" }
+                        { value: 2, text: "Female" },
                       ]}
-                      onChange={value => onChange({ ...model, sex: value })}
+                      onChange={(value) => onChange({ ...model, sex: value })}
                     />
                   </GridItem>
                   <GridItem xs={12} md={6}></GridItem>
@@ -124,7 +126,7 @@ const Body = ({ model, onChange }) => {
                 id="input-realm"
                 label={t("Realm")}
                 value={model.realm}
-                onChange={value => onChange({ ...model, realm: value })}
+                onChange={(value) => onChange({ ...model, realm: value })}
               />
             </GridItem>
             <GridItem xs={12} md={6}>
@@ -132,7 +134,7 @@ const Body = ({ model, onChange }) => {
                 id="input-second-phone"
                 label={t("Second Phone")}
                 value={model.secondPhone}
-                onChange={value => onChange({ ...model, secondPhone: value })}
+                onChange={(value) => onChange({ ...model, secondPhone: value })}
               />
             </GridItem>
             <GridItem xs={12} md={6}>
@@ -140,7 +142,7 @@ const Body = ({ model, onChange }) => {
                 id="input-openid"
                 label={t("OpenID")}
                 value={model.openId}
-                onChange={value => onChange({ ...model, openId: value })}
+                onChange={(value) => onChange({ ...model, openId: value })}
               />
             </GridItem>
             <GridItem xs={12} md={6}>
@@ -162,8 +164,11 @@ const Body = ({ model, onChange }) => {
           </GridContainer>
         </GridItem>
         <GridItem xs={12} md={6}>
-          <Attributes model={model} onChange={newModel => onChange(newModel)} />
-          <Roles model={model} onChange={newModel => onChange(newModel)} />
+          <Attributes
+            model={model}
+            onChange={(newModel) => onChange(newModel)}
+          />
+          <Roles model={model} onChange={(newModel) => onChange(newModel)} />
         </GridItem>
       </GridContainer>
     </CardBody>
@@ -174,16 +179,16 @@ const styles = {
   avatarContainer: {
     justifyContent: "center",
     alignItems: "center",
-    display: "flex"
+    display: "flex",
   },
   avatarLarge: {
     minWidth: 96,
     minHeight: 96,
     marginLeft: "auto",
-    marginRight: "auto"
-  }
+    marginRight: "auto",
+  },
 };
 
-const useStyles = makeStyles(theme => styles);
+const useStyles = makeStyles((theme) => styles);
 
 export default Body;

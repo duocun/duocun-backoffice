@@ -60,41 +60,41 @@ describe("canAddDateRange", () => {
   });
 });
 
-describe("isInPeriod", () => {
-  it("returns true given date is in given period; false otherwise", () => {
-    let date = new Date("2020-08-06 12:00:00");
-    let period = {
-      startDate: new Date("2020-08-06 00:00:00"),
-      endDate: new Date("2020-08-07 00:00:00"),
-    };
-    expect(Model.isInPeriod(date, period)).to.be.true;
-    date = new Date("2020-08-08");
-    expect(Model.isInPeriod(date, period)).to.be.false;
-  });
-});
+// describe("isInPeriod", () => {
+//   it("returns true given date is in given period; false otherwise", () => {
+//     let date = new Date("2020-08-06 12:00:00");
+//     let period = {
+//       startDate: new Date("2020-08-06 00:00:00"),
+//       endDate: new Date("2020-08-07 00:00:00"),
+//     };
+//     expect(Model.isInPeriod(date, period)).to.be.true;
+//     date = new Date("2020-08-08");
+//     expect(Model.isInPeriod(date, period)).to.be.false;
+//   });
+// });
 
-describe("isScheduled", () => {
-  it("returns true if given date is scheduled; false otherwise", () => {
-    const model = {
-      areas: [
-        {
-          areaId: "1",
-          periods: [
-            {
-              startDate: new Date("2020-08-01"),
-              endDate: new Date("2020-08-04"),
-              dows: [
-                Number(moment("2020-08-02").format("d")),
-                Number(moment("2020-08-03").format("d")),
-              ],
-            },
-          ],
-        },
-      ],
-    };
-    expect(Model.isScheduled(model, "2", new Date("2020-08-02"))).to.be.false;
-    expect(Model.isScheduled(model, "1", new Date("2020-08-03"))).to.be.true;
-    expect(Model.isScheduled(model, "1", new Date("2020-08-01"))).to.be.false;
-    expect(Model.isScheduled(model, "1", new Date("2020-09-01"))).to.be.false;
-  });
-});
+// describe("isScheduled", () => {
+//   it("returns true if given date is scheduled; false otherwise", () => {
+//     const model = {
+//       areas: [
+//         {
+//           areaId: "1",
+//           periods: [
+//             {
+//               startDate: new Date("2020-08-01"),
+//               endDate: new Date("2020-08-04"),
+//               dows: [
+//                 Number(moment("2020-08-02").format("d")),
+//                 Number(moment("2020-08-03").format("d")),
+//               ],
+//             },
+//           ],
+//         },
+//       ],
+//     };
+//     expect(Model.isScheduled(model, "2", new Date("2020-08-02"))).to.be.false;
+//     expect(Model.isScheduled(model, "1", new Date("2020-08-03"))).to.be.true;
+//     expect(Model.isScheduled(model, "1", new Date("2020-08-01"))).to.be.false;
+//     expect(Model.isScheduled(model, "1", new Date("2020-09-01"))).to.be.false;
+//   });
+// });

@@ -29,6 +29,7 @@ import WidgetsIcon from "@material-ui/icons/Widgets";
 import SupervisorAccountIcon from "@material-ui/icons/SupervisorAccount";
 import DateRangeIcon from "@material-ui/icons/DateRange";
 import PostAddIcon from "@material-ui/icons/PostAdd";
+import SettingsIcon from "@material-ui/icons/Settings";
 
 import DashboardRoute from "views/Dashboard/DashboardRoute.js";
 import CategoriesPage from "views/Categories/Categories.js";
@@ -45,6 +46,7 @@ import MerchantsPage from "views/Merchants/MerchantsPage";
 import RolesPage from "views/Roles/Roles";
 import ScheduleRoute from "views/Schedule/ScheduleRoute";
 import ProfilePage from "views/Profile/Profile";
+import SettingPage from "views/Setting/Setting";
 import { ROLE_ENUM } from "models/account";
 import { RESOURCES } from "models/account";
 import { PERMISSIONS } from "models/account";
@@ -203,6 +205,16 @@ const dashboardRoutes = [
     icon: DateRangeIcon,
     perm: {
       role: ROLE_ENUM.MERCHANT_ADMIN
+    }
+  },
+  {
+    path: "/setting",
+    name: "Setting",
+    component: SettingPage,
+    layout: "/",
+    icon: SettingsIcon,
+    perm: {
+      role: ROLE_ENUM.SUPER
     }
   },
   {
