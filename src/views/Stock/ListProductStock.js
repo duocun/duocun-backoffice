@@ -164,7 +164,7 @@ const StockRow = ({
     }
     setAdd(0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedQuantity]);
+  }, []);
 
   return (
     <TableRow className={classes.textCenter}>
