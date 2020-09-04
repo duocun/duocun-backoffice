@@ -188,14 +188,14 @@ const StockRow = ({
             }}
           />
         ) : (
-          <CloseIcon
-            color="error"
-            className={classes.iconButton}
-            onClick={() => {
-              onToggleStockEnabled(product);
-            }}
-          />
-        )}
+            <CloseIcon
+              color="error"
+              className={classes.iconButton}
+              onClick={() => {
+                onToggleStockEnabled(product);
+              }}
+            />
+          )}
       </TableCell>
       <TableCell className={classes.textCenter}>
         {product.stock &&
@@ -209,14 +209,14 @@ const StockRow = ({
               }}
             />
           ) : (
-            <CloseIcon
-              color="error"
-              className={classes.iconButton}
-              onClick={() => {
-                onToggleAllowNegative(product);
-              }}
-            />
-          ))}
+              <CloseIcon
+                color="error"
+                className={classes.iconButton}
+                onClick={() => {
+                  onToggleAllowNegative(product);
+                }}
+              />
+            ))}
         {(!product.stock || !product.stock.enabled) && <RemoveIcon />}
       </TableCell>
       <TableCell className={classes.textCenter}>
@@ -228,8 +228,8 @@ const StockRow = ({
             onChange={(e) => setQuantity(e.target.value)}
           ></Input>
         ) : (
-          <>- - -</>
-        )}
+            <>- - -</>
+          )}
       </TableCell>
       <TableCell className={classes.textCenter}>
         {product.stock && product.stock.enabled ? (
@@ -245,13 +245,13 @@ const StockRow = ({
             value={add}
           ></Input>
         ) : (
-          <>- - -</>
-        )}
+            <>- - -</>
+          )}
       </TableCell>
       {dates.map((date) => {
         const dateQuantity = product.stock
           ? quantity -
-            countProductFromDate(date, product.delivery, product._id, "before")
+          countProductFromDate(date, product.delivery, product._id, "before")
           : null;
         return (
           <TableCell key={date} className={classes.textCenter}>
@@ -259,8 +259,8 @@ const StockRow = ({
               <span
                 className={
                   product.stock &&
-                  product.stock.enabled &&
-                  isQuantityDeficient(dateQuantity, product)
+                    product.stock.enabled &&
+                    isQuantityDeficient(dateQuantity, product)
                     ? classes.textDanger
                     : null
                 }
@@ -268,8 +268,8 @@ const StockRow = ({
                 {dateQuantity}
               </span>
             ) : (
-              <>- - -</>
-            )}
+                <>- - -</>
+              )}
           </TableCell>
         );
       })}
@@ -630,18 +630,18 @@ export default function ListProductStock({ location }) {
                           rowCount={rowsPerPage}
                         />
                       ) : (
-                        products.map((product, index) => (
-                          <StockRow
-                            key={product._id}
-                            number={rowsPerPage * page + index + 1}
-                            product={product}
-                            dates={getDateStrArrayBetween(startDate, endDate)}
-                            onToggleStockEnabled={handleToggleStockEnabled}
-                            onToggleAllowNegative={handleToggleAllowNegative}
-                            onSetQuantity={handleSetQuantity}
-                          />
-                        ))
-                      )}
+                          products.map((product, index) => (
+                            <StockRow
+                              key={product._id}
+                              number={rowsPerPage * page + index + 1}
+                              product={product}
+                              dates={getDateStrArrayBetween(startDate, endDate)}
+                              onToggleStockEnabled={handleToggleStockEnabled}
+                              onToggleAllowNegative={handleToggleAllowNegative}
+                              onSetQuantity={handleSetQuantity}
+                            />
+                          ))
+                        )}
                     </TableBody>
                   </Table>
                 </TableContainer>
