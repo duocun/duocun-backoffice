@@ -238,7 +238,7 @@ const StockRow = ({
             className={classes.inputInRow}
             onChange={(e) => {
               const newQuantity =
-                (product.stock.quantity || 0) + parseInt(e.target.value);
+                (quantity || 0) + parseInt(e.target.value);
               setAdd(e.target.value);
               setQuantity(newQuantity);
             }}
