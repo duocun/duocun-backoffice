@@ -199,6 +199,7 @@ export default function SupportPage() {
         }
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [managerId, userOffset]);
 
   const queryMessage = () => {
