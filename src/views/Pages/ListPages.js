@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
@@ -70,7 +70,7 @@ export default function ListPages({ location }) {
       severity: "info"
     });
   };
-  const updateData = () => {
+  const updateData = useCallback(() => {
     ApiPageService.getPageList(page, rowsPerPage, [sort])
       .then(({ data }) => {
         if (data.code === "success") {
@@ -93,7 +93,8 @@ export default function ListPages({ location }) {
       .finally(() => {
         setLoading(false);
       });
-  };
+  }, [page, rowsPerPage]);
+
   const onConfirmModal = value => {
     setModalOpen(false);
     if (!value) {
@@ -134,8 +135,7 @@ export default function ListPages({ location }) {
   };
   useEffect(() => {
     updateData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, rowsPerPage, sort]);
+  }, [updateData]);
 
   return (
     <GridContainer>
