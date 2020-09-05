@@ -186,16 +186,20 @@ export default function SupportPage() {
             setIsUserMore(false);
           }
           if (data.data.length > 0) {
-            setUsers(users.concat(data.data));
-            // if(userPage === 0){
+            setUsers(oldUsers => {
+              return [...oldUsers].concat(data.data);
+            });
+            // if (userPage === 0) {
             //   setUserId(data.data[0]._id);
             // }
           }
-          setUserPage(userPage + 1);
+          setUserPage(oldUserPage => {
+            return oldUserPage + 1;
+          });
         }
       });
     }
-  }, [managerId, users, userOffset, userPage]);
+  }, [managerId, userOffset]);
 
   const queryMessage = () => {
     if (userId && userId !== "") {
