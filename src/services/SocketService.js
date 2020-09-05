@@ -1,7 +1,6 @@
 import socketIOClient from 'socket.io-client';
-import { Subject } from 'rxjs';
-const ENDPOINT = process.env.REACT_APP_SOCKET_HOST;
 
+const ENDPOINT = process.env.REACT_APP_SOCKET_HOST;
 let socket = null;
 
 export const getSocket = () => {
