@@ -74,7 +74,7 @@ const defaultOrdersModel = {
  * props --- None
  * redux --- order, account, deliverDate
  */
-const OrderFormPage = ({ match, order, onAfterUpdate, history }) => {
+const OrderFormPage = ({ match, order, history }) => {
   const { t } = useTranslation();
   const classes = useStyles();
   const [modifyByAccount, setModifyByAccount] = useState({
@@ -151,7 +151,7 @@ const OrderFormPage = ({ match, order, onAfterUpdate, history }) => {
         });
       });
     }
-  }, [match.params, model, modifyByAccount._id, order]);
+  }, [match.params, modifyByAccount._id, order]);
 
   const getCheckMap = model => {
     if (model.items && model.items.length > 0) {
@@ -164,31 +164,6 @@ const OrderFormPage = ({ match, order, onAfterUpdate, history }) => {
       return {};
     }
   };
-
-  // useEffect(() => {
-  //   // set products for remove products function
-  //   if (model) {
-  //     if (model.items && model.items.length > 0) {
-  //       const checkMap = {};
-  //       model.items.forEach(it => {
-  //         checkMap[it.productId] = { ...it, status: false };
-  //       });
-  //       setCheckMap(checkMap);
-  //     }
-
-  //     // set model for save function
-  //     if (model.actionCode === 'PS') {
-  //       setModel({
-  //         ...model,
-  //         modifyBy: modifyByAccount._id
-  //       });
-  //     } else {
-  //       setModel({ ...model, modifyBy: modifyByAccount._id });
-  //     }
-  //   } else {
-
-  //   }
-  // }, [model]);
 
   const handleCreate = () => {
     if (model._id === "clone") {
@@ -214,7 +189,6 @@ const OrderFormPage = ({ match, order, onAfterUpdate, history }) => {
                 return;
               } else {
                 setAlert(newAlert);
-                onAfterUpdate();
               }
             } else {
               setAlert({
@@ -241,6 +215,8 @@ const OrderFormPage = ({ match, order, onAfterUpdate, history }) => {
       removeAlert();
       setProcessing(true);
       setModel({ ...model, modifyBy: modifyByAccount._id });
+
+
       ApiOrderService.updateOrder(model)
         .then(({ data }) => {
           if (data.code === "success") {
@@ -248,7 +224,6 @@ const OrderFormPage = ({ match, order, onAfterUpdate, history }) => {
               message: t("Update successfully"),
               severity: "success"
             });
-            onAfterUpdate();
           } else {
             setAlert({
               message: t("Update failed"),

@@ -89,7 +89,7 @@ const TransactionFormPage = ({
         );
       }
     }
-  }, [account, match.params.id, model, modifyByAccount._id]);
+  }, [account, match.params.id, modifyByAccount._id]);
 
   useEffect(() => {
     const token = AuthService.getAuthToken();
@@ -152,9 +152,6 @@ const TransactionFormPage = ({
   //   });
   // };
 
-  const handleUpdateData = accountId => {
-    // updateData(accountId, actionCode, startDate, endDate);
-  };
 
   // const handleCreate = () => {
   //   if (model.fromId && model.staffId) {
@@ -401,7 +398,6 @@ const TransactionFormPage = ({
           account={account}
           transaction={model}
           items={items}
-          onAfterUpdate={handleUpdateData}
         />
       </GridItem>
     </GridContainer>

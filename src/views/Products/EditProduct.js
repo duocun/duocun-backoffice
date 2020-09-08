@@ -105,6 +105,7 @@ const defaultProductModelState = {
   rank: 0,
   taxRate: 0,
   merchantId: "",
+  scheduleId: "",
   stock: {
     enabled: false,
     allowNegative: false,
@@ -421,6 +422,7 @@ const EditProduct = ({ match, history }) => {
   const [processing, setProcessing] = useState(false);
   const [model, setModel] = useState(defaultProductModelState);
   const [merchants, setMerchants] = useState([]);
+  const [schedules, setSchedules] = useState([]);
   const [categoryTreeData, setCategoryTreeData] = useState([]);
   const [attributes, setAttributes] = useState(defaultAttributesState);
   const [alert, setAlert] = useState(
@@ -447,6 +449,7 @@ const EditProduct = ({ match, history }) => {
           }
           setAttributes(data.meta?.attributes || []);
           setMerchants(data.meta?.merchants || []);
+          setSchedules(data.meta?.schedules ?? []);
         } else {
           setAlert({
             message: t("Data not found"),
@@ -464,7 +467,7 @@ const EditProduct = ({ match, history }) => {
       .finally(() => {
         setLoading(false);
       });
-  }, []); // match.params.id, model, t
+  }, [t, match.params.id, model]); // match.params.id, model, t
 
   const uploadPicture = picture => {
     let file = picture;
@@ -732,6 +735,37 @@ const EditProduct = ({ match, history }) => {
                         </Box>
                       </GridItem>
                       <GridItem xs={12} lg={6}>
+                        <Box pb={2}>
+                          <FormControl className={classes.select}>
+                            <InputLabel id="product-schedule-label">
+                              {t("Schedule")}
+                            </InputLabel>
+                            <Select
+                              id="product-schedule"
+                              labelId="product-schedule-label"
+                              value={model.scheduleId}
+                              onChange={e => {
+                                setModel({
+                                  ...model,
+                                  scheduleId: e.target.value
+                                });
+                              }}
+                            >
+                              {schedules.map(schedule => {
+                                return (
+                                  <MenuItem
+                                    key={schedule._id}
+                                    value={schedule._id}
+                                  >
+                                    {schedule.title}
+                                  </MenuItem>
+                                );
+                              })}
+                            </Select>
+                          </FormControl>
+                        </Box>
+                      </GridItem>
+                      <GridItem xs={12}>
                         <h5 className={classes.heading}>{t("Stock")}</h5>
                       </GridItem>
                       <GridItem xs={12} lg={6}>
