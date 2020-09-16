@@ -1,5 +1,6 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { useTranslation } from "react-i18next";
+
 import {
   Avatar,
   Badge,
@@ -16,42 +17,37 @@ import {
   makeStyles,
   Typography,
   CircularProgress,
+  Tooltip,
+  // Dialog,
+  // DialogActions,
+  // DialogContent,
+  // DialogContentText,
+  // DialogTitle,
+  // TextField,
 } from '@material-ui/core';
 import {
   Person,
   EmojiEmotions,
-  Settings,
   Image,
   Clear,
-  PhotoSizeSelectLargeOutlined,
 } from '@material-ui/icons';
 
 import { Picker } from 'emoji-mart'
 import 'emoji-mart/css/emoji-mart.css'
 import InfiniteScroll from 'react-infinite-scroller'
+import TimeAgo from 'javascript-time-ago';
+import zh from 'javascript-time-ago/locale/zh';
+
+import Auth from "services/AuthService";
+import ApiService from 'services/api/ApiService';
+import ApiAuthService from 'services/api/ApiAuthService';
+import { getSocket } from "services/SocketService";
 
 import GridContainer from 'components/Grid/GridContainer.js';
 import GridItem from 'components/Grid/GridItem.js';
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-import Auth from "services/AuthService";
-import ApiService from 'services/api/ApiService';
-import ApiAuthService from 'services/api/ApiAuthService';
-import { buildQuery, buildPaginationQuery } from "helper/index";
-import FlashStorage from "services/FlashStorage";
-import { getSocket } from "services/SocketService";
-import TimeAgo from 'javascript-time-ago';
-import zh from 'javascript-time-ago/locale/zh';
-
-// for setting welcome message by admin
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import TextField from '@material-ui/core/TextField';
-import Tooltip from '@material-ui/core/Tooltip';
 
 TimeAgo.addLocale(zh);
 
@@ -86,9 +82,6 @@ const useStyles = makeStyles((theme) => ({
   chatBoxAvatarRight: {
     marginLeft: '16px',
   },
-  chatInputBox: {
-
-  },
   chatInputArea: {
     width: '100%',
     padding: '7px 15px',
@@ -108,40 +101,39 @@ const useStyles = makeStyles((theme) => ({
   chatImage: {
     maxWidth: "300px",
     display: "block",
-    cursor: "pointer"
+    cursor: "pointer",
   },
   imageInput: {
-    display: "none"
+    display: "none",
   },
   imageContainer: {
     display: "flex",
     position: "relative",
     justifyContent: "center",
-    maxHeight: "200px"
+    maxHeight: "200px",
   },
   imageClearButton: {
     position: "absolute",
     left: "0",
-    height: "36px"    
+    height: "36px",
   },
-  sendImage:{
-    objectFit: "contain"
+  sendImage: {
+    objectFit: "contain",
   },
   content: {
-    width: "85%"
+    width: "85%",
   },
   category: {
     marginBottom: "2px",
     fontSize: "12px",
-    color: "black"
-  }
-
+    color: "black",
+  },
 }));
 
 let socket = null;
 
 export default function SupportPage() {
-  
+
   const { t } = useTranslation();
   const classes = useStyles();
   const chatBoxRef = React.useRef(null);
@@ -150,7 +142,7 @@ export default function SupportPage() {
 
   const [message, setMessage] = React.useState('');
   const [emojiVisible, setEmojiVisible] = React.useState(false);
-  const [settingVisible, setSettingVisible] = React.useState(false);
+  // const [settingVisible, setSettingVisible] = React.useState(false);
   const [users, setUsers] = React.useState([]);
   const [messages, setMessages] = React.useState([]);
   const [messagesList, setMessagesList] = React.useState([]);
@@ -162,7 +154,7 @@ export default function SupportPage() {
   const [userPage, setUserPage] = React.useState(0);
   const [chatPage, setChatPage] = React.useState(0);
   const [isMessageMore, setIsMessageMore] = React.useState(false);
-  const [welcomeMessage, setWelcomeMessage] = React.useState("");
+  // const [welcomeMessage, setWelcomeMessage] = React.useState("");
   const [category, setCategory] = React.useState("other");
 
   // for checking current message receiver is logged in or not
@@ -175,14 +167,9 @@ export default function SupportPage() {
   // for dynamic accumulation due to socket message
   const [userOffset, setUserOffset] = React.useState(0);
   const [chatOffset, setChatOffset] = React.useState(0);
-  
-  const [alert, setAlert] = React.useState(
-    FlashStorage.get("ATTRIBUTE_ALERT") || { message: "", severity: "info" }
-  );
 
-
-  const queryUser = () => {
-    if(managerId && managerId !== ""){
+  const queryUser = React.useCallback(() => {
+    if (managerId && managerId !== "") {
       let query = {};
       let s_query = {
         where: {},
@@ -193,36 +180,33 @@ export default function SupportPage() {
       s_query.options.skip = userOffset + pageSize * userPage;
 
       query.query = JSON.stringify(s_query);
-      ApiService.v2().get("messages/chatusers", query).then( ({data}) => {
-        if(data.code === "success"){
-          if(data.data.length < pageSize){
+      ApiService.v2().get("messages/chatusers", query).then(({ data }) => {
+        if (data.code === "success") {
+          if (data.data.length < pageSize) {
             setIsUserMore(false);
           }
-          if(data.data.length > 0){        
-            setUsers(users.concat(data.data));
-            // if(userPage === 0){
+          if (data.data.length > 0) {
+            setUsers(oldUsers => {
+              return [...oldUsers].concat(data.data);
+            });
+            // if (userPage === 0) {
             //   setUserId(data.data[0]._id);
             // }
           }
-          setUserPage(userPage + 1);
+          setUserPage(oldUserPage => {
+            return oldUserPage + 1;
+          });
         }
-      }).catch(e => {
-        console.error(e);
-        setAlert({
-          message: t("Data not found"),
-          severity: "error"
-        });
       });
     }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [managerId, userOffset]);
 
   const queryMessage = () => {
-    if(userId && userId !== ""){
+    if (userId && userId !== "") {
       // get messages
       let query = {};
-      let conditions = {};      
       let pageSize = 30;
-
       let s_query = {
         where: {},
         options: {}
@@ -232,46 +216,38 @@ export default function SupportPage() {
 
       query.query = JSON.stringify(s_query);
       console.log(query);
-      ApiService.v2().get(`messages/chatmessages/${managerId}/${userId}`, query).then(({data}) => {
-
-        if(data.code === "success"){
-          if(chatPage === 0){
+      ApiService.v2().get(`messages/chatmessages/${managerId}/${userId}`, query).then(({ data }) => {
+        if (data.code === "success") {
+          if (chatPage === 0) {
             setTimeout(() => {
               chatBoxRef.current.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
             }, 200);
           }
           console.log(data.data);
-          if(data.data.length < pageSize){
+          if (data.data.length < pageSize) {
             setIsMessageMore(false);
           }
-          if(data.data.length > 0){
+          if (data.data.length > 0) {
             setMessages(JSON.parse(
               JSON.stringify(messagesList.concat(data.data))).reverse());
             setMessagesList(messagesList.concat(data.data));
             setChatPage(chatPage + 1);
           }
         }
-      }).catch(e => {
-        console.error(e);
-        setAlert({
-          message: t("Data not found"),
-          severity: "error"
-        });
       });
     }
-
   };
 
   const getTimeStr = (startTime) => {
-    if(startTime){
+    if (startTime) {
       return timeAgo.format(startTime);
-    }else{
+    } else {
       return t("");
     }
-  }
+  };
 
   const handleUserItemClick = (selectedUserId, userIndex) => {
-    if(userId !== selectedUserId){
+    if (userId !== selectedUserId) {
       users[userIndex].unread = 0;
       setCategory(users[userIndex].category);
       console.log(users[userIndex].category);
@@ -283,10 +259,10 @@ export default function SupportPage() {
       setChatPage(0);
       setChatOffset(0);
     }
-  }
+  };
 
   const handleSubmit = () => {
-    if(userId !== ""){
+    if (userId !== "") {
       if (message.trim() === '' && selectedMedia === null) {
         setMessage('');
       } else {
@@ -316,44 +292,29 @@ export default function SupportPage() {
         // console.log(newMessage);
         socket.emit('admin_send', newMessage);
       }
-    }else{
-      setAlert({
-        message: t("Please select customer"),
-        severity: "error"
-      });
     }
   };
 
-  const receiveSocket = (socket) => {
-    socket.off("connect").on("connect", (data) => {
-      console.log('auto connect');
-    });
-
-    socket.off('id').on('id', (data) => {
-      console.log(`my id is ${data}`);      
-    });
-
+  const receiveSocket = React.useCallback((socket) => {
     socket.off('to_manager').on('to_manager', (data) => {
       console.log(data);
       // check if this is from a new user or not and also if this is from a currently reading user
       let usersLength = users.length;
       let isNew = true;
-      for(let i = 0; i < usersLength; i++){
+      for (let i = 0; i < usersLength; i++) {
         // if new message's sender is in list
         console.log(users[i]._id, data.sender);
-        if(users[i]._id === data.sender){
+        if (users[i]._id === data.sender) {
           isNew = false;
           // if it is currently viewing user's
-          if(userId === data.sender){
-
+          if (userId === data.sender) {
             // reset messages
-            ApiService.v2().get(`messages/reset/${data._id}`).then(({data}) => {
-              if(data.code === "success"){
+            ApiService.v2().get(`messages/reset/${data._id}`).then(({ data }) => {
+              if (data.code === "success") {
                 // reset messages ok
                 console.log(data.data)
               }
             });
-
             // just add message
             let messageData = {
               _id: data.sender,
@@ -367,40 +328,37 @@ export default function SupportPage() {
             setChatOffset(chatOffset + 1);
             setTimeout(() => {
               chatBoxRef.current.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
-            }, 200);           
-            
+            }, 200);
             // update current user's category 
             const newUsers = [...users];
             newUsers[i].category = data.category;
             setUsers(newUsers);
-
           } else {
-            const userItem = users.splice(i, 1)[0];            
+            const userItem = users.splice(i, 1)[0];
             userItem.unread = userItem.unread + 1;
-            userItem.message = data.message !== "" ? data.message: t('Image Arrived');
+            userItem.message = data.message !== "" ? data.message : t('Image Arrived');
             userItem.category = data.category;
             // users.unshift(userItem);
             console.log(users);
-            setUsers([ userItem, ...users ]);            
+            setUsers([userItem, ...users]);
           }
-
           break;
         }
       }
-      if(isNew){
+      if (isNew) {
         setUsers([{
           _id: data.sender,
           senderName: data.senderName,
           senderImg: data.senderImg,
           createdAt: data.createdAt,
           userNo: data.userNo,
-          message: data.message ? data.message: t('Image arrived'),
+          message: data.message ? data.message : t('Image arrived'),
           unread: 1
         }, ...users]);
         setUserOffset(userOffset + 1);
       }
     })
-  }
+  }, [t, userId, users, userOffset, chatOffset, messages, messagesList]);
 
   const handleUploadClick = (event) => {
     if (event.target.files && event.target.files[0]) {
@@ -416,7 +374,7 @@ export default function SupportPage() {
   const onClearImage = () => {
     setSelectedFile("");
     setMedia(null);
-  }
+  };
 
   // const getWelcomeMessage = () => {
   //   ApiService.v2().get(`setting`).then(({data}) => {
@@ -426,8 +384,8 @@ export default function SupportPage() {
 
   React.useEffect(() => {
     const token = Auth.getAuthToken();
-    ApiAuthService.getCurrentUser(token).then(({data}) => {
-      if(data && data.code === "success"){
+    ApiAuthService.getCurrentUser(token).then(({ data }) => {
+      if (data && data.code === "success") {
         setManagerId(data.data._id);
         setManagerName(data.data.username);
         setManagerImg(data.data.profileImg);
@@ -440,38 +398,38 @@ export default function SupportPage() {
         queryUser();
       }
     });
-  }, []);
+  }, [queryUser]);
 
   React.useEffect(() => {
-    if(socket){
-      receiveSocket(socket);    
+    if (socket) {
+      receiveSocket(socket);
     }
-  }, [users, userId, messagesList]);
+  }, [receiveSocket]);
 
-  const handleCancel = () => {
-    setSettingVisible(false);
-  }
+  // const handleCancel = () => {
+  //   setSettingVisible(false);
+  // }
 
-  const handleChangeMessage = () => {
-    console.log(this.welcomeMessage);
-  }
+  // const handleChangeMessage = () => {
+  //   console.log(this.welcomeMessage);
+  // }
 
-  const handleWelcomeMessageChange = ({target}) => {
-    const str = target.value;
-    setWelcomeMessage(target.value);
-  }
+  // const handleWelcomeMessageChange = ({ target }) => {
+  //   const str = target.value;
+  //   setWelcomeMessage(target.value);
+  // }
 
   const getCategoryName = (curCategory) => {
-    if(curCategory === "problem"){
+    if (curCategory === "problem") {
       return t("Product / Delivery problems");
-    }else if(curCategory === "order"){
+    } else if (curCategory === "order") {
       return t("Change or Cancel Order");
-    }else if(curCategory === "support"){
+    } else if (curCategory === "support") {
       return t("Technical Support");
-    }else{
+    } else {
       return t("Other");
     }
-  }
+  };
 
   // const download = (fileUrl) => {
   //   console.log(fileUrl)
@@ -494,7 +452,7 @@ export default function SupportPage() {
       headers: {}
     })
       .then(response => {
-        response.arrayBuffer().then(function(buffer) {
+        response.arrayBuffer().then(function (buffer) {
           const url = window.URL.createObjectURL(new Blob([buffer]));
           const link = document.createElement("a");
           link.href = url;
@@ -553,17 +511,17 @@ export default function SupportPage() {
                               <ListItemAvatar>
                                 <Badge
                                   color="secondary"
-                                  badgeContent={ user.unread }
+                                  badgeContent={user.unread}
                                   overlap="circle"
                                 >
-                                  { user.senderImg === "" 
+                                  {user.senderImg === ""
                                     ? <Avatar><Person /></Avatar>
-                                    : <Avatar alt = {user.senderName} src = {user.senderImg}/>
-                                  }                                  
+                                    : <Avatar alt={user.senderName} src={user.senderImg} />
+                                  }
                                 </Badge>
                               </ListItemAvatar>
                               <ListItemText
-                                primary={user.senderName ? user.senderName : `${t("User")} ${user.userNo}` + `   (${getCategoryName(user.category)})`}
+                                primary={user.senderName ? user.senderName : `${t("User")} ${user.userNo} (${getCategoryName(user.category)})`}
                                 secondary={
                                   <Typography
                                     noWrap={true}
@@ -571,18 +529,18 @@ export default function SupportPage() {
                                     color="textSecondary"
                                     className={classes.content}
                                   >
-                                    { user.message }                                    
+                                    {user.message}
                                   </Typography>
                                 }
                               />
-                              <ListItemSecondaryAction>                                  
+                              <ListItemSecondaryAction>
                                 <Typography
                                   component="span"
                                   variant="caption"
                                   color="textPrimary"
                                 >
-                                  { getTimeStr(user.createdAt) }
-                                </Typography>                                
+                                  {getTimeStr(user.createdAt)}
+                                </Typography>
                               </ListItemSecondaryAction>
                             </ListItem>
                             <Divider variant="inset" />
@@ -629,9 +587,9 @@ export default function SupportPage() {
                                 alignItems="flex-start"
                               >
                                 <ListItemAvatar>
-                                  { messageItem.senderImg === "" 
+                                  {messageItem.senderImg === ""
                                     ? <Avatar><Person /></Avatar>
-                                    : <Avatar alt = {messageItem.senderName} src = {messageItem.senderImg}/>
+                                    : <Avatar alt={messageItem.senderName} src={messageItem.senderImg} />
                                   }
                                 </ListItemAvatar>
                                 <ListItemText
@@ -645,12 +603,12 @@ export default function SupportPage() {
                                         variant="body1"
                                         color="textPrimary"
                                       >
-                                        { messageItem.image && 
-                                          <Tooltip title = {t("You can download this image")}>
-                                            <img className={classes.chatImage} src={messageItem.image} onClick={(e) => download(e)} />
+                                        {messageItem.image &&
+                                          <Tooltip title={t("You can download this image")}>
+                                            <img className={classes.chatImage} src={messageItem.image} alt="chat" onClick={(e) => download(e)} />
                                           </Tooltip>
                                         }
-                                        { messageItem.message}
+                                        {messageItem.message}
                                       </Typography>
                                     </span>
                                   }
@@ -673,8 +631,8 @@ export default function SupportPage() {
                                         component="span"
                                         variant="body1"
                                       >
-                                        { messageItem.image && 
-                                          <img className={classes.chatImage} src={messageItem.image} />
+                                        {messageItem.image &&
+                                          <img className={classes.chatImage} src={messageItem.image} alt="chat" />
                                         }
                                         {messageItem.message}
                                       </Typography>
@@ -683,8 +641,8 @@ export default function SupportPage() {
                                 />
                                 <ListItemAvatar>
                                   <Avatar
-                                    className = {classes.chatBoxAvatarRight}
-                                    src = {messageItem.senderImg}
+                                    className={classes.chatBoxAvatarRight}
+                                    src={messageItem.senderImg}
                                   />
                                 </ListItemAvatar>
                               </ListItem>
@@ -698,10 +656,10 @@ export default function SupportPage() {
               </GridContainer>
               <GridContainer>
                 <GridItem xs={12}>
-                  { selectedMedia && 
+                  {selectedMedia &&
                     <div className={classes.imageContainer}
                     >
-                      <IconButton 
+                      <IconButton
                         color="primary"
                         aria-label="close"
                         component="span"
@@ -709,8 +667,8 @@ export default function SupportPage() {
                         onClick={() => onClearImage()}
                       >
                         <Clear />
-                      </IconButton>                  
-                      <img src={selectedFile} className={classes.sendImage} />
+                      </IconButton>
+                      <img src={selectedFile} className={classes.sendImage} alt="chat" />
                     </div>
                   }
                   <div
@@ -768,11 +726,11 @@ export default function SupportPage() {
                     >
                       <Settings />
                     </IconButton> */}
-                    <Dialog open={settingVisible} onClose={handleCancel} aria-labelledby="form-dialog-title">
+                    {/* <Dialog open={settingVisible} onClose={handleCancel} aria-labelledby="form-dialog-title">
                       <DialogTitle id="form-dialog-title">{t('Welcome Message Setting')}</DialogTitle>
                       <DialogContent>
                         <DialogContentText>
-                          { t('You can set the welcome message that will appear in the inquiry form of customer service page.') }
+                          {t('You can set the welcome message that will appear in the inquiry form of customer service page.')}
                         </DialogContentText>
                         <TextField
                           autoFocus
@@ -786,13 +744,13 @@ export default function SupportPage() {
                       </DialogContent>
                       <DialogActions>
                         <Button onClick={handleCancel} color="primary">
-                          { t('Cancel') }
+                          {t('Cancel')}
                         </Button>
                         <Button onClick={handleChangeMessage} color="primary">
-                          { t('Save') }
+                          {t('Save')}
                         </Button>
                       </DialogActions>
-                    </Dialog>
+                    </Dialog> */}
                   </div>
                   <InputBase
                     inputRef={chatInputRef}
