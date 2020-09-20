@@ -1,5 +1,6 @@
-export const signIn = () => ({
-  type: "SIGN_IN"
+export const signIn = payload => ({
+  type: "SIGN_IN",
+  payload
 });
 
 export const signOut = () => ({

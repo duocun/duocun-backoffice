@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
@@ -364,14 +364,19 @@ const ProductQuantitySchedule = ({ productId, productQuantity, days = 7 }) => {
   const { t } = useTranslation();
   const [orders, setOrders] = useState([]);
   const [dates] = useState(getDateRangeStrings(days));
-  useEffect(() => {
+  
+  const getDelivers = useCallback(() => {
     ApiProductService.getProductDeliveries(productId).then(async ({ data }) => {
       moment.locale("zh-cn");
       if (data.code && data.code === "success") {
         setOrders(data.data);
       }
     });
-  }, []);
+  }, [productId]);
+
+  useEffect(() => {
+    getDelivers();
+  }, [getDelivers]);
 
   return (
     <Card>
@@ -429,7 +434,7 @@ const EditProduct = ({ match, history }) => {
     });
   };
 
-  const updatePage = () => {
+  const updatePage = useCallback(() => {
     ApiProductService.getProduct(match.params.id)
       .then(async ({ data }) => {
         if (data.code === "success") {
@@ -459,7 +464,7 @@ const EditProduct = ({ match, history }) => {
       .finally(() => {
         setLoading(false);
       });
-  };
+  }, [t, match.params.id, model]); // match.params.id, model, t
 
   const uploadPicture = picture => {
     let file = picture;
@@ -480,7 +485,7 @@ const EditProduct = ({ match, history }) => {
     });
   };
 
-  const saveModel = () => {
+  const saveModel = useCallback(() => {
     removeAlert();
     setProcessing(true);
     ApiProductService.saveProduct(model)
@@ -504,7 +509,6 @@ const EditProduct = ({ match, history }) => {
             severity: "error"
           });
         }
-        setProcessing(false);
       })
       .catch(e => {
         console.error(e);
@@ -512,9 +516,11 @@ const EditProduct = ({ match, history }) => {
           message: t("Save failed"),
           severity: "error"
         });
+      })
+      .finally(() => {
         setProcessing(false);
       });
-  };
+  }, [model, history,t, updatePage]);
 
   useEffect(() => {
     setLoading(true);
@@ -702,7 +708,7 @@ const EditProduct = ({ match, history }) => {
                             inputProps={{
                               value: model.rank,
                               onChange: e => {
-                                setModel({ ...model, rank: e.target.value });
+                                setModel({ ...model, rank: Number(e.target.value) });
                               }
                             }}
                           />
@@ -983,7 +989,7 @@ const EditProduct = ({ match, history }) => {
               </GridItem>
               <GridItem xs={12} container direction="row-reverse">
                 <Box mt={2}>
-                  <Button variant="contained" href="products">
+                  <Button variant="contained" onClick={() => history.goBack()}>
                     <FormatListBulletedIcon />
                     {t("Back")}
                   </Button>

@@ -1,5 +1,6 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import Avatar from "@material-ui/core/Avatar";
@@ -39,20 +40,20 @@ const useStyles = makeStyles(theme => ({
 const Login = ({ signIn, history, isAuthorized }) => {
   const classes = useStyles();
   const { t } = useTranslation();
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [failed, setFailed] = useState(false);
 
-  const handleLogin = () => {
-    ApiAuthService.login(username, password)
+  const handleLogin = useCallback(() => {
+    ApiAuthService.login(email, password)
       .then(({ data }) => {
-        if (data.code === 'success') {
-          const tokenId = data.data;
+        if (data.code === "success") {
+          const tokenId = data.token;
           ApiAuthService.getCurrentUser(tokenId).then(({ data }) => {
             const account = data;
             if (AuthService.isAuthorized(account)) {
               AuthService.login(tokenId);
-              signIn();
+              signIn({ data: account });
               history.push("/admin/dashboard");
             } else {
               if (isAuthorized) {
@@ -69,7 +70,8 @@ const Login = ({ signIn, history, isAuthorized }) => {
         console.error(e);
         setFailed(true);
       });
-  };
+  }, [email, password, history, isAuthorized, signIn]);
+
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -91,11 +93,11 @@ const Login = ({ signIn, history, isAuthorized }) => {
             margin="normal"
             required
             fullWidth
-            id="username"
-            label={t("Username")}
-            name="username"
+            id="email"
+            label={t("Email")}
+            name="email"
             autoFocus
-            onChange={e => setUsername(e.target.value)}
+            onChange={e => setEmail(e.target.value)}
           />
           <TextField
             variant="outlined"
@@ -109,6 +111,7 @@ const Login = ({ signIn, history, isAuthorized }) => {
             autoComplete="current-password"
             onChange={e => setPassword(e.target.value)}
           />
+          <Link to="/forgot-password">{t("Forgot password?")}</Link>
           <Button
             type="button"
             fullWidth
@@ -133,12 +136,13 @@ Login.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  isAuthorized: state.isAuthorized
+  isAuthorized: state.isAuthorized,
+  user: state.user
 });
 
 const mapDispatchToProps = dispatch => ({
   signIn: () => dispatch(signIn()),
-  signOut: () => dispatch(signOut()),
+  signOut: () => dispatch(signOut())
 });
 
 export default connect(

@@ -1,19 +1,14 @@
-import React, {useEffect} from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 // react plugin for creating charts
 import ChartistGraph from "react-chartist";
 // @material-ui/core
 import { makeStyles } from "@material-ui/core/styles";
 import Icon from "@material-ui/core/Icon";
-// @material-ui/icons
-import IconButton from "@material-ui/core/IconButton";
-import AccountBoxOutlinedIcon from '@material-ui/icons/AccountBoxOutlined';
-import * as moment from 'moment';
-import {connect} from 'react-redux';
-
+import * as moment from "moment";
+import { connect } from "react-redux";
 
 import Store from "@material-ui/icons/Store";
-import Warning from "@material-ui/icons/Warning";
 import DateRange from "@material-ui/icons/DateRange";
 import LocalOffer from "@material-ui/icons/LocalOffer";
 import Update from "@material-ui/icons/Update";
@@ -29,7 +24,6 @@ import GridContainer from "components/Grid/GridContainer.js";
 import Table from "components/Table/Table.js";
 import Tasks from "components/Tasks/Tasks.js";
 import CustomTabs from "components/CustomTabs/CustomTabs.js";
-import Danger from "components/Typography/Danger.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardIcon from "components/Card/CardIcon.js";
@@ -46,35 +40,37 @@ import {
 
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
 
-
-import { loadStatisticsSummaryAsync } from 'redux/actions/statistics';
+import { loadStatisticsSummaryAsync } from "redux/actions/statistics";
 
 const useStyles = makeStyles(styles);
 
-const Dashboard = ({summary, loadStatisticsSummary, history}) => {
+const Dashboard = ({ summary, loadStatisticsSummary, history }) => {
   const classes = useStyles();
 
   useEffect(() => {
-    const startDate = moment().format('YYYY-MM-DD');
-    const endDate = moment().format('YYYY-MM-DD');
+    const startDate = moment().format("YYYY-MM-DD");
+    const endDate = moment().format("YYYY-MM-DD");
     loadStatisticsSummary(startDate, endDate);
-  }, []);
+  }, [loadStatisticsSummary]);
 
   return (
     <div>
       <GridContainer>
         <GridItem xs={12} sm={6} md={3}>
           <Card>
-            <CardHeader color="warning" stats icon onClick={()=>{history.push("/dashboard/order-summary")}}>
+            <CardHeader
+              color="warning"
+              stats
+              icon
+              onClick={() => {
+                history.push("/dashboard/order-summary");
+              }}
+            >
               <CardIcon color="warning">
                 <Icon>content_copy</Icon>
               </CardIcon>
-              <p className={classes.cardCategory}>
-                Orders
-              </p>
-              <h3 className={classes.cardTitle}>
-                {summary.nOrders}
-              </h3>
+              <p className={classes.cardCategory}>Orders</p>
+              <h3 className={classes.cardTitle}>{summary.nOrders}</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -94,13 +90,18 @@ const Dashboard = ({summary, loadStatisticsSummary, history}) => {
         </GridItem>
         <GridItem xs={12} sm={6} md={3}>
           <Card>
-            <CardHeader color="success" stats icon onClick={()=>{history.push("/dashboard/sales")}}>
+            <CardHeader
+              color="success"
+              stats
+              icon
+              onClick={() => {
+                history.push("/dashboard/sales");
+              }}
+            >
               <CardIcon color="success">
                 <Store />
               </CardIcon>
-              <p className={classes.cardCategory}>
-                Sales
-              </p>
+              <p className={classes.cardCategory}>Sales</p>
               <h3 className={classes.cardTitle}>
                 <span>${summary.totalPrice}</span>
               </h3>
@@ -115,8 +116,8 @@ const Dashboard = ({summary, loadStatisticsSummary, history}) => {
         </GridItem>
         <GridItem xs={12} sm={6} md={3}>
           <Card>
-          {/* onClick={()=>{history.push("/dashboard/pickup/all")} */}
-            <CardHeader color="danger" stats icon >
+            {/* onClick={()=>{history.push("/dashboard/pickup/all")} */}
+            <CardHeader color="danger" stats icon>
               <CardIcon color="danger">
                 <Icon>info_outline</Icon>
               </CardIcon>
@@ -140,8 +141,8 @@ const Dashboard = ({summary, loadStatisticsSummary, history}) => {
                 <Accessibility />
               </CardIcon>
               <Link to="/dashboard/salary">
-              <p className={classes.cardCategory}>Salary</p>
-              <h3 className={classes.cardTitle}>+245</h3>
+                <p className={classes.cardCategory}>Salary</p>
+                <h3 className={classes.cardTitle}>+245</h3>
               </Link>
             </CardHeader>
             <CardFooter stats>
@@ -156,7 +157,12 @@ const Dashboard = ({summary, loadStatisticsSummary, history}) => {
       <GridContainer>
         <GridItem xs={12} sm={12} md={4}>
           <Card chart>
-            <CardHeader color="success" onClick={()=>{history.push("/dashboard/order-analytics")}}>
+            <CardHeader
+              color="success"
+              onClick={() => {
+                history.push("/dashboard/order-analytics");
+              }}
+            >
               <ChartistGraph
                 className="ct-chart"
                 data={dailySalesChart.data}
@@ -183,7 +189,12 @@ const Dashboard = ({summary, loadStatisticsSummary, history}) => {
         </GridItem>
         <GridItem xs={12} sm={12} md={4}>
           <Card chart>
-            <CardHeader color="warning" onClick={()=>{history.push("/dashboard/product-analytics")}}>
+            <CardHeader
+              color="warning"
+              onClick={() => {
+                history.push("/dashboard/product-analytics");
+              }}
+            >
               <ChartistGraph
                 className="ct-chart"
                 data={emailsSubscriptionChart.data}
@@ -294,14 +305,13 @@ const Dashboard = ({summary, loadStatisticsSummary, history}) => {
       </GridContainer>
     </div>
   );
-}
+};
 
-
-const mapStateToProps = (state) => ({ summary: state.statisticsSummary });
-const mapDispatchToProps = (dispatch) => ({
+const mapStateToProps = state => ({ summary: state.statisticsSummary });
+const mapDispatchToProps = dispatch => ({
   loadStatisticsSummary: (startDate, endDate) => {
     dispatch(loadStatisticsSummaryAsync(startDate, endDate));
-  },
+  }
 });
 export default connect(
   mapStateToProps,

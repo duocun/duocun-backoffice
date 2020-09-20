@@ -6,3 +6,7 @@ table.dc-table {
 .dc-full, .dc-full-select, .dc-full-textarea{
   width: 100%
 }
+.MuiCard-root h4 {
+  margin-top: 7px;
+  margin-bottom: 7px;
+}

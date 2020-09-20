@@ -1,5 +1,5 @@
 import ApiService from "services/api/ApiService";
-import { buildPaginationQuery } from "helper/index";
+// import { buildPaginationQuery } from "helper/index";
 export default {
   getDriverList: () => {
     // let query = {};
@@ -14,5 +14,5 @@ export default {
     //   []
     // );
     return ApiService.v2().get("drivers");
-  },
+  }
 };

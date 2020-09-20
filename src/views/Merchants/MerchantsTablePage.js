@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 
@@ -12,13 +12,11 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 import TablePagination from "components/Table/TablePagniation.js";
-import TableSortLabel from "@material-ui/core/TableSortLabel";
 import Searchbar from "components/Searchbar/Searchbar";
 
 import ApiMerchantService from "services/api/ApiMerchantService";
 import { getQueryParam } from "helper/index";
-import MerchantsTable from './MerchantsTable';
-
+import MerchantsTable from "./MerchantsTable";
 
 export default function MerchantsTablePage({ location }) {
   const { t } = useTranslation();
@@ -35,11 +33,8 @@ export default function MerchantsTablePage({ location }) {
   const [query, setQuery] = useState(getQueryParam(location, "search") || "");
   const [sort, setSort] = useState(["_id", 1]);
 
-  useEffect(() => {
-    updateData();
-  }, [page, rowsPerPage, sort]);
 
-  const updateData = () => {
+  const updateData = useCallback(() => {
     ApiMerchantService.getMerchantList(page, rowsPerPage, query, [sort]).then(
       ({ data }) => {
         setMerchants(data.data);
@@ -47,7 +42,12 @@ export default function MerchantsTablePage({ location }) {
         setLoading(false);
       }
     );
-  };
+  },[page, query, rowsPerPage, sort]);
+
+  useEffect(() => {
+    updateData();
+  }, [page, rowsPerPage, sort, updateData]);
+
   const toggleSort = fieldName => {
     // sort only one field
     if (sort && sort[0] === fieldName) {
@@ -98,9 +98,14 @@ export default function MerchantsTablePage({ location }) {
             <CardBody>
               <GridContainer>
                 <GridItem xs={12}>
-                  {
-                    MerchantsTable({merchants, toggleSort, rowsPerPage, sort, page, loading})
-                  }
+                  {MerchantsTable({
+                    merchants,
+                    toggleSort,
+                    rowsPerPage,
+                    sort,
+                    page,
+                    loading
+                  })}
                 </GridItem>
               </GridContainer>
             </CardBody>

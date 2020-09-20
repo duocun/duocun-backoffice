@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-// import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
-import * as moment from 'moment';
+import * as moment from "moment";
 import { KeyboardDatePicker } from "@material-ui/pickers";
-// import {useForm} from "react-hook-form";
-// import TimePicker from "components/TimePicker/TimePicker";
 
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
@@ -20,56 +17,42 @@ import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 
-// import FormLabel from "@material-ui/core/FormLabel";
-// import FormGroup from "@material-ui/core/FormGroup";
 import FormControl from "@material-ui/core/FormControl";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Checkbox from "@material-ui/core/Checkbox";
 import Select from "@material-ui/core/Select";
 
-// import Skeleton from "@material-ui/lab/Skeleton";
 import Alert from "@material-ui/lab/Alert";
-// import CustomInput from "components/CustomInput/CustomInput";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import Button from "@material-ui/core/Button";
-// import IconButton from "@material-ui/core/IconButton";
 
 // icons
 import FormatListBulletedIcon from "@material-ui/icons/FormatListBulleted";
 import SaveIcon from "@material-ui/icons/Save";
-import HistoryIcon from '@material-ui/icons/History';
+import HistoryIcon from "@material-ui/icons/History";
 
 import FlashStorage from "services/FlashStorage";
-
 
 import AccountSearch from "components/AccountSearch/AccountSearch";
 import AddressSearch from "components/AddressSearch/AddressSearch";
 import OrderItemEditor from "views/Orders/OrderItemEditor";
 
 import AuthService from "services/AuthService";
-import ApiAuthService from 'services/api/ApiAuthService';
-import ApiAccountService from 'services/api/ApiAccountService';
-import ApiOrderService from 'services/api/ApiOrderService';
+import ApiAuthService from "services/api/ApiAuthService";
+import ApiAccountService from "services/api/ApiAccountService";
+import ApiOrderService from "services/api/ApiOrderService";
 import ApiMerchantService from "services/api/ApiMerchantService";
 
+import { selectOrder, setDeliverDate } from "redux/actions/order";
+import { setAccount } from "redux/actions/account";
 
-// import { Save as SaveIcon, FormatListBulleted as FormatListBulletedIcon } from "@material-ui/icons";
-// import { TextField, Button, Checkbox,
-//     Select, MenuItem, InputLabel, FormControl, FormControlLabel } from "@material-ui/core";
-
-import { selectOrder, setDeliverDate } from 'redux/actions/order';
-import { setAccount } from 'redux/actions/account';
-// import ApiAccountService from "services/api/ApiAccountService";
-
-const useStyles = makeStyles(() => ({
-
-}));
+const useStyles = makeStyles(() => ({}));
 
 const FormMode = {
-  NEW: 'new',
-  EDIT: 'edit',
-  CLONE: 'clone'
+  NEW: "new",
+  EDIT: "edit",
+  CLONE: "clone"
 };
 
 const defaultOrdersModel = {
@@ -85,21 +68,23 @@ const defaultOrdersModel = {
   created: "",
   type: "",
   actionCode: ""
-}
+};
 
 /**
  * props --- None
  * redux --- order, account, deliverDate
  */
-const OrderFormPage = ({ match, order, onAfterUpdate, history }) => {
+const OrderFormPage = ({ match, order, history }) => {
   const { t } = useTranslation();
   const classes = useStyles();
-  const [modifyByAccount, setModifyByAccount] = useState({ _id: '', username: '' });
+  const [modifyByAccount, setModifyByAccount] = useState({
+    _id: "",
+    username: ""
+  });
   // const [accounts, setAccounts] = useState([]);
   const [merchants, setMerchants] = useState([]);
   const [model, setModel] = useState(defaultOrdersModel);
   const [itemMap, setItemMap] = useState({});
-  const [drivers, setDriverList] = useState([]);
   const [productMap, setCheckMap] = useState({});
   const [driverKeyword, setDriverKeyword] = useState("");
   const [processing, setProcessing] = useState(false);
@@ -122,11 +107,12 @@ const OrderFormPage = ({ match, order, onAfterUpdate, history }) => {
     });
   }, []);
 
-
   useEffect(() => {
-    ApiMerchantService.getMerchants({ type: 'G', status: 'A' }).then(({ data }) => {
-      setMerchants(data.data);
-    });
+    ApiMerchantService.getMerchants({ type: "G", status: "A" }).then(
+      ({ data }) => {
+        setMerchants(data.data);
+      }
+    );
   }, []);
 
   // useEffect(() => {
@@ -136,19 +122,19 @@ const OrderFormPage = ({ match, order, onAfterUpdate, history }) => {
   // }, []);
 
   useEffect(() => {
-    ApiAccountService.getAccounts({ type: 'driver', status: 'A' }).then((d) => {
-      const staffs = d.data.data;
-      setDriverList(staffs);
-    });
-  }, []);
-
-  useEffect(() => {
     if (match.params && match.params.id === FormMode.NEW) {
       // setModel(cloned);
     } else if (match.params && match.params.id === FormMode.CLONE) {
-      let cloned = { ...order, price: 0, cost: 0, tax: 0, total: 0, _id: FormMode.CLONE };
+      let cloned = {
+        ...order,
+        price: 0,
+        cost: 0,
+        tax: 0,
+        total: 0,
+        _id: FormMode.CLONE
+      };
       setCheckMap(getCheckMap(cloned));
-      setDriverKeyword(cloned? cloned.driverName: '');
+      setDriverKeyword(cloned ? cloned.driverName : "");
       setModel({
         ...cloned,
         modifyBy: modifyByAccount._id
@@ -158,58 +144,31 @@ const OrderFormPage = ({ match, order, onAfterUpdate, history }) => {
       ApiOrderService.getOrder(orderId).then(({ data }) => {
         const order = data.data;
         setCheckMap(getCheckMap(order));
-        setDriverKeyword(order? order.driverName: '');
+        setDriverKeyword(order ? order.driverName : "");
         setModel({
           ...order,
           modifyBy: modifyByAccount._id
         });
       });
     }
-  }, []);
+  }, [match.params, modifyByAccount._id, order]);
 
-  const getCheckMap = (model) => {
+  const getCheckMap = model => {
     if (model.items && model.items.length > 0) {
       const checkMap = {};
       model.items.forEach(it => {
         checkMap[it.productId] = { ...it, status: false };
       });
-      return checkMap;// setCheckMap(checkMap);
-    }else{
+      return checkMap; // setCheckMap(checkMap);
+    } else {
       return {};
     }
-  }
-
-  // useEffect(() => {
-  //   // set products for remove products function
-  //   if (model) {
-  //     if (model.items && model.items.length > 0) {
-  //       const checkMap = {};
-  //       model.items.forEach(it => {
-  //         checkMap[it.productId] = { ...it, status: false };
-  //       });
-  //       setCheckMap(checkMap);
-  //     }
-
-  //     // set model for save function
-  //     if (model.actionCode === 'PS') {
-  //       setModel({
-  //         ...model,
-  //         modifyBy: modifyByAccount._id
-  //       });
-  //     } else {
-  //       setModel({ ...model, modifyBy: modifyByAccount._id });
-  //     }
-  //   } else {
-
-  //   }
-  // }, [model]);
-
-
+  };
 
   const handleCreate = () => {
-    if (model._id === 'clone') {
+    if (model._id === "clone") {
       const vs = Object.values(itemMap);
-      const items = vs.filter(v => v._id !== 'new');
+      const items = vs.filter(v => v._id !== "new");
 
       if (model.clientId && items && items.length > 0) {
         let d = { ...model, items };
@@ -218,476 +177,415 @@ const OrderFormPage = ({ match, order, onAfterUpdate, history }) => {
 
         removeAlert();
         setProcessing(true);
-        ApiOrderService.createOrder(d).then(({ data }) => {
-          if (data.code === 'success') {
-            const newAlert = {
-              message: t("Saved successfully"),
-              severity: "success"
-            };
-            if (model._id === "new") {
-              FlashStorage.set("ORDER_ALERT", newAlert);
-              return;
+        ApiOrderService.createOrder(d)
+          .then(({ data }) => {
+            if (data.code === "success") {
+              const newAlert = {
+                message: t("Saved successfully"),
+                severity: "success"
+              };
+              if (model._id === "new") {
+                FlashStorage.set("ORDER_ALERT", newAlert);
+                return;
+              } else {
+                setAlert(newAlert);
+              }
             } else {
-              setAlert(newAlert);
-              onAfterUpdate();
+              setAlert({
+                message: t("Save failed"),
+                severity: "error"
+              });
             }
-          } else {
+            setProcessing(false);
+          })
+          .catch(e => {
+            console.error(e);
             setAlert({
               message: t("Save failed"),
               severity: "error"
             });
-          }
-          setProcessing(false);
-        }).catch(e => {
-          console.error(e);
-          setAlert({
-            message: t("Save failed"),
-            severity: "error"
+            setProcessing(false);
           });
-          setProcessing(false);
-        });
       }
     }
   };
 
   const handleUpdate = () => {
-    if (model._id !== 'new' && model._id !== 'clone' && modifyByAccount._id) {
+    if (model._id !== "new" && model._id !== "clone" && modifyByAccount._id) {
       removeAlert();
       setProcessing(true);
-      setModel({ ...model, modifyBy: modifyByAccount._id })
-      ApiOrderService.updateOrder(model).then(({ data }) => {
-        if (data.code === 'success') {
-          setAlert({
-            message: t("Update successfully"),
-            severity: "success"
-          });
-          onAfterUpdate();
-        } else {
+      setModel({ ...model, modifyBy: modifyByAccount._id });
+
+
+      ApiOrderService.updateOrder(model)
+        .then(({ data }) => {
+          if (data.code === "success") {
+            setAlert({
+              message: t("Update successfully"),
+              severity: "success"
+            });
+          } else {
+            setAlert({
+              message: t("Update failed"),
+              severity: "error"
+            });
+          }
+          setProcessing(false);
+        })
+        .catch(e => {
+          console.error(e);
           setAlert({
             message: t("Update failed"),
             severity: "error"
           });
-        }
-        setProcessing(false);
-      }).catch(e => {
-        console.error(e);
-        setAlert({
-          message: t("Update failed"),
-          severity: "error"
+          setProcessing(false);
         });
-        setProcessing(false);
-      });
     }
-  }
+  };
 
   const canSplit = () => {
     const vs = Object.keys(productMap).map(pId => productMap[pId]);
     const checked = vs.filter(v => v.status);
     const unchecked = vs.filter(v => !v.status);
-    return (checked.length > 0 && unchecked.length > 0);
-  }
+    return checked.length > 0 && unchecked.length > 0;
+  };
 
   const handleSplitOrder = () => {
     const vs = Object.keys(productMap).map(pId => productMap[pId]);
     const checked = vs.filter(v => v.status);
     // const unchecked = vs.filter(v => !v.status);
     if (canSplit()) {
-      const r = window.confirm('拆分送货单, 为选中的商品新建一个送货单。');
+      const r = window.confirm("拆分送货单, 为选中的商品新建一个送货单。");
       if (r) {
         ApiOrderService.splitOrder(model._id, checked).then(({ data }) => {
-          const r = data;
           updateFormData(model._id);
         });
       }
     }
-  }
-
-  // location --- ILocation
-  const getAddrString = (location) => {
-    if (location) {
-      const city = location.subLocality ? location.subLocality : location.city;
-      const province = location.province;
-      const streetName = location.streetName;
-      return location.streetNumber + ' ' + streetName + ', ' + city + ', ' + province;
-    } else {
-      return '';
-    }
-  }
+  };
 
   const handleSubmit = () => {
-    if (model._id && model._id !== 'new' && model._id !== 'clone') {
+    if (model._id && model._id !== "new" && model._id !== "clone") {
       handleUpdate();
     } else {
       handleCreate();
     }
-  }
+  };
   const handleToggleProduct = (e, it) => {
     const c = { ...productMap };
     c[it.productId].status = e.target.checked;
     setCheckMap(c);
-  }
+  };
 
-  const updateFormData = (id) => {
+  const updateFormData = id => {
     if (id) {
       ApiOrderService.getOrder(id).then(({ data }) => {
         const order = data.data;
         setModel(order);
       });
     }
-  }
+  };
 
-  const handleBack = () => {
-
-  }
-
-  const handleUpdateItemMap = (itemMap) => {
+  const handleUpdateItemMap = itemMap => {
     setItemMap(itemMap);
     const vs = Object.values(itemMap);
-    const items = vs.filter(v => v._id !== 'new');
+    const items = vs.filter(v => v._id !== "new");
     const charge = ApiOrderService.getChargeFromOrderItems(items, 0);
     setModel({ ...model, ...charge, items });
-  }
+  };
 
-  const handleSelectDeliverLocation = (location) => {
+  const handleSelectDeliverLocation = location => {
     setModel({ ...model, location });
-  }
+  };
 
-  const handleDeliverDateChange = (m) => {
-    const deliverDate = m.toISOString().split('T')[0];
-    setModel({ ...model, deliverDate, delivered: `${deliverDate}T15:00:00.000Z` });
-  }
-
-  const handleSelectProduct = (item) => {
-    setModel({ ...model, items: [item] });
-  }
-
-  const handleDriverChange = (e) => {
-    const driverId = e.target.value;
-    const driver = drivers.find(d => d._id === driverId);
+  const handleDeliverDateChange = m => {
+    const deliverDate = m.toISOString().split("T")[0];
     setModel({
       ...model,
-      driverId: e.target.value,
-      driverName: driver ? driver.username : ''
+      deliverDate,
+      delivered: `${deliverDate}T15:00:00.000Z`
     });
-  }
+  };
 
   const handleSelectDriver = account => {
-    // const type = account ? account.type : 'driver';
-    setDriverKeyword(account ? account.username : '');
+    setDriverKeyword(account ? account.username : "");
     setModel({
       ...model,
       driverId: account._id,
-      driverName: account ? account.username : ''
+      driverName: account ? account.username : ""
     });
-  }
+  };
 
   const handleClearDriver = () => {
     setDriverKeyword("");
-  }
+  };
 
   const handleSearchDriver = (page, rowsPerPage, keyword) => {
-    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword, ['driver']);
-  }
+    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword, [
+      "driver"
+    ]);
+  };
 
   const getTitle = () => {
-    if (model._id === 'new' || model._id === 'clone') {
-      return 'New Order';
+    if (model._id === "new" || model._id === "clone") {
+      return "New Order";
     } else {
-      return 'Edit Order';
+      return "Edit Order";
     }
-  }
+  };
 
   // const [alert, setAlert] = useState({ message: "", severity: "info" });
 
   //////////////////// For data fetch
-  const getOrderData = () => {
-
-  }
-
-  const updateData = () => {
-    // const qDeliverDate = deliverDate ? {deliverDate} : {};
-    // const keyword = query;
-    // const condition = {
-    //   $or: [
-    //     { clientName: { $regex: keyword }},
-    //     { clientPhone: { $regex: keyword }},
-    //     { code: { $regex: keyword }}
-    //   ],
-    //   status: {
-    //     $nin: [OrderStatus.BAD, OrderStatus.DELETED, OrderStatus.TEMP],
-    //   },
-    //   ...qDeliverDate
-    // };
-    // ApiOrderService.getOrders(page, rowsPerPage, condition, [sort]).then(
-    //   ({ data }) => {
-    //     setOrders(data.data);
-    //     setTotalRows(data.count);
-    //     setLoading(false);
-    //     if(data.data && data.data.length>0){
-    //       const d = data.data[0];
-    //       const _id = d.clientId ? d.clientId : '';
-    //       const username = d.clientName ? d.clientName: '';
-    //       setAccount({_id, username, type: 'client'});
-    //     }
-    //   }
-    // );
-  };
-
-  // const updateFormData = (id) => {
-  //   if(id){
-  //     ApiOrderService.getOrder(id).then(({data}) => {
-  //       const order = data.data;
-  //       setModel(order);
-  //     });
-  //   }
-  // }
-
-  // const handleAfterUpdate = () => {
-  //   updateFormData(model._id);
-  //   updateData();
-  // }
 
 
-  /////////////////// For render and events 
+  /////////////////// For render and events
 
   return (
-        <Card>
-          <CardHeader color="primary">
-            <GridContainer>
-              <GridItem xs={12} lg={6}>
-                <h4>{t(getTitle())}</h4>
-              </GridItem>
-            </GridContainer>
-          </CardHeader>
-          <CardBody>
-            <GridContainer>
-              {!!alert.message && (
-                <GridItem xs={12}>
-                  <Alert severity={alert.severity} onClose={removeAlert}>
-                    {alert.message}
-                  </Alert>
-                </GridItem>
-              )}
-              {
-                !(model._id === 'new' || model._id === 'clone') &&
-                <GridItem xs={12} md={4} lg={4}>
-                  <Box pb={2}>
-                    <TextField id="order-code"
-                      label={`${t("Code")}`}
-                      value={model.code}
-                      InputLabelProps={{ shrink: model.code ? true : false }}
-                      InputProps={{
-                        readOnly: true,
-                      }} />
-                  </Box>
-                </GridItem>
-              }
-              <GridItem xs={12} md={4} lg={4}>
-                <Box pb={2}>
-                  <TextField id="order-client"
-                    label={`${t("Client")}`}
-                    value={model.clientName ? model.clientName : ''}
-                    InputLabelProps={{ shrink: model.clientId ? true : false }}
-                    InputProps={{
-                      readOnly: true,
-                    }}
-                  />
-                </Box>
-              </GridItem>
-              <GridItem xs={12} md={4} lg={4}>
-                <Box pb={2}>
-                  <TextField id="order-client-phone"
-                    label={`${t("Client Phone")}`}
-                    value={model.clientPhone ? model.clientPhone : ''}
-                    InputLabelProps={{ shrink: model.clientPhone ? true : false }}
-                    onChange={e => {
-                      setModel({ ...model, clientPhone: e.target.value });
-                    }}
-                  />
-                </Box>
-              </GridItem>
-              <GridItem xs={12}  md={8} lg={8}>
-                <Box pb={2}>
-                  <AddressSearch
-                    label={'Deliver Address'}
-                    placeholder={'Search Address'}
-                    handleSelectLocation={handleSelectDeliverLocation}
-                    location={model.location}
-                  />
-                </Box>
-              </GridItem>
-
-              {
-                (model._id === "new" || model._id === "clone") &&
-                <GridItem xs={12} lg={6}>
-                  <Box pb={2}>
-                    <FormControl className={classes.select}>
-                      <InputLabel id="merchant-label">
-                        {t("Merchant")}
-                      </InputLabel>
-                      <Select
-                        id="merchant"
-                        labelId="merchant-label"
-                        value={model.merchantId}
-                        onChange={e => {
-                          setModel({
-                            ...model,
-                            merchantId: e.target.value
-                          });
-                        }}
-                      >
-                        {merchants.map(merchant => {
-                          return (
-                            <MenuItem
-                              key={merchant._id}
-                              value={merchant._id}
-                            >
-                              {merchant.name}
-                            </MenuItem>
-                          );
-                        })}
-                      </Select>
-                    </FormControl>
-                  </Box>
-                </GridItem>
-              }
-
-              {
-                (model._id === "new" || model._id === "clone") &&
-                <GridItem xs={12} lg={12}>
-                  <Box pb={2}>
-                    <OrderItemEditor merchantId={model.merchantId} onUpdateItemMap={handleUpdateItemMap} />
-                  </Box>
-                </GridItem>
-              }
-
-              {
-                !(model._id === 'new' || model._id === 'clone') &&
-                <GridItem xs={12} lg={12}>
-                  <Box pb={2}>
-                    {
-                      model.items && model.items.length > 0 &&
-                      model.items.map(it => <div key={it.productId}>
-                        <FormControlLabel
-                          control={<Checkbox checked={productMap[it.productId] ? productMap[it.productId].status : false}
-                            onChange={(e) => handleToggleProduct(e, it)}
-                            name={`${it.productId}`} />}
-                          label={`${it.productName} x ${it.quantity}`}
-                          color="primary"
-                        />
-                      </div>)
-                    }
-                    <Button
-                      color="primary"
-                      variant="contained"
-                      disabled={processing}
-                      onClick={handleSplitOrder}
-                    >
-                      <SaveIcon />
-                      {t("Split Order")}
-                    </Button>
-                  </Box>
-                </GridItem>
-              }
-              <GridItem xs={12} md={4} lg={4}>
-                <Box pb={2}>
-                  <TextField id="order-total"
-                    label={`${t("Total")}`}
-                    value={model.total ? model.total : ''}
-                    InputLabelProps={{ shrink: model.total ? true : false }}
-                    InputProps={{
-                      readOnly: true,
-                    }}
-                  />
-                </Box>
-              </GridItem>
-
-              <GridItem xs={12}  md={3} lg={3}>
-                <AccountSearch
-                  label="Driver"
-                  placeholder="Search name or phone"
-                  val={driverKeyword}
-                  onSelect={handleSelectDriver}
-                  onSearch={handleSearchDriver}
-                  onClear={handleClearDriver}
-                />
-              </GridItem>
-              <GridItem xs={12}  md={3} lg={3}>
-                <Box pb={2}>
-                  <TextField id="order-driver-phone"
-                    label={`${t("Driver Phone")}`}
-                    value={model.driverPhone ? model.driverPhone : ''}
-                    InputLabelProps={{ shrink: model.driverPhone ? true : false }}
-                    InputProps={{
-                      readOnly: true,
-                    }}
-                  />
-                </Box>
-              </GridItem>
-
-              <GridItem xs={12} md={9} lg={9}>
-                <Box pb={2}>
-                  <TextField id="order-note"
-                    label={`${t("Note")}`}
-                    fullWidth
-                    value={model.note ? model.note : ''}
-                    InputLabelProps={{ shrink: model.note ? true : false }}
-                    // InputProps={{}}
-                    onChange={e => {
-                      setModel({ ...model, note: e.target.value });
-                    }}
-                  />
-                </Box>
-              </GridItem>
-              <GridItem xs={12} md={4} lg={4}>
-                <KeyboardDatePicker
-                  variant="inline"
-                  label={t("Deliver Date")}
-                  format="YYYY-MM-DD"
-                  value={moment.utc(model.delivered)}
-                  onChange={(m) => handleDeliverDateChange(m)}
-                  InputLabelProps={{
-                    shrink: model.delivered? true : false,
+    <Card>
+      <CardHeader color="primary">
+        <GridContainer>
+          <GridItem xs={12} lg={6}>
+            <h4>{t(getTitle())}</h4>
+          </GridItem>
+        </GridContainer>
+      </CardHeader>
+      <CardBody>
+        <GridContainer>
+          {!!alert.message && (
+            <GridItem xs={12}>
+              <Alert severity={alert.severity} onClose={removeAlert}>
+                {alert.message}
+              </Alert>
+            </GridItem>
+          )}
+          {!(model._id === "new" || model._id === "clone") && (
+            <GridItem xs={12} md={4} lg={4}>
+              <Box pb={2}>
+                <TextField
+                  id="order-code"
+                  label={`${t("Code")}`}
+                  value={model.code}
+                  InputLabelProps={{ shrink: model.code ? true : false }}
+                  InputProps={{
+                    readOnly: true
                   }}
                 />
-              </GridItem>
-              <GridItem xs={12} container direction="row-reverse">
+              </Box>
+            </GridItem>
+          )}
+          <GridItem xs={12} md={4} lg={4}>
+            <Box pb={2}>
+              <TextField
+                id="order-client"
+                label={`${t("Client")}`}
+                value={model.clientName ? model.clientName : ""}
+                InputLabelProps={{ shrink: model.clientId ? true : false }}
+                InputProps={{
+                  readOnly: true
+                }}
+              />
+            </Box>
+          </GridItem>
+          <GridItem xs={12} md={4} lg={4}>
+            <Box pb={2}>
+              <TextField
+                id="order-client-phone"
+                label={`${t("Client Phone")}`}
+                value={model.clientPhone ? model.clientPhone : ""}
+                InputLabelProps={{ shrink: model.clientPhone ? true : false }}
+                onChange={e => {
+                  setModel({ ...model, clientPhone: e.target.value });
+                }}
+              />
+            </Box>
+          </GridItem>
+          <GridItem xs={12} md={8} lg={8}>
+            <Box pb={2}>
+              <AddressSearch
+                label={"Deliver Address"}
+                placeholder={"Search Address"}
+                handleSelectLocation={handleSelectDeliverLocation}
+                location={model.location}
+              />
+            </Box>
+          </GridItem>
 
-                <Box mt={2} mr={2}>
-                  <Link to={`../orders`}>
-                    <Button variant="contained">
-                      <FormatListBulletedIcon />
-                      {t("Back")}
-                    </Button>
-                  </Link>
-                </Box>
-                <Box mt={2} mr={2}>
-                  <Button
-                    color="primary"
-                    variant="contained"
-                    disabled={processing}
-                    onClick={handleSubmit}
+          {(model._id === "new" || model._id === "clone") && (
+            <GridItem xs={12} lg={6}>
+              <Box pb={2}>
+                <FormControl className={classes.select}>
+                  <InputLabel id="merchant-label">{t("Merchant")}</InputLabel>
+                  <Select
+                    id="merchant"
+                    labelId="merchant-label"
+                    value={model.merchantId}
+                    onChange={e => {
+                      setModel({
+                        ...model,
+                        merchantId: e.target.value
+                      });
+                    }}
                   >
-                    <SaveIcon />
-                    {t("Save")}
-                  </Button>
-                </Box>
-                <Box mt={2} mr={2}>
-                  <Link to={`../finance/transactions`}>
-                    <Button color="primary" variant="contained">
-                      <HistoryIcon />
-                      {t("Transaction History")}
-                    </Button>
-                  </Link>
-                </Box>
-              </GridItem>
+                    {merchants.map(merchant => {
+                      return (
+                        <MenuItem key={merchant._id} value={merchant._id}>
+                          {merchant.name}
+                        </MenuItem>
+                      );
+                    })}
+                  </Select>
+                </FormControl>
+              </Box>
+            </GridItem>
+          )}
 
-            </GridContainer>
-          </CardBody>
-        </Card>
+          {(model._id === "new" || model._id === "clone") && (
+            <GridItem xs={12} lg={12}>
+              <Box pb={2}>
+                <OrderItemEditor
+                  merchantId={model.merchantId}
+                  onUpdateItemMap={handleUpdateItemMap}
+                />
+              </Box>
+            </GridItem>
+          )}
+
+          {!(model._id === "new" || model._id === "clone") && (
+            <GridItem xs={12} lg={12}>
+              <Box pb={2}>
+                {model.items &&
+                  model.items.length > 0 &&
+                  model.items.map(it => (
+                    <div key={it.productId}>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={
+                              productMap[it.productId]
+                                ? productMap[it.productId].status
+                                : false
+                            }
+                            onChange={e => handleToggleProduct(e, it)}
+                            name={`${it.productId}`}
+                          />
+                        }
+                        label={`${it.productName} x ${it.quantity}`}
+                        color="primary"
+                      />
+                    </div>
+                  ))}
+                <Button
+                  color="primary"
+                  variant="contained"
+                  disabled={processing}
+                  onClick={handleSplitOrder}
+                >
+                  <SaveIcon />
+                  {t("Split Order")}
+                </Button>
+              </Box>
+            </GridItem>
+          )}
+          <GridItem xs={12} md={4} lg={4}>
+            <Box pb={2}>
+              <TextField
+                id="order-total"
+                label={`${t("Total")}`}
+                value={model.total ? model.total : ""}
+                InputLabelProps={{ shrink: model.total ? true : false }}
+                InputProps={{
+                  readOnly: true
+                }}
+              />
+            </Box>
+          </GridItem>
+
+          <GridItem xs={12} md={3} lg={3}>
+            <AccountSearch
+              label="Driver"
+              placeholder="Search name or phone"
+              val={driverKeyword}
+              onSelect={handleSelectDriver}
+              onSearch={handleSearchDriver}
+              onClear={handleClearDriver}
+            />
+          </GridItem>
+          <GridItem xs={12} md={3} lg={3}>
+            <Box pb={2}>
+              <TextField
+                id="order-driver-phone"
+                label={`${t("Driver Phone")}`}
+                value={model.driverPhone ? model.driverPhone : ""}
+                InputLabelProps={{ shrink: model.driverPhone ? true : false }}
+                InputProps={{
+                  readOnly: true
+                }}
+              />
+            </Box>
+          </GridItem>
+
+          <GridItem xs={12} md={9} lg={9}>
+            <Box pb={2}>
+              <TextField
+                id="order-note"
+                label={`${t("Note")}`}
+                fullWidth
+                value={model.note ? model.note : ""}
+                InputLabelProps={{ shrink: model.note ? true : false }}
+                // InputProps={{}}
+                onChange={e => {
+                  setModel({ ...model, note: e.target.value });
+                }}
+              />
+            </Box>
+          </GridItem>
+          <GridItem xs={12} md={4} lg={4}>
+            <KeyboardDatePicker
+              variant="inline"
+              label={t("Deliver Date")}
+              format="YYYY-MM-DD"
+              value={moment.utc(model.delivered)}
+              onChange={m => handleDeliverDateChange(m)}
+              InputLabelProps={{
+                shrink: model.delivered ? true : false
+              }}
+            />
+          </GridItem>
+          <GridItem xs={12} container direction="row-reverse">
+            <Box mt={2} mr={2}>
+              <Link to={`../orders`}>
+                <Button variant="contained">
+                  <FormatListBulletedIcon />
+                  {t("Back")}
+                </Button>
+              </Link>
+            </Box>
+            <Box mt={2} mr={2}>
+              <Button
+                color="primary"
+                variant="contained"
+                disabled={processing}
+                onClick={handleSubmit}
+              >
+                <SaveIcon />
+                {t("Save")}
+              </Button>
+            </Box>
+            <Box mt={2} mr={2}>
+              <Link to={`../finance/transactions`}>
+                <Button color="primary" variant="contained">
+                  <HistoryIcon />
+                  {t("Transaction History")}
+                </Button>
+              </Link>
+            </Box>
+          </GridItem>
+        </GridContainer>
+      </CardBody>
+    </Card>
   );
 };
-
 
 OrderFormPage.propTypes = {
   match: PropTypes.shape({
@@ -698,7 +596,7 @@ OrderFormPage.propTypes = {
   history: PropTypes.object
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
   order: state.order
 });
 // const mapDispatchToProps = (dispatch) => ({
@@ -709,6 +607,8 @@ const mapStateToProps = (state) => ({
 export default connect(
   mapStateToProps,
   {
-    selectOrder, setDeliverDate, setAccount
+    selectOrder,
+    setDeliverDate,
+    setAccount
   }
 )(OrderFormPage);

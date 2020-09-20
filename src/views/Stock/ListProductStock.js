@@ -43,70 +43,70 @@ import ApiCategoryService from "services/api/ApiCategoryService";
 
 moment.locale("zh-cn");
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   heading: {
     marginTop: "0.5rem",
-    marginBottom: "0.5rem"
+    marginBottom: "0.5rem",
   },
   tableContainer: {
-    maxHeight: "calc(100vh - 240px)"
+    maxHeight: "calc(100vh - 240px)",
   },
   table: {
     minWidth: 1024,
     "& td": {
       minWidth: "50px",
-      padding: "0.5rem"
+      padding: "0.5rem",
     },
     "& th": {
       minWidth: "50px",
-      padding: "0.5rem"
-    }
+      padding: "0.5rem",
+    },
   },
   formControl: {
     margin: theme.spacing(1),
-    minWidth: 120
+    minWidth: 120,
   },
   selectEmpty: {
-    marginTop: theme.spacing(2)
+    marginTop: theme.spacing(2),
   },
   textCenter: {
-    textAlign: "center"
+    textAlign: "center",
   },
   iconButton: {
-    cursor: "pointer"
+    cursor: "pointer",
   },
   inputInRow: {
     maxWidth: "3.5rem",
-    textAlign: "center"
+    textAlign: "center",
   },
   linkLabel: {
-    color: "#3f51b5"
+    color: "#3f51b5",
   },
   headerBox: {
     marginTop: "28px",
     marginRight: "2rem",
-    display: "inline-block"
+    display: "inline-block",
   },
   headerLabel: {
     color: "#eeeeee",
     display: "inline-block",
-    marginRight: "1rem"
+    marginRight: "1rem",
   },
   headerSelect: {
     "&:before": {
-      borderColor: "#eeeeee"
+      borderColor: "#eeeeee",
     },
     "&:after": {
-      borderColor: "#eeeeee"
+      borderColor: "#eeeeee",
     },
-    color: "#eeeeee"
+    color: "#eeeeee",
   },
   headerSelectIcon: {
-    fill: "#eeeeee"
+    fill: "#eeeeee",
   },
   textDanger: {
-    color: "#f44336"
-  }
+    color: "#f44336",
+  },
 }));
 
 const isQuantityDeficient = (quantity, product) => {
@@ -114,14 +114,14 @@ const isQuantityDeficient = (quantity, product) => {
   return (product.stock.warningThreshold || 0) >= quantity;
 };
 
-const isProductQuantityDeficient = product => {
+const isProductQuantityDeficient = (product) => {
   if (!product.stock || !product.stock.enabled) return false;
   let quantity = product.stock.quantity || 0;
   if (product.delivery) {
-    product.delivery.forEach(order => {
+    product.delivery.forEach((order) => {
       order.items
-        .filter(item => item.productId === product._id)
-        .forEach(item => {
+        .filter((item) => item.productId === product._id)
+        .forEach((item) => {
           quantity -= item.quantity;
         });
     });
@@ -130,7 +130,7 @@ const isProductQuantityDeficient = product => {
 };
 
 const getCategoryName = (categories, product) => {
-  let category = categories.find(c => c._id === product.categoryId);
+  let category = categories.find((c) => c._id === product.categoryId);
   if (category) {
     return category.name;
   } else {
@@ -144,7 +144,7 @@ const StockRow = ({
   onToggleStockEnabled,
   onToggleAllowNegative,
   onSetQuantity,
-  dates
+  dates,
 }) => {
   const classes = useStyles();
   const [quantity, setQuantity] = useState(
@@ -159,11 +159,13 @@ const StockRow = ({
     if (!product.stock || !product.stock.enabled) {
       return;
     }
-    if (product.stock.quantity != debouncedQuantity) {
+    if (product.stock.quantity !== debouncedQuantity) {
       onSetQuantity(product, debouncedQuantity);
     }
     setAdd(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedQuantity]);
+
   return (
     <TableRow className={classes.textCenter}>
       <TableCell>{number}</TableCell>
@@ -186,14 +188,14 @@ const StockRow = ({
             }}
           />
         ) : (
-          <CloseIcon
-            color="error"
-            className={classes.iconButton}
-            onClick={() => {
-              onToggleStockEnabled(product);
-            }}
-          />
-        )}
+            <CloseIcon
+              color="error"
+              className={classes.iconButton}
+              onClick={() => {
+                onToggleStockEnabled(product);
+              }}
+            />
+          )}
       </TableCell>
       <TableCell className={classes.textCenter}>
         {product.stock &&
@@ -207,14 +209,14 @@ const StockRow = ({
               }}
             />
           ) : (
-            <CloseIcon
-              color="error"
-              className={classes.iconButton}
-              onClick={() => {
-                onToggleAllowNegative(product);
-              }}
-            />
-          ))}
+              <CloseIcon
+                color="error"
+                className={classes.iconButton}
+                onClick={() => {
+                  onToggleAllowNegative(product);
+                }}
+              />
+            ))}
         {(!product.stock || !product.stock.enabled) && <RemoveIcon />}
       </TableCell>
       <TableCell className={classes.textCenter}>
@@ -223,33 +225,33 @@ const StockRow = ({
             inputProps={{ type: "number", className: classes.textCenter }}
             className={classes.inputInRow}
             value={quantity}
-            onChange={e => setQuantity(e.target.value)}
+            onChange={(e) => setQuantity(e.target.value)}
           ></Input>
         ) : (
-          <>- - -</>
-        )}
+            <>- - -</>
+          )}
       </TableCell>
       <TableCell className={classes.textCenter}>
         {product.stock && product.stock.enabled ? (
           <Input
             inputProps={{ type: "number", className: classes.textCenter }}
             className={classes.inputInRow}
-            onChange={e => {
+            onChange={(e) => {
               const newQuantity =
-                (product.stock.quantity || 0) + parseInt(e.target.value);
+                (quantity || 0) + parseInt(e.target.value);
               setAdd(e.target.value);
               setQuantity(newQuantity);
             }}
             value={add}
           ></Input>
         ) : (
-          <>- - -</>
-        )}
+            <>- - -</>
+          )}
       </TableCell>
-      {dates.map(date => {
+      {dates.map((date) => {
         const dateQuantity = product.stock
           ? quantity -
-            countProductFromDate(date, product.delivery, product._id, "before")
+          countProductFromDate(date, product.delivery, product._id, "before")
           : null;
         return (
           <TableCell key={date} className={classes.textCenter}>
@@ -257,8 +259,8 @@ const StockRow = ({
               <span
                 className={
                   product.stock &&
-                  product.stock.enabled &&
-                  isQuantityDeficient(dateQuantity, product)
+                    product.stock.enabled &&
+                    isQuantityDeficient(dateQuantity, product)
                     ? classes.textDanger
                     : null
                 }
@@ -266,8 +268,8 @@ const StockRow = ({
                 {dateQuantity}
               </span>
             ) : (
-              <>- - -</>
-            )}
+                <>- - -</>
+              )}
           </TableCell>
         );
       })}
@@ -289,10 +291,10 @@ export default function ListProductStock({ location }) {
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [totalRows, setTotalRows] = useState(0);
   const [query, setQuery] = useState(getQueryParam(location, "search") || "");
-  const [sort, setSort] = useState(["_id", -1]);
+  const [sort] = useState(["_id", -1]);
   const [categories, setCategories] = useState([]);
   const [filterParams, setFilterParams] = useState({
-    "stock.enabled": true
+    "stock.enabled": true,
   });
   // states related to stock dates
   const [startDate, setStartDate] = useState(moment());
@@ -306,7 +308,7 @@ export default function ListProductStock({ location }) {
   const removeAlert = () => {
     setAlert({
       message: "",
-      severity: "info"
+      severity: "info",
     });
   };
 
@@ -315,51 +317,51 @@ export default function ListProductStock({ location }) {
       updateData();
       setAlert({
         message: t("Saved successfully") + ": " + product.name,
-        severity: "success"
+        severity: "success",
       });
     } else {
       setAlert({
         message: t("Save failed"),
-        severity: "error"
+        severity: "error",
       });
     }
     setProcessing(false);
   };
 
-  const handleToggleStockEnabled = product => {
+  const handleToggleStockEnabled = (product) => {
     if (processing) {
       return;
     }
     removeAlert();
     setProcessing(true);
     ApiStockService.toggleStockEnabled(product)
-      .then(resp => {
+      .then((resp) => {
         handleServerResponse(resp, product);
       })
-      .catch(e => {
+      .catch((e) => {
         console.error(e);
         setAlert({
           message: t("Save failed"),
-          severity: "error"
+          severity: "error",
         });
       });
   };
 
-  const handleToggleAllowNegative = product => {
+  const handleToggleAllowNegative = (product) => {
     if (processing) {
       return;
     }
     removeAlert();
     setProcessing(true);
     ApiStockService.toggleAllowNegative(product)
-      .then(resp => {
+      .then((resp) => {
         handleServerResponse(resp, product);
       })
-      .catch(e => {
+      .catch((e) => {
         console.error(e);
         setAlert({
           message: t("Save failed"),
-          severity: "error"
+          severity: "error",
         });
       });
   };
@@ -371,24 +373,24 @@ export default function ListProductStock({ location }) {
     removeAlert();
     setProcessing(true);
     ApiStockService.setQuantity(product, quantity)
-      .then(resp => {
+      .then((resp) => {
         handleServerResponse(resp, product);
       })
-      .catch(e => {
+      .catch((e) => {
         console.error(e);
         setAlert({
           message: t("Save failed"),
-          severity: "error"
+          severity: "error",
         });
       });
   };
 
   const updateData = () => {
     ApiStockService.getStockList(page, rowsPerPage, query, filterParams, [
-      sort
+      sort,
     ]).then(({ data }) => {
       if (data.code === "success") {
-        data.data = data.data.map(product => {
+        data.data = data.data.map((product) => {
           product.categoryName = getCategoryName(categories, product);
           return product;
         });
@@ -398,7 +400,7 @@ export default function ListProductStock({ location }) {
       } else {
         setAlert({
           message: t("Cannnot load data"),
-          severity: "error"
+          severity: "error",
         });
       }
     });
@@ -414,10 +416,12 @@ export default function ListProductStock({ location }) {
   }, []);
 
   useEffect(() => {
-    setLoading(true);
-    updateData();
+    if (categories.length) {
+      setLoading(true);
+      updateData();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, rowsPerPage, sort, categories]);
+  }, []); // page, rowsPerPage, sort, categories
 
   useEffect(() => {
     setLoading(true);
@@ -453,12 +457,12 @@ export default function ListProductStock({ location }) {
                         labelId="labelCategory"
                         inputProps={{
                           classes: {
-                            icon: classes.headerSelectIcon
+                            icon: classes.headerSelectIcon,
                           },
-                          placeholder: t("Category")
+                          placeholder: t("Category"),
                         }}
                         value={filterParams.categoryId}
-                        onChange={e => {
+                        onChange={(e) => {
                           const newParams = { ...filterParams };
                           if (e.target.value) {
                             newParams.categoryId = e.target.value;
@@ -469,7 +473,7 @@ export default function ListProductStock({ location }) {
                         }}
                       >
                         <MenuItem value="">{t("All")}</MenuItem>
-                        {categories.map(category => (
+                        {categories.map((category) => (
                           <MenuItem key={category._id} value={category._id}>
                             {category.name}
                           </MenuItem>
@@ -488,12 +492,12 @@ export default function ListProductStock({ location }) {
                         labelId="labelStockEnabled"
                         inputProps={{
                           classes: {
-                            icon: classes.headerSelectIcon
+                            icon: classes.headerSelectIcon,
                           },
-                          placeholder: t("Stock Enabled")
+                          placeholder: t("Stock Enabled"),
                         }}
                         value={filterParams["stock.enabled"]}
-                        onChange={e => {
+                        onChange={(e) => {
                           const newParams = { ...filterParams };
                           if (e.target.value) {
                             if (e.target.value === "true") {
@@ -524,12 +528,12 @@ export default function ListProductStock({ location }) {
                         labelId="labelAllowNegative"
                         inputProps={{
                           classes: {
-                            icon: classes.headerSelectIcon
+                            icon: classes.headerSelectIcon,
                           },
-                          placeholder: t("Allow negative quantity")
+                          placeholder: t("Allow negative quantity"),
                         }}
                         value={filterParams["stock.allowNegative"]}
-                        onChange={e => {
+                        onChange={(e) => {
                           const newParams = { ...filterParams };
                           if (e.target.value) {
                             if (e.target.value === "true") {
@@ -566,7 +570,7 @@ export default function ListProductStock({ location }) {
                   </GridItem>
                   <GridItem xs={12} md={3} align="right">
                     <Searchbar
-                      onChange={e => {
+                      onChange={(e) => {
                         const { target } = e;
                         setQuery(target.value);
                       }}
@@ -611,7 +615,7 @@ export default function ListProductStock({ location }) {
                         <TableCell>{t("Quantity")}</TableCell>
                         <TableCell>{t("Add Quantity")}</TableCell>
                         {getDateStrArrayBetween(startDate, endDate).map(
-                          date => (
+                          (date) => (
                             <TableCell key={date}>
                               {moment(date).format("MM-DD ddd")}
                             </TableCell>
@@ -626,18 +630,18 @@ export default function ListProductStock({ location }) {
                           rowCount={rowsPerPage}
                         />
                       ) : (
-                        products.map((product, index) => (
-                          <StockRow
-                            key={product._id}
-                            number={rowsPerPage * page + index + 1}
-                            product={product}
-                            dates={getDateStrArrayBetween(startDate, endDate)}
-                            onToggleStockEnabled={handleToggleStockEnabled}
-                            onToggleAllowNegative={handleToggleAllowNegative}
-                            onSetQuantity={handleSetQuantity}
-                          />
-                        ))
-                      )}
+                          products.map((product, index) => (
+                            <StockRow
+                              key={product._id}
+                              number={rowsPerPage * page + index + 1}
+                              product={product}
+                              dates={getDateStrArrayBetween(startDate, endDate)}
+                              onToggleStockEnabled={handleToggleStockEnabled}
+                              onToggleAllowNegative={handleToggleAllowNegative}
+                              onSetQuantity={handleSetQuantity}
+                            />
+                          ))
+                        )}
                     </TableBody>
                   </Table>
                 </TableContainer>
@@ -670,9 +674,9 @@ StockRow.propTypes = {
   onToggleStockEnabled: PropTypes.func,
   onToggleAllowNegative: PropTypes.func,
   onSetQuantity: PropTypes.func,
-  dates: PropTypes.array
+  dates: PropTypes.array,
 };
 
 ListProductStock.propTypes = {
-  location: PropTypes.object
+  location: PropTypes.object,
 };

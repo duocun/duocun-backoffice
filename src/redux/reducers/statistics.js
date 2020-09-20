@@ -1,5 +1,3 @@
-
-
 export const statisticsSummary = (state = {}, action) => {
   if (action && action.type === "SET_STATISTICS_SUMMARY") {
     return action.payload;
@@ -13,6 +11,3 @@ export const driverSummary = (state = [], action) => {
   }
   return state;
 };
-
-
-

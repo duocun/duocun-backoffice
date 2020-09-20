@@ -19,7 +19,6 @@ import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TablePagination from "components/Table/TablePagniation.js";
 import TableBodySkeleton from "components/Table/TableBodySkeleton";
-import TableSortLabel from "@material-ui/core/TableSortLabel";
 
 import { Button } from "@material-ui/core";
 import IconButton from "@material-ui/core/IconButton";
@@ -57,7 +56,8 @@ export default function ListPages({ location }) {
       : 0
   );
   const [totalRows, setTotalRows] = useState(0);
-  const [sort, setSort] = useState(["_id", 1]);
+  // const [sort, setSort] = useState(["_id", 1]);
+  const sort = ["_id", 1];
   const [processing, setProcessing] = useState(false);
   const [removeId, setRemoveId] = useState("");
   const [modalOpen, setModalOpen] = useState(false);

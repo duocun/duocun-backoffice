@@ -1,5 +1,5 @@
 /*eslint-disable*/
-import React from "react";
+import React, { useEffect, useContext } from "react";
 import { useTranslation } from "react-i18next";
 import classNames from "classnames";
 import PropTypes from "prop-types";
@@ -14,10 +14,40 @@ import ListItemText from "@material-ui/core/ListItemText";
 import Icon from "@material-ui/core/Icon";
 // core components
 import AdminNavbarLinks from "components/Navbars/AdminNavbarLinks.js";
+import RoleContext from "shared/RoleContext";
+import AuthContext from "shared/AuthContext";
 
 import styles from "assets/jss/material-dashboard-react/components/sidebarStyle.js";
+import { ROLE_ENUM } from "models/account";
 
 const useStyles = makeStyles(styles);
+
+const hasRole = (currentUser, perm, rbacData) => {
+  if (!perm) {
+    return true;
+  }
+  if (!rbacData) {
+    return false;
+  }
+  if (!currentUser || !currentUser.roles) {
+    return false;
+  }
+  if (currentUser.roles.includes(Number(ROLE_ENUM.SUPER))) {
+    return true;
+  }
+  let hasRole = true;
+  if (perm.role) {
+    hasRole = hasRole && currentUser.roles.includes(Number(perm.role));
+  }
+  if (perm.resource) {
+    for (const r of currentUser.roles) {
+      if (rbacData[r][perm.resource]) {
+        return hasRole;
+      }
+    }
+  }
+  return false;
+};
 
 export default function Sidebar(props) {
   const classes = useStyles();
@@ -27,51 +57,59 @@ export default function Sidebar(props) {
     return window.location.href.indexOf(routeName) > -1 ? true : false;
   }
   const { color, logo, image, logoText, routes } = props;
+  const rbacData = useContext(RoleContext);
+  const currentUser = useContext(AuthContext);
   var links = (
     <List className={classes.list}>
-      {routes.map((prop, key) => {
-        var activePro = " ";
-        var listItemClasses;
-        listItemClasses = classNames({
-          [" " + classes[color]]: activeRoute(prop.path)
-        });
-        const whiteFontClasses = classNames({
-          [" " + classes.whiteFont]: activeRoute(prop.path)
-        });
-        return (
-          <NavLink
-            to={prop.path}
-            className={activePro + classes.item}
-            activeClassName="active"
-            key={key}
-          >
-            <ListItem button className={classes.itemLink + listItemClasses}>
-              {typeof prop.icon === "string" ? (
-                <Icon
-                  className={classNames(classes.itemIcon, whiteFontClasses, {
-                    [classes.itemIconRTL]: props.rtlActive
+      {routes
+        .filter((prop) => !prop.hide)
+        .map((prop, key) => {
+          const isAllowed = hasRole(currentUser, prop.perm, rbacData);
+          if (!isAllowed) {
+            return null;
+          }
+          var activePro = " ";
+          var listItemClasses;
+          listItemClasses = classNames({
+            [" " + classes[color]]: activeRoute(prop.path),
+          });
+          const whiteFontClasses = classNames({
+            [" " + classes.whiteFont]: activeRoute(prop.path),
+          });
+          return (
+            <NavLink
+              to={prop.path}
+              className={activePro + classes.item}
+              activeClassName="active"
+              key={key}
+            >
+              <ListItem button className={classes.itemLink + listItemClasses}>
+                {typeof prop.icon === "string" ? (
+                  <Icon
+                    className={classNames(classes.itemIcon, whiteFontClasses, {
+                      [classes.itemIconRTL]: props.rtlActive,
+                    })}
+                  >
+                    {prop.icon}
+                  </Icon>
+                ) : (
+                  <prop.icon
+                    className={classNames(classes.itemIcon, whiteFontClasses, {
+                      [classes.itemIconRTL]: props.rtlActive,
+                    })}
+                  />
+                )}
+                <ListItemText
+                  primary={t(prop.name)}
+                  className={classNames(classes.itemText, whiteFontClasses, {
+                    [classes.itemTextRTL]: props.rtlActive,
                   })}
-                >
-                  {prop.icon}
-                </Icon>
-              ) : (
-                <prop.icon
-                  className={classNames(classes.itemIcon, whiteFontClasses, {
-                    [classes.itemIconRTL]: props.rtlActive
-                  })}
+                  disableTypography={true}
                 />
-              )}
-              <ListItemText
-                primary={t(prop.name)}
-                className={classNames(classes.itemText, whiteFontClasses, {
-                  [classes.itemTextRTL]: props.rtlActive
-                })}
-                disableTypography={true}
-              />
-            </ListItem>
-          </NavLink>
-        );
-      })}
+              </ListItem>
+            </NavLink>
+          );
+        })}
     </List>
   );
   var brand = (
@@ -79,7 +117,7 @@ export default function Sidebar(props) {
       <NavLink
         to="/"
         className={classNames(classes.logoLink, {
-          [classes.logoLinkRTL]: props.rtlActive
+          [classes.logoLinkRTL]: props.rtlActive,
         })}
       >
         <div className={classes.logoImage}>
@@ -98,12 +136,12 @@ export default function Sidebar(props) {
           open={props.open}
           classes={{
             paper: classNames(classes.drawerPaper, {
-              [classes.drawerPaperRTL]: props.rtlActive
-            })
+              [classes.drawerPaperRTL]: props.rtlActive,
+            }),
           }}
           onClose={props.handleDrawerToggle}
           ModalProps={{
-            keepMounted: true // Better open performance on mobile.
+            keepMounted: true, // Better open performance on mobile.
           }}
         >
           {brand}
@@ -126,8 +164,8 @@ export default function Sidebar(props) {
           open
           classes={{
             paper: classNames(classes.drawerPaper, {
-              [classes.drawerPaperRTL]: props.rtlActive
-            })
+              [classes.drawerPaperRTL]: props.rtlActive,
+            }),
           }}
         >
           {brand}
@@ -152,5 +190,5 @@ Sidebar.propTypes = {
   image: PropTypes.string,
   logoText: PropTypes.string,
   routes: PropTypes.arrayOf(PropTypes.object),
-  open: PropTypes.bool
+  open: PropTypes.bool,
 };

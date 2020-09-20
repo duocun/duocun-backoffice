@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 import { useTranslation } from "react-i18next";
 // core components
-import * as moment from 'moment';
+import * as moment from "moment";
 
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
@@ -26,14 +26,13 @@ import TableRow from "@material-ui/core/TableRow";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 
-
-import ApiStatisticsService from 'services/api/ApiStatisticsService';
+import ApiStatisticsService from "services/api/ApiStatisticsService";
 // import ApiOrderService from "services/api/ApiOrderService";
 
-import { setDeliverDate } from 'redux/actions/order';
+import { setDeliverDate } from "redux/actions/order";
 import { TableHead } from "../../../node_modules/@material-ui/core";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   cardCategoryWhite: {
     color: "rgba(255,255,255,.62)",
     margin: "0",
@@ -55,45 +54,50 @@ const useStyles = makeStyles((theme) => ({
   },
   formControl: {
     margin: theme.spacing(1),
-    minWidth: 120,
+    minWidth: 120
   },
   selectEmpty: {
-    marginTop: theme.spacing(2),
+    marginTop: theme.spacing(2)
   },
   itemRow: {
     fontSize: "12px"
   }
 }));
 
-
-const ProductSummaryPage = ({ match, history, deliverDate, setDeliverDate }) => {
+const ProductSummaryPage = ({
+  match,
+  history,
+  deliverDate,
+  setDeliverDate
+}) => {
   const classes = useStyles();
   const { t } = useTranslation();
   const [productList, setProductList] = useState([]);
   const [sort, setSort] = useState(["_id", -1]);
 
+
+
+  const loadData = useCallback( deliverDate => {
+    ApiStatisticsService.getProductStatistic(deliverDate).then(({ data }) => {
+      setProductList(data.data);
+    });
+  }, []);
+
   useEffect(() => {
     if (!deliverDate) {
-      const date = moment().format('YYYY-MM-DD');
+      const date = moment().format("YYYY-MM-DD");
       setDeliverDate(date);
       loadData(deliverDate);
     } else {
       loadData(deliverDate);
     }
-  }, []);
+  }, [deliverDate, setDeliverDate, loadData]);
 
-  const loadData = (deliverDate) => {
-    ApiStatisticsService.getProductStatistic(deliverDate).then(({ data }) => {
-      setProductList(data.data);
-    });
-  }
-
-  const handleDateChange = (m) => {
-    const date = m.format('YYYY-MM-DD');
+  const handleDateChange = m => {
+    const date = m.format("YYYY-MM-DD");
     setDeliverDate(date);
     loadData(date);
-  }
-
+  };
 
   const renderSort = fieldName => {
     return (
@@ -117,7 +121,6 @@ const ProductSummaryPage = ({ match, history, deliverDate, setDeliverDate }) => 
   };
 
   return (
-
     <GridContainer>
       <Card>
         <CardHeader color="primary">
@@ -128,16 +131,16 @@ const ProductSummaryPage = ({ match, history, deliverDate, setDeliverDate }) => 
               format="YYYY-MM-DD"
               value={moment.utc(deliverDate)}
               InputLabelProps={{
-                shrink: deliverDate? true : false,
+                shrink: deliverDate ? true : false
               }}
               onChange={handleDateChange}
             />
           </GridItem>
         </CardHeader>
         <CardBody>
-          <Table >
+          <Table>
             <TableHead>
-            <TableCell
+              <TableCell
                 onClick={() => {
                   toggleSort("productName");
                 }}
@@ -193,8 +196,8 @@ const ProductSummaryPage = ({ match, history, deliverDate, setDeliverDate }) => 
               </TableCell>
             </TableHead>
             <TableBody>
-              {productList.map((it) =>
-                <TableRow key={it.productId} >
+              {productList.map(it => (
+                <TableRow key={it.productId}>
                   <TableCell className={classes.itemRow}>
                     {it.productName}
                   </TableCell>
@@ -204,25 +207,20 @@ const ProductSummaryPage = ({ match, history, deliverDate, setDeliverDate }) => 
                   <TableCell className={classes.itemRow}>
                     x{it.quantity}
                   </TableCell>
-                  <TableCell className={classes.itemRow}>
-                    {it.price}
-                  </TableCell>
-                  <TableCell className={classes.itemRow}>
-                    {it.cost}
-                  </TableCell>
+                  <TableCell className={classes.itemRow}>{it.price}</TableCell>
+                  <TableCell className={classes.itemRow}>{it.cost}</TableCell>
                   <TableCell className={classes.itemRow}>
                     {it.totalCost}
                   </TableCell>
                 </TableRow>
-              )}
+              ))}
             </TableBody>
           </Table>
         </CardBody>
       </Card>
     </GridContainer>
   );
-}
-
+};
 
 ProductSummaryPage.propTypes = {
   match: PropTypes.shape({
@@ -233,8 +231,8 @@ ProductSummaryPage.propTypes = {
   history: PropTypes.object
 };
 
-const mapStateToProps = (state) => ({
-  deliverDate: state.deliverDate,
+const mapStateToProps = state => ({
+  deliverDate: state.deliverDate
 });
 export default connect(
   mapStateToProps,

@@ -1,47 +1,46 @@
 import React, { useState, useEffect } from "react";
-import { useTranslation } from "react-i18next";
-import { makeStyles } from "@material-ui/core/styles";
 import PropTypes from "prop-types";
 import {
   KeyboardDatePicker,
-  MuiPickersUtilsProvider
+  MuiPickersUtilsProvider,
 } from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
 import moment from "moment";
 import "moment/locale/zh-cn";
+import { useStyles } from "@material-ui/pickers/views/Calendar/SlideTransition";
 
 moment.locale("zh-cn");
 
-const useStyle = makeStyles(theme => {
-  return {
-    label: {
-      color: theme.palette.grey[100]
-    },
-    input: {
-      color: theme.palette.grey[100],
-      marginRight: "1rem",
-      width: "160px"
-    },
-    inputIcon: {
-      fill: theme.palette.grey[100]
-    }
-  };
-});
-
 export default function DateRangePicker({
-  defaultStartDate = new Date(),
-  defaultEndDate = new Date(),
-  minDate = undefined,
-  maxDate = undefined,
-  onChange
+  defaultStartDate,
+  defaultEndDate,
+  minDate,
+  maxDate,
+  exactDate,
+  classNames = undefined,
+  onChange,
 }) {
-  const { t } = useTranslation();
-  const classes = useStyle();
+  // const { t } = useTranslation();
+  const [classes, setClasses] = useState(useStyles());
   const [startDate, setStartDate] = useState(defaultStartDate);
   const [endDate, setEndDate] = useState(defaultEndDate);
 
   useEffect(() => {
-    onChange(startDate, endDate);
+    if (classNames) {
+      setClasses(classNames);
+    }
+  }, [classNames]);
+
+  useEffect(() => {
+    if (exactDate) {
+      onChange(
+        moment(moment(startDate).format("YYYY-MM-DD 00:00:00")).toDate(),
+        moment(moment(endDate).format("YYYY-MM-DD 00:00:00")).toDate()
+      );
+    } else {
+      onChange(startDate, endDate);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startDate, endDate]);
 
   return (
@@ -58,12 +57,12 @@ export default function DateRangePicker({
         minDate={minDate}
         maxDate={endDate}
         value={startDate}
-        onChange={date => setStartDate(date)}
+        onChange={(date) => setStartDate(date)}
         InputLabelProps={{
-          className: classes.label
+          className: classes.label,
         }}
         inputProps={{
-          className: classes.input
+          className: classes.input,
         }}
       />
       <KeyboardDatePicker
@@ -74,12 +73,12 @@ export default function DateRangePicker({
         minDate={startDate}
         maxDate={maxDate}
         value={endDate}
-        onChange={date => setEndDate(date)}
+        onChange={(date) => setEndDate(date)}
         InputLabelProps={{
-          className: classes.label
+          className: classes.label,
         }}
         inputProps={{
-          className: classes.input
+          className: classes.input,
         }}
       />
     </MuiPickersUtilsProvider>
@@ -91,5 +90,16 @@ DateRangePicker.propTypes = {
   defaultEndDate: PropTypes.object,
   minDate: PropTypes.object,
   maxDate: PropTypes.object,
-  onChange: PropTypes.func
+  classNames: PropTypes.object,
+  onChange: PropTypes.func,
+  exactDate: PropTypes.bool,
+};
+
+DateRangePicker.defaultProps = {
+  defaultStartDate: new Date(),
+  defaultEndDate: new Date(),
+  minDate: undefined,
+  maxDate: undefined,
+  exactDate: false,
+  onChange: () => {},
 };

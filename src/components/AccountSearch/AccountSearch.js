@@ -1,13 +1,11 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
-import MenuItem from "@material-ui/core/MenuItem";
+
 import CustomInput from "components/CustomInput/CustomInput.js";
 import SearchDropDown from "components/SearchDropDown/SearchDropDown.js";
 
-import InfiniteScroll from 'react-infinite-scroll-component';
-
-const useStyles = makeStyles((styles) => ({
+const useStyles = makeStyles(styles => ({
   searchWrapper: {
     width: "100%"
   },
@@ -24,7 +22,7 @@ const useStyles = makeStyles((styles) => ({
     width: "320px",
     height: "200px",
     overflowY: "scroll"
-  },
+  }
   // list: {
   //   position: "absolute",
   //   backgroundColor: "white",
@@ -42,13 +40,22 @@ const useStyles = makeStyles((styles) => ({
 
 const rowsPerPage = 10;
 
-const AccountSearch = ({label, placeholder, val, id, onSearch, onSelect, onClear}) => {
+const AccountSearch = ({
+  label,
+  placeholder,
+  val,
+  id,
+  onSearch,
+  onSelect,
+  onEndClicked = () => {},
+  onClear
+}) => {
   const classes = useStyles();
   const { t } = useTranslation();
   const [page, setPage] = useState(0);
-  const [keyword, setKeyword] = useState(val);// getQueryParam(location, "search") || "");
+  const [keyword, setKeyword] = useState(val); // getQueryParam(location, "search") || "");
 
-  const [account, setAccount] = useState({_id: id, username: val});
+  // const [account, setAccount] = useState({ _id: id, username: val });
   const [searching, setSearching] = useState(false);
   const [dropdown, setDropdown] = useState(false);
   const [accounts, setAccounts] = useState({});
@@ -56,22 +63,22 @@ const AccountSearch = ({label, placeholder, val, id, onSearch, onSelect, onClear
   const [hasMoreAccounts, setHasMoreAccounts] = useState(true);
 
   const handleSearch = (keyword, page) => {
-    if(searching){
+    if (searching) {
       return;
     }
     if (keyword) {
       setSearching(true);
-      onSearch(page, rowsPerPage, keyword).then(({data}) => {
+      onSearch(page, rowsPerPage, keyword).then(({ data }) => {
         const dMap = {};
         data.data.forEach(d => {
           dMap[d._id] = d;
-        })
+        });
         setAccounts(dMap);
         setCount(data.count);
         setPage(1);
-        if(data.data.length<data.count){
+        if (data.data.length < data.count) {
           setHasMoreAccounts(true);
-        }else{
+        } else {
           setHasMoreAccounts(false);
         }
         setSearching(false);
@@ -80,22 +87,21 @@ const AccountSearch = ({label, placeholder, val, id, onSearch, onSelect, onClear
       setPage(1);
       setHasMoreAccounts(true);
     }
-  }
+  };
 
   useEffect(() => {
     setKeyword(val); // fix me
-    setAccount({_id: id, username: val});
+    // setAccount({ _id: id, username: val });
   }, [id, val]);
 
-  const handleSelectData = (account) => {
+  const handleSelectData = account => {
     onSelect(account);
-    setAccount(account);
+    // setAccount(account);
     setDropdown(false);
-    const str = account.username + ' ' + (account.phone ? account.phone:'');
+    const str = account.username + " " + (account.phone ? account.phone : "");
     setKeyword(str);
     setSearching(false);
-  }
-
+  };
 
   const fetchData = () => {
     if (Object.keys(accounts).length >= count) {
@@ -103,8 +109,8 @@ const AccountSearch = ({label, placeholder, val, id, onSearch, onSelect, onClear
       return;
     }
 
-    onSearch(page, rowsPerPage, keyword).then(({data}) => {
-      const dMap = {...accounts};
+    onSearch(page, rowsPerPage, keyword).then(({ data }) => {
+      const dMap = { ...accounts };
       data.data.forEach(d => {
         dMap[d._id] = d;
       });
@@ -112,111 +118,75 @@ const AccountSearch = ({label, placeholder, val, id, onSearch, onSelect, onClear
       setCount(data.count);
       setPage(page + 1);
     });
-  }
+  };
 
-  const handleKeywordChange = ({target}) => {
+  const handleKeywordChange = ({ target }) => {
     const str = target.value;
     setKeyword(str);
-    setAccount({_id:'', username:''});
+    // setAccount({ _id: "", username: "" });
     setPage(0);
     setDropdown(true);
     handleSearch(str, 0);
-  }
+  };
 
-  const handleFocus = () => {
-
-  }
+  const handleFocus = () => {};
 
   const handleBlur = () => {
     // setSearching(false);
-  }
+  };
 
   const divStyle = {
     // position: "absolute",
     // zIndex:"3000"
-  }
-  return <div className={classes.searchWrapper}>
-  {/* <Throttle time="1000" handler="onChange"> */}
-{/* </Throttle> */}
+  };
+  return (
+    <div className={classes.searchWrapper}>
+      {/* <Throttle time="1000" handler="onChange"> */}
+      {/* </Throttle> */}
       <CustomInput
         className={classes.inputBox}
         labelText={t(label)}
         formControlProps={{
           fullWidth: true,
-          className: classes.margin + " " + classes.search,
+          className: classes.margin + " " + classes.search
         }}
-        labelProps={{ shrink: (keyword ? true : false) }}
+        labelProps={{ shrink: keyword ? true : false }}
         inputProps={{
           value: keyword,
           placeholder: t(placeholder),
           inputProps: {
-            "aria-label": t(placeholder),
+            "aria-label": t(placeholder)
           },
           style: { color: "black" },
           onChange: handleKeywordChange,
-          onKeyDown: (event) => {
+          onKeyDown: event => {
             const { key } = event;
             if (key === "Enter") {
               return handleSearch(keyword, page);
             }
           },
           onFocus: handleFocus,
-          onBlur: handleBlur,
+          onBlur: handleBlur
         }}
         onClear={onClear}
       />
-    <div style={divStyle}>
-    {
-      dropdown &&
-      <SearchDropDown
-        data={Object.keys(accounts).map(id => accounts[id])}
-        hasMore={hasMoreAccounts}
-        fetchData={fetchData}
-        selectData={handleSelectData}
-        show={dropdown}
-      />
-    }
-      {/* {
-        dropdown &&
-        
-        <InfiniteScroll 
-        className={classes.list}
-        dataLength={Object.keys(accounts).length} //This is important field to render the next data
-        next={fetchData}
-        hasMore={hasMoreAccounts}
-        loader={<h4>Loading...</h4>}
-        height={200}
-        endMessage={
-          <p style={{textAlign: 'center'}}>
-          <b>Yay! You have seen it all</b>
-        </p>
-      }
-      // below props only if you need pull down functionality
-      // refreshFunction={this.refresh}
-      // pullDownToRefresh
-      // pullDownToRefreshContent={
-        //   <h3 style={{textAlign: 'center'}}>&#8595; Pull down to refresh</h3>
-        // }
-        // releaseToRefreshContent={
-          //   <h3 style={{textAlign: 'center'}}>&#8593; Release to refresh</h3>
-          // }
-          >
-      {
-        accounts && Object.keys(accounts).length > 0 && searching &&
-        Object.keys(accounts).map(id =>
-            <MenuItem className={classes.listItem} key={id} value={id} onClick={() => handleSelectData(accounts[id])}>
-          <div>{accounts[id].username + " " + accounts[id].phone} </div>
-        </MenuItem>
-        )
-      }
-      </InfiniteScroll>
-    } */}
+      <div style={divStyle}>
+        {dropdown && (
+          <SearchDropDown
+            data={Object.keys(accounts).map(id => accounts[id])}
+            hasMore={hasMoreAccounts}
+            fetchData={fetchData}
+            selectData={handleSelectData}
+            onEndClicked={() => {
+              setDropdown(false);
+              onEndClicked(keyword);
+            }}
+            show={dropdown}
+          />
+        )}
+      </div>
     </div>
-  </div>
-}
-
-// AccountSearch.propTypes = {
-//   location: PropTypes.object,
-// };
+  );
+};
 
 export default AccountSearch;

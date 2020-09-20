@@ -1,4 +1,3 @@
-
 export const transactions = (state = [], action) => {
   if (action && action.type === "SET_TRANSACTIONS") {
     return action.payload;

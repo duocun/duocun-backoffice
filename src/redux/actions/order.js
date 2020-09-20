@@ -1,43 +1,43 @@
 export const OrderStatus = {
-  BAD: 'B',          // client return, compansate
-  DELETED: 'D',          // cancellation
-  TEMP: 'T',             // generate a temp order for electronic order
-  NEW: 'N',
-  LOADED: 'L',           // The driver took the food from Merchant
-  DONE: 'F',             // Finish delivery
-  MERCHANT_CHECKED: 'MC'  // VIEWED BY MERCHANT
+  BAD: "B", // client return, compansate
+  DELETED: "D", // cancellation
+  TEMP: "T", // generate a temp order for electronic order
+  NEW: "N",
+  LOADED: "L", // The driver took the food from Merchant
+  DONE: "F", // Finish delivery
+  MERCHANT_CHECKED: "MC" // VIEWED BY MERCHANT
 };
 
 export const loadOrders = payload => {
   return {
-    type: 'SET_ORDERS',
+    type: "SET_ORDERS",
     payload
-  }
-}
+  };
+};
 export const loadFilterOrders = payload => {
   return {
-    type: 'LOAD_FILTER_ORDERS',
+    type: "LOAD_FILTER_ORDERS",
     payload
-  }
-}
+  };
+};
 
 // payload --- deliverDate string
 export const setDeliverDate = payload => ({
-  type: 'SET_DELIVER_DATE',
+  type: "SET_DELIVER_DATE",
   payload
-})
+});
 
 // payload --- order created date string
 export const setOrderDate = payload => ({
-  type: 'SET_ORDER_DATE',
+  type: "SET_ORDER_DATE",
   payload
-})
+});
 
 // payload --- order object
 export const selectOrder = payload => ({
-  type: 'SELECT_ORDER',
+  type: "SELECT_ORDER",
   payload
-})
+});
 
 // async
 

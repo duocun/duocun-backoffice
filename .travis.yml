@@ -1,10 +1,6 @@
 language: node_js
 node_js:
-  - "12.14.0"
-
-branches:
-  only:
-    - master
+  - "14.8.0"
 
 cache:
   directories:
@@ -14,11 +10,23 @@ script:
   - npm run test
   - npm run build
 
+# deploy:
+#   provider: pages
+#   skip-cleanup: true
+#   github-token: $GITHUB_TOKEN
+#   keep-history: true
+#   on:
+#     branch: master
+#   local_dir: build
+
 deploy:
-  provider: pages
-  skip-cleanup: true
-  github-token: $GITHUB_TOKEN
-  keep-history: true
-  on:
-    branch: master
-  local_dir: build
+  - provider: s3
+    access_key_id: $AWS_ACCESS_KEY_ID
+    secret_access_key: $AWS_SECRET_ACCESS_KEY
+    skip_cleanup: true
+    bucket: "admin-dev.duocun.ca"
+    region: us-east-1
+    local_dir: build
+    on:
+      repo: duocun/duocun-backoffice
+      branch: develop

@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "@material-ui/core/styles";
-import * as moment from 'moment';
+import * as moment from "moment";
 import { KeyboardDatePicker } from "@material-ui/pickers";
 // import {useForm} from "react-hook-form";
 // import TimePicker from "components/TimePicker/TimePicker";
@@ -37,30 +37,27 @@ import Button from "@material-ui/core/Button";
 // icons
 import FormatListBulletedIcon from "@material-ui/icons/FormatListBulleted";
 import SaveIcon from "@material-ui/icons/Save";
-import HistoryIcon from '@material-ui/icons/History';
+import HistoryIcon from "@material-ui/icons/History";
 
 import FlashStorage from "services/FlashStorage";
-
 
 import AccountSearch from "components/AccountSearch/AccountSearch";
 import AddressSearch from "components/AddressSearch/AddressSearch";
 import OrderItemEditor from "views/Orders/OrderItemEditor";
 
 import AuthService from "services/AuthService";
-import ApiAuthService from 'services/api/ApiAuthService';
-import ApiAccountService from 'services/api/ApiAccountService';
-import ApiOrderService from 'services/api/ApiOrderService';
+import ApiAuthService from "services/api/ApiAuthService";
+import ApiAccountService from "services/api/ApiAccountService";
+import ApiOrderService from "services/api/ApiOrderService";
 import ApiMerchantService from "services/api/ApiMerchantService";
 // import ApiLocationService from 'services/api/ApiLocationService';
 
 // import moment from 'moment-timezone/moment-timezone';
-const useStyles = makeStyles(theme => ({
-
-}));
+const useStyles = makeStyles(theme => ({}));
 
 /**
  * props: data, onAfterUpdate
- * 
+ *
  */
 const OrderForm = ({ data, onAfterUpdate, history }) => {
   // const { register, handleSubmit, watch, errors } = useForm();
@@ -76,7 +73,10 @@ const OrderForm = ({ data, onAfterUpdate, history }) => {
 
   const { t } = useTranslation();
   const classes = useStyles();
-  const [modifyByAccount, setModifyByAccount] = useState({ _id: '', username: '' });
+  const [modifyByAccount, setModifyByAccount] = useState({
+    _id: "",
+    username: ""
+  });
   const [accounts, setAccounts] = useState([]);
   const [merchants, setMerchants] = useState([]);
   const [model, setModel] = useState(data);
@@ -97,18 +97,19 @@ const OrderForm = ({ data, onAfterUpdate, history }) => {
   );
 
   useEffect(() => {
-    ApiMerchantService.getMerchants({type: 'G', status:'A'}).then(({data}) => {
-      setMerchants(data.data);
-    });
+    ApiMerchantService.getMerchants({ type: "G", status: "A" }).then(
+      ({ data }) => {
+        setMerchants(data.data);
+      }
+    );
   }, []);
 
-
   useEffect(() => {
-    ApiAccountService.getAccounts({ type: 'driver', status: 'A' }).then((d) => {
+    ApiAccountService.getAccounts({ type: "driver", status: "A" }).then(d => {
       const staffs = d.data.data;
       setDriverList(staffs);
       // set products for remove products function
-      if(data){
+      if (data) {
         if (data.items && data.items.length > 0) {
           const checkMap = {};
           data.items.forEach(it => {
@@ -118,7 +119,7 @@ const OrderForm = ({ data, onAfterUpdate, history }) => {
         }
 
         // set model for save function
-        if (data.actionCode === 'PS') {
+        if (data.actionCode === "PS") {
           setModel({
             ...data,
             modifyBy: modifyByAccount._id
@@ -135,100 +136,105 @@ const OrderForm = ({ data, onAfterUpdate, history }) => {
     ApiAuthService.getCurrentUser(token).then(({ data }) => {
       const account = { ...data.data };
       setModifyByAccount(account);
-      ApiAccountService.getAccountList(null, null, { type: { $in: ['driver', 'system'] } }).then(({ data }) => {
+      ApiAccountService.getAccountList(null, null, {
+        type: { $in: ["driver", "system"] }
+      }).then(({ data }) => {
         setAccounts(data.data);
       });
     });
   }, []);
 
-
   const handleCreate = () => {
-    if (model._id === 'clone') {
+    if (model._id === "clone") {
       const vs = Object.values(itemMap);
-      const items = vs.filter(v => v._id !== 'new');
+      const items = vs.filter(v => v._id !== "new");
 
       if (model.clientId && items && items.length > 0) {
-        let d = {...model, items};
+        let d = { ...model, items };
         delete d._id;
         delete d.code;
 
         removeAlert();
         setProcessing(true);
-        ApiOrderService.createOrder(d).then(({ data }) => {
-          if (data.code === 'success') {
-            const newAlert = {
-              message: t("Saved successfully"),
-              severity: "success"
-            };
-            if (model._id === "new") {
-              FlashStorage.set("ORDER_ALERT", newAlert);
-              return;
+        ApiOrderService.createOrder(d)
+          .then(({ data }) => {
+            if (data.code === "success") {
+              const newAlert = {
+                message: t("Saved successfully"),
+                severity: "success"
+              };
+              if (model._id === "new") {
+                FlashStorage.set("ORDER_ALERT", newAlert);
+                return;
+              } else {
+                setAlert(newAlert);
+                onAfterUpdate();
+              }
             } else {
-              setAlert(newAlert);
-              onAfterUpdate();
+              setAlert({
+                message: t("Save failed"),
+                severity: "error"
+              });
             }
-          } else {
-            setAlert({
-              message: t("Save failed"),
-              severity: "error"
-            });
-          }
-          setProcessing(false);
-        }).catch(e => {
+            setProcessing(false);
+          })
+          .catch(e => {
             console.error(e);
             setAlert({
               message: t("Save failed"),
               severity: "error"
             });
             setProcessing(false);
-        });
+          });
       }
     }
   };
 
   const handleUpdate = () => {
-    if (model._id !== 'new' && model._id !== 'clone' && modifyByAccount._id) {
+    if (model._id !== "new" && model._id !== "clone" && modifyByAccount._id) {
       removeAlert();
       setProcessing(true);
-      setModel({ ...model, modifyBy: modifyByAccount._id })
-      ApiOrderService.updateOrder(model).then(({ data }) => {
-        if (data.code === 'success') {
-          setAlert({
-            message: t("Update successfully"),
-            severity: "success"
-          });
-          onAfterUpdate();
-        } else {
+      setModel({ ...model, modifyBy: modifyByAccount._id });
+      ApiOrderService.updateOrder(model)
+        .then(({ data }) => {
+          if (data.code === "success") {
+            setAlert({
+              message: t("Update successfully"),
+              severity: "success"
+            });
+            onAfterUpdate();
+          } else {
+            setAlert({
+              message: t("Update failed"),
+              severity: "error"
+            });
+          }
+          setProcessing(false);
+        })
+        .catch(e => {
+          console.error(e);
           setAlert({
             message: t("Update failed"),
             severity: "error"
           });
-        }
-        setProcessing(false);
-      }).catch(e => {
-        console.error(e);
-        setAlert({
-          message: t("Update failed"),
-          severity: "error"
+          setProcessing(false);
         });
-        setProcessing(false);
-      });
     }
-  }
+  };
 
   const canSplit = () => {
     const vs = Object.keys(productMap).map(pId => productMap[pId]);
     const checked = vs.filter(v => v.status);
     const unchecked = vs.filter(v => !v.status);
-    return (checked.length > 0 && unchecked.length > 0);
-  }
+    return checked.length > 0 && unchecked.length > 0;
+  };
 
   const handleSplitOrder = () => {
     const vs = Object.keys(productMap).map(pId => productMap[pId]);
     const checked = vs.filter(v => v.status);
     // const unchecked = vs.filter(v => !v.status);
     if (canSplit()) {
-      const r = window.confirm('拆分送货单, 为选中的商品新建一个送货单。');
+      const r = window.confirm("拆分送货单, 为选中的商品新建一个送货单。");
       if (r) {
         ApiOrderService.splitOrder(model._id, checked).then(({ data }) => {
           const r = data;
@@ -236,102 +242,78 @@ const OrderForm = ({ data, onAfterUpdate, history }) => {
         });
       }
     }
-  }
-
-  // location --- ILocation
-  const getAddrString = (location) => {
-    if (location) {
-      const city = location.subLocality ? location.subLocality : location.city;
-      const province = location.province;
-      const streetName = location.streetName;
-      return location.streetNumber + ' ' + streetName + ', ' + city + ', ' + province;
-    } else {
-      return '';
-    }
-  }
+  };
 
   const handleSubmit = () => {
-    if (model._id && model._id !== 'new' && model._id !== 'clone') {
+    if (model._id && model._id !== "new" && model._id !== "clone") {
       handleUpdate();
     } else {
       handleCreate();
     }
-  }
+  };
   const handleToggleProduct = (e, it) => {
     const c = { ...productMap };
     c[it.productId].status = e.target.checked;
     setCheckMap(c);
-  }
+  };
 
-  const updateFormData = (id) => {
+  const updateFormData = id => {
     if (id) {
       ApiOrderService.getOrder(id).then(({ data }) => {
         const order = data.data;
         setModel(order);
       });
     }
-  }
+  };
 
-  const handleBack = () => {
-
-  }
-
-  const handleUpdateItemMap = (itemMap) => {
+  const handleUpdateItemMap = itemMap => {
     setItemMap(itemMap);
     const vs = Object.values(itemMap);
-    const items = vs.filter(v => v._id !== 'new');
+    const items = vs.filter(v => v._id !== "new");
     const charge = ApiOrderService.getChargeFromOrderItems(items, 0);
-    setModel({...model, ...charge, items});
-  }
+    setModel({ ...model, ...charge, items });
+  };
 
-  const handleSelectDeliverLocation = (location) => {
+  const handleSelectDeliverLocation = location => {
     setModel({ ...model, location });
-  }
+  };
 
-  const handleDeliverDateChange = (m) => {
-    const deliverDate = m.toISOString().split('T')[0];
-    setModel({ ...model, deliverDate, delivered: `${deliverDate}T15:00:00.000Z` });
-  }
-
-  const handleSelectProduct = (item) => {
-    setModel({ ...model, items: [item] });
-  }
-
-  const handleDriverChange = (e) => {
-    const driverId = e.target.value;
-    const driver = drivers.find(d => d._id === driverId);
+  const handleDeliverDateChange = m => {
+    const deliverDate = m.toISOString().split("T")[0];
     setModel({
       ...model,
-      driverId: e.target.value,
-      driverName: driver ? driver.username: ''
+      deliverDate,
+      delivered: `${deliverDate}T15:00:00.000Z`
     });
-  }
+  };
 
   const handleSelectDriver = account => {
     // const type = account ? account.type : 'driver';
-    setDriverKeyword(account ? account.username : '');
+    setDriverKeyword(account ? account.username : "");
     setModel({
       ...model,
       driverId: account._id,
-      driverName: account ? account.username: ''
+      driverName: account ? account.username : ""
     });
-  }
+  };
 
   const handleClearDriver = () => {
     setDriverKeyword("");
-  }
+  };
 
   const handleSearchDriver = (page, rowsPerPage, keyword) => {
-    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword, ['driver']);
-  }
+    return ApiAccountService.getAccountByKeyword(page, rowsPerPage, keyword, [
+      "driver"
+    ]);
+  };
 
   const getTitle = () => {
-    if (model._id === 'new' || model._id === 'clone') {
-      return 'New Order';
+    if (model._id === "new" || model._id === "clone") {
+      return "New Order";
     } else {
-      return 'Edit Order';
+      return "Edit Order";
     }
-  }
+  };
 
   return (
     <GridContainer>
@@ -353,39 +335,43 @@ const OrderForm = ({ data, onAfterUpdate, history }) => {
                   </Alert>
                 </GridItem>
               )}
-              {
-                !(model._id === 'new' || model._id === 'clone') &&
+              {!(model._id === "new" || model._id === "clone") && (
                 <GridItem xs={12} lg={12}>
                   <Box pb={2}>
-                    <TextField id="order-code"
+                    <TextField
+                      id="order-code"
                       label={`${t("Code")}`}
                       value={model.code}
                       InputLabelProps={{ shrink: model.code ? true : false }}
                       InputProps={{
-                        readOnly: true,
+                        readOnly: true
                       }}
                     />
                   </Box>
                 </GridItem>
-              }
+              )}
               <GridItem xs={12} lg={6}>
                 <Box pb={2}>
-                  <TextField id="order-client"
+                  <TextField
+                    id="order-client"
                     label={`${t("Client")}`}
-                    value={model.clientName ? model.clientName : ''}
+                    value={model.clientName ? model.clientName : ""}
                     InputLabelProps={{ shrink: model.clientId ? true : false }}
                     InputProps={{
-                      readOnly: true,
+                      readOnly: true
                     }}
                   />
                 </Box>
               </GridItem>
               <GridItem xs={12} lg={6}>
                 <Box pb={2}>
-                  <TextField id="order-client-phone"
+                  <TextField
+                    id="order-client-phone"
                     label={`${t("Client Phone")}`}
-                    value={model.clientPhone ? model.clientPhone : ''}
-                    InputLabelProps={{ shrink: model.clientPhone ? true : false }}
+                    value={model.clientPhone ? model.clientPhone : ""}
+                    InputLabelProps={{
+                      shrink: model.clientPhone ? true : false
+                    }}
                     onChange={e => {
                       setModel({ ...model, clientPhone: e.target.value });
                     }}
@@ -395,16 +381,15 @@ const OrderForm = ({ data, onAfterUpdate, history }) => {
               <GridItem xs={12} lg={12}>
                 <Box pb={2}>
                   <AddressSearch
-                    label={'Deliver Address'}
-                    placeholder={'Search Address'}
+                    label={"Deliver Address"}
+                    placeholder={"Search Address"}
                     handleSelectLocation={handleSelectDeliverLocation}
                     location={model.location}
                   />
                 </Box>
               </GridItem>
 
-              {
-                (model._id === "new" || model._id === "clone") &&
+              {(model._id === "new" || model._id === "clone") && (
                 <GridItem xs={12} lg={6}>
                   <Box pb={2}>
                     <FormControl className={classes.select}>
@@ -424,10 +409,7 @@ const OrderForm = ({ data, onAfterUpdate, history }) => {
                       >
                         {merchants.map(merchant => {
                           return (
-                            <MenuItem
-                              key={merchant._id}
-                              value={merchant._id}
-                            >
+                            <MenuItem key={merchant._id} value={merchant._id}>
                               {merchant.name}
                             </MenuItem>
                           );
@@ -436,33 +418,39 @@ const OrderForm = ({ data, onAfterUpdate, history }) => {
                     </FormControl>
                   </Box>
                 </GridItem>
-              }
+              )}
 
-              {
-                (model._id === "new" || model._id === "clone") &&
+              {(model._id === "new" || model._id === "clone") && (
                 <GridItem xs={12} lg={12}>
                   <Box pb={2}>
-                    <OrderItemEditor merchantId={model.merchantId} onUpdateItemMap={handleUpdateItemMap} />
+                    <OrderItemEditor
+                      merchantId={model.merchantId}
+                      onUpdateItemMap={handleUpdateItemMap}
+                    />
                   </Box>
                 </GridItem>
-              }
+              )}
 
-              {
-                !(model._id === 'new' || model._id === 'clone') &&
+              {!(model._id === "new" || model._id === "clone") && (
                 <GridItem xs={12} lg={12}>
                   <Box pb={2}>
-                    {
-                      model.items && model.items.length > 0 &&
-                      model.items.map(it => <div key={it.productId}>
-                        <FormControlLabel
-                          control={<Checkbox checked={productMap[it.productId].status}
-                            onChange={(e) => handleToggleProduct(e, it)}
-                            name={`${it.productId}`} />}
-                          label={`${it.productName} x ${it.quantity}`}
-                          color="primary"
-                        />
-                      </div>)
-                    }
+                    {model.items &&
+                      model.items.length > 0 &&
+                      model.items.map(it => (
+                        <div key={it.productId}>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={productMap[it.productId].status}
+                                onChange={e => handleToggleProduct(e, it)}
+                                name={`${it.productId}`}
+                              />
+                            }
+                            label={`${it.productName} x ${it.quantity}`}
+                            color="primary"
+                          />
+                        </div>
+                      ))}
                     <Button
                       color="primary"
                       variant="contained"
@@ -474,15 +462,16 @@ const OrderForm = ({ data, onAfterUpdate, history }) => {
                     </Button>
                   </Box>
                 </GridItem>
-              }
+              )}
               <GridItem xs={12} lg={6}>
                 <Box pb={2}>
-                  <TextField id="order-total"
+                  <TextField
+                    id="order-total"
                     label={`${t("Total")}`}
-                    value={model.total ? model.total : ''}
+                    value={model.total ? model.total : ""}
                     InputLabelProps={{ shrink: model.total ? true : false }}
                     InputProps={{
-                      readOnly: true,
+                      readOnly: true
                     }}
                   />
                 </Box>
@@ -490,7 +479,7 @@ const OrderForm = ({ data, onAfterUpdate, history }) => {
 
               <GridItem xs={12} lg={6}>
                 {/* <Box pb={5}> */}
-                  {/* <TextField id="order-driver"
+                {/* <TextField id="order-driver"
                     label={`${t("Driver")}`}
                     value={model.driverName}
                     InputLabelProps={{ shrink: model.driverId ? true : false }}
@@ -498,19 +487,18 @@ const OrderForm = ({ data, onAfterUpdate, history }) => {
                       readOnly: true,
                     }}
                   /> */}
-              <GridItem xs={12} sm={12} lg={3}>
-                <AccountSearch
-                  label="Driver"
-                  placeholder="Search name or phone"
-                  val={driverKeyword}
-                  onSelect={handleSelectDriver}
-                  onSearch={handleSearchDriver}
-                  onClear={handleClearDriver}
-                />
-              </GridItem>
-                  {
-                    
-                    // model.driverId &&
+                <GridItem xs={12} sm={12} lg={3}>
+                  <AccountSearch
+                    label="Driver"
+                    placeholder="Search name or phone"
+                    val={driverKeyword}
+                    onSelect={handleSelectDriver}
+                    onSearch={handleSearchDriver}
+                    onClear={handleClearDriver}
+                  />
+                </GridItem>
+                {
+                  // model.driverId &&
                   // <FormControl className={classes.select}>
                   //     <InputLabel id="driver-label">{t("Driver")}</InputLabel>
                   //     <Select id="driver"
@@ -521,7 +509,7 @@ const OrderForm = ({ data, onAfterUpdate, history }) => {
                   //             {t("Unassigned")}
                   //         </MenuItem>
                   //       {
-                  //         drivers.map(driver => 
+                  //         drivers.map(driver =>
                   //           <MenuItem key={driver._id} value={driver._id}>
                   //             {driver.username}
                   //           </MenuItem>
@@ -529,17 +517,20 @@ const OrderForm = ({ data, onAfterUpdate, history }) => {
                   //       }
                   //     </Select>n
                   //   </FormControl>
-                    }
+                }
                 {/* </Box> */}
               </GridItem>
               <GridItem xs={12} lg={6}>
                 <Box pb={2}>
-                  <TextField id="order-driver-phone"
+                  <TextField
+                    id="order-driver-phone"
                     label={`${t("Driver Phone")}`}
-                    value={model.driverPhone ? model.driverPhone : ''}
-                    InputLabelProps={{ shrink: model.driverPhone ? true : false }}
+                    value={model.driverPhone ? model.driverPhone : ""}
+                    InputLabelProps={{
+                      shrink: model.driverPhone ? true : false
+                    }}
                     InputProps={{
-                      readOnly: true,
+                      readOnly: true
                     }}
                   />
                 </Box>
@@ -547,10 +538,11 @@ const OrderForm = ({ data, onAfterUpdate, history }) => {
 
               <GridItem xs={12} lg={12}>
                 <Box pb={2}>
-                  <TextField id="order-note"
+                  <TextField
+                    id="order-note"
                     label={`${t("Note")}`}
                     fullWidth
-                    value={model.note ? model.note : ''}
+                    value={model.note ? model.note : ""}
                     InputLabelProps={{ shrink: model.note ? true : false }}
                     // InputProps={{}}
                     onChange={e => {
@@ -565,14 +557,13 @@ const OrderForm = ({ data, onAfterUpdate, history }) => {
                   label={t("Deliver Date")}
                   format="YYYY-MM-DD"
                   value={moment.utc(model.delivered)}
-                  onChange={(m) => handleDeliverDateChange(m)}
+                  onChange={m => handleDeliverDateChange(m)}
                   InputLabelProps={{
-                    shrink: model.delivered ? true : false,
+                    shrink: model.delivered ? true : false
                   }}
                 />
               </GridItem>
               <GridItem xs={12} container direction="row-reverse">
-
                 <Box mt={2} mr={2}>
                   <Link to={`../orders`}>
                     <Button variant="contained">
@@ -601,15 +592,13 @@ const OrderForm = ({ data, onAfterUpdate, history }) => {
                   </Link>
                 </Box>
               </GridItem>
-
             </GridContainer>
           </CardBody>
         </Card>
       </GridItem>
     </GridContainer>
-  )
-}
-
+  );
+};
 
 OrderForm.propTypes = {
   // match: PropTypes.shape({

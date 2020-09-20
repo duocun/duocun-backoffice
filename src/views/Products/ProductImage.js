@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import { makeStyles } from "@material-ui/core/styles";
 import CancelIcon from "@material-ui/icons/Cancel";
@@ -25,7 +25,7 @@ export default function ProductImage({ src, onRemove }) {
   return (
     <div className={classes.imageWrapper}>
       <CancelIcon className={classes.deleteIcon} onClick={onRemove} />
-      <img className={classes.image} src={getPictureUrl(src)}></img>
+      <img className={classes.image} src={getPictureUrl(src)} alt=""></img>
     </div>
   );
 }

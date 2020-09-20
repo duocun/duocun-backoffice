@@ -28,12 +28,12 @@ const useStyles = makeStyles(styles);
 const AdminNavbarLinks = ({ signOut }) => {
   const { t } = useTranslation();
   const history = useHistory({
-    basename: "/" // "admin2" // backoffice
+    basename: "", // admin2 backoffice
   });
   const classes = useStyles();
   const [openNotification, setOpenNotification] = React.useState(null);
   const [openProfile, setOpenProfile] = React.useState(null);
-  const handleClickNotification = event => {
+  const handleClickNotification = (event) => {
     if (openNotification && openNotification.contains(event.target)) {
       setOpenNotification(null);
     } else {
@@ -43,7 +43,7 @@ const AdminNavbarLinks = ({ signOut }) => {
   const handleCloseNotification = () => {
     setOpenNotification(null);
   };
-  const handleClickProfile = event => {
+  const handleClickProfile = (event) => {
     if (openProfile && openProfile.contains(event.target)) {
       setOpenProfile(null);
     } else {
@@ -107,7 +107,7 @@ const AdminNavbarLinks = ({ signOut }) => {
               id="notification-menu-list-grow"
               style={{
                 transformOrigin:
-                  placement === "bottom" ? "center top" : "center bottom"
+                  placement === "bottom" ? "center top" : "center bottom",
               }}
             >
               <Paper>
@@ -182,12 +182,21 @@ const AdminNavbarLinks = ({ signOut }) => {
               id="profile-menu-list-grow"
               style={{
                 transformOrigin:
-                  placement === "bottom" ? "center top" : "center bottom"
+                  placement === "bottom" ? "center top" : "center bottom",
               }}
             >
               <Paper>
                 <ClickAwayListener onClickAway={handleCloseProfile}>
                   <MenuList role="menu">
+                    <MenuItem
+                      onClick={() => {
+                        handleCloseProfile();
+                        history.push("/profile");
+                      }}
+                      className={classes.dropdownItem}
+                    >
+                      {t("My Profile")}
+                    </MenuItem>
                     <MenuItem
                       onClick={handleLogout}
                       className={classes.dropdownItem}
@@ -206,11 +215,11 @@ const AdminNavbarLinks = ({ signOut }) => {
 };
 
 AdminNavbarLinks.propTypes = {
-  signOut: PropTypes.func
+  signOut: PropTypes.func,
 };
 
-const mapDispatchToProps = dispatch => ({
-  signOut: () => dispatch(signOut())
+const mapDispatchToProps = (dispatch) => ({
+  signOut: () => dispatch(signOut()),
 });
 
 export default connect(

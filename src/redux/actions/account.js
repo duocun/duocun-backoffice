@@ -3,58 +3,73 @@ import ApiAccountService from "../../services/api/ApiAccountService";
 // export const loadAccountsSearchAsync = (payload, option) => {}
 
 export const loadAccountsAsync = (page, pageSize, payload, option) => {
-    return (dispatch) => {
+  return dispatch => {
     dispatch({ type: "LOAD_ACCOUNTS" });
-    if(option === 'name'){
-      ApiAccountService.getAccountAllKeyword(page, pageSize, payload).then(res=>res.data).then(
-        (res) => dispatch(setAccounts(res.data)),
-        (err) => {throw err}
-      ).catch(err=>{
-        console.log(err)
-      })
-    }else if(option === 'phone' && payload.length >= 3){
-      ApiAccountService.getAccountAllPhone(page, pageSize, payload).then(res=>res.data).then(
-        (res) => dispatch(setAccounts(res.data)),
-        (err) => {throw err}
-      ).catch(err=>{
-        console.log(err)
-      })
+    if (option === "name") {
+      ApiAccountService.getAccountAllKeyword(page, pageSize, payload)
+        .then(res => res.data)
+        .then(
+          res => dispatch(setAccounts(res.data)),
+          err => {
+            throw err;
+          }
+        )
+        .catch(err => {
+          console.log(err);
+        });
+    } else if (option === "phone" && payload.length >= 3) {
+      ApiAccountService.getAccountAllPhone(page, pageSize, payload)
+        .then(res => res.data)
+        .then(
+          res => dispatch(setAccounts(res.data)),
+          err => {
+            throw err;
+          }
+        )
+        .catch(err => {
+          console.log(err);
+        });
     }
   };
 };
 
-export const loadAccountsByTypeAsync = (payload) =>{
-  return (dispatch) => {
+export const loadAccountsByTypeAsync = payload => {
+  return dispatch => {
     dispatch({ type: "LOAD_ACCOUNTS" });
-      ApiAccountService.getAccountsByType(payload).then(res=>res.data).then(
-        (res) => dispatch(setAccounts(res.data)),
-        (err) => {throw err}
-      ).catch(err=>{
-        console.log(err)
-      })
+    ApiAccountService.getAccountsByType(payload)
+      .then(res => res.data)
+      .then(
+        res => dispatch(setAccounts(res.data)),
+        err => {
+          throw err;
+        }
+      )
+      .catch(err => {
+        console.log(err);
+      });
   };
-}
+};
 
-export const setAccounts = (payload) => {
+export const setAccounts = payload => {
   return {
     type: "SET_ACCOUNTS",
-    payload,
+    payload
   };
 };
 
 // The account to be operate
-export const setAccount = (payload) => {
+export const setAccount = payload => {
   return {
     type: "SET_ACCOUNT",
-    payload,
+    payload
   };
 };
 
 // The account logged in currently
-export const setLoggedInAccount = (payload) => {
+export const setLoggedInAccount = payload => {
   return {
     type: "SET_LOGGED_IN_ACCOUNT",
-    payload,
+    payload
   };
 };
 

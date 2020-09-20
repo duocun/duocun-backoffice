@@ -25,6 +25,13 @@ import CategoryIcon from "@material-ui/icons/Category";
 import StoreIcon from "@material-ui/icons/Store";
 import TransactionIcon from "@material-ui/icons/AttachMoney";
 import SalaryIcon from "@material-ui/icons/PeopleAlt";
+import WidgetsIcon from "@material-ui/icons/Widgets";
+import SupervisorAccountIcon from "@material-ui/icons/SupervisorAccount";
+import DateRangeIcon from "@material-ui/icons/DateRange";
+import PostAddIcon from "@material-ui/icons/PostAdd";
+import SettingsIcon from "@material-ui/icons/Settings";
+
+import DashboardRoute from "views/Dashboard/DashboardRoute.js";
 // import ListAltIcon from "@material-ui/icons/ListAlt";
 // core components/views for Admin layout
 import CategoriesPage from "views/Categories/Categories.js";
@@ -38,11 +45,16 @@ import TableList from "views/TableList/TableList.js";
 import StaticPage from "views/Pages/Pages.js";
 // import Assignment from "views/Assignment/AssignmentRoute";
 import SupportPage from 'views/Support/Support.js';
-import DashboardRoute from "views/Dashboard/DashboardRoute.js";
 
 import AccountsRoute from "views/Accounts/AccountsRoute";
 import MerchantsPage from "views/Merchants/MerchantsPage";
-import WidgetsIcon from "@material-ui/icons/Widgets";
+import RolesPage from "views/Roles/Roles";
+import ScheduleRoute from "views/Schedule/ScheduleRoute";
+import ProfilePage from "views/Profile/Profile";
+import SettingPage from "views/Setting/Setting";
+import { ROLE_ENUM } from "models/account";
+import { RESOURCES } from "models/account";
+import { PERMISSIONS } from "models/account";
 
 const dashboardRoutes = [
   {
@@ -50,14 +62,21 @@ const dashboardRoutes = [
     name: "Dashboard",
     icon: Dashboard,
     component: DashboardRoute,
-    layout: "/"
+    layout: "/",
+    perm: {
+      resource: RESOURCES.STATISTICS,
+      permission: PERMISSIONS.READ
+    }
   },
   {
     path: "/categories",
     name: "Categories",
     icon: CategoryIcon,
     component: CategoriesPage,
-    layout: "/"
+    layout: "/",
+    perm: {
+      resource: RESOURCES.CATEGORY
+    }
   },
   // {
   //   path: "/finance",
@@ -71,69 +90,143 @@ const dashboardRoutes = [
     name: "Order",
     icon: "content_paste",
     component: OrderRoute,
-    layout: "/"
+    layout: "/",
+    perm: {
+      resource: RESOURCES.ORDER
+    }
   },
   {
     path: "/finance/transactions",
     name: "Transaction",
     icon: TransactionIcon,
     component: FinanceRoute,
-    layout: "/"
+    layout: "/",
+    perm: {
+      role: ROLE_ENUM.SUPER
+    }
   },
   {
     path: "/finance/salary",
     name: "Salary",
     icon: SalaryIcon,
     component: FinanceRoute,
-    layout: "/"
+    layout: "/",
+    perm: {
+      role: ROLE_ENUM.SUPER
+    }
   },
   {
     path: "/products",
     name: "Products",
     icon: LocalMallIcon,
     component: ProductPage,
-    layout: "/"
+    layout: "/",
+    perm: {
+      resource: RESOURCES.PRODUCT
+    }
   },
   {
     path: "/stocks",
     name: "Stock",
     icon: WidgetsIcon,
     component: StockPage,
-    layout: "/"
+    layout: "/",
+    perm: {
+      resource: RESOURCES.STOCK
+    }
   },
   {
     path: "/attributes",
     name: "Attributes",
     icon: EditAttributesIcon,
     component: AttributePage,
-    layout: "/"
+    layout: "/",
+    perm: {
+      role: ROLE_ENUM.SUPER
+    }
   },
   {
     path: "/accounts",
     name: "Accounts",
     icon: Person,
     component: AccountsRoute,
-    layout: "/"
+    layout: "/",
+    perm: {
+      role: ROLE_ENUM.SUPER
+    }
   },
   {
     path: "/merchants",
     name: "Merchants",
     icon: StoreIcon,
     component: MerchantsPage,
-    layout: "/"
+    layout: "/",
+    perm: {
+      role: ROLE_ENUM.MERCHANT_ADMIN
+    }
   },
   {
     path: "/maps",
     name: "Assignment",
     icon: LocationIcon,
     component: MapRoute,
-    layout: "/"
+    layout: "/",
+    perm: {
+      role: ROLE_ENUM.SUPER
+    }
   },
   {
     path: "/pages",
     name: "Static Page",
-    icon: LocationIcon,
+    icon: PostAddIcon,
     component: StaticPage,
+    layout: "/",
+    perm: {
+      role: ROLE_ENUM.SUPER
+    }
+  },
+  {
+    path: "/roles",
+    name: "Roles & Permissions",
+    icon: SupervisorAccountIcon,
+    component: RolesPage,
+    layout: "/",
+    perm: {
+      role: ROLE_ENUM.SUPER
+    }
+  },
+  {
+    path: "/profile",
+    name: "Profile",
+    component: ProfilePage,
+    layout: "/",
+    hide: true
+  },
+  {
+    path: "/schedules",
+    name: "Schedule",
+    component: ScheduleRoute,
+    layout: "/",
+    icon: DateRangeIcon,
+    perm: {
+      role: ROLE_ENUM.MERCHANT_ADMIN
+    }
+  },
+  {
+    path: "/setting",
+    name: "Setting",
+    component: SettingPage,
+    layout: "/",
+    icon: SettingsIcon,
+    perm: {
+      role: ROLE_ENUM.SUPER
+    }
+  },
+  {
+    path: "/table",
+    name: "Table List",
+    icon: "content_paste",
+    component: TableList,
     layout: "/"
   },
   // {
@@ -145,7 +238,7 @@ const dashboardRoutes = [
   // },
   /** 
    * Customer Service Menu
-   * @author  terminator
+   * metalgear
   */
   {
     path: '/support',

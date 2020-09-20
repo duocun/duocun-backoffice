@@ -2,32 +2,32 @@ import ApiService from "services/api/ApiService";
 import { buildQuery, buildPaginationQuery } from "helper/index";
 
 export default {
-  getLocationList: (page, pageSize, {address}, sort = []) => {
+  getLocationList: (page, pageSize, { address }, sort = []) => {
     let query = {};
     let conditions = {};
     if (address) {
-      conditions.address = {  $regex: address };
+      conditions.address = { $regex: address };
     }
     query.query = buildPaginationQuery(page, pageSize, conditions, [], sort);
     return ApiService.v2().get("locations", query);
   },
 
   // condition --- {placeId} or  {address}
-  getLocations: (conditions) => {
+  getLocations: conditions => {
     let query = {};
     query.query = buildQuery(conditions);
     return ApiService.v2().get("locations/", query);
   },
 
   // condition --- {placeId} or  {address}
-  getLocationByGeocode: (conditions) => {
+  getLocationByGeocode: conditions => {
     let query = {};
     query.query = buildQuery(conditions);
     return ApiService.v2().get("locations/geocode/", query);
   },
-  
+
   // return {placeId, mainText, secondaryText}
-  getSuggestAddressList: (keyword) => {
+  getSuggestAddressList: keyword => {
     return ApiService.v2().get("locations/suggest/" + keyword);
   },
 
@@ -37,7 +37,7 @@ export default {
       $or: [
         {
           address: { $regex: keyword }
-        },
+        }
       ]
     };
     query.keyword = query.query = buildPaginationQuery(
@@ -52,6 +52,5 @@ export default {
 
   createLocation: (locationData = {}) => {
     return ApiService.v2().post("locations", locationData);
-  },
-
+  }
 };
