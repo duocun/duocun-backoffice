@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useTranslation } from "react-i18next";
 
 import {
@@ -132,6 +132,29 @@ const useStyles = makeStyles((theme) => ({
 
 let socket = null;
 
+const pageSize = 20;
+
+const buildUserQuery = (userPage, userOffset) => {
+  let query = {};
+  let s_query = {
+    where: {},
+    options: {}
+  };
+  
+  s_query.options.limit = pageSize;
+  s_query.options.skip = userOffset + pageSize * userPage;
+
+  query.query = JSON.stringify(s_query);
+
+  return query;
+};
+
+
+const queryUser = async (uPage, uOffset) => {
+  const query = buildUserQuery(uPage, uOffset);
+  return await ApiService.v2().get("messages/chatusers", query);
+};
+
 export default function SupportPage() {
 
   const { t } = useTranslation();
@@ -151,7 +174,7 @@ export default function SupportPage() {
   const [managerName, setManagerName] = React.useState("");
   const [userId, setUserId] = React.useState("");
   const [isUserMore, setIsUserMore] = React.useState(true);
-  const [userPage, setUserPage] = React.useState(0);
+  const [userPage, setUserPage] = React.useState(-1);
   const [chatPage, setChatPage] = React.useState(0);
   const [isMessageMore, setIsMessageMore] = React.useState(false);
   // const [welcomeMessage, setWelcomeMessage] = React.useState("");
@@ -168,39 +191,6 @@ export default function SupportPage() {
   const [userOffset, setUserOffset] = React.useState(0);
   const [chatOffset, setChatOffset] = React.useState(0);
 
-  const queryUser = React.useCallback(() => {
-    if (managerId && managerId !== "") {
-      let query = {};
-      let s_query = {
-        where: {},
-        options: {}
-      };
-      let pageSize = 20;
-      s_query.options.limit = pageSize;
-      s_query.options.skip = userOffset + pageSize * userPage;
-
-      query.query = JSON.stringify(s_query);
-      ApiService.v2().get("messages/chatusers", query).then(({ data }) => {
-        if (data.code === "success") {
-          if (data.data.length < pageSize) {
-            setIsUserMore(false);
-          }
-          if (data.data.length > 0) {
-            setUsers(oldUsers => {
-              return [...oldUsers].concat(data.data);
-            });
-            // if (userPage === 0) {
-            //   setUserId(data.data[0]._id);
-            // }
-          }
-          setUserPage(oldUserPage => {
-            return oldUserPage + 1;
-          });
-        }
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [managerId, userOffset]);
 
   const queryMessage = () => {
     if (userId && userId !== "") {
@@ -389,22 +379,55 @@ export default function SupportPage() {
         setManagerId(data.data._id);
         setManagerName(data.data.username);
         setManagerImg(data.data.profileImg);
-        console.log(data.data);
         // socket initialization
         socket = getSocket();
         socket.emit('admin_init', {
           'id': data.data._id
         });
-        queryUser();
       }
     });
-  }, [queryUser]);
+  }, []);
 
   React.useEffect(() => {
     if (socket) {
       receiveSocket(socket);
     }
   }, [receiveSocket]);
+
+  
+  useEffect(() => {
+    if (managerId) {
+      queryUser(0, 0).then(({ data }) => {
+        if (data.code === "success") {
+          if (data.data.length < pageSize) {
+            setIsUserMore(false);
+          }
+          if (data.data.length > 0) {
+            setUsers(data.data);
+            setUserPage(0);
+          }
+        }
+      });
+    }
+  }, [managerId]);
+
+  const loadMore = useCallback(() => {
+    if (userPage < 0) {
+      return;
+    }
+    queryUser(userPage + 1, userOffset).then(({ data }) => {
+      if (data.code === "success") {
+        if (data.data.length < pageSize) {
+          setIsUserMore(false);
+        }
+        if (data.data.length > 0) {
+          setUsers(data.data);
+          setUserPage(userPage + 1);
+        }
+      }
+    });
+    
+  }, [userPage, userOffset]);
 
   // const handleCancel = () => {
   //   setSettingVisible(false);
@@ -482,7 +505,7 @@ export default function SupportPage() {
               >
                 <InfiniteScroll
                   pageStart={0}
-                  loadMore={queryUser}
+                  loadMore={loadMore}
                   hasMore={isUserMore}
                   loader={
                     <div
