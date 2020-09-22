@@ -41,6 +41,7 @@ import zh from 'javascript-time-ago/locale/zh';
 import Auth from "services/AuthService";
 import ApiService from 'services/api/ApiService';
 import ApiAuthService from 'services/api/ApiAuthService';
+import ApiCustomerService from 'services/api/ApiCustomerService';
 import { getSocket } from "services/SocketService";
 
 import GridContainer from 'components/Grid/GridContainer.js';
@@ -132,29 +133,6 @@ const useStyles = makeStyles((theme) => ({
 
 let socket = null;
 
-const pageSize = 20;
-
-const buildUserQuery = (userPage, userOffset) => {
-  let query = {};
-  let s_query = {
-    where: {},
-    options: {}
-  };
-  
-  s_query.options.limit = pageSize;
-  s_query.options.skip = userOffset + pageSize * userPage;
-
-  query.query = JSON.stringify(s_query);
-
-  return query;
-};
-
-
-const queryUser = async (uPage, uOffset) => {
-  const query = buildUserQuery(uPage, uOffset);
-  return await ApiService.v2().get("messages/chatusers", query);
-};
-
 export default function SupportPage() {
 
   const { t } = useTranslation();
@@ -191,6 +169,7 @@ export default function SupportPage() {
   const [userOffset, setUserOffset] = React.useState(0);
   const [chatOffset, setChatOffset] = React.useState(0);
 
+  const PAGE_SIZE = 20;
 
   const queryMessage = () => {
     if (userId && userId !== "") {
@@ -397,9 +376,9 @@ export default function SupportPage() {
   
   useEffect(() => {
     if (managerId) {
-      queryUser(0, 0).then(({ data }) => {
+      ApiCustomerService.queryUser(0, 0, PAGE_SIZE).then(({ data }) => {
         if (data.code === "success") {
-          if (data.data.length < pageSize) {
+          if (data.data.length < PAGE_SIZE) {
             setIsUserMore(false);
           }
           if (data.data.length > 0) {
@@ -415,9 +394,9 @@ export default function SupportPage() {
     if (userPage < 0) {
       return;
     }
-    queryUser(userPage + 1, userOffset).then(({ data }) => {
+    ApiCustomerService.queryUser(userPage + 1, userOffset, PAGE_SIZE).then(({ data }) => {
       if (data.code === "success") {
-        if (data.data.length < pageSize) {
+        if (data.data.length < PAGE_SIZE) {
           setIsUserMore(false);
         }
         if (data.data.length > 0) {
