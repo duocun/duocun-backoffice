@@ -106,7 +106,7 @@ const Setting = ({ history }) => {
                       label={t('Welcome Message')}
                       value={model.welcome_message}
                       onChange={(e) =>
-                        setModel({ ...model, welcome_message: e.bubblestarget.value })
+                        setModel({ ...model, welcome_message: e.target.value })
                       }
                       fullWidth
                     />
