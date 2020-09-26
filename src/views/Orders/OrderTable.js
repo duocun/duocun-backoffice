@@ -71,6 +71,7 @@ export const OrderTable = ({
               { field: "address", label: "Address" },
               { field: "merchantName", label: "Merchant" },
               { field: "items", label: "Product" },
+              { field: "note", label: "Note" },
               { field: "actions", label: "Actions" }
             ]}
             sort={sort}
@@ -108,7 +109,9 @@ export const OrderTable = ({
                             </div>
                           ))}
                       </TableCell>
-
+                      <TableCell>
+                        {row.note ? row.note : ""}
+                      </TableCell>
                       <TableCell className={classes.operationRow}>
                         <Link to={`orders/clone`}>
                           <IconButton aria-label="clone">
