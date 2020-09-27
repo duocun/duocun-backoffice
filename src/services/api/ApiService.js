@@ -4,6 +4,9 @@ import Auth from "../AuthService";
 
 export const API_HOST = process.env.REACT_APP_API_HOST;
 export const API_V2_HOST = API_HOST;
+
+export const API_V1_HOST = process.env.REACT_APP_API_V1_HOST
+
 export default class ApiService {
   apiHost = "";
 
@@ -12,7 +15,7 @@ export default class ApiService {
   }
 
   static v1() {
-    return new ApiService(API_HOST);
+    return new ApiService(API_V1_HOST);
   }
 
   static v2() {
