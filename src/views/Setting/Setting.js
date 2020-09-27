@@ -14,7 +14,7 @@ import Alert from "components/CustomAlert/CustomAlert";
 import CustomLoader from "components/CustomLoader/CustomLoader";
 import CustomSelect from "components/CustomInput/SelectWithLabel";
 import TextField from '@material-ui/core/TextField';
-import { DEFAULT_MODEL } from "models/setting";
+import { DEFAULT_PAYMENT_GATEWAY_VENDOR } from "models/setting";
 import * as ApiSettingService from "services/api/ApiSettingService";
 
 
@@ -22,7 +22,7 @@ const Setting = ({ history }) => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
-  const [model, setModel] = useState(DEFAULT_MODEL);
+  const [model, setModel] = useState(DEFAULT_PAYMENT_GATEWAY_VENDOR);
   const [alert, setAlert] = useState(null);
 
   const loadModel = useCallback(() => {
@@ -90,13 +90,13 @@ const Setting = ({ history }) => {
                   <GridItem xs={12} md={6}>
                     <CustomSelect
                       label="Payment Method"
-                      value={model.payment_method}
+                      value={model.paymentGatewayVendor}
                       itemData={[
                         { text: "Snappay", value: "snappay" },
                         { text: "Alphapay", value: "alphapay" },
                       ]}
                       onChange={(value) =>
-                        setModel({ ...model, payment_method: value })
+                        setModel({ ...model, paymentGatewayVendor: value })
                       }
                     />                    
                   </GridItem>
@@ -104,9 +104,9 @@ const Setting = ({ history }) => {
                     <TextField
                       id="welcome-message"
                       label={t('Welcome Message')}
-                      value={model.welcome_message}
+                      value={model.welcomeMessage}
                       onChange={(e) =>
-                        setModel({ ...model, welcome_message: e.target.value })
+                        setModel({ ...model, welcomeMessage: e.target.value })
                       }
                       fullWidth
                     />
