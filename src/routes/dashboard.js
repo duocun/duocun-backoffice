@@ -96,6 +96,16 @@ const dashboardRoutes = [
     }
   },
   {
+    path: "/fixorders",
+    name: "Fix Order",
+    icon: "content_paste",
+    component: OrderRoute,
+    layout: "/",
+    perm: {
+      resource: RESOURCES.ORDER
+    }
+  },
+  {
     path: "/finance/transactions",
     name: "Transaction",
     icon: TransactionIcon,

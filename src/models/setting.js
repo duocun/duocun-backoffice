@@ -1,5 +1,5 @@
-export const DEFAULT_MODEL = {
+export const DEFAULT_PAYMENT_GATEWAY_VENDOR = {
   _id: "new",
-  payment_method: "snappay",
-  welcome_message: "Welcome!"
+  paymentGatewayVendor: "snappay",
+  welcomeMessage: "Welcome!"
 };
