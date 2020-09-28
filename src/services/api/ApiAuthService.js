@@ -3,7 +3,7 @@ import Auth from "../AuthService";
 
 export default {
   login: (email, password) => {
-    return ApiService.v1().post(
+    return ApiService.v2().post(
       "accounts/login",
       {
         email,
@@ -13,10 +13,10 @@ export default {
     );
   },
   getCurrentUser: tokenId => {
-    return ApiService.v1().get("accounts/current", { tokenId });
+    return ApiService.v2().get("accounts/current", { tokenId });
   },
   getCurrentAccount: () => {
     const tokenId = Auth.getAuthToken();
-    return ApiService.v1().get("accounts/current", { tokenId });
+    return ApiService.v2().get("accounts/current", { tokenId });
   }
 };
