@@ -40,6 +40,14 @@ export default {
     return ApiService.v2().get("orders", query);
   },
 
+  queryOrders: (conditions) => {
+    // 5f70095d8e9e63620316f4ee
+    let query = {};
+
+    query.query = buildQuery(conditions);
+    return ApiService.v2().get("orders", query);
+  },
+  
   getOrderListByDate: (
     page,
     pageSize,
