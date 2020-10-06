@@ -301,6 +301,7 @@ export default function SupportPage() {
             // update current user's category 
             const newUsers = [...users];
             newUsers[i].category = data.category;
+            newUsers[i].message = data.message !== "" ? data.message : t('Image Arrived');
             setUsers(newUsers);
           } else {
             const userItem = users.splice(i, 1)[0];
@@ -326,6 +327,14 @@ export default function SupportPage() {
         }, ...users]);
         setUserOffset(userOffset + 1);
       }
+    });
+
+    socket.off("id").on("id", (data) => {
+      console.log("Now connected as User");
+    });
+
+    socket.off("manager").on("manager", (data) => {
+      console.log("You are connected To Socket Server as manager");
     })
   }, [t, userId, users, userOffset, chatOffset, messages, messagesList]);
 
@@ -360,6 +369,7 @@ export default function SupportPage() {
         setManagerImg(data.data.profileImg);
         // socket initialization
         socket = getSocket();
+        console.log(`Now Connecting to Socket with ID ${data.data._id}`);
         socket.emit('admin_init', {
           'id': data.data._id
         });
@@ -431,41 +441,6 @@ export default function SupportPage() {
     } else {
       return t("Other");
     }
-  };
-
-  // const download = (fileUrl) => {
-  //   console.log(fileUrl)
-  //   var element = document.createElement("a");
-  //   var file = new Blob(
-  //     [
-  //       fileUrl
-  //     ],
-  //     { type: "image/*" }
-  //   );
-  //   element.href = URL.createObjectURL(file);
-  //   element.download = fileUrl.split("/").pop();
-  //   element.click();
-  // };
-
-  const download = e => {
-    const fileUrl = e.target.src;
-    fetch(fileUrl, {
-      method: "GET",
-      headers: {}
-    })
-      .then(response => {
-        response.arrayBuffer().then(function (buffer) {
-          const url = window.URL.createObjectURL(new Blob([buffer]));
-          const link = document.createElement("a");
-          link.href = url;
-          link.setAttribute("download", fileUrl.split("/").pop()); //or any other extension
-          document.body.appendChild(link);
-          link.click();
-        });
-      })
-      .catch(err => {
-        console.log(err);
-      });
   };
 
   return (
@@ -607,7 +582,9 @@ export default function SupportPage() {
                                       >
                                         {messageItem.image &&
                                           <Tooltip title={t("You can download this image")}>
-                                            <img className={classes.chatImage} src={messageItem.image} alt="chat" onClick={(e) => download(e)} />
+                                            <a href={messageItem.image} target="_blank">
+                                              <img className={classes.chatImage} src={messageItem.image} alt="chat"/>
+                                            </a>
                                           </Tooltip>
                                         }
                                         {messageItem.message}
