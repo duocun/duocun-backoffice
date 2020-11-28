@@ -22,8 +22,18 @@ import { useTranslation } from "react-i18next";
 import styles from "assets/jss/material-dashboard-react/components/headerLinksStyle.js";
 import AuthService from "services/AuthService";
 import { signOut } from "redux/actions";
+// socket
+import Snackbar from '@material-ui/core/Snackbar';
+import ApiAuthService from 'services/api/ApiAuthService';
+import { getSocket } from "services/SocketService";
+import MuiAlert from '@material-ui/lab/Alert';
 
 const useStyles = makeStyles(styles);
+
+let socket = null;
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const AdminNavbarLinks = ({ signOut }) => {
   const { t } = useTranslation();
@@ -33,6 +43,7 @@ const AdminNavbarLinks = ({ signOut }) => {
   const classes = useStyles();
   const [openNotification, setOpenNotification] = React.useState(null);
   const [openProfile, setOpenProfile] = React.useState(null);
+  const [openToast, setOpenToast] = React.useState(false);
   const handleClickNotification = (event) => {
     if (openNotification && openNotification.contains(event.target)) {
       setOpenNotification(null);
@@ -58,8 +69,44 @@ const AdminNavbarLinks = ({ signOut }) => {
     signOut();
     history.push("/login");
   };
+
+  React.useEffect(() => {
+    const token = AuthService.getAuthToken();
+    ApiAuthService.getCurrentUser(token).then(({ data }) => {
+      if (data && data.code === "success") {
+        // socket initialization
+        if(socket === null){
+          console.log("now connecting to socket...");
+          socket = getSocket();
+          socket.emit('admin_init', {
+            'id': data.data._id
+          });
+
+          socket.off('to_manager').on('to_manager', (data) => {
+            setOpenToast(true);
+          });
+        }
+      }
+    });
+  }, []);
+
+  const handleCloseToast = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenToast(false);
+  };
+
   return (
     <div>
+      <div className={classes.alertBox}>
+        <Snackbar open={openToast} autoHideDuration={6000} onClose={handleCloseToast} 
+          anchorOrigin={{vertical:'top', horizontal:'right'}} key="topright">
+          <Alert onClose={handleCloseToast} severity="info">
+            {t("Message arrived from customer!")}
+          </Alert>
+        </Snackbar>
+      </div>
       <Button
         color={window.innerWidth > 959 ? "transparent" : "white"}
         justIcon={window.innerWidth > 959}

@@ -76,7 +76,13 @@ const headerLinksStyle = theme => ({
       width: "100%"
     },
     display: "inline-block"
-  }
+  },
+  alertBox: {
+    width: '100%',
+    '& > * + *': {
+      marginTop: theme.spacing(2),
+    },
+  },
 });
 
 export default headerLinksStyle;

@@ -360,9 +360,6 @@ export default function SupportPage() {
         setManagerImg(data.data.profileImg);
         // socket initialization
         socket = getSocket();
-        socket.emit('admin_init', {
-          'id': data.data._id
-        });
       }
     });
   }, []);

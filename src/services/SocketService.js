@@ -5,7 +5,9 @@ let socket = null;
 
 export const getSocket = () => {
   if (!socket) {
-    socket = socketIOClient(ENDPOINT);
+    socket = socketIOClient(ENDPOINT, {
+      path: `${process.env.REACT_APP_SOCKET_SVC_PATH}/socket.io`
+    });
   }
   return socket;
 }

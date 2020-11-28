@@ -132,11 +132,13 @@
   "Welcome Message Setting": "Welcome Message Setting",
   "Welcome Message": "Welcome Message",
   "You can set the welcome message that will appear in the inquiry form of customer service page.": "You can set the welcome message that will appear in the inquiry form of customer service page.",
-  "Cancel": "Cancel",
+  "Cancel": "取消",
   "Please input welcome message": "Please input welcome message",
-  "Product / Delivery problems": "Product / Delivery problems",
-  "Change or Cancel Order": "Change or Cancel Order",
-  "Technical Support": "Technical Support",
-  "Other": "Other",
-  "You can download this image": "You can download this image"
+  "Product / Delivery problems": "产品/运输问题",
+  "Change or Cancel Order": "更改或者取消订单",
+  "Technical Support": "技术支持",
+  "Other": "其他",
+  "You can download this image": "可下载图片",
+  "Type a message...": "请输入。。。",
+  "Message arrived from customer!": "您有一条新信息未读"
 }
