@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { useHistory } from "react-router-dom";
@@ -24,6 +24,7 @@ import AuthService from "services/AuthService";
 import { signOut } from "redux/actions";
 // socket
 import Snackbar from '@material-ui/core/Snackbar';
+import { useSnackbar } from 'helper/useSnackbar';
 import ApiAuthService from 'services/api/ApiAuthService';
 import { getSocket } from "services/SocketService";
 import MuiAlert from '@material-ui/lab/Alert';
@@ -43,39 +44,50 @@ const AdminNavbarLinks = ({ signOut }) => {
   const classes = useStyles();
   const [openNotification, setOpenNotification] = React.useState(null);
   const [openProfile, setOpenProfile] = React.useState(null);
-  const [openToast, setOpenToast] = React.useState(false);
-  const handleClickNotification = (event) => {
-    if (openNotification && openNotification.contains(event.target)) {
-      setOpenNotification(null);
-    } else {
-      setOpenNotification(event.currentTarget);
-    }
-  };
-  const handleCloseNotification = () => {
+  const snackbar = useSnackbar();
+  // eslint-disable-next-line
+  const {open: openToast, showSnackbar, hideSnackbar} = snackbar;
+  const snackbarRef = React.useRef(snackbar);
+  React.useEffect(() => {
+    snackbarRef.current = snackbar;
+  }, [snackbar])
+  const handleClickNotification = React.useCallback((event) => {
+    setOpenNotification((oldOpenNotification) => {
+      if (oldOpenNotification && oldOpenNotification.contains(event.target)) {
+        return null;
+      } else {
+        return event.currentTarget;
+      }
+    })
+
+  }, []);
+  const handleCloseNotification = React.useCallback(() => {
     setOpenNotification(null);
-  };
-  const handleClickProfile = (event) => {
-    if (openProfile && openProfile.contains(event.target)) {
-      setOpenProfile(null);
-    } else {
-      setOpenProfile(event.currentTarget);
-    }
-  };
-  const handleCloseProfile = () => {
+  }, []);
+  const handleClickProfile = React.useCallback((event) => {
+    setOpenProfile(oldOpenProfile => {
+      if (oldOpenProfile && oldOpenProfile.contains(event.target)) {
+        return null;
+      } else {
+        return event.currentTarget;
+      }
+    });
+  }, []);
+  const handleCloseProfile = React.useCallback(() => {
     setOpenProfile(null);
-  };
-  const handleLogout = () => {
+  }, []);
+  const handleLogout = React.useCallback(() => {
     AuthService.logout();
     signOut();
     history.push("/login");
-  };
+  }, [signOut, history]);
 
   React.useEffect(() => {
     const token = AuthService.getAuthToken();
     ApiAuthService.getCurrentUser(token).then(({ data }) => {
       if (data && data.code === "success") {
         // socket initialization
-        if(socket === null){
+        if (socket === null) {
           console.log("now connecting to socket...");
           socket = getSocket();
           socket.emit('admin_init', {
@@ -83,25 +95,29 @@ const AdminNavbarLinks = ({ signOut }) => {
           });
 
           socket.off('to_manager').on('to_manager', (data) => {
-            setOpenToast(true);
+            snackbarRef.current.showSnackbar();
           });
         }
       }
     });
   }, []);
 
-  const handleCloseToast = (event, reason) => {
+  useEffect(() => {
+    console.log('open toast: ' + openToast);
+  }, [openToast]);
+
+  const handleCloseToast = useCallback((event, reason) => {
     if (reason === 'clickaway') {
       return;
     }
-    setOpenToast(false);
-  };
+    hideSnackbar();
+  }, [hideSnackbar]);
 
   return (
     <div>
       <div className={classes.alertBox}>
-        <Snackbar open={openToast} autoHideDuration={6000} onClose={handleCloseToast} 
-          anchorOrigin={{vertical:'top', horizontal:'right'}} key="topright">
+        <Snackbar open={openToast} autoHideDuration={6000} onClose={handleCloseToast}
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
           <Alert onClose={handleCloseToast} severity="info">
             {t("Message arrived from customer!")}
           </Alert>

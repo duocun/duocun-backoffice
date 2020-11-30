@@ -144,13 +144,17 @@ export default function SupportPage() {
   const [message, setMessage] = React.useState('');
   const [emojiVisible, setEmojiVisible] = React.useState(false);
   // const [settingVisible, setSettingVisible] = React.useState(false);
-  const [users, setUsers] = React.useState([]);
+  // const [users, setUsers] = React.useState([]);
+  const [userData, setUserData] = React.useState({
+    users: [],
+    userId: ''
+  });
   const [messages, setMessages] = React.useState([]);
   const [messagesList, setMessagesList] = React.useState([]);
   const [managerId, setManagerId] = React.useState("");
   const [managerImg, setManagerImg] = React.useState("");
   const [managerName, setManagerName] = React.useState("");
-  const [userId, setUserId] = React.useState("");
+  // const [userId, setUserId] = React.useState("");
   const [isUserMore, setIsUserMore] = React.useState(true);
   const [userPage, setUserPage] = React.useState(-1);
   const [chatPage, setChatPage] = React.useState(0);
@@ -163,15 +167,17 @@ export default function SupportPage() {
 
   // for sending images
   const [selectedFile, setSelectedFile] = React.useState(null);
-  const [selectedMedia, setMedia] = React.useState(null);
+  const [selectedMedia, setSelectedMedia] = React.useState(null);
 
   // for dynamic accumulation due to socket message
   const [userOffset, setUserOffset] = React.useState(0);
   const [chatOffset, setChatOffset] = React.useState(0);
 
+  const { users, userId } = userData;
+
   const PAGE_SIZE = 20;
 
-  const queryMessage = () => {
+  const queryMessage = useCallback(() => {
     if (userId && userId !== "") {
       // get messages
       let query = {};
@@ -184,7 +190,6 @@ export default function SupportPage() {
       s_query.options.skip = chatOffset + pageSize * chatPage;
 
       query.query = JSON.stringify(s_query);
-      console.log(query);
       ApiService.v2().get(`messages/chatmessages/${managerId}/${userId}`, query).then(({ data }) => {
         if (data.code === "success") {
           if (chatPage === 0) {
@@ -192,20 +197,19 @@ export default function SupportPage() {
               chatBoxRef.current.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
             }, 200);
           }
-          console.log(data.data);
           if (data.data.length < pageSize) {
-            setIsMessageMore(false);
+            setIsMessageMore(() => false);
           }
           if (data.data.length > 0) {
-            setMessages(JSON.parse(
+            setMessages(() => JSON.parse(
               JSON.stringify(messagesList.concat(data.data))).reverse());
-            setMessagesList(messagesList.concat(data.data));
-            setChatPage(chatPage + 1);
+            setMessagesList((oldMessagesList) => oldMessagesList.concat(data.data));
+            setChatPage((oldChatPage) => oldChatPage + 1);
           }
         }
       });
     }
-  };
+  }, [userId, chatOffset, chatPage, managerId, messagesList]);
 
   const getTimeStr = (startTime) => {
     if (startTime) {
@@ -215,26 +219,42 @@ export default function SupportPage() {
     }
   };
 
-  const handleUserItemClick = (selectedUserId, userIndex) => {
+  const setUserId = useCallback((newUserId) => {
+    setUserData((oldUserData) => {
+      return { ...oldUserData, userId: newUserId };
+    });
+  }, []);
+
+  const setUsers = (newUsers) => {
+    setUserData((oldUserData) => {
+      return { ...oldUserData, users: newUsers }
+    });
+  }
+
+  const handleUserItemClick = useCallback((selectedUserId, userIndex) => {
     if (userId !== selectedUserId) {
       users[userIndex].unread = 0;
-      setCategory(users[userIndex].category);
-      console.log(users[userIndex].category);
-      setUserLoggedIn(users[userIndex].userNo === 0);
+      setCategory(() => users[userIndex].category);
+      setUserLoggedIn(() => users[userIndex].userNo === 0);
       setUserId(selectedUserId);
-      setMessagesList([]);
-      setMessages([]);
-      setIsMessageMore(true);
-      setChatPage(0);
-      setChatOffset(0);
+      setMessagesList(() =>[]);
+      setMessages(() => []);
+      setIsMessageMore(() => true);
+      setChatPage(() => 0);
+      setChatOffset(() => 0);
     }
-  };
+  }, [userId, users, setUserId]);
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     if (userId !== "") {
       if (message.trim() === '' && selectedMedia === null) {
-        setMessage('');
+        setMessage(() => '');
       } else {
+        const selectedUserIndex = users.findIndex((u) => u._id === userId);
+        if (selectedUserIndex > -1) {
+          users[selectedUserIndex]['message'] = message === '' ? t('Image') : message;
+          setUsers(users);
+        }
         let newMessage = {
           message: message,
           image: selectedFile,
@@ -244,16 +264,15 @@ export default function SupportPage() {
           category: category,
           createdAt: Date.now()
         };
-        setMessages([...messages, newMessage]);
-        setMessagesList([newMessage, ...messagesList]);
-        setChatOffset(chatOffset + 1);
-        setMessage('');
-        setMedia(null);
-        setSelectedFile("");
+        setMessages((oldMessages) => [...oldMessages, newMessage]);
+        setMessagesList((oldMessagesList) => [newMessage, ...oldMessagesList]);
+        setChatOffset((oldChatOffset) => oldChatOffset + 1);
+        setMessage(() => '');
+        setSelectedMedia(() => null);
+        setSelectedFile(() => "");
         setTimeout(() => {
           chatBoxRef.current.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
-        }, 1000);
-
+        }, 200);
         // send data via socket
         newMessage.receiver = userId;
         newMessage.userLoggedIn = userLoggedIn;
@@ -262,87 +281,90 @@ export default function SupportPage() {
         socket.emit('admin_send', newMessage);
       }
     }
-  };
+  }, [t, userId, users, message, selectedMedia, selectedFile, category, managerId, managerImg, managerName, userLoggedIn]);
 
-  const receiveSocket = React.useCallback((socket) => {
-    socket.off('to_manager').on('to_manager', (data) => {
-      console.log(data);
-      // check if this is from a new user or not and also if this is from a currently reading user
-      let usersLength = users.length;
-      let isNew = true;
-      for (let i = 0; i < usersLength; i++) {
-        // if new message's sender is in list
-        console.log(users[i]._id, data.sender);
-        if (users[i]._id === data.sender) {
-          isNew = false;
-          // if it is currently viewing user's
-          if (userId === data.sender) {
-            // reset messages
-            ApiService.v2().get(`messages/reset/${data._id}`).then(({ data }) => {
-              if (data.code === "success") {
-                // reset messages ok
-                console.log(data.data)
+  const receiveSocket = React.useCallback((data) => {
+    let isNew = true;
+    if (socket) {
+      let newUsers;
+      setUserData((oldUserData) => {
+        const { users: oldUsers, userId: oldUserId } = oldUserData;
+        // check if this is from a new user or not and also if this is from a currently reading user
+        let usersLength = oldUsers.length;
+        for (let i = 0; i < usersLength; i++) {
+          // if new message's sender is in list
+          if (oldUsers[i]._id === data.sender) {
+            isNew = false;
+            // if it is currently viewing user's
+            if (oldUserId === data.sender) {
+              // reset messages
+              ApiService.v2().get(`messages/reset/${data._id}`).then(({ data }) => {
+                if (data.code === "success") {
+                  // reset messages ok
+                }
+              });
+              // just add message
+              let messageData = {
+                _id: data.sender,
+                message: data.message,
+                image: data.image,
+                createdAt: data.createdAt,
+                senderImg: data.senderImg
               }
-            });
-            // just add message
-            let messageData = {
-              _id: data.sender,
-              message: data.message,
-              image: data.image,
-              createdAt: data.createdAt,
-              senderImg: data.senderImg
+              setMessages((oldMessages) => oldMessages.concat(messageData));
+              setMessagesList((oldMessagesList) => [messageData].concat(oldMessagesList));
+              setChatOffset((oldChatOffset) => oldChatOffset + 1);
+              setTimeout(() => {
+                if (chatBoxRef.current) {
+                  chatBoxRef.current.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
+                }
+              }, 200);
+              // update current user's category 
+              newUsers = [...oldUsers];
+              newUsers[i].category = data.category;
+            } else {
+              const userItem = oldUsers.splice(i, 1)[0];
+              userItem.unread = userItem.unread + 1;
+              userItem.message = data.message !== "" ? data.message : t('Image Arrived');
+              userItem.category = data.category;
+              // oldUsers.unshift(userItem);
+              newUsers = [userItem, ...oldUsers];
             }
-            setMessages(messages.concat(messageData));
-            setMessagesList([messageData].concat(messagesList));
-            setChatOffset(chatOffset + 1);
-            setTimeout(() => {
-              chatBoxRef.current.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
-            }, 200);
-            // update current user's category 
-            const newUsers = [...users];
-            newUsers[i].category = data.category;
-            setUsers(newUsers);
-          } else {
-            const userItem = users.splice(i, 1)[0];
-            userItem.unread = userItem.unread + 1;
-            userItem.message = data.message !== "" ? data.message : t('Image Arrived');
-            userItem.category = data.category;
-            // users.unshift(userItem);
-            console.log(users);
-            setUsers([userItem, ...users]);
+            break;
           }
-          break;
         }
-      }
-      if (isNew) {
-        setUsers([{
-          _id: data.sender,
-          senderName: data.senderName,
-          senderImg: data.senderImg,
-          createdAt: data.createdAt,
-          userNo: data.userNo,
-          message: data.message ? data.message : t('Image arrived'),
-          unread: 1
-        }, ...users]);
-        setUserOffset(userOffset + 1);
-      }
-    })
-  }, [t, userId, users, userOffset, chatOffset, messages, messagesList]);
+        if (isNew) {
+          newUsers = [{
+            _id: data.sender,
+            senderName: data.senderName,
+            senderImg: data.senderImg,
+            createdAt: data.createdAt,
+            userNo: data.userNo,
+            message: data.message ? data.message : t('Image arrived'),
+            unread: 1
+          }, ...oldUsers];
+          setUserOffset((oldUserOffset) => oldUserOffset + 1);
+        }
+        setUserData({ ...oldUserData, users: newUsers });
+      });
+    }
+  }, [t]);
 
   const handleUploadClick = (event) => {
     if (event.target.files && event.target.files[0]) {
-      setMedia(event.target.files[0]);
+      setSelectedMedia(() => event.target.files[0]);
       const reader = new FileReader();
       reader.readAsDataURL(event.target.files[0]);
       reader.onload = (e) => {
         setSelectedFile(reader.result);
       };
     }
+    event.target.value = null;
   };
 
   const onClearImage = () => {
-    setSelectedFile("");
-    setMedia(null);
+    setSelectedFile(() => "");
+    setSelectedMedia(() => null);
   };
 
   // const getWelcomeMessage = () => {
@@ -362,15 +384,19 @@ export default function SupportPage() {
         socket = getSocket();
       }
     });
+    return () => {
+      socket = null;
+    }
   }, []);
 
   React.useEffect(() => {
     if (socket) {
-      receiveSocket(socket);
+      socket.off('to_manager', receiveSocket).on('to_manager', receiveSocket);
     }
-  }, [receiveSocket]);
+  // eslint-disable-next-line
+  }, [socket, receiveSocket]);
 
-  
+
   useEffect(() => {
     if (managerId) {
       ApiCustomerService.queryUser(0, 0, PAGE_SIZE).then(({ data }) => {
@@ -394,15 +420,15 @@ export default function SupportPage() {
     ApiCustomerService.queryUser(userPage + 1, userOffset, PAGE_SIZE).then(({ data }) => {
       if (data.code === "success") {
         if (data.data.length < PAGE_SIZE) {
-          setIsUserMore(false);
+          setIsUserMore(() => false);
         }
         if (data.data.length > 0) {
           setUsers(data.data);
-          setUserPage(userPage + 1);
+          setUserPage((oldUserPage) => oldUserPage + 1);
         }
       }
     });
-    
+
   }, [userPage, userOffset]);
 
   // const handleCancel = () => {
