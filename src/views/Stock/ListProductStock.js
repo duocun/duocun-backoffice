@@ -148,7 +148,7 @@ const StockRow = ({
 }) => {
   const classes = useStyles();
   const [quantity, setQuantity] = useState(
-    product.stock ? product.stock.quantity || 0 : 0
+    product.stock ? parseInt(product.stock.quantity) ?? 0 : 0
   );
   const [add, setAdd] = useState(0);
   const debouncedQuantity = useDebounce(quantity, 1000);
@@ -238,7 +238,7 @@ const StockRow = ({
             className={classes.inputInRow}
             onChange={(e) => {
               const newQuantity =
-                (quantity || 0) + parseInt(e.target.value);
+                parseInt(quantity || "0") + parseInt(e.target.value);
               setAdd(e.target.value);
               setQuantity(newQuantity);
             }}
