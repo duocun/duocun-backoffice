@@ -173,7 +173,10 @@ export default function SupportPage() {
   const [userOffset, setUserOffset] = React.useState(0);
   const [chatOffset, setChatOffset] = React.useState(0);
 
-  const { users, userId } = userData;
+  const { users, userId } = userData ?? {
+    users: [],
+    userId: ""
+  };
 
   const PAGE_SIZE = 20;
 
@@ -237,7 +240,7 @@ export default function SupportPage() {
       setCategory(() => users[userIndex].category);
       setUserLoggedIn(() => users[userIndex].userNo === 0);
       setUserId(selectedUserId);
-      setMessagesList(() =>[]);
+      setMessagesList(() => []);
       setMessages(() => []);
       setIsMessageMore(() => true);
       setChatPage(() => 0);
@@ -287,65 +290,69 @@ export default function SupportPage() {
     let isNew = true;
     if (socket) {
       let newUsers;
+      let flag = true;
       setUserData((oldUserData) => {
-        const { users: oldUsers, userId: oldUserId } = oldUserData;
-        // check if this is from a new user or not and also if this is from a currently reading user
-        let usersLength = oldUsers.length;
-        for (let i = 0; i < usersLength; i++) {
-          // if new message's sender is in list
-          if (oldUsers[i]._id === data.sender) {
-            isNew = false;
-            // if it is currently viewing user's
-            if (oldUserId === data.sender) {
-              // reset messages
-              ApiService.v2().get(`messages/reset/${data._id}`).then(({ data }) => {
-                if (data.code === "success") {
-                  // reset messages ok
+        if (flag) {
+          flag = false;
+          const { users: oldUsers, userId: oldUserId } = oldUserData;
+          // check if this is from a new user or not and also if this is from a currently reading user
+          let usersLength = oldUsers.length;
+          for (let i = 0; i < usersLength; i++) {
+            // if new message's sender is in list
+            if (oldUsers[i]._id === data.sender) {
+              isNew = false;
+              // if it is currently viewing user's
+              if (oldUserId === data.sender) {
+                // reset messages
+                ApiService.v2().get(`messages/reset/${data._id}`).then(({ data }) => {
+                  if (data.code === "success") {
+                    // reset messages ok
+                  }
+                });
+                // just add message
+                let messageData = {
+                  _id: data.sender,
+                  message: data.message,
+                  image: data.image,
+                  createdAt: data.createdAt,
+                  senderImg: data.senderImg
                 }
-              });
-              // just add message
-              let messageData = {
-                _id: data.sender,
-                message: data.message,
-                image: data.image,
-                createdAt: data.createdAt,
-                senderImg: data.senderImg
+                setMessages((oldMessages) => oldMessages.concat(messageData));
+                setMessagesList((oldMessagesList) => [messageData].concat(oldMessagesList));
+                setChatOffset((oldChatOffset) => oldChatOffset + 1);
+                setTimeout(() => {
+                  if (chatBoxRef.current) {
+                    chatBoxRef.current.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
+                  }
+                }, 200);
+                // update current user's category 
+                newUsers = [...oldUsers];
+                newUsers[i].category = data.category;
+              } else {
+                const userItem = oldUsers.splice(i, 1)[0];
+                userItem.unread = userItem.unread + 1;
+                userItem.message = data.message !== "" ? data.message : t('Image Arrived');
+                userItem.category = data.category;
+                // oldUsers.unshift(userItem);
+                newUsers = [userItem, ...oldUsers];
               }
-              setMessages((oldMessages) => oldMessages.concat(messageData));
-              setMessagesList((oldMessagesList) => [messageData].concat(oldMessagesList));
-              setChatOffset((oldChatOffset) => oldChatOffset + 1);
-              setTimeout(() => {
-                if (chatBoxRef.current) {
-                  chatBoxRef.current.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
-                }
-              }, 200);
-              // update current user's category 
-              newUsers = [...oldUsers];
-              newUsers[i].category = data.category;
-            } else {
-              const userItem = oldUsers.splice(i, 1)[0];
-              userItem.unread = userItem.unread + 1;
-              userItem.message = data.message !== "" ? data.message : t('Image Arrived');
-              userItem.category = data.category;
-              // oldUsers.unshift(userItem);
-              newUsers = [userItem, ...oldUsers];
+              break;
             }
-            break;
           }
+          if (isNew) {
+            newUsers = [{
+              _id: data.sender,
+              senderName: data.senderName,
+              senderImg: data.senderImg,
+              createdAt: data.createdAt,
+              userNo: data.userNo,
+              message: data.message ? data.message : t('Image arrived'),
+              unread: 1
+            }, ...oldUsers];
+            setUserOffset((oldUserOffset) => oldUserOffset + 1);
+          }
+          setUserData({ ...oldUserData, users: newUsers });
         }
-        if (isNew) {
-          newUsers = [{
-            _id: data.sender,
-            senderName: data.senderName,
-            senderImg: data.senderImg,
-            createdAt: data.createdAt,
-            userNo: data.userNo,
-            message: data.message ? data.message : t('Image arrived'),
-            unread: 1
-          }, ...oldUsers];
-          setUserOffset((oldUserOffset) => oldUserOffset + 1);
-        }
-        setUserData({ ...oldUserData, users: newUsers });
       });
     }
   }, [t]);
@@ -393,7 +400,7 @@ export default function SupportPage() {
     if (socket) {
       socket.off('to_manager', receiveSocket).on('to_manager', receiveSocket);
     }
-  // eslint-disable-next-line
+    // eslint-disable-next-line
   }, [socket, receiveSocket]);
 
 
