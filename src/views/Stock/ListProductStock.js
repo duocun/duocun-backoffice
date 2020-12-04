@@ -385,7 +385,7 @@ export default function ListProductStock({ location }) {
       });
   };
 
-  const updateData = () => {
+  const updateData = React.useCallback(() => {
     ApiStockService.getStockList(page, rowsPerPage, query, filterParams, [
       sort,
     ]).then(({ data }) => {
@@ -404,7 +404,7 @@ export default function ListProductStock({ location }) {
         });
       }
     });
-  };
+  }, [categories, filterParams, page, query, rowsPerPage, sort, t]);
 
   useEffect(() => {
     setLoading(true);
@@ -420,8 +420,7 @@ export default function ListProductStock({ location }) {
       setLoading(true);
       updateData();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // page, rowsPerPage, sort, categories
+  }, [categories, updateData]); // page, rowsPerPage, sort, categories
 
   useEffect(() => {
     setLoading(true);
@@ -461,18 +460,20 @@ export default function ListProductStock({ location }) {
                           },
                           placeholder: t("Category"),
                         }}
-                        value={filterParams.categoryId}
+                        value={filterParams.categoryId ?? "all"}
                         onChange={(e) => {
-                          const newParams = { ...filterParams };
                           if (e.target.value) {
-                            newParams.categoryId = e.target.value;
-                          } else {
-                            delete newParams.categoryId;
+                            const newParams = { ...filterParams };
+                            if (e.target.value !== "all") {
+                              newParams.categoryId = e.target.value;
+                            } else {
+                              delete newParams.categoryId;
+                            }
+                            setFilterParams(newParams);
                           }
-                          setFilterParams(newParams);
                         }}
                       >
-                        <MenuItem value="">{t("All")}</MenuItem>
+                        <MenuItem value="all">{t("All")}</MenuItem>
                         {categories.map((category) => (
                           <MenuItem key={category._id} value={category._id}>
                             {category.name}
@@ -496,7 +497,7 @@ export default function ListProductStock({ location }) {
                           },
                           placeholder: t("Stock Enabled"),
                         }}
-                        value={filterParams["stock.enabled"]}
+                        value={filterParams["stock.enabled"] === true || filterParams["stock.enabled"] === false ? filterParams["stock.enabled"].toString() : "all"}
                         onChange={(e) => {
                           const newParams = { ...filterParams };
                           if (e.target.value) {
@@ -511,7 +512,7 @@ export default function ListProductStock({ location }) {
                           setFilterParams(newParams);
                         }}
                       >
-                        <MenuItem value="">{t("All")}</MenuItem>
+                        <MenuItem value="all">{t("All")}</MenuItem>
                         <MenuItem value="true">{t("Yes")}</MenuItem>
                         <MenuItem value="false">{t("No")}</MenuItem>
                       </Select>
@@ -532,22 +533,24 @@ export default function ListProductStock({ location }) {
                           },
                           placeholder: t("Allow negative quantity"),
                         }}
-                        value={filterParams["stock.allowNegative"]}
+                        value={filterParams["stock.allowNegative"] === true || filterParams["stock.allowNegative"] === false ? filterParams["stock.allowNegative"].toString() : "all" }
                         onChange={(e) => {
-                          const newParams = { ...filterParams };
                           if (e.target.value) {
-                            if (e.target.value === "true") {
-                              newParams["stock.allowNegative"] = true;
+                            const newParams = { ...filterParams };
+                            if (e.target.value !== "all") {
+                              if (e.target.value === "true") {
+                                newParams["stock.allowNegative"] = true;
+                              } else {
+                                newParams["stock.allowNegative"] = false;
+                              }
                             } else {
-                              newParams["stock.allowNegative"] = false;
+                              delete newParams["stock.allowNegative"];
                             }
-                          } else {
-                            delete newParams["stock.allowNegative"];
+                            setFilterParams(newParams);
                           }
-                          setFilterParams(newParams);
                         }}
                       >
-                        <MenuItem value="">{t("All")}</MenuItem>
+                        <MenuItem value="all">{t("All")}</MenuItem>
                         <MenuItem value="true">{t("Yes")}</MenuItem>
                         <MenuItem value="false">{t("No")}</MenuItem>
                       </Select>

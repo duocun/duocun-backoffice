@@ -4,10 +4,11 @@ import MuiTablePagination from "@material-ui/core/TablePagination";
 
 export default function TablePagination(props) {
   const { t } = useTranslation();
+
   return (
     <MuiTablePagination
       component="div"
-      rowsPerPageOptions={[10, 20, 50]}
+      rowsPerPageOptions={[10, 25, 50]}
       count={2}
       {...props}
       labelRowsPerPage={t("Rows per page")}
