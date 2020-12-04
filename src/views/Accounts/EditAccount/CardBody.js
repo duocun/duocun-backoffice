@@ -24,7 +24,7 @@ const Body = ({ model, onChange }) => {
               <h5>{t("Basic Information")}</h5>
             </GridItem>
             <GridContainer>
-              <GridItem xs={12} md={4} clasName={classes.avatarContainer}>
+              <GridItem xs={12} md={4} className={classes.avatarContainer}>
                 <UserAvatar user={model} className={classes.avatarLarge} />
               </GridItem>
               <GridItem xs={12} md={8}>
