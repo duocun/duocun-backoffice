@@ -132,7 +132,7 @@ const ScheduleList = () => {
                   </TableHead>
                   <TableBody>
                     {loading ? (
-                      <TableBodySkeleton colCount={4} rowCount={rowsPerPage} />
+                      <TableBodySkeleton colCount={6} rowCount={rowsPerPage} />
                     ) : (
                       schedules.map((schedule, idx) => (
                         <TableRow key={schedule._id}>
