@@ -18,7 +18,12 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TablePagination from "components/Table/TablePagniation.js";
 import TableRow from "@material-ui/core/TableRow";
+import IconButton from '@material-ui/core/IconButton';
 import { makeStyles } from "@material-ui/core/styles";
+import {
+  Edit as EditIcon,
+  Delete as DeleteIcon
+} from "@material-ui/icons";
 import * as ApiScheduleService from "services/api/ApiScheduleService";
 
 const ScheduleList = () => {
@@ -55,6 +60,25 @@ const ScheduleList = () => {
         setLoading(false);
       });
   }, [page, rowsPerPage, t]);
+
+  const deleteSchedule = useCallback((id) => {
+    if (window.confirm(t('Are you sure to delete?'))) {
+      ApiScheduleService.del(id)
+        .then(() => {
+          setSchedules((oldSchedules) => {
+            const schedules = oldSchedules.filter((s) => s._id !== id);
+            return schedules;
+          });
+        })
+        .catch((e) => {
+          setAlert({
+            severity: "error",
+            message: t("Cannot delete data"),
+          });
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [t]);
 
   useEffect(() => {
     loadData();
@@ -102,6 +126,8 @@ const ScheduleList = () => {
                       <TableCell>{t("Title")}</TableCell>
                       <TableCell>{t("Description")}</TableCell>
                       <TableCell>{t("Order End Margin")}</TableCell>
+                      <TableCell>{t("Special Date")}</TableCell>
+                      <TableCell>{t("Actions")}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -118,6 +144,17 @@ const ScheduleList = () => {
                           </TableCell>
                           <TableCell>{schedule.description}</TableCell>
                           <TableCell>{schedule.endTimeMargin}</TableCell>
+                          <TableCell>{schedule.isSpecial ? t('Yes') : t('No')}</TableCell>
+                          <TableCell>
+                            <Link to={`schedules/${schedule._id}`}>
+                              <IconButton aria-label="edit">
+                                <EditIcon />
+                              </IconButton>
+                            </Link>
+                            <IconButton aria-label="delete" onClick={() => deleteSchedule(schedule._id)}>
+                              <DeleteIcon />
+                            </IconButton>
+                          </TableCell>
                         </TableRow>
                       ))
                     )}

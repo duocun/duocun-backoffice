@@ -13,3 +13,7 @@ export const get = id => {
 export const save = data => {
   return ApiService.v2().post(`/schedules/${data._id}`, { data });
 };
+
+export const del = (id) => {
+  return ApiService.v2().delete(`/schedules/${id}`);
+};

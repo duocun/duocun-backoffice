@@ -100,5 +100,12 @@
   "Other": "Other",
   "You can download this image": "You can download this image",
   "Type a message...": "Type a message...",
-  "Message arrived from customer!": "Message arrived from customer!"
+  "Message arrived from customer!": "Message arrived from customer!",
+  "Title": "Title",
+  "Description": "Description",
+  "Order End Margin": "Order End Margin",
+  "Special Date": "Special Date",
+  "Delete": "Delete",
+  "Cannot delete data": "Cannot delete data",
+  "Are you sure to delete?": "Are you sure to delete?"
 }

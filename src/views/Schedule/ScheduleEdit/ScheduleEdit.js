@@ -11,6 +11,7 @@ import CardFooter from "components/Card/CardFooter";
 import Alert from "components/CustomAlert/CustomAlert";
 
 import CustomTextField from "components/CustomInput/CustomTextField";
+import SelectWithLabel from "components/CustomInput/SelectWithLabel";
 import DateRangePicker from "components/DateRangePicker/DateRangePicker";
 
 import { DEFAULT_MODEL, validate, convertDataToModel } from "models/schedule";
@@ -183,6 +184,25 @@ const ScheduleEdit = ({ match, history }) => {
                         value={model.description}
                         onChange={(value) =>
                           setModel({ ...model, description: value })
+                        }
+                      />
+                    </GridItem>
+                    <GridItem xs={12}>
+                      <SelectWithLabel
+                        id="select-is-special"
+                        label={t('Special Date')}
+                        itemData={[{
+                          id: 1,
+                          value: true,
+                          text: 'Yes'
+                        }, {
+                          id: 2,
+                          value: false,
+                          text: 'No'
+                        }]}
+                        value={model.isSpecial}
+                        onChange={(value) =>
+                          setModel({ ...model, isSpecial: value })
                         }
                       />
                     </GridItem>

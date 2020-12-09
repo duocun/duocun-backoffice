@@ -5,6 +5,7 @@ export const DEFAULT_MODEL = {
   _id: "new",
   title: "",
   description: "",
+  isSpecial: false,
   areas: [],
   endTimeMargin: 0,
   startDate: moment(moment().format("YYYY-MM-DD 00:00:00")).toDate(),
