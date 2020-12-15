@@ -19,6 +19,7 @@ export default function DateRangePicker({
   exactDate,
   classNames = undefined,
   onChange,
+  disabled = false
 }) {
   // const { t } = useTranslation();
   const [classes, setClasses] = useState(useStyles());
@@ -64,6 +65,7 @@ export default function DateRangePicker({
         inputProps={{
           className: classes.input,
         }}
+        disabled={disabled}
       />
       <KeyboardDatePicker
         autoOk={true}
@@ -80,6 +82,7 @@ export default function DateRangePicker({
         inputProps={{
           className: classes.input,
         }}
+        disabled={disabled}
       />
     </MuiPickersUtilsProvider>
   );

@@ -55,6 +55,7 @@ const NewPeriod = ({ startDate, endDate, onAdd }) => {
             };
             setModel(newModel);
           }}
+          disabled={true}
         />
       </GridItem>
       <GridItem xs={12}>

@@ -74,6 +74,16 @@ const ScheduleEdit = ({ match, history }) => {
       status: "A",
       ...model,
     };
+    // if (scheduleData.areas) {
+    //   scheduleData.areas.forEach((a) => {
+    //     if (a.periods) {
+    //       a.periods.forEach((p) => {
+    //         p.startDate = scheduleData.startDate;
+    //         p.endDate = scheduleData.endDate;
+    //       });
+    //     }
+    //   });
+    // }
     ApiScheduleService.save(scheduleData)
       .then(({ data }) => {
         if (data.code === "success") {
@@ -226,8 +236,19 @@ const ScheduleEdit = ({ match, history }) => {
                           defaultEndDate={model.endDate}
                           exactDate
                           onChange={(start, end) => {
+                            const scheduleData = { ...model };
+                            if (scheduleData.areas) {
+                              scheduleData.areas.forEach((a) => {
+                                if (a.periods) {
+                                  a.periods.forEach((p) => {
+                                    p.startDate = start;
+                                    p.endDate = end;
+                                  });
+                                }
+                              });
+                            }
                             setModel({
-                              ...model,
+                              ...scheduleData,
                               startDate: start,
                               endDate: end,
                             });
