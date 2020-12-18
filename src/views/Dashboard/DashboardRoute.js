@@ -1,6 +1,7 @@
 import React from "react";
 import { Switch, Route } from "react-router-dom";
 import DriverSummaryPage from "views/Dashboard/DriverSummaryPage";
+import DriverByOrderSummaryPage from "views/Dashboard/DriverByOrderSummaryPage";
 import SalarySummaryPage from "views/Dashboard/SalarySummaryPage";
 import ProductSummaryPage from "views/Dashboard/ProductSummaryPage";
 import OrderSummaryPage from "views/Dashboard/OrderSummaryPage";
@@ -14,6 +15,7 @@ const DashboardRoute = () => {
     <Switch>
       <Route exact path="/dashboard" component={Dashboard} />
       <Route exact path="/dashboard/pickup/:id" component={DriverSummaryPage} />
+      <Route exact path="/dashboard/pickup-by-order/:id" component={DriverByOrderSummaryPage} />
       <Route exact path="/dashboard/salary" component={SalarySummaryPage} />
       <Route
         exact

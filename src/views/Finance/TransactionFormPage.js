@@ -64,14 +64,16 @@ const TransactionFormPage = ({
             const expense = data.data[0];
             const toName = expense ? expense.username : "";
             const staffName = account ? account.username : "";
-            setModel({
-              ...model,
-              toId: expense ? expense._id : "",
-              toName,
-              staffId: account ? account._id : "",
-              staffName,
-              note: account ? `Pay salary to ${account.username}` : "",
-              modifyBy: modifyByAccount._id
+            setModel(() => {
+              return {
+                ...model,
+                toId: expense ? expense._id : "",
+                toName,
+                staffId: account ? account._id : "",
+                staffName,
+                note: account ? `Pay salary to ${account.username}` : "",
+                modifyBy: modifyByAccount._id
+              };
             });
           });
         } else {
@@ -84,12 +86,14 @@ const TransactionFormPage = ({
         ApiTransactionService.getTransaction(match.params.id).then(
           ({ data }) => {
             const tr = data.data;
-            setModel({ ...tr, modifyBy: modifyByAccount._id });
+            setModel(() => {
+              return { ...tr, modifyBy: modifyByAccount._id };
+            });
           }
         );
       }
     }
-  }, [account, match.params.id, modifyByAccount._id]);
+  }, [model, account, match.params.id, modifyByAccount._id]);
 
   useEffect(() => {
     const token = AuthService.getAuthToken();

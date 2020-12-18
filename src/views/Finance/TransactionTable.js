@@ -60,7 +60,7 @@ export const TransactionTable = ({
     if (!rows.length) {
       return (
         <TableRow>
-          <TableCell align="center" colSpan={7} size="medium">
+          <TableCell align="center" colSpan={9} size="medium">
             {t("No data to display")}
           </TableCell>
         </TableRow>
@@ -132,7 +132,7 @@ export const TransactionTable = ({
         />
         <TableBody>
           {loading ? (
-            <TableBodySkeleton colCount={7} rowCount={rowsPerPage} />
+            <TableBodySkeleton colCount={9} rowCount={rowsPerPage} />
           ) : (
             renderRows(account, rows)
           )}
