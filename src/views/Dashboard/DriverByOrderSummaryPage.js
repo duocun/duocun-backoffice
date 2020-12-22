@@ -93,8 +93,6 @@ const DriverByOrderSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
     ApiStatisticsService.getDriverStatisticByOrder(deliverDate).then(({ data }) => {
       const summary = data.data;
 
-      setDriverSummary(summary);
-
       setDriverList(
         Object.keys(summary).map(driverId => ({
           _id: driverId,
@@ -111,6 +109,10 @@ const DriverByOrderSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
         });
         return 0;
       });
+
+      setTimeout(() => {
+        setDriverSummary(() => summary);
+      }, 3000);
 
       if (match.params && match.params.id) {
         const driverId = Object.keys(summary).find(
