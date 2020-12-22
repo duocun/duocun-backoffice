@@ -71,7 +71,7 @@ export const TransactionTable = ({
         {rows.map((row, idx) => (
           <TableRow key={idx} onClick={() => selectRow(row)}>
             {/* <TableCell>{page * rowsPerPage + idx + 1}</TableCell> */}
-            <TableCell>{toDateString(row.created)}</TableCell>
+            <TableCell>{toDateString(row.modified)}</TableCell>
             {/* <TableCell>{toDateString(row.delivered)}</TableCell> */}
             <TableCell>{row.fromName}</TableCell>
             <TableCell>{row.toName}</TableCell>

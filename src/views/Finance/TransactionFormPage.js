@@ -64,9 +64,9 @@ const TransactionFormPage = ({
             const expense = data.data[0];
             const toName = expense ? expense.username : "";
             const staffName = account ? account.username : "";
-            setModel(() => {
+            setModel((oldModel) => {
               return {
-                ...model,
+                ...oldModel,
                 toId: expense ? expense._id : "",
                 toName,
                 staffId: account ? account._id : "",
@@ -77,9 +77,11 @@ const TransactionFormPage = ({
             });
           });
         } else {
-          setModel({
-            ...model,
-            modifyBy: modifyByAccount._id
+          setModel((oldModel) => {
+            return {
+              ...oldModel,
+              modifyBy: modifyByAccount._id
+            }
           });
         }
       } else {
@@ -93,7 +95,7 @@ const TransactionFormPage = ({
         );
       }
     }
-  }, [model, account, match.params.id, modifyByAccount._id]);
+  }, [account, match.params.id, model._id, model.actionCode, modifyByAccount._id]);
 
   useEffect(() => {
     const token = AuthService.getAuthToken();

@@ -75,7 +75,7 @@ const TransactionTablePage = ({ account, setAccount, location, history }) => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalRows, setTotalRows] = useState(0);
   const [query, setQuery] = useState(account ? account.username : "");
-  const [sort, setSort] = useState(["created", -1]);
+  const [sort, setSort] = useState(["modified", -1]);
 
   // filters
   const [actionCode, setActionCode] = useState("A");
