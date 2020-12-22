@@ -152,10 +152,13 @@ const StockRow = ({
   );
   const [add, setAdd] = useState(0);
   const debouncedQuantity = useDebounce(quantity, 1000);
+  const debouncedAdd = useDebounce(add, 1000);
+
   // useEffect(() => {
   //   setAdd(quantity - product.stock ? product.stock.quantity || 0 : 0);
   // }, [quantity]);
   useEffect(() => {
+    setQuantity(() => debouncedAdd + debouncedQuantity)
     if (!product.stock || !product.stock.enabled) {
       return;
     }
@@ -164,7 +167,7 @@ const StockRow = ({
     }
     setAdd(0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedQuantity]);
+  }, [debouncedQuantity, debouncedAdd]);
 
   return (
     <TableRow className={classes.textCenter}>
@@ -225,7 +228,7 @@ const StockRow = ({
             inputProps={{ type: "number", className: classes.textCenter }}
             className={classes.inputInRow}
             value={quantity}
-            onChange={(e) => setQuantity(e.target.value)}
+            onChange={(e) => setQuantity(parseInt(e.target.value || "0"))}
           ></Input>
         ) : (
             <>- - -</>
@@ -236,12 +239,7 @@ const StockRow = ({
           <Input
             inputProps={{ type: "number", className: classes.textCenter }}
             className={classes.inputInRow}
-            onChange={(e) => {
-              const newQuantity =
-                parseInt(quantity || "0") + parseInt(e.target.value);
-              setAdd(e.target.value);
-              setQuantity(newQuantity);
-            }}
+            onChange={(e) => setAdd(parseInt(e.target.value || "0"))}
             value={add}
           ></Input>
         ) : (
