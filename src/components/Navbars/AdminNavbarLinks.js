@@ -116,7 +116,7 @@ const AdminNavbarLinks = ({ signOut }) => {
   return (
     <div>
       <div className={classes.alertBox}>
-        <Snackbar open={openToast} autoHideDuration={6000} onClose={handleCloseToast}
+        <Snackbar open={openToast} onClose={handleCloseToast}
           anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
           <Alert onClose={handleCloseToast} severity="info">
             {t("Message arrived from customer!")}
