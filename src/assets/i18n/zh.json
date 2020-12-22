@@ -147,5 +147,6 @@
   "Special Date": "特殊日期",
   "Delete": "删除",
   "Cannot delete data": "删除失败",
-  "Are you sure to delete?": "您确定要删除吗？"
+  "Are you sure to delete?": "您确定要删除吗？",
+  "All": "所有"
 }

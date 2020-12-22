@@ -18,6 +18,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 // import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
+import Button from "@material-ui/core/Button";
 import { KeyboardDatePicker } from "@material-ui/pickers";
 
 import Table from "@material-ui/core/Table";
@@ -26,10 +27,10 @@ import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 
 import ApiStatisticsService from "services/api/ApiStatisticsService";
-import ApiOrderService from "services/api/ApiOrderService";
+// import ApiOrderService from "services/api/ApiOrderService";
 
 import { setDeliverDate } from "redux/actions/order";
-// import { red } from "@material-ui/core/colors";
+import ApiRouteService from "services/api/ApiRouteService";
 
 const useStyles = makeStyles(theme => ({
   cardCategoryWhite: {
@@ -52,7 +53,8 @@ const useStyles = makeStyles(theme => ({
     minWidth: 750
   },
   formControl: {
-    margin: theme.spacing(1),
+    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(1),
     minWidth: 120
   },
   selectEmpty: {
@@ -61,10 +63,10 @@ const useStyles = makeStyles(theme => ({
   itemRow: {
     fontSize: "12px"
   },
-  warningChanged:{
+  warningChanged: {
     color: "red"
   },
-  warningDeleted:{
+  warningDeleted: {
     color: "red",
     textDecoration: "line-through"
   }
@@ -79,19 +81,17 @@ export const PickupStatus = {
 };
 
 // deliverDate: redux state
-const DriverSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
+const DriverByOrderSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
   const classes = useStyles();
   const { t } = useTranslation();
   const [driverSummary, setDriverSummary] = useState({});
   const [options, setDriverList] = useState([]);
   const [driver, setDriver] = useState({ _id: "", name: "" });
-  const [dupClients, setDupClientList] = useState([]);
 
 
-  const loadData = useCallback( deliverDate => {
-    ApiStatisticsService.getDriverStatistic(deliverDate).then(({ data }) => {
+  const loadData = useCallback(deliverDate => {
+    ApiStatisticsService.getDriverStatisticByOrder(deliverDate).then(({ data }) => {
       const summary = data.data;
-      setDriverSummary(summary);
 
       setDriverList(
         Object.keys(summary).map(driverId => ({
@@ -99,11 +99,26 @@ const DriverSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
           name: data.data[driverId].driverName
         }))
       );
+      Object.keys(summary).map(driverId => {
+        ApiRouteService.getRoutesByDriverAndDeliverDate(driverId, deliverDate).then(({ data }) => {
+          summary[driverId].pickups.sort((a, b) => {
+            const aIndex = data.data.routes[0].route.findIndex((r) => r.orderId === a.items[0].orderId);
+            const bIndex = data.data.routes[0].route.findIndex((r) => r.orderId === b.items[0].orderId);
+            return bIndex - aIndex;
+          });
+        });
+        return 0;
+      });
+
+      setTimeout(() => {
+        setDriverSummary(() => summary);
+      }, 3000);
 
       if (match.params && match.params.id) {
         const driverId = Object.keys(summary).find(
           id => id === match.params.id
         );
+
         if (driverId) {
           const defaultDriver = summary[driverId];
           if (defaultDriver) {
@@ -144,8 +159,30 @@ const DriverSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
     loadData(date);
   };
 
+  const exportText = () => {
+    const element = document.createElement('a');
+    let text = '';
+    Object.keys(driverSummary).map((driverId) => {
+      text += driverSummary[driverId].driverName + '\n';
+      driverSummary[driverId].pickups.forEach((p) => {
+        text += '\t' + p.clientName + ': ' + p.codes.join(', ') + '\n';
+        p.items.forEach((i) => {
+          i.products.forEach((pd) => {
+            text += '\t\t' + pd.productName + '\t\t x' + pd.quantity.toString() + '\n';
+          });
+        });
+      });
+      return 0;
+    });
+    const file = new Blob([text], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    element.download = `取货单-${deliverDate}`;
+    document.body.appendChild(element);
+    element.click();
+  }
+
   const getStatusText = status => {
-    switch(status){
+    switch (status) {
       case PickupStatus.PICKED_UP:
         return "已提";
       case PickupStatus.PICKED_UP_BUT_CHANGED:
@@ -157,23 +194,23 @@ const DriverSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
     }
   }
 
-  const getStatusTextClassName = status => {
-    switch(status){
-      case PickupStatus.PICKED_UP_BUT_CHANGED:
-        return "warningChanged";
-      case PickupStatus.DELETED:
-        return "warningDeleted";
-      default:
-        return "";
-    }
-  }
+  // const getStatusTextClassName = status => {
+  //   switch (status) {
+  //     case PickupStatus.PICKED_UP_BUT_CHANGED:
+  //       return "warningChanged";
+  //     case PickupStatus.DELETED:
+  //       return "warningDeleted";
+  //     default:
+  //       return "";
+  //   }
+  // }
 
-  useEffect(() => {
-    const now = moment().toISOString();
-    ApiOrderService.getDuplicates(now).then(({ data }) => {
-      setDupClientList(data);
-    });
-  }, [deliverDate, setDeliverDate]);
+  // useEffect(() => {
+  //   const now = moment().toISOString();
+  //   ApiOrderService.getDuplicates(now).then(({ data }) => {
+  //     setDupClientList(data);
+  //   });
+  // }, [deliverDate, setDeliverDate]);
 
   useEffect(() => {
     if (!deliverDate) {
@@ -188,7 +225,7 @@ const DriverSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
 
   return (
     <GridContainer>
-      <GridItem xs={12} sm={6} md={6}>
+      <GridItem xs={12} sm={4} md={4}>
         {
           <FormControl className={classes.formControl}>
             <InputLabel id="driver-select-label">{t("Driver")}</InputLabel>
@@ -210,7 +247,7 @@ const DriverSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
           </FormControl>
         }
       </GridItem>
-      <GridItem xs={12} sm={6} md={6}>
+      <GridItem xs={12} sm={4} md={4}>
         <KeyboardDatePicker
           variant="inline"
           label={`${t("Deliver Date")}`}
@@ -222,34 +259,42 @@ const DriverSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
           onChange={handleDateChange}
         />
       </GridItem>
+      <GridItem xs={12} sm={4} md={4} style={{ alignSelf: 'center' }}>
+        <FormControl className={classes.formControl}>
+          <Button variant="contained" color="primary" onClick={exportText}>导出</Button>
+        </FormControl>
+      </GridItem>
       {driverSummary &&
         Object.keys(driverSummary).length > 0 &&
         driver &&
         driverSummary[driver._id] &&
-        driverSummary[driver._id].merchants.map(
-          m => (
+        driverSummary[driver._id].pickups.map(
+          (m, k) => (
             // <GridItem xs={12} sm={12} md={12}>
-            <Card key={m.merchantName}>
+            <Card key={m.clientName + k.toString()}>
               <CardHeader color="primary">
-                <div key={m.merchantName}>
-                  <div>{m.merchantName}</div>
+                <div key={m.clientName + k.toString()}>
+                  <div>{m.clientName}: {m.codes.join(', ')} （{getStatusText(m.status)}）</div>
                 </div>
               </CardHeader>
               <CardBody>
                 <Table>
                   <TableBody>
                     {m.items.map((prop, key) => (
-                      <TableRow key={key} className={getStatusTextClassName(prop.status)}>
-                        <TableCell className={classes.itemRow}>
-                          {prop.productName}
-                        </TableCell>
-                        <TableCell className={classes.itemRow}>
-                          x{prop.quantity}
-                        </TableCell>
-                        <TableCell className={classes.itemRow}>
-                          {getStatusText(prop.status)}
-                        </TableCell>
-                      </TableRow>
+                      <React.Fragment key={key}>
+                        {
+                          prop.products.map((p, pk) => (
+                            <TableRow key={pk}>
+                              <TableCell className={classes.itemRow}>
+                                {p.productName}
+                              </TableCell>
+                              <TableCell className={classes.itemRow}>
+                                x{p.quantity}
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        }
+                      </React.Fragment>
                     ))}
                   </TableBody>
                 </Table>
@@ -258,26 +303,11 @@ const DriverSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
           )
           // </GridItem>
         )}
-      {dupClients && dupClients.length > 0 && (
-        <Card>
-          <CardHeader color="primary">有重复订单的客户</CardHeader>
-          <Table>
-            <TableBody>
-              {dupClients.map(prop => (
-                <TableRow key={prop.clientPhone}>
-                  <TableCell>{prop.clientName}</TableCell>
-                  <TableCell>{prop.clientPhone}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Card>
-      )}
     </GridContainer>
   );
 };
 
-DriverSummaryPage.propTypes = {
+DriverByOrderSummaryPage.propTypes = {
   match: PropTypes.shape({
     params: PropTypes.shape({
       id: PropTypes.string
@@ -294,4 +324,4 @@ export default connect(
   {
     setDeliverDate
   }
-)(DriverSummaryPage);
+)(DriverByOrderSummaryPage);

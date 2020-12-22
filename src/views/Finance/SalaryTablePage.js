@@ -136,7 +136,7 @@ const SalaryTablePage = ({
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalRows, setTotalRows] = useState(0);
-  const [sort, setSort] = useState(["created", -1]);
+  const [sort, setSort] = useState(["modified", -1]);
   const [processing, setProcessing] = useState(false);
 
   const removeAlert = () => {
@@ -428,7 +428,7 @@ const SalaryTablePage = ({
                     transactions.map((row, idx) => (
                       <TableRow key={idx} onClick={() => handelSelectRow(row)}>
                         {/* <TableCell>{page * rowsPerPage + idx + 1}</TableCell> */}
-                        <TableCell>{toDateString(row.created)}</TableCell>
+                        <TableCell>{toDateString(row.modified)}</TableCell>
                         <TableCell>{row.fromName}</TableCell>
                         <TableCell>{row.toName}</TableCell>
                         <TableCell>{row.amount}</TableCell>
