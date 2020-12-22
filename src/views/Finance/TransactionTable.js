@@ -60,7 +60,7 @@ export const TransactionTable = ({
     if (!rows.length) {
       return (
         <TableRow>
-          <TableCell align="center" colSpan={7} size="medium">
+          <TableCell align="center" colSpan={9} size="medium">
             {t("No data to display")}
           </TableCell>
         </TableRow>
@@ -71,7 +71,7 @@ export const TransactionTable = ({
         {rows.map((row, idx) => (
           <TableRow key={idx} onClick={() => selectRow(row)}>
             {/* <TableCell>{page * rowsPerPage + idx + 1}</TableCell> */}
-            <TableCell>{toDateString(row.created)}</TableCell>
+            <TableCell>{toDateString(row.modified)}</TableCell>
             {/* <TableCell>{toDateString(row.delivered)}</TableCell> */}
             <TableCell>{row.fromName}</TableCell>
             <TableCell>{row.toName}</TableCell>
@@ -132,7 +132,7 @@ export const TransactionTable = ({
         />
         <TableBody>
           {loading ? (
-            <TableBodySkeleton colCount={7} rowCount={rowsPerPage} />
+            <TableBodySkeleton colCount={9} rowCount={rowsPerPage} />
           ) : (
             renderRows(account, rows)
           )}

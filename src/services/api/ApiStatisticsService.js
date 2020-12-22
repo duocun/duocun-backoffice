@@ -17,6 +17,10 @@ export default {
     let query = { deliverDate };
     return ApiService.v2().get("statistics/driver", query);
   },
+  getDriverStatisticByOrder: deliverDate => {
+    let query = { deliverDate };
+    return ApiService.v2().get("statistics/driver-by-order", query);
+  },
   getProductStatistic: deliverDate => {
     let query = { deliverDate };
     return ApiService.v2().get("statistics/product", query);

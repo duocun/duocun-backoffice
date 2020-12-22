@@ -497,15 +497,23 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
                   >
                     {d.username}
                   </div>
-                  <div style={{ width: "15%", float: "left" }}>
+                  <div style={{ width: "10%", float: "left" }}>
                     <img src={d.url} alt="assigned" />
                   </div>
                   {d.onDuty && (
                     <Link
                       to={`../dashboard/pickup/${d._id}`}
-                      style={{ width: "25%", float: "left", fontSize: "12px" }}
+                      style={{ width: "20%", float: "left", fontSize: "12px" }}
                     >
                       查看提货
+                    </Link>
+                  )}
+                  {d.onDuty && (
+                    <Link
+                      to={`../dashboard/pickup-by-order/${d._id}`}
+                      style={{ width: "20%", float: "left", fontSize: "12px" }}
+                    >
+                      查看按单提货
                     </Link>
                   )}
                 </div>
