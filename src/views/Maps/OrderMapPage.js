@@ -238,10 +238,10 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
   const [lines, setLines] = useState([]);
   const [assignments, setAssignments] = useState([]);
 
-  const updateDriverListFromAssignments = (assignments, drivers) => {
+  const updateDriverListFromAssignments = useCallback((assignments, drivers) => {
     const driverMap = getDriverMap(assignments);
     return updateDriverDuty(driverMap, drivers);
-  }
+  }, []);
 
   const getMarkerIcon = (marker, colorMap) => {
     if (marker.driverId === UNASSIGNED_DRIVER_ID) {
@@ -311,7 +311,7 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
         }
       );
     });
-  }, [deliverDate, setDeliverDate, updateMarkers]);
+  }, [deliverDate, setDeliverDate, updateMarkers, updateDriverListFromAssignments]);
 
   const getDriverMap = assignments => {
     const driverMap = {};

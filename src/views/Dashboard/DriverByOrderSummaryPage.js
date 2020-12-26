@@ -31,6 +31,8 @@ import ApiStatisticsService from "services/api/ApiStatisticsService";
 
 import { setDeliverDate } from "redux/actions/order";
 import ApiRouteService from "services/api/ApiRouteService";
+import Backdrop from '@material-ui/core/Backdrop';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const useStyles = makeStyles(theme => ({
   cardCategoryWhite: {
@@ -87,7 +89,7 @@ const DriverByOrderSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
   const [driverSummary, setDriverSummary] = useState({});
   const [options, setDriverList] = useState([]);
   const [driver, setDriver] = useState({ _id: "", name: "" });
-
+  const [open, setOpen] = useState(false);
 
   const loadData = useCallback(deliverDate => {
     ApiStatisticsService.getDriverStatisticByOrder(deliverDate).then(({ data }) => {
@@ -99,20 +101,18 @@ const DriverByOrderSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
           name: data.data[driverId].driverName
         }))
       );
-      Object.keys(summary).map(driverId => {
-        ApiRouteService.getRoutesByDriverAndDeliverDate(driverId, deliverDate).then(({ data }) => {
-          summary[driverId].pickups.sort((a, b) => {
-            const aIndex = data.data.routes[0].route.findIndex((r) => r.orderId === a.items[0].orderId);
-            const bIndex = data.data.routes[0].route.findIndex((r) => r.orderId === b.items[0].orderId);
-            return bIndex - aIndex;
-          });
-        });
-        return 0;
-      });
+      // Object.keys(summary).map(driverId => {
+      //   ApiRouteService.getRoutesByDriverAndDeliverDate(driverId, deliverDate).then(({ data }) => {
+      //     summary[driverId].pickups.sort((a, b) => {
+      //       const aIndex = data.data.routes[0].route.findIndex((r) => r.orderId === a.items[0].orderId);
+      //       const bIndex = data.data.routes[0].route.findIndex((r) => r.orderId === b.items[0].orderId);
+      //       return bIndex - aIndex;
+      //     });
+      //   });
+      //   return 0;
+      // });
 
-      setTimeout(() => {
-        setDriverSummary(() => summary);
-      }, 3000);
+      setDriverSummary(() => summary);
 
       if (match.params && match.params.id) {
         const driverId = Object.keys(summary).find(
@@ -165,7 +165,7 @@ const DriverByOrderSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
     Object.keys(driverSummary).map((driverId) => {
       text += driverSummary[driverId].driverName + '\n';
       driverSummary[driverId].pickups.forEach((p) => {
-        text += '\t' + p.clientName + ': ' + p.codes.join(', ') + '\n';
+        text += '\t' + p.clientName + ' : : : : ' + p.codes.join(', ') + '\n';
         p.items.forEach((i) => {
           i.products.forEach((pd) => {
             text += '\t\t' + pd.productName + '\t\t x' + pd.quantity.toString() + '\n';
@@ -179,6 +179,25 @@ const DriverByOrderSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
     element.download = `取货单-${deliverDate}`;
     document.body.appendChild(element);
     element.click();
+  }
+
+  const sortSummary = () => {
+    setOpen(true);
+    const summary = JSON.parse(JSON.stringify(driverSummary));
+    Object.keys(summary).map(driverId => {
+      ApiRouteService.getRoutesByDriverAndDeliverDate(driverId, deliverDate).then(({ data }) => {
+        summary[driverId].pickups.sort((a, b) => {
+          const aIndex = data.data.routes[0].route.findIndex((r) => r.orderId === a.items[0].orderId);
+          const bIndex = data.data.routes[0].route.findIndex((r) => r.orderId === b.items[0].orderId);
+          return bIndex - aIndex;
+        });
+      });
+      return 0;
+    });
+    setTimeout(() => {
+      setDriverSummary(() => summary);
+      setOpen(false);
+    }, 10000)
   }
 
   const getStatusText = status => {
@@ -225,6 +244,9 @@ const DriverByOrderSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
 
   return (
     <GridContainer>
+      <Backdrop className={classes.backdrop} open={open} style={{ zIndex: 10000 }}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <GridItem xs={12} sm={4} md={4}>
         {
           <FormControl className={classes.formControl}>
@@ -260,6 +282,9 @@ const DriverByOrderSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
         />
       </GridItem>
       <GridItem xs={12} sm={4} md={4} style={{ alignSelf: 'center' }}>
+        <FormControl className={classes.formControl}>
+          <Button variant="contained" color="secondary" onClick={sortSummary} style={{ marginRight: 20 }}>排序</Button>
+        </FormControl>
         <FormControl className={classes.formControl}>
           <Button variant="contained" color="primary" onClick={exportText}>导出</Button>
         </FormControl>
