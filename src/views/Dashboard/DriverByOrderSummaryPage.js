@@ -162,16 +162,53 @@ const DriverByOrderSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
   const exportText = () => {
     const element = document.createElement('a');
     let text = '';
+    const aList = {};
+    const bList = {};
+    Object.keys(driverSummary).map((driverId) => {
+      aList[driverId] = [];
+      bList[driverId] = [];
+      driverSummary[driverId].pickups.forEach((p) => {
+        p.items.forEach((i) => {
+          i.products.forEach((pd) => {
+            if (i.merchantId === '5fef5a304814e984eed00e36' || i.merchantId === '5fef54e57ce06c83c152fdb3') {
+              aList[driverId].push(pd);
+            }
+            if (pd.productIsRed) {
+              bList[driverId].push(pd);
+            }
+          });
+        });
+      });
+    });
+    text += '\n';
     Object.keys(driverSummary).map((driverId) => {
       text += driverSummary[driverId].driverName + '\n';
+      text += '\n';
+      aList[driverId].forEach((a) => {
+        text += '\tA：' + a.productName + '\t\t x' + a.quantity.toString() + '\n';
+      });
+      bList[driverId].forEach((b) => {
+        text += '\tB：' + b.productName + '\t\t x' + b.quantity.toString() + '\n';
+      });
+      text += '\n';
       driverSummary[driverId].pickups.forEach((p) => {
         text += '\t' + p.clientName + ' : : : : ' + p.codes.join(', ') + '\n';
         p.items.forEach((i) => {
           i.products.forEach((pd) => {
-            text += '\t\t' + pd.productName + '\t\t x' + pd.quantity.toString() + '\n';
+            text += '\t\t';
+            if (pd.productIsRed) {
+              text += '- ';
+            }
+            text += pd.productName;
+            if (pd.quantity > 1) {
+              text += '\t\t x' + pd.quantity.toString() + '\n';
+            } else {
+              text += '\n';
+            }
           });
         });
       });
+      text += '\n';
       return 0;
     });
     const file = new Blob([text], { type: 'text/plain' });

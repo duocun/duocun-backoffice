@@ -106,6 +106,7 @@ const defaultProductModelState = {
   taxRate: 0,
   merchantId: "",
   scheduleId: "",
+  isRed: false,
   stock: {
     enabled: false,
     allowNegative: false,
@@ -761,6 +762,35 @@ const EditProduct = ({ match, history }) => {
                                   </MenuItem>
                                 );
                               })}
+                            </Select>
+                          </FormControl>
+                        </Box>
+                      </GridItem>
+                      <GridItem xs={12} lg={6}>
+                        <Box pb={2}>
+                          <FormControl className={classes.select}>
+                            <InputLabel id="product-is_red-label">
+                              {t('红')}
+                            </InputLabel>
+                            <Select
+                              id="product-is_red"
+                              labelId="product-is_red-label"
+                              value={model.isRed.toString()}
+                              onChange={e => setModel({
+                                ...model,
+                                isRed: e.target.value === 'true'
+                              })}
+                            >
+                              <MenuItem
+                                value={"true"}
+                              >
+                                {t('是')}
+                              </MenuItem>
+                              <MenuItem
+                                value={"false"}
+                              >
+                                {t('否')}
+                              </MenuItem>
                             </Select>
                           </FormControl>
                         </Box>
