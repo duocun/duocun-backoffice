@@ -162,19 +162,28 @@ const DriverByOrderSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
   const exportText = () => {
     const element = document.createElement('a');
     let text = '';
-    const aList = {};
+    const a1List = {};
+    const a2List = {};
     const bList = {};
     Object.keys(driverSummary).forEach((driverId) => {
-      aList[driverId] = {};
+      a1List[driverId] = {};
+      a2List[driverId] = {};
       bList[driverId] = {};
       driverSummary[driverId].pickups.forEach((p) => {
         p.items.forEach((i) => {
           i.products.forEach((pd) => {
-            if (i.merchantId === '5fef5a304814e984eed00e36' || i.merchantId === '5fef54e57ce06c83c152fdb3') {
-              if (aList[driverId][pd.productName]) {
-                aList[driverId][pd.productName] += pd.quantity;
+            if (i.merchantId === '5fef5a304814e984eed00e36') {
+              if (a1List[driverId][pd.productName]) {
+                a1List[driverId][pd.productName] += pd.quantity;
               } else {
-                aList[driverId][pd.productName] = pd.quantity;
+                a1List[driverId][pd.productName] = pd.quantity;
+              }
+            }
+            if (i.merchantId === '5fef54e57ce06c83c152fdb3') {
+              if (a2List[driverId][pd.productName]) {
+                a2List[driverId][pd.productName] += pd.quantity;
+              } else {
+                a2List[driverId][pd.productName] = pd.quantity;
               }
             }
             if (pd.productIsRed) {
@@ -192,15 +201,31 @@ const DriverByOrderSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
     Object.keys(driverSummary).map((driverId) => {
       text += driverSummary[driverId].driverName + '\n';
       text += '\n';
-      const aKeys = Object.keys(aList[driverId]);
-      aKeys.sort((a, b) => {
+      const a1Keys = Object.keys(a1List[driverId]);
+      if (a1Keys.length > 0) {
+        text += '\t----------十度库----------\n';
+      }
+      a1Keys.sort((a, b) => {
         if (a > b) return 1;
         if (a < b) return -1;
         return 0;
       });
-      aKeys.forEach((aKey) => {
-        text += '\tA：' + aKey + '\t\t x' + aList[driverId][aKey].toString() + '\n';
+      a1Keys.forEach((a1Key) => {
+        text += '\tA：' + a1Key + '\t\t x' + a1List[driverId][a1Key].toString() + '\n';
       });
+      const a2Keys = Object.keys(a2List[driverId]);
+      if (a2Keys.length > 0) {
+        text += '\t----------冷冻库----------\n';
+      }
+      a2Keys.sort((a, b) => {
+        if (a > b) return 1;
+        if (a < b) return -1;
+        return 0;
+      });
+      a2Keys.forEach((a2Key) => {
+        text += '\tA：' + a2Key + '\t\t x' + a2List[driverId][a2Key].toString() + '\n';
+      });
+      text += '\n';
       const bKeys = Object.keys(bList[driverId]);
       bKeys.sort((a, b) => {
         if (a > b) return 1;
@@ -228,7 +253,7 @@ const DriverByOrderSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
           });
         });
       });
-      text += '\n';
+      text += '\n\n\n';
       return 0;
     });
     const file = new Blob([text], { type: 'text/plain' });
