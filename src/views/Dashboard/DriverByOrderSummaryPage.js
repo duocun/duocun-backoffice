@@ -164,17 +164,25 @@ const DriverByOrderSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
     let text = '';
     const aList = {};
     const bList = {};
-    Object.keys(driverSummary).map((driverId) => {
-      aList[driverId] = [];
-      bList[driverId] = [];
+    Object.keys(driverSummary).forEach((driverId) => {
+      aList[driverId] = {};
+      bList[driverId] = {};
       driverSummary[driverId].pickups.forEach((p) => {
         p.items.forEach((i) => {
           i.products.forEach((pd) => {
             if (i.merchantId === '5fef5a304814e984eed00e36' || i.merchantId === '5fef54e57ce06c83c152fdb3') {
-              aList[driverId].push(pd);
+              if (aList[driverId][pd.productName]) {
+                aList[driverId][pd.productName] += pd.quantity;
+              } else {
+                aList[driverId][pd.productName] = pd.quantity;
+              }
             }
             if (pd.productIsRed) {
-              bList[driverId].push(pd);
+              if (bList[driverId][pd.productName]) {
+                bList[driverId][pd.productName] += pd.quantity;
+              } else {
+                bList[driverId][pd.productName] = pd.quantity;
+              }
             }
           });
         });
@@ -184,11 +192,23 @@ const DriverByOrderSummaryPage = ({ match, deliverDate, setDeliverDate }) => {
     Object.keys(driverSummary).map((driverId) => {
       text += driverSummary[driverId].driverName + '\n';
       text += '\n';
-      aList[driverId].forEach((a) => {
-        text += '\tA：' + a.productName + '\t\t x' + a.quantity.toString() + '\n';
+      const aKeys = Object.keys(aList[driverId]);
+      aKeys.sort((a, b) => {
+        if (a > b) return 1;
+        if (a < b) return -1;
+        return 0;
       });
-      bList[driverId].forEach((b) => {
-        text += '\tB：' + b.productName + '\t\t x' + b.quantity.toString() + '\n';
+      aKeys.forEach((aKey) => {
+        text += '\tA：' + aKey + '\t\t x' + aList[driverId][aKey].toString() + '\n';
+      });
+      const bKeys = Object.keys(bList[driverId]);
+      bKeys.sort((a, b) => {
+        if (a > b) return 1;
+        if (a < b) return -1;
+        return 0;
+      });
+      bKeys.forEach((bKey) => {
+        text += '\tB：' + bKey + '\t\t x' + bList[driverId][bKey].toString() + '\n';
       });
       text += '\n';
       driverSummary[driverId].pickups.forEach((p) => {
