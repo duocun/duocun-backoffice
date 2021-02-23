@@ -88,122 +88,123 @@ const OrderMap = withScriptjs(
       containerElement,
       mapElement
     }) => (
-        <GoogleMap
-          defaultZoom={zoom}
-          defaultCenter={center}
+      <GoogleMap
+        defaultZoom={zoom}
+        defaultCenter={center}
+        defaultOptions={{
+          scrollwheel: true,
+          zoomControl: true,
+          fullscreenControl: false,
+          mapTypeControl: false,
+          streetViewControl: false,
+          styles: [
+            {
+              featureType: "water",
+              stylers: [
+                { saturation: 43 },
+                { lightness: -11 },
+                { hue: "#0088ff" }
+              ]
+            },
+            {
+              featureType: "road",
+              elementType: "geometry.fill",
+              stylers: [
+                { hue: "#ff0000" },
+                { saturation: -100 },
+                { lightness: 99 }
+              ]
+            },
+            {
+              featureType: "road",
+              elementType: "geometry.stroke",
+              stylers: [{ color: "#808080" }, { lightness: 54 }]
+            },
+            {
+              featureType: "landscape.man_made",
+              elementType: "geometry.fill",
+              stylers: [{ color: "#ece2d9" }]
+            },
+            {
+              featureType: "poi.park",
+              elementType: "geometry.fill",
+              stylers: [{ color: "#ccdca1" }]
+            },
+            {
+              featureType: "road",
+              elementType: "labels.text.fill",
+              stylers: [{ color: "#767676" }]
+            },
+            {
+              featureType: "road",
+              elementType: "labels.text.stroke",
+              stylers: [{ color: "#ffffff" }]
+            },
+            { featureType: "poi", stylers: [{ visibility: "off" }] },
+            {
+              featureType: "landscape.natural",
+              elementType: "geometry.fill",
+              stylers: [{ visibility: "on" }, { color: "#b8cb93" }]
+            },
+            { featureType: "poi.park", stylers: [{ visibility: "on" }] },
+            {
+              featureType: "poi.sports_complex",
+              stylers: [{ visibility: "on" }]
+            },
+            { featureType: "poi.medical", stylers: [{ visibility: "on" }] },
+            {
+              featureType: "poi.business",
+              stylers: [{ visibility: "simplified" }]
+            }
+          ]
+        }}
+      >
+        <DrawingManager
+          // defaultDrawingMode={window.google.maps.drawing.OverlayType.POLYGON}
           defaultOptions={{
-            scrollwheel: true,
-            zoomControl: true,
-            fullscreenControl: false,
-            mapTypeControl: false,
-            streetViewControl: false,
-            styles: [
-              {
-                featureType: "water",
-                stylers: [
-                  { saturation: 43 },
-                  { lightness: -11 },
-                  { hue: "#0088ff" }
-                ]
-              },
-              {
-                featureType: "road",
-                elementType: "geometry.fill",
-                stylers: [
-                  { hue: "#ff0000" },
-                  { saturation: -100 },
-                  { lightness: 99 }
-                ]
-              },
-              {
-                featureType: "road",
-                elementType: "geometry.stroke",
-                stylers: [{ color: "#808080" }, { lightness: 54 }]
-              },
-              {
-                featureType: "landscape.man_made",
-                elementType: "geometry.fill",
-                stylers: [{ color: "#ece2d9" }]
-              },
-              {
-                featureType: "poi.park",
-                elementType: "geometry.fill",
-                stylers: [{ color: "#ccdca1" }]
-              },
-              {
-                featureType: "road",
-                elementType: "labels.text.fill",
-                stylers: [{ color: "#767676" }]
-              },
-              {
-                featureType: "road",
-                elementType: "labels.text.stroke",
-                stylers: [{ color: "#ffffff" }]
-              },
-              { featureType: "poi", stylers: [{ visibility: "off" }] },
-              {
-                featureType: "landscape.natural",
-                elementType: "geometry.fill",
-                stylers: [{ visibility: "on" }, { color: "#b8cb93" }]
-              },
-              { featureType: "poi.park", stylers: [{ visibility: "on" }] },
-              {
-                featureType: "poi.sports_complex",
-                stylers: [{ visibility: "on" }]
-              },
-              { featureType: "poi.medical", stylers: [{ visibility: "on" }] },
-              {
-                featureType: "poi.business",
-                stylers: [{ visibility: "simplified" }]
-              }
-            ]
+            drawingControl: true,
+            drawingControlOptions: {
+              position: window.google.maps.ControlPosition.TOP_CENTER,
+              drawingModes: [window.google.maps.drawing.OverlayType.POLYGON]
+            },
+            circleOptions: {
+              fillColor: `#ffff00`,
+              fillOpacity: 1,
+              strokeWeight: 5,
+              clickable: false,
+              editable: true,
+              zIndex: 1
+            }
           }}
-        >
-          <DrawingManager
-            // defaultDrawingMode={window.google.maps.drawing.OverlayType.POLYGON}
-            defaultOptions={{
-              drawingControl: true,
-              drawingControlOptions: {
-                position: window.google.maps.ControlPosition.TOP_CENTER,
-                drawingModes: [window.google.maps.drawing.OverlayType.POLYGON]
-              },
-              circleOptions: {
-                fillColor: `#ffff00`,
-                fillOpacity: 1,
-                strokeWeight: 5,
-                clickable: false,
-                editable: true,
-                zIndex: 1
-              }
-            }}
-            onOverlayComplete={onOverlayComplete}
-            onPolygonComplete={onPolygonComplete}
-          />
+          onOverlayComplete={onOverlayComplete}
+          onPolygonComplete={onPolygonComplete}
+        />
 
-          {markers && markers.length > 0 &&
-            markers.map(d => (
-              <Marker
-                key={d.orderId}
-                position={{ lat: d.lat, lng: d.lng }}
-                icon={{
-                  url:
-                    d.icon === "gRed"
-                      ? gRed
-                      : d.icon === "gGreen"
-                        ? gGreen
-                        : COLOR_MAP[d.icon].url
-                }}
-                label={{ text: d.clientName, fontSize: "11px" }}
-              // labelAnchor={{ x: 30 , y: 80 }}
-              // labelStyle={{
-              //   marginLeft: '30px',
-              //   paddingLeft: '50px'
-              // }}
-              />
-            ))}
-          {lines &&
-            lines.length > 0 &&
-            lines.map(line => (
+        {markers && markers.length > 0 &&
+          markers.map(d => (
+            <Marker
+              key={d.orderId}
+              position={{ lat: d.lat, lng: d.lng }}
+              icon={{
+                url:
+                  d.icon === "gRed"
+                    ? gRed
+                    : d.icon === "gGreen"
+                      ? gGreen
+                      : COLOR_MAP[d.icon].url
+              }}
+              label={{ text: d.clientName, fontSize: "11px" }}
+            // labelAnchor={{ x: 30 , y: 80 }}
+            // labelStyle={{
+            //   marginLeft: '30px',
+            //   paddingLeft: '50px'
+            // }}
+            />
+          ))}
+        {lines &&
+          lines.length > 0 &&
+          lines.map(line => {
+            return line.driverId !== 'unassigned' && (
               <Polyline
                 key={line.driverId}
                 path={line.route}
@@ -221,9 +222,10 @@ const OrderMap = withScriptjs(
                   ]
                 }}
               />
-            ))}
-        </GoogleMap>
-      )
+            )
+          })}
+      </GoogleMap>
+    )
   )
 );
 
@@ -246,9 +248,9 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
   const getMarkerIcon = (marker, colorMap) => {
     if (marker.driverId === UNASSIGNED_DRIVER_ID) {
       return 'gRed';
-    } else if(marker.status === OrderStatus.DONE){
+    } else if (marker.status === OrderStatus.DONE) {
       return 'gGreen';
-    } else if(colorMap[marker.driverId]) {
+    } else if (colorMap[marker.driverId]) {
       return colorMap[marker.driverId];
     } else {
       return 'gRed'; // fix me
@@ -262,11 +264,11 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
       const colorMap = getColorMap(drivers);
       if (assignments) {
         assignments.forEach(marker => {
-            marker.icon = getMarkerIcon(marker, colorMap);
+          marker.icon = getMarkerIcon(marker, colorMap);
         });
 
         setMarkers(assignments);
-        if (routes && routes.length > 0 && drivers && drivers.length>0) {
+        if (routes && routes.length > 0 && drivers && drivers.length > 0) {
           routes.forEach(r => {
             const driverId = r.driverId;
             const driver = drivers.find(d => d._id === driverId);
@@ -295,7 +297,7 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
             d.url = url;
             i++;
           });
-          
+
           const drivers = updateDriverListFromAssignments(assignments, data.data);
 
           setAssignments(assignments);
@@ -430,7 +432,7 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
       setBounds(null);
 
       const cloned = assignments && assignments.length > 0 ? [...assignments] : [];
-      
+
       cloned.forEach(assignment => {
         // { orderId, lat, lng, type, status, driverId, driverName, clientName }
         if (orderIdMap[assignment.orderId]) {
@@ -489,35 +491,47 @@ const OrderMapPage = ({ deliverDate, setDeliverDate }) => {
               </div>
             </div>
             {drivers.map(
-              d => (
-                <div className="leftCol" key={d._id}>
-                  <div
-                    style={{ width: "50%", float: "left" }}
-                    onClick={() => handleAssign(d)}
-                  >
-                    {d.username}
-                  </div>
-                  <div style={{ width: "10%", float: "left" }}>
-                    <img src={d.url} alt="assigned" />
-                  </div>
-                  {d.onDuty && (
-                    <Link
-                      to={`../dashboard/pickup/${d._id}`}
-                      style={{ width: "20%", float: "left", fontSize: "12px" }}
+              d => {
+                const driverLines = lines.find((l) => l.driverId === d._id);
+                const routes = driverLines ? driverLines.route : [];
+                const data = [];
+                routes.forEach((r) => {
+                  const index = data.findIndex((d) => d.lat === r.lat && d.lng === r.lng);
+                  if (index < 0) {
+                    data.push(r);
+                  }
+                });
+                const count = driverLines ? data.length - 1 : 0;
+                return (
+                  <div className="leftCol" key={d._id}>
+                    <div
+                      style={{ width: "50%", float: "left" }}
+                      onClick={() => handleAssign(d)}
                     >
-                      查看提货
-                    </Link>
-                  )}
-                  {d.onDuty && (
-                    <Link
-                      to={`../dashboard/pickup-by-order/${d._id}`}
-                      style={{ width: "20%", float: "left", fontSize: "12px" }}
-                    >
-                      查看按单提货
-                    </Link>
-                  )}
-                </div>
-              )
+                      {d.username} ({count})
+                      </div>
+                    <div style={{ width: "10%", float: "left" }}>
+                      <img src={d.url} alt="assigned" />
+                    </div>
+                    {d.onDuty && (
+                      <Link
+                        to={`../dashboard/pickup/${d._id}`}
+                        style={{ width: "20%", float: "left", fontSize: "12px" }}
+                      >
+                        查看提货
+                      </Link>
+                    )}
+                    {d.onDuty && (
+                      <Link
+                        to={`../dashboard/pickup-by-order/${d._id}`}
+                        style={{ width: "20%", float: "left", fontSize: "12px" }}
+                      >
+                        查看按单提货
+                      </Link>
+                    )}
+                  </div>
+                )
+              }
               // <div className="rightCol">Driver 2</div>
             )}
           </div>
