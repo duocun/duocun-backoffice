@@ -100,6 +100,7 @@ const defaultProductModelState = {
   descriptionEN: "",
   price: 0,
   cost: 0,
+  original_price: 0,
   categoryId: "",
   pictures: [],
   rank: 0,
@@ -264,29 +265,29 @@ const CombinationTable = ({
                   onCancel={() => setEditRowIdx(-1)}
                 />
               ) : (
-                <TableRow key={index}>
-                  <TableCell>
-                    {getCombinationDescription(attributes, combination)}
-                  </TableCell>
-                  <TableCell>{combination.price}</TableCell>
-                  <TableCell>{combination.cost}</TableCell>
-                  <TableCell>{combination.quantity}</TableCell>
-                  <TableCell>
-                    <IconButton
-                      disabled={processing}
-                      onClick={() => setEditRowIdx(index)}
-                    >
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton
-                      disabled={processing}
-                      onClick={() => onDelete(index)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              )
+                  <TableRow key={index}>
+                    <TableCell>
+                      {getCombinationDescription(attributes, combination)}
+                    </TableCell>
+                    <TableCell>{combination.price}</TableCell>
+                    <TableCell>{combination.cost}</TableCell>
+                    <TableCell>{combination.quantity}</TableCell>
+                    <TableCell>
+                      <IconButton
+                        disabled={processing}
+                        onClick={() => setEditRowIdx(index)}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton
+                        disabled={processing}
+                        onClick={() => onDelete(index)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                )
             )}
         </TableBody>
       </Table>
@@ -366,7 +367,7 @@ const ProductQuantitySchedule = ({ productId, productQuantity, days = 7 }) => {
   const { t } = useTranslation();
   const [orders, setOrders] = useState([]);
   const [dates] = useState(getDateRangeStrings(days));
-  
+
   const getDelivers = useCallback(() => {
     ApiProductService.getProductDeliveries(productId).then(async ({ data }) => {
       moment.locale("zh-cn");
@@ -524,7 +525,7 @@ const EditProduct = ({ match, history }) => {
       .finally(() => {
         setProcessing(false);
       });
-  }, [model, history,t, updatePage]);
+  }, [model, history, t, updatePage]);
 
   useEffect(() => {
     setLoading(true);
@@ -665,6 +666,23 @@ const EditProduct = ({ match, history }) => {
                               value: model.cost,
                               onChange: e => {
                                 setModel({ ...model, cost: e.target.value });
+                              }
+                            }}
+                          />
+                        </Box>
+                      </GridItem>
+                      <GridItem xs={12} lg={6}>
+                        <Box pb={2}>
+                          <CustomInput
+                            labelText={t("Original Price")}
+                            id="product-price"
+                            formControlProps={{
+                              fullWidth: true
+                            }}
+                            inputProps={{
+                              value: model.original_price,
+                              onChange: e => {
+                                setModel({ ...model, original_price: e.target.value });
                               }
                             }}
                           />

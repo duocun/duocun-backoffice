@@ -148,5 +148,6 @@
   "Delete": "删除",
   "Cannot delete data": "删除失败",
   "Are you sure to delete?": "您确定要删除吗？",
-  "All": "所有"
+  "All": "所有",
+  "Original Price": "原价"
 }
