@@ -25,7 +25,7 @@ const Attributes = props => {
                   labelPlacement="end"
                   control={
                     <Checkbox
-                      checked={props.model.attributes.includes(key)}
+                      checked={props.model.attributes ? props.model.attributes.includes(key) : false}
                       onChange={e => {
                         const newModel = { ...props.model };
                         arrayToggleElem(newModel.attributes, key);
